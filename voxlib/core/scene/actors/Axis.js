@@ -18,7 +18,7 @@
 vxl.def.model.axis = new vxlModel();
 vxl.def.model.axis.load('axis', {
                     	"vertices": [	-1, 0, 0, 	 1, 0, 0, 	 0,-2, 0,	 0, 2, 0,	 0, 0,-1,	 0, 0, 1	],
-                    	"indices": [ 	0, 1, 	2, 3, 	4, 5	],
+                    	"wireframe": [ 	0, 1, 	2, 3, 	4, 5	],
                     	"colors": [	1, 1, 0 ,1,	  1, 1, 0 ,1,	0, 1 ,0 ,1,	 0, 1 ,0 ,1,  0, 0, 1 ,1,	 0, 0, 1 ,1	]
                     	});
  

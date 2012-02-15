@@ -48,8 +48,7 @@ function vxlView(canvasID, scene){
 	this.zNear = 0.1;
 	this.zFar = 10000;
 	this.fovy = 10;
-	this.backgroundColor = vxl.def.color.background.slice(0);
-	this.ambientColor = vxl.def.color.ambient.slice(0);
+	this.backgroundColor = vxl.def.view.background.slice(0);
 
 	//Create Renderer
 	this.renderer = new vxlRenderer(this);
@@ -161,15 +160,6 @@ vxlView.prototype.setBackgroundColor = function(v){
 	this.renderer.clearColor(this.backgroundColor);
 };
 
-/**
- * Sets the ambient color
- * @param {Array} v the new ambient color given as an array of three numbers
- * 
- */
-vxlView.prototype.setAmbientColor = function(v){
-	this.ambientColor = v.slice(0);
-	this.renderer.prg.setUniform("uAmbientColor", this.ambientColor);
-};
 
 /**
  * Sets the clear depth

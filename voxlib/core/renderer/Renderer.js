@@ -171,7 +171,7 @@ vxlRenderer.prototype.setRenderRate = function(rate){ //rate in ms
  * @see vxlView#setBackgroundColor
  */
 vxlRenderer.prototype.clearColor = function(cc){
-	this.gl.clearColor(cc[0], cc[1], cc[2], 1.0);
+	this.gl.clearColor(cc[0], cc[1], cc[2], cc[3]);
 }
 
 /**

@@ -58,12 +58,11 @@ vxl.def = {
 	
 	model			: {
 						folder:"voxdata/models",
-						color: [0.9,0.9,0.9,1.0]
+						diffuse: [0.9,0.0,0.0,1.0]
 					},
     
-    color			: {
-    					ambient: [0.5,0.5,0.5],
-    					background: [135/256,135/256,135/256]
+    view			: {
+    					background: [135/256,135/256,135/256,1.0]
     				},			      
 	
 	actor			: {

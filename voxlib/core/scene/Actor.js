@@ -29,16 +29,8 @@ function vxlActor(model){
   	this.model 	 = model;
   	this.name 	 = model.name;
   	this.diffuse = model.diffuse;
-  	if (this.diffuse != null && this.diffuse.length == 3) this.diffuse.push(1.0);
   }
   
-  
-  this.buffer = {
-    vertex:null, 
-    normal:null,
-    color:null,
-    index:null
-  }
   
   this.renderers = [];
   this.buffers = [];
@@ -70,32 +62,39 @@ vxlActor.prototype.allocate = function(renderer){
    	
 	var gl = renderer.gl;
 	var model = this.model;
-    var buffer = {};//this.buffer;
+    var buffer = {};
 	
 	buffer.vertex = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertex);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices), gl.STATIC_DRAW);
 	
 	if (model.normals){
 		buffer.normal = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, buffer.normal);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals.slice(0)), gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals), gl.STATIC_DRAW);
 	}
 	
-	if (model.scalars || model.colors){
+	if (model.scalars != undefined || model.colors != undefined){
 		buffer.color = gl.createBuffer(); //we don't BIND values or use the buffer until the lut is loaded and available
 	}
 	
-	gl.bindBuffer(gl.ARRAY_BUFFER, null);
 	
-	if (model.indices){
-		buffer.index = gl.createBuffer();
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.index);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices.slice(0)), gl.STATIC_DRAW);
+	
+	if (model.wireframe != undefined){
+		buffer.wireframe = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.wireframe);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
 	}
 	
+	if (model.indices != undefined){
+		buffer.index = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.index);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices), gl.STATIC_DRAW);
+	}
 	
+	gl.bindBuffer(gl.ARRAY_BUFFER, null);
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	
 	this.renderers.push(renderer);
 	this.buffers.push(buffer);
 };
@@ -104,11 +103,7 @@ vxlActor.prototype.allocate = function(renderer){
 * Deletes the WebGL buffers used for this object. After this the actor will not be rendered until a new allocation takes place
 */
 vxlActor.prototype.deallocate = function(){
-  var buffer = this.buffer;
-  this.buffer.vertex    = null;
-  this.buffer.normal    = null;
-  this.buffer.color     = null;
-  this.buffer.index     = null;
+
   throw('exception');
 };
 
@@ -125,15 +120,15 @@ vxlActor.prototype.render = function(renderer){
 	var idx = this.renderers.indexOf(renderer);
 
 	var model = this.model;
-    var buffer = this.buffers[idx]; //this.buffer
+    var buffer = this.buffers[idx]; 
 	
     //@The actor is a good renderer friend. It borrows its gl and prg objects to do its own rendering.
 	var gl = renderer.gl;
 	var prg = renderer.prg;
 
 
-	prg.setUniform("uOpacity",this.opacity); 
-	prg.setUniform("uObjectColor",this.diffuse);
+	//prg.setUniform("uOpacity",this.opacity); 
+	prg.setUniform("uMaterialDiffuse",this.diffuse);
 	prg.setUniform("uUseVertexColors", false);
     
     prg.disableVertexAttribArray("aVertexColor");
@@ -190,9 +185,9 @@ vxlActor.prototype.render = function(renderer){
 		else if (this.mode == vxl.def.actor.mode.WIREFRAME){
 			prg.setUniform("uUseShading", false);
 			prg.disableVertexAttribArray("aVertexNormal");
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.index);
-			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices.slice(0)), gl.STATIC_DRAW);
-			gl.drawElements(gl.LINES, model.indices.length, gl.UNSIGNED_SHORT,0);
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.wireframe);
+			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
+			gl.drawElements(gl.LINES, model.wireframe.length, gl.UNSIGNED_SHORT,0);
 		}
 		else if (this.mode == vxl.def.actor.mode.POINTS){
 			prg.setUniform("uUseShading", true);

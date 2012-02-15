@@ -44,6 +44,7 @@ vxlModel.prototype.load = function(nm,payload){
 	if (payload.obj_name != null){
 		this.name = payload.obj_name;
 	}
+	//copy by reference (no slicing) as models are loaded once
 	this.vertices 	= payload.vertices;
 	this.indices 	= payload.indices;
 	this.diffuse 	= payload.diffuse;
@@ -51,15 +52,16 @@ vxlModel.prototype.load = function(nm,payload){
 	this.wireframe  = payload.wireframe;
 	this.colors     = payload.colors;	
 
-	if(!this.normals && !this.wireframe){
+	if(this.normals == undefined && this.indices != undefined){
 		this.getNormals();
 	}
 	
-	
-	if(!this.color){
-		this.color = vxl.def.model.color.slice(0); //so posterior modifications of the default don't affect this model
+	if(this.diffuse == undefined){
+		//We copy the default by value so posterior modifications of the default do not affect this model
+		this.diffuse = vxl.def.model.diffuse.slice(0); 
 	}
-	if (this.wireframe == null){
+	
+	if (this.wireframe == undefined){
 		this.getWireframeIndices();
 	}
 	

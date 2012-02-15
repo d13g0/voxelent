@@ -16,7 +16,7 @@
 
 
 vxl.def.model.boundingBox = new vxlModel();
-vxl.def.model.boundingBox.load('bounding box', { "vertices" : [], "indices":[0,1,1,2,2,3,3,0,0,4,4,5,5,6,6,7,7,4,1,5,2,6,3,7], "diffuse":[1.0,1.0,1.0,1.0]});
+vxl.def.model.boundingBox.load('bounding box', { "vertices" : [], "wireframe":[0,1,1,2,2,3,3,0,0,4,4,5,5,6,6,7,7,4,1,5,2,6,3,7], "diffuse":[1.0,1.0,1.0,1.0]});
 
 //vxlBoundingBox IS a vxlActor                                               
 vxlBoundingBox.prototype = new vxlActor();
