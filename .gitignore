@@ -30,4 +30,5 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 c4rd4m0m/
 c4n3l4/
-*.*DS_Store*
+.DS_Store*
+._.DS_Store
