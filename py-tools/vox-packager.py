@@ -1,8 +1,8 @@
 import sys,string,traceback, os.path, subprocess, shutil
 
 print '-- START --'
-VERSION_TAG = "_v0.4"
-SLUG = "c4rd4m0m"
+VERSION_TAG = "_v0.85"
+SLUG = "c4n3l4"
 
 minify = True
 #Here is one of the beauties of this script: It does not matter how the files are organized into folders. This will always be the order. regardless.
@@ -11,26 +11,30 @@ core = [
          'Notifier', 
          'Math3D',
          'CameraState',   
-         'Camera', 
-         'CanvasListener', 
+         'Camera',
+         'CameraManager',
+         'CameraInteractor', 
+         'ViewListener', 
          'TrackballCameraInteractor', 
+         'PickerInteractor',
          'Transforms',
          'DiffusiveProgram',
          'PhongProgram',
          'Program',
-         'Renderer', 
+         'Renderer',
+         'Model',  
          'Actor', 
          'Scene', 
          'LookupTable', 
          'LookupTableManager', 
          'BoundingBox', 
          'Axis', 
+         'Floor',
          'View', 
-         'Model', 
          'AssetManager', 
          'API', 
-         'Animation', 
-         'Main'
+         'FrameAnimation'
+
 ]
 
 
@@ -82,9 +86,12 @@ for lkp in core:
         
 w = open('..\\..\\out\\voxelent'+VERSION_TAG+'.js','w');
 w2 = open('..\\..\\html\\demos\\voxelent'+VERSION_TAG+'.js','w');
+w3 = open('..\\..\\html\\tutorials\\voxelent'+VERSION_TAG+'.js','w');
 w.write(buffer);
 w2.write(buffer);
+w3.write(buffer);
 w.close()
 w2.close();
+w3.close();
 
 print ' -- END --'

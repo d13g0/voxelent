@@ -37,12 +37,13 @@ function vxlRenderer(vw){
     this.prg = new vxlProgram(this.gl);
     this.setDefaultProgram();
     
-    this.transforms = new vxlTransforms(this.view);
+    this.transforms = new vxlTransforms(vw);
 }
 
 /**
  * Tries to obtain a WebGL context from the canvas associated with the view to which this
  * renderer belongs to.
+ * @TODO: Review depth test and blending functions maybe these should be configurable.
  */
 vxlRenderer.prototype.getWebGLContext = function(){
 	
@@ -63,7 +64,8 @@ vxlRenderer.prototype.getWebGLContext = function(){
 		}
 	}
 	if (_webGLContext == null) {
-		alert("Could not initialise WebGL"); 
+		alert("Could not intiailise WebGL");
+		throw("Could not initialise WebGL"); 
 		return;
 	}
 	else {
@@ -80,7 +82,7 @@ vxlRenderer.prototype.getWebGLContext = function(){
  * Sets the program 'diffusive' as the program by default to be used by this renderer
  */
 vxlRenderer.prototype.setDefaultProgram = function(){
-    this.setProgram(vxl.glsl.diffusive.NAME, vxl.glsl.diffusive);
+    this.setProgram(vxl.def.glsl.diffusive.NAME, vxl.def.glsl.diffusive);
 }
 
 /**
@@ -118,12 +120,12 @@ vxlRenderer.prototype.clear = function(){
  */
 vxlRenderer.prototype.start = function(){
 	if(this.mode == vxl.def.renderer.mode.TIMER){
-		message('starting renderer at '+this.renderRate+ 'ms');
+		//vxl.go.console('Renderer: starting rendering for view ['+this.view.name+'] at '+this.renderRate+ 'ms');
 		this.timerID = setInterval((function(self) {return function() {self.render();}})(this),this.renderRate); 
 	}
 	else if(this.mode == vxl.def.renderer.mode.ANIMFRAME){
-		vxl.go.render();
-		message('vxl.go.render invoked');
+		//vxl.go.render();
+		message('Renderer for animation invoked');
 	}
 }
 
@@ -135,7 +137,7 @@ vxlRenderer.prototype.stop = function(){
 		clearInterval(this.timerID);
 	}
 	else if (this.mode == vxl.def.renderer.mode.ANIMFRAME){
-		vxl.go.cancelRender();
+		//vxl.go.cancelRender();
 	}
 }
 
@@ -148,10 +150,6 @@ vxlRenderer.prototype.setRenderRate = function(rate){ //rate in ms
 	this.renderRate = rate;
 	this.stop();
 
-	if (this.animation && this.animation.running){
-		this.animation.stop();
-		this.animation.start();
-	}
 	
 	if (rate == null || rate <=0){
 		//this.mode = vxl.def.renderer.ANIMFRAME; //disabled for now
@@ -160,7 +158,7 @@ vxlRenderer.prototype.setRenderRate = function(rate){ //rate in ms
 	}	
 	else{
 		this.mode = vxl.def.renderer.mode.TIMER;
-		message('vxlRenderer.mode = TIMER, render rate = ' + rate);
+		vxl.go.console('Renderer: view['+this.view.name+'] mode = TIMER, render rate = ' + rate,true);
 	}
 	
 	this.start();
@@ -203,23 +201,11 @@ vxlRenderer.prototype._setMatrices = function(){
 /**
  * Renders the scene by delegating the rendering to each actor present in the scene
  */
-vxlRenderer.prototype.render = function(){
-	
-	var gl = this.gl;
-    var scene = this.view.scene;
-    
+vxlRenderer.prototype.render = function(){	
+	//vxl.go.console('Rendering view ['+this.view.name+']');
+    var scene = this.view.scene;   
 	this.view.prepareForRendering();
-    this._setMatrices();
-    
-	this.view.boundingBox.render(this);
-	this.view.axis.render(this);
-	
-	scene.allocate(this);
-    
-    for(var i=0; i<scene.actors.length; i++){
-       gl.bindBuffer(gl.ARRAY_BUFFER, null);
-       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-       scene.actors[i].render(this);
-    }
+    this._setMatrices(); //TODO: review. We need to implement matrix stack behaviour here
+    scene.render(this);
 }
 

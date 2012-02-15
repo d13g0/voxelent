@@ -20,15 +20,18 @@
  */
 
 /**
- * Creates a vxlCamera. 
+ * 
  * A vxlCamera object simplifies WebGL programming by providing a simple object interface to the lower level
  * matrix manipulations that are required to view a 3D scene.
+ * 
  * When moving and rotating the camera, such matrices are updated and Voxelent's Nucleo will use this information
  * in order to draw the scene accordingly to the camera position an orientation.
  * 
  * A vxlCamera object requires a vxlView to be created. Having said that, a vxlView can be associated with 
  * multiple cameras.
  * 
+ * @class
+ * @constructor Creates a vxlCamera. 
  * @param {vxlView} vw
  * @param {Object} t the type of camera 
  * @author Diego Cantor
@@ -46,6 +49,7 @@ function vxlCamera(vw,t) {
     this.elevation 	= 0;
 	this.steps		= 0;
     this.home 		= vxl.vec3.create([0,0,0]);
+    this.id         = 0;
 	
    
 	
@@ -53,29 +57,24 @@ function vxlCamera(vw,t) {
         this.type = t;
     }
     else {
-        this.type = vxl.def.cameraType.ORBITING;
+        this.type = vxl.def.camera.type.ORBITING;
     }
     
 
 	this.distance = 0;
 	this.debug = false;
-   
 
-	//camera animation
-	/*this.spining = false;
-	this.spinTimerID = 0;
-	this.spinSpeed = 0.5;
-    this.state = new vxlCameraState(this);*/
 };
+
 
 /**
  * Establishes the type of camera
- * @param {vxl.def.cameraType} t
+ * @param {vxl.def.camera.type} t
  */
 vxlCamera.prototype.setType = function(t){
-    if (t != vxl.def.cameraType.ORBITING && t != vxl.def.cameraType.TRACKING) {
+    if (t != vx.def.camera.type.ORBITING && t != vxl.def.camera.type.TRACKING) {
         alert('Wrong Camera Type!. Setting Orbitting type by default');
-        this.type = vxl.def.cameraType.ORBITING;
+        this.type = vxl.def.camera.type.ORBITING;
     }
     else{
         this.type = t;
@@ -112,13 +111,13 @@ vxlCamera.prototype.goHome = function(h){
  * Calculates the distance to the current focal point
  */
 vxlCamera.prototype.computeDistance = function() {
-	console.info('compute distance called');
+	vxl.go.console('compute distance called');
 	/*var c = this;
 
 	var d = vxl.vec3.subtract(c.focalPoint, c.position);
 	c.distance = vxl.vec3.length(d);
 
-	//message(c.focalPoint.toString(1,'fp') + ' distance=' + c.distance);
+	//vxl.go.console(c.focalPoint.toString(1,'fp') + ' distance=' + c.distance);
 
 	if(c.distance < 1e-20) {
 		c.distance = 1e-20;
@@ -141,7 +140,7 @@ vxlCamera.prototype.computeDistance = function() {
  * @param {Number} d 
  */
 vxlCamera.prototype.setDistance = function(d) {
-	console.info('set distance called');
+	vxl.go.console('set distance called');
 	/*if(this.distance == d) {
 		return;
 	}
@@ -169,7 +168,7 @@ vxlCamera.prototype.setDistance = function(d) {
 };
 
 vxlCamera.prototype.computeViewTransform = function() {
-	console.info('compute view transform called');
+	vxl.go.console('compute view transform called');
 	/*var c = this;
     this.update();*/
 	/*var m = c.transform;
@@ -239,7 +238,7 @@ vxlCamera.prototype.setFocus = function(f){
 
 
 vxlCamera.prototype.pan = function(dx, dy) {
-	console.info(' pan called');
+	vxl.go.console(' pan called');
 	/*@TODO: Review buggy*/
 	/*message('dx = ' + dx);
 	message('dy = ' + dy);
@@ -250,7 +249,7 @@ vxlCamera.prototype.pan = function(dx, dy) {
 }
 
 vxlCamera.prototype.dolly = function(value) {
-	console.info(' dolly called');
+	vxl.go.console(' dolly called');
 	/*var c = this;
 	if(value <= 0.0)
 		return;
@@ -326,7 +325,7 @@ vxlCamera.prototype.update = function(){
 	
 	this.computeAxis();
     
-    if (this.type == vxl.def.cameraType.TRACKING){
+    if (this.type == vxl.def.camera.type.TRACKING){
         vxl.mat4.translate(this.matrix, this.position);
         vxl.mat4.rotateY(this.matrix, this.azimuth * Math.PI/180);
         vxl.mat4.rotateX(this.matrix, this.elevation * Math.PI/180);
@@ -351,7 +350,7 @@ vxlCamera.prototype.update = function(){
     * you don't believe me, go ahead and comment the if clause...
     * Why do you think we do not update the position?
     */
-    if(this.type == vxl.def.cameraType.TRACKING){
+    if(this.type == vxl.def.camera.type.TRACKING){
         vxl.mat4.multVec4(this.matrix, new vxlVector4(0, 0, 0, 1), this.position);
     }
     
@@ -390,22 +389,24 @@ vxlCamera.prototype.refresh = function() {
  */
 vxlCamera.prototype.shot = function(bb){
 	var maxDim = Math.max(bb[3] - bb[0], bb[4] - bb[1]);
+	var centre = this.view.scene.centre;
+	
 	if(maxDim != 0) {
 		var distance = 1.5 * maxDim / (Math.tan(this.view.fovy * Math.PI / 180));
-		this.setPosition([vxl.go.centre[0], vxl.go.centre[1], vxl.go.centre[2]+ distance]);
+		this.setPosition([centre[0], centre[1], centre[2]+ distance]);
 	}
 	
-	this.setFocus(vxl.go.centre);
+	this.setFocus(centre);
 }
 
 /**
  * The camera moves to a position where all the actors in the scene are viewed. The actors
  * are seen in full within their surrounding environment.
  * 
- * A long shot uses the global bounding box of the view
+ * A long shot uses the global bounding box of the view's scene
  */
 vxlCamera.prototype.longShot = function() {
-	this.shot(vxl.go.boundingBox);
+	this.shot(this.view.scene.bb);
 }
 
 /**
@@ -434,7 +435,7 @@ vxlCamera.prototype.retrieve = function() {
 vxlCamera.prototype.reset = function() {
 	var c = this;
 	c.state.reset();
-	message('camera.reset');
+	vxl.go.console('Camera: reset');
 }
 
 
@@ -447,7 +448,7 @@ vxlCamera.prototype.above = function() {
 	vxl.vec3.set([0, 0, -1], c.up);
 	vxl.vec3.set([1, 0, 0], c.right);
 	c.setPosition(0, c.distance, 0);
-	message('camera.reset');
+	vxl.go.console('Camera: above');
 };
 
 vxlCamera.prototype.below = function() {
@@ -459,7 +460,7 @@ vxlCamera.prototype.below = function() {
 	vxl.vec3.set([0, 0, 1], c.up);
 	vxl.vec3.set([1, 0, 0], c.right);
 	c.setPosition(0, -c.distance, 0);
-	message('camera.reset');
+	vxl.go.console('Camera: below');
 }
 
 vxlCamera.prototype.right = function() {
@@ -471,7 +472,7 @@ vxlCamera.prototype.right = function() {
 	vxl.vec3.set([0, 1, 0], c.up);
 	vxl.vec3.set([0, 0, 1], c.right);
 	c.setPosition(-c.distance, 0, 0);
-	message('camera.reset');
+	vxl.go.console('Camera: right');
 }
 
 vxlCamera.prototype.left = function() {
@@ -483,12 +484,12 @@ vxlCamera.prototype.left = function() {
 	vxl.vec3.set([0, 1, 0], c.up);
 	vxl.vec3.set([0, 0, 1], c.right);
 	c.setPosition(c.distance, 0, 0);
-	message('camera.reset');
+	vxl.go.console('Camera: left');
 }
 
 vxlCamera.prototype.debugMessage = function(v) {
 	if(this.debug) {
-		message(v);
+		vxl.go.console(v);
 	}
 };
 

@@ -14,12 +14,13 @@
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/  
 /**
- * Creates a vxlCameraState object and associates it with a vxlCamera. This association is unique
- * each camera has one vxlCameraState object. The vxlCameraState object allows to save/retrive 
+ * Creates a vxlCameraState object and associates it with a vxlCamera. 
+ * 
+ * This association is unique. each camera has one vxlCameraState object. The vxlCameraState object allows to save/retrive 
  * camera states forthe camera it is associated with during the construction.
  * 
  * 
- * @class vxlCameraState allows the implementation of the Memento pattern for vxlCamera in Voxelent's Nucleo.
+ * @class 
  * @constructor this is the constructor doc
  * @param {vxlCamera} camera
  * @author Diego Cantor

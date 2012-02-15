@@ -15,13 +15,11 @@
 ---------------------------------------------------------------------------*/  
 //@NOTE: It allows to decouple listening from interaction behaviour
 
-
+vxlTrackballCameraInteractor.prototype = new vxlCameraInteractor();
 
 function vxlTrackballCameraInteractor(c){
-	this.camera = c;
 	this.MOTION_FACTOR = 10.0;
-	this.task = vxl.def.cameraTask.NONE;
-	
+	this.task = vxl.def.camera.task.NONE;
 	this.x = 0;
 	this.y = 0;
 	this.lastX = 0;
@@ -31,22 +29,20 @@ function vxlTrackballCameraInteractor(c){
 	this.keyPressed = 0;
 	this.button = -1;
 	this.dragging = false;
-	this.picking = false;
+	this.connectTo(c);
 }
 
-vxlTrackballCameraInteractor.prototype.changeCamera = function(c){
-	this.camera = c;
-}
+
 
 vxlTrackballCameraInteractor.prototype.onMouseUp = function(ev){
 	//Only for debug purposes
 	/*var task = this.task;
 	var c = this.camera;
-	if (task == vxl.def.cameratask.PAN){
-			message('New Focal Point : ' + c.focalPoint.toString(1,'focalPoint'));
+	if (task == vxl.def.camera.task.PAN){
+			vxl.go.console('Trackball Camera INteractor: New Focal Point : ' + c.focalPoint.toString(1,'focalPoint'));
 	}*/
 	
-	task = vxl.def.cameraTask.NONE;
+	task = vxl.def.camera.task.NONE;
 	
 	this.dragging = false;
 }
@@ -60,23 +56,13 @@ vxlTrackballCameraInteractor.prototype.onMouseDown = function(ev){
 
 vxlTrackballCameraInteractor.prototype.onMouseMove = function(ev){
 
-	
-	
 	this.lastX = this.x;
 	this.lastY = this.y;
 	
 	this.x = ev.clientX;
     this.y = ev.clientY;
 	
-	
-	
-	/*if (this.picking){
-		var o = $('#vxl-id-view').offset();
-		var xo = Math.round(this.x - o.left);
-		var yo = Math.round(this.y - o.top);
-		message(xo+','+yo);
-	}*/
-	
+
 	if (!this.dragging) return;
 	
 	
@@ -133,7 +119,7 @@ vxlTrackballCameraInteractor.prototype.onKeyDown = function(ev){
 	else if(this.ctrlPressed && this.keyPressed !=17) {
 		var px = 0;
 		var py = 0;
-		message(ev);
+		vxl.go.console(ev);
 		if (this.keyPressed == 38){
 			py = 10;
 		}
@@ -159,7 +145,7 @@ vxlTrackballCameraInteractor.prototype.onKeyUp = function(ev){
 }
 
 vxlTrackballCameraInteractor.prototype.dolly = function(value){
-	this.task = vxl.def.cameraTask.DOLLY;
+	this.task = vxl.def.camera.task.DOLLY;
 	var camera = this.camera;
 	var dv = 2 * this.MOTION_FACTOR * value / camera.view.canvas.height;
 	
@@ -171,7 +157,7 @@ vxlTrackballCameraInteractor.prototype.dolly = function(value){
 }
 
 vxlTrackballCameraInteractor.prototype.rotate = function(dx, dy){
-	this.task = vxl.def.cameraTask.ROTATE;
+	this.task = vxl.def.camera.task.ROTATE;
 	
 	var camera = this.camera;
 	var canvas = camera.view.canvas;
@@ -189,18 +175,19 @@ vxlTrackballCameraInteractor.prototype.rotate = function(dx, dy){
 }
 
 vxlTrackballCameraInteractor.prototype.pan = function(dx,dy){
-	this.task = vxl.def.cameraTask.PAN;
+	this.task = vxl.def.camera.task.PAN;
 	
 	var camera = this.camera;
 	var canvas = camera.view.canvas;
+	var scene = camera.view.scene;
 	
 	var dimMax = Math.max(canvas.width, canvas.height);
 	
 	var deltaX = 1 / dimMax;
 	var deltaY = 1 / dimMax;
 				
-	var ndx = dx * deltaX * this.MOTION_FACTOR * vxl.go.boundingBox.max();
-	var ndy = dy * deltaY * this.MOTION_FACTOR * vxl.go.boundingBox.max();
+	var ndx = dx * deltaX * this.MOTION_FACTOR * scene.bb.max();
+	var ndy = dy * deltaY * this.MOTION_FACTOR * scene.bb.max();
 
 	camera.pan(ndx,ndy);
 	camera.refresh();

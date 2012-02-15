@@ -28,8 +28,11 @@ function vxlTransforms(vw){
 	this.cMatrix     = new vxlMatrix4x4();    // The camera matrix	
 };
 
+/**
+ * Calculates the Model-View matrix for the current camera.
+ */
 vxlTransforms.prototype.calculateModelView = function(){
-	vxl.mat4.set(this.view.camera.getViewTransform(), this.mvMatrix);
+	vxl.mat4.set(this.view.cameraman.active.getViewTransform(), this.mvMatrix);
     
 };
 

@@ -20,17 +20,16 @@
  * @constructor
  * @author Diego Cantor
  */
-function vxlModel(){
-	this.name = null;
-	this.indices = null;
-	this.vertices = null;
-	this.scalars = null;
-	this.color = null;
-	this.normals = null;
-	this.wireframe =  null;
-	this.centre = null;
-	this.outline = null;
-	this.wireframemode = false;
+function vxlModel(name){
+	this.name = name;
+	this.indices 	= null;
+	this.vertices 	= null;
+	this.scalars 	= null;
+	this.diffuse	= null;
+	this.normals 	= null;
+	this.wireframe 	= null;
+	this.centre 	= null;
+	this.outline 	= null;
 	//texture
 
 }
@@ -47,19 +46,23 @@ vxlModel.prototype.load = function(nm,payload){
 	}
 	this.vertices 	= payload.vertices;
 	this.indices 	= payload.indices;
-	this.color 		= payload.color;
+	this.diffuse 	= payload.diffuse;
 	this.scalars 	= payload.scalars;
-	
+	this.wireframe  = payload.wireframe;
+	this.colors     = payload.colors;	
 
-	if(!this.normals){
+	if(!this.normals && !this.wireframe){
 		this.getNormals();
 	}
 	
+	
 	if(!this.color){
-		this.color = vxl.def.modelcolor.slice(0); //so posterior modifications of the default don't affect this model
+		this.color = vxl.def.model.color.slice(0); //so posterior modifications of the default don't affect this model
+	}
+	if (this.wireframe == null){
+		this.getWireframeIndices();
 	}
 	
-	this.getWireframeIndices();
 	this.getOutline();
 	this.getCentre();
 }

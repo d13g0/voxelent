@@ -35,7 +35,7 @@ function vxlProgram (gl) {
 };
 
 vxlProgram.prototype.register = function(id,code){
-	console.info('Registering program '+ id);
+	vxl.go.console('Registering program '+ id);
     this._codebase[id] = code;
 };
 
@@ -47,10 +47,10 @@ vxlProgram.prototype._createShader = function(type,code){
     var gl      = this._gl;
     var shader = null;
     
-    if (type == vxl.def.VERTEX_SHADER){
+    if (type == vxl.def.glsl.VERTEX_SHADER){
         shader = gl.createShader(gl.VERTEX_SHADER);
     }
-    else if (type == vxl.def.FRAGMENT_SHADER){
+    else if (type == vxl.def.glsl.FRAGMENT_SHADER){
         shader = gl.createShader(gl.FRAGMENT_SHADER);
     }
     
@@ -77,12 +77,12 @@ vxlProgram.prototype.loadProgram = function(id){
     
     
     if (programCode.VERTEX_SHADER){
-        var vs = this._createShader(vxl.def.VERTEX_SHADER,programCode.VERTEX_SHADER);
+        var vs = this._createShader(vxl.def.glsl.VERTEX_SHADER,programCode.VERTEX_SHADER);
         gl.attachShader(webGLProgram, vs);
     }
     
     if (programCode.FRAGMENT_SHADER){
-        var fs = this._createShader(vxl.def.FRAGMENT_SHADER,programCode.FRAGMENT_SHADER);
+        var fs = this._createShader(vxl.def.glsl.FRAGMENT_SHADER,programCode.FRAGMENT_SHADER);
         gl.attachShader(webGLProgram, fs);
     }
     
@@ -92,7 +92,7 @@ vxlProgram.prototype.loadProgram = function(id){
         alert("Program: Could not link the shading program");
     }
     else{
-        console.info("Program: the program "+id+" has been loaded");
+        vxl.go.console("Program: the program "+id+" has been loaded");
     }
     
     this._webGLProgram[id] = webGLProgram;
@@ -149,7 +149,7 @@ vxlProgram.prototype.useProgram = function(id){
         this._currentProgramID = id;
         this._parseUniforms();
         
-        console.info('Program: the program '+id+' has been linked and is the current program');
+        vxl.go.console('Program: the program '+id+' has been linked and is the current program');
     }
     else{
         alert("Program: the program " + id + " has NOT been loaded");
@@ -160,15 +160,15 @@ vxlProgram.prototype.loadDefaults = function(){
     var code = this._codebase[this._currentProgramID];
     
     if ('DEFAULTS' in code){
-        console.info('Program: defaults for program '+this._currentProgramID+' found. Loading..');
+        vxl.go.console('Program: defaults for program '+this._currentProgramID+' found. Loading..');
         var defaults = code.DEFAULTS;
         for(var u in defaults){
             this.setUniform(u,defaults[u]);
-            console.info('Program: Uniform:'+u+', Default Value:'+defaults[u]);
+            vxl.go.console('Program: Uniform:'+u+', Default Value:'+defaults[u]);
         }
     }
     else{
-    	console.info('Program: WARNING: defaults for program '+this._currentProgramID+' NOT found');
+    	vxl.go.console('Program: WARNING: defaults for program '+this._currentProgramID+' NOT found');
     }
 };
 
@@ -230,7 +230,7 @@ vxlProgram.prototype._setPolymorphicUniform = function(uniformID, locationID,val
     
     if (glslType == 'bool'){
     	//if (typeof value != 'boolean') { 
-    	//	console.info('Program: the uniform '+uniformID+' is defined as bool in GLSL. However the JS variable is not');
+    	//	vxl.go.console('Program: the uniform '+uniformID+' is defined as bool in GLSL. However the JS variable is not');
     	//}/
         gl.uniform1i(locationID,value);
         return;
@@ -248,7 +248,7 @@ vxlProgram.prototype._setPolymorphicUniform = function(uniformID, locationID,val
     
     else if (glslType == 'mat4'){    
     	if (!(value instanceof vxlMatrix4x4)){
-    		console.info('Program: the uniform '+uniformID+' is defined as mat4 in GLSL. However the JS variable is not.');
+    		vxl.go.console('Program: the uniform '+uniformID+' is defined as mat4 in GLSL. However the JS variable is not.');
     	}
         gl.uniformMatrix4fv(locationID,false,value.getAsFloat32Array());
         return;

@@ -1,22 +1,32 @@
+/**
+ * Manages the lookup table files. The constructor will try to load all
+ * the lookup tables defined in vxl.def.luts at once.
+ * 
+ * @class
+ * @constructor
+ */
 function vxlLookupTableManager(){
 	this.lutTimerID = 0;
 	this.tables = [];
-	vxl.go.notifier.addSource('vxl.event.default_lut_loaded',this);
-    
+	vxl.go.notifier.addSource(vxl.events.DEFAULT_LUT_LOADED,this);
+	this.loadAll();
 }
 
+/**
+ * Load a lookup table file
+ * @param {String} name the filename of the lookup table to load
+ */
 vxlLookupTableManager.prototype.load = function(name){
 		var self = this;
 		if (this.isLoaded(name)) return;
 
-		//message('Requesting '+name+'...');
 	    var request = new XMLHttpRequest();
-	    request.open("GET", vxl.def.lutFolder+'/'+name+'.lut');
+	    request.open("GET", vxl.def.lut.folder+'/'+name+'.lut');
 	    request.onreadystatechange = function() {
 	      if (request.readyState == 4) {
 		    if(request.status == 404) {
 				alert (name + ' does not exist');
-				message(name + ' does not exist');
+				vxl.go.console('LookupTableManager: '+name + ' does not exist');
 			 }
 			else {
 				self.handle(name,JSON.parse(request.responseText));
@@ -25,17 +35,22 @@ vxlLookupTableManager.prototype.load = function(name){
 	    }
 		request.send();
 }
-
+/**
+ * Once the lookup table file is retrieved, this method adds it to the lookup table manager
+ */
 vxlLookupTableManager.prototype.handle = function (ID, payload) {
 	var lut = new vxlLookupTable();
 	lut.load(ID,payload);
 	this.tables.push(lut);
 	
-	if (lut.ID == vxl.def.lut){
-		vxl.go.notifier.fire('vxl.event.default_lut_loaded');
+	if (lut.ID == vxl.def.lut.main){
+		vxl.go.notifier.fire(vxl.events.DEFAULT_LUT_LOADED);
 	}
 }
-
+/**
+ * Check if a lookup table has been loaded by this lookup table manager
+ * @param {String} ID the id of the table to check
+ */
 vxlLookupTableManager.prototype.isLoaded = function(ID){
 	for(var i=0;i<this.tables.length;i++){
 		if (this.tables[i].ID == ID) return true;
@@ -43,6 +58,10 @@ vxlLookupTableManager.prototype.isLoaded = function(ID){
 	return false;
 }
 
+/**
+ * Retrieves a lookup table
+ * @param {String} ID id of the lookup table to retrieve
+ */
 vxlLookupTableManager.prototype.get = function(ID){
 	for(var i=0;i<this.tables.length;i++){
 		if (this.tables[i].ID == ID) return this.tables[i];
@@ -50,6 +69,10 @@ vxlLookupTableManager.prototype.get = function(ID){
 	return null;
 }
 
+/**
+ * Returns a list with the names of all of the lookup tables that have been loaded.
+ * @returns {Array} an array with the names of the lookup tables that have been loaded
+ */
 vxlLookupTableManager.prototype.getAllLoaded = function(){
     var tablenames = [];
     for(var i=0;i<this.tables.length;i++){
@@ -58,17 +81,24 @@ vxlLookupTableManager.prototype.getAllLoaded = function(){
     return tablenames;
 }
 
+/**
+ * Checks if all the lookup tables have been loaded
+ */
 vxlLookupTableManager.prototype.allLoaded = function(){
-	//think of a timeout to alter this state in the case not all tables are loaded (can this happen?)
-	return (vxl.def.luts.length == this.tables.length);
+	//@TODO: think of a timeout to alter this state in the case not all tables are loaded (can this happen?)
+	return (vxl.def.lut.list.length == this.tables.length);
 }
 
+/**
+ * Loads all the lookup tables defined in vxl.def.luts
+ */
 vxlLookupTableManager.prototype.loadAll = function(){
-	for(var i=0;i<vxl.def.luts.length;i++){
-		this.load(vxl.def.luts[i]);
+	for(var i=0;i<vxl.def.lut.list.length;i++){
+		this.load(vxl.def.lut.list[i]);
 	}
 }
 
-
+/**
+ * Creates the global lookup table manager and load all the lookup tables at once
+ */
 vxl.go.lookupTableManager = new vxlLookupTableManager();
-vxl.go.lookupTableManager.loadAll();

@@ -1,65 +1,8 @@
 /* default.css */
-/*----------------------------------------------------------------------------- 
- Web Fonts
-------------------------------------------------------------------------------*/
-
-@font-face {
-    font-family: Eurofurence;
-    font-style:italic;
-    src: url(f/eurof56.ttf) format("truetype");
-}
-
-@font-face {
-    font-family: Eurofurence;
-    font-weight:normal;
-    src: url(f/eurof55.ttf) format("truetype");
-}
-
-@font-face {
-    font-family: Eurofurence;
-    font-weight:bold;
-    src: url(f/eurof75.ttf) format("truetype");
-
-}
-
-.euro { 
-    font-family: Eurofurence, Arial;
-    font-weight:normal;
-}
-
-.euro-bold {
-    font-family: Eurofurence, Arial;
-    font-weight: bold;
-}
-
-.euro-italic{
-    font-family: Eurofurence, Arial;
-    font-style:italic;
-}
-
 body
 {
-	font-size:	    1em;
-	font-weight:	normal;
-	text-transform:	none;
-	font-family:	"Trebuchet MS", sans-serif;
-	font-size-adjust:	.48;
-    line-height:	1.58em;
-    color:	        #292929;
-	background:	    #FFFFFF;
-    margin-top:	    1.58em;
-	margin-left:	5%;
-	margin-right:	5%;
-	margin-bottom:	1.58em;
-	padding-top:	0;
-	padding-left:	0;
-	padding-right:	0;
-	padding-bottom:	0;
-	border-top:	    0;
-	border-left:	0;
-	border-bottom:	0;
-	border-right:	0;
-	width:	auto;
+	font: 12px "Lucida Grande", Tahoma, Arial, Helvetica, sans-serif;
+	width: 800px;
 }
 
 .header
@@ -69,122 +12,13 @@ body
 	padding: 8px;
 }
 
-h1	{	
-	font-family: Eurofurence, Arial, Helvetica, sans-serif;
-	font-size-adjust:	.46;
-	font-size:	1.80em;
-	font-weight:400;
-	font-style:	normal;
-	text-decoration:none;
-	word-spacing:normal;
-	letter-spacing:normal;
-	text-transform:none;
-   	margin-top:	1.33em;
-	margin-bottom:.33em;
-	padding-top:0;
-	padding-bottom:0;
-	border-top:	0;
-	border-bottom:0;
-    color:#104E8B;
-}	
-		
-h2	{	
-	font-family: Eurofurence, Arial, Helvetica, sans-serif;
-	font-size-adjust:.46;
-	font-size:1.58em;
-	font-weight:500;
-	font-style:normal;
-	text-decoration:none;
-	word-spacing:normal;
-	letter-spacing:normal;
-	text-transform:none;
-   	margin-top:1.75em;
-	margin-bottom:.33em;
-	padding-top:0;
-	padding-bottom:0;
-	border-top:0;
-	border-bottom:0;
-    color:#1874CD;
-}	
-		
-h3	{	
-	font-family:	Eurofurence, Arial, Helvetica, sans-serif;
-	font-size-adjust:	.46;
-	font-size:	1.33em;
-	font-weight:	500;
-	font-style:	normal;
-	text-decoration:	none;
-	word-spacing:	normal;
-	letter-spacing:	normal;
-	text-transform:	none;
-    margin-top:	1.58em;
-	margin-bottom:	.33em;
-	padding-top:	0;
-	padding-bottom:	0;
-	border-top:	0;
-	border-bottom:	0;
-    color:#00A9E0;
-	}	
-		
-h4	{	
-	font-family:	Eurofurence, Arial, Helvetica, sans-serif;
-	font-size-adjust:	.46;
-	font-size:	1.17em;
-	font-weight:	550;
-	font-style:	normal;
-	text-decoration:	none;
-	word-spacing:	normal;
-	letter-spacing:	normal;
-	text-transform:	none;
-    margin-top:	1.33em;
-	margin-bottom:	.33em;
-	padding-top:	0;
-	padding-bottom:	0;
-	border-top:	0;
-	border-bottom:	0;
-    color:#292929;
-	}	
-		
-h5, dt	{	
-	font-family:	Eurofurence, Arial, Helvetica, sans-serif;
-	font-size-adjust:	.46;
-	font-size:	1em;
-	font-weight:	600;
-	font-style:	normal;
-	text-decoration:	none;
-	word-spacing:	normal;
-	letter-spacing:	normal;
-	text-transform:	none;
-    margin-top:	1.17em;
-	margin-bottom:	.33em;
-	padding-top:	0;
-	padding-bottom:	0;
-	border-top:	0;
-	border-bottom:	0;
-	}	
-		
-h6	{	
-	font-family:	Eurofurence, Arial, Helvetica, sans-serif;
-	font-size-adjust:	.46;
-	font-size:	0.7em;
-	font-weight:	600;
-	font-style:	normal;
-	text-decoration:	none;
-	word-spacing:	normal;
-	letter-spacing:	normal;
-	text-transform:	none;
-    margin-top:	1em;
-	margin-bottom:	.33em;
-	padding-top:	0;
-	padding-bottom:	0;
-	border-top:	0;
-	border-bottom:	0;
-	}	
-
-h1, h2, h3, h4, h5, h6 {	
-	text-align:	left;
-}	
-
+h1
+{
+	font-size: 150%;
+	font-weight: bold;
+	padding: 0;
+	margin: 1em 0 0 .3em;
+}
 
 hr
 {
@@ -241,6 +75,7 @@ h1.classTitle
 	line-height:130%;
 }
 
+h2 { font-size: 110%; }
 caption, div.sectionTitle
 {
 	background-color: #7F8FB1;

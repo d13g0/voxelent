@@ -1,6 +1,10 @@
 
 vxl.go.notifier = new vxlNotifier();
 
+/**
+ * @class
+ * @constructor
+ */
 function vxlNotifier(){
 	this.targetList = {};
 	this.sourceList = {};
@@ -8,7 +12,7 @@ function vxlNotifier(){
 }
 
 vxlNotifier.prototype.addTarget = function(event,t){
-	message('vxlNotifier: adding target for event '+event);
+	vxl.go.console('vxlNotifier: adding target for event '+event);
 	var targetList = this.targetList;
 	if (targetList[event]== undefined){
 		targetList[event] = [];
@@ -18,7 +22,7 @@ vxlNotifier.prototype.addTarget = function(event,t){
 
 
 vxlNotifier.prototype.addSource = function(event,src){
-	message('vxlNotifier: adding source for event '+event);
+	vxl.go.console('vxlNotifier: adding source for event '+event);
 	var targetList = this.targetList;
 	var sourceList = this.sourceList;
 	
@@ -40,7 +44,7 @@ vxlNotifier.prototype.addSource = function(event,src){
 vxlNotifier.prototype.fire = function(event){
 	var targetList = this.targetList;
 	var src = this.sourceList[event];
-	message('vxlNotifier: firing ' +event);
+	vxl.go.console('vxlNotifier: firing ' +event);
 	$(document).trigger(event,[event,src,targetList]);
 }
 

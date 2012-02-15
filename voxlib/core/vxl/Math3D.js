@@ -1,3 +1,6 @@
+/**
+ * @class
+ */
 vxl.vec3 = {};
 
 vxl.vec3.dot = function(a,b){

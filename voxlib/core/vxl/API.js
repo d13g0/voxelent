@@ -24,6 +24,10 @@
  * Using vxl.api in your programs you will be able to access many of the features offered by 
  * Voxelent's Nucleo library.
  * 
+ * By design, type checking is enforced throughout the functions provided by the public API. 
+ * The goal is to help novice programmers that will use the API more often than advanced programmers.
+ * 
+ * 
  * @class
  * @constructor
  * @author Diego Cantor
@@ -34,10 +38,12 @@
  /**
   * Creates and returns a vxlView object
   * @param {String} canvas_id The canvas' Document Object Model (DOM) id.
+  * @param {vxlScene} scene optional, the scene associated to this view
   * @returns {vxlView} a new vxlView object
   */
- api.prototype.setup = function(canvas_id){
- 	return new vxlView(canvas_id);
+ api.prototype.setup = function(canvas_id, scene){
+ 	if (scene != null && !(scene instanceof vxlScene)) throw ('api.setup: scene parameter is invalid');
+ 	return new vxlView(canvas_id,scene);
  }
   
   /**
@@ -54,7 +60,7 @@
    */
  api.prototype.setCameraDistance = function(op){
 	 g_fovy = op;
-	 message('fovY = ' + op);
+	 vxl.go.console('fovY = ' + op);
  }
  
  /**
@@ -100,7 +106,7 @@
 
  api.prototype.setLookupTable = function(name){
  	if (!vxl.go.lookupTableManager.isLoaded(name)){
-		message('Lookup Table '+name+' has not been loaded');
+		vxl.go.console('Lookup Table '+name+' has not been loaded');
 		return;
 	}
 	
@@ -130,7 +136,7 @@
   * through it and will try to load every element of this list. Every element being the file name.
   * 
   * Nucleo supports three different loading modes which are defined in 
-  * vxl.def.loadingMode:
+  * vxl.def.asset.loadingMode:
   * 
   * LIVE: As each asset is loaded it is added immediately into the scene by creating the corresponding actor
   * 
@@ -141,14 +147,16 @@
   * This allows background loading.
   * 
   * @param {String|Array} arguments the name of the asset or the list of assets (each element being the file name).
-  * @param {vxl.def.loadingMode} mode the loading mode
+  * @param {vxl.def.asset.loadingMode} mode the loading mode
+  * @param {vxlScene} scene the scene in case we do not want to load these assets in the current one
   * 
-  * @see {vxl#def#loadingMode}
+  * @see {vxl#def#asset#loadingMode}
   * @see {vxlAssetManager}
   * @see {vxlScene#setLoadingMode}
   */
- api.prototype.loadAssets = function(arguments,mode){
- 	var scene = vxl.c.view.scene;
+ api.prototype.loadAssets = function(arguments,mode,scene){
+ 	
+ 	var scene = scene==null?vxl.c.scene:scene;
  	var assets = [];
  	if (typeof(arguments) == 'string' || arguments instanceof String){
  		assets.push(arguments);
@@ -163,7 +171,6 @@
 	}
 	
 	vxl.go.assetManager.loadList(assets, scene);
-	vxl.c.view.start();
  }
  
  
@@ -172,7 +179,7 @@
   * The axis is always centered in the focal point of the camera
   */
  api.prototype.axisON = function(){
-	vxl.c.view.axis.setVisible(true);
+	vxl.c.view.scene.axis.setVisible(true);
 	vxl.c.camera.refresh();
  }
  
@@ -180,7 +187,7 @@
   * Hides the axis in the current view
   */
  api.prototype.axisOFF = function(){
-	vxl.c.view.axis.setVisible(false);
+	vxl.c.view.scene.axis.setVisible(false);
 	vxl.c.camera.refresh();
  }
  
@@ -189,7 +196,7 @@
   * @TODO: move the bounding box to the scene object
   */
  api.prototype.boundingBoxON = function(){
-	vxl.c.view.boundingBox.visible = true;
+	vxl.c.view.scene.boundingBox.visible = true;
 	vxl.c.camera.refresh();
  }
  
@@ -198,7 +205,7 @@
   * @TODO: move the bounding box to the scene object
   */
  api.prototype.boundingBoxOFF= function(){
-	vxl.c.view.boundingBox.visible = false;
+	vxl.c.view.scene.boundingBox.visible = false;
 	vxl.c.camera.refresh();
  }
  
@@ -221,7 +228,7 @@
  api.prototype.setAmbientLight = function(l){
 	this.setAmbientColor(l,l,l);
 	vxl.c.view.refresh();
-	message('Ambient light changed to '+(l*100)+'%');
+	vxl.go.console('API:Ambient light changed to '+(l*100)+'%');
 	return true;
  }
 
@@ -233,12 +240,12 @@
  */ 
 api.prototype.wireframeON = function(){
 	if (vxl.c.actor){
-		vxl.c.actor.setVisualizationMode(vxl.def.visMode.WIREFRAME);
+		vxl.c.actor.setVisualizationMode(vxl.def.actor.mode.WIREFRAME);
 	}
 	else {
-		vxl.c.view.scene.setVisualizationMode(vxl.def.visMode.WIREFRAME);
+		vxl.c.view.scene.setVisualizationMode(vxl.def.actor.mode.WIREFRAME);
 	}
-	message('Wireframe is shown.');
+	vxl.go.console('API:Wireframe is shown.');
  }
  
  /**
@@ -246,20 +253,20 @@ api.prototype.wireframeON = function(){
   */
  api.prototype.surfaceON = function(){
 	if (vxl.c.actor){
-		vxl.c.actor.setVisualizationMode(vxl.def.visMode.SOLID);
+		vxl.c.actor.setVisualizationMode(vxl.def.actor.mode.SOLID);
 	}
 	else {
-		vxl.c.view.scene.setVisualizationMode(vxl.def.visMode.SOLID);
+		vxl.c.view.scene.setVisualizationMode(vxl.def.actor.mode.SOLID);
 	}
-	message('Wireframe is hidden.');
+	vxl.go.console('API:Wireframe is hidden.');
  }
  
  api.prototype.pointsON = function(){
 	if (vxl.c.actor){
-		vxl.c.actor.setVisualizationMode(vxl.def.visMode.POINTS);
+		vxl.c.actor.setVisualizationMode(vxl.def.actor.mode.POINTS);
 	}
 	else {
-		vxl.c.view.scene.setVisualizationMode(vxl.def.visMode.POINTS);
+		vxl.c.view.scene.setVisualizationMode(vxl.def.actor.mode.POINTS);
 	}
  }
  
@@ -275,7 +282,7 @@ api.prototype.wireframeON = function(){
 		vxl.c.view.scene.setOpacity(opacity);
 	}
 	vxl.c.view.refresh();
-	message('Opacity changed to '+(op*100)+'%');
+	vxl.go.console('API:Opacity changed to '+(op*100)+'%');
   }
   
  
@@ -326,7 +333,7 @@ api.prototype.wireframeON = function(){
 		a.setFrame(f);
 	}
 	else{
-		message('frame ' + f +' does not exist. Animation goes back to the beginning');
+		vxl.go.console('API:frame ' + f +' does not exist. Animation goes back to the beginning');
 		a.setFrame(1);
 	}
  }

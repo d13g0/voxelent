@@ -14,7 +14,10 @@
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/   
 
-vxl.glsl.diffusive = {
+/**
+ * @class
+ */
+vxl.def.glsl.diffusive = {
 	
 	NAME : 'diffusive',
 
@@ -48,9 +51,9 @@ vxl.glsl.diffusive = {
     "uniform mat4 uPMatrix; ",
     "uniform mat4 uNMatrix; ",
     "uniform vec3 uLightingDirection;",
-    "uniform vec3 uDirectionalColor;",
-    "uniform vec3 uAmbientColor;",
-    "uniform vec3 uObjectColor;",
+    "uniform vec4 uDirectionalColor;",
+    "uniform vec4 uAmbientColor;",
+    "uniform vec4 uObjectColor;",
     "uniform bool uUseShading;",
     "uniform bool uUseVertexColors;",
     "uniform float uPointSize;",
@@ -62,12 +65,12 @@ vxl.glsl.diffusive = {
     "        vAux = aVertexColor;",
     "   }",
     "   else {",
-    "		 vAux = vec4(uObjectColor,1.0);",
+    "		 vAux = uObjectColor;",
     "   }",
     "   if(uUseShading) {",
     "		vec4 transformedNormal = uNMatrix * vec4(aVertexNormal, 1.0);",
     "	    float directionalLightWeighting = max(dot(transformedNormal.xyz,uLightingDirection),0.0);",
-    "	    vColor = vec4(vAux.rgb * (uAmbientColor + uDirectionalColor * directionalLightWeighting),1.0);",
+    "	    vColor = vAux * (uAmbientColor + uDirectionalColor * directionalLightWeighting);",
     "	}",
     "   else {",
     "		vColor = vAux;",
@@ -88,8 +91,8 @@ vxl.glsl.diffusive = {
     "}"].join('\n'),
     
     DEFAULTS : {
-        "uLightingDirection" : [0.0,0.0,1.0],
-        "uDirectionalColor"  : [0.68,0.68,0.68],
-        "uAmbientColor"      : [0.24,0.24,0.24]
+        "uLightingDirection" : [0.0,0.3,1.0],
+        "uDirectionalColor"  : [0.68,0.68,0.68,1.0],
+        "uAmbientColor"      : [0.24,0.24,0.24,1.0]
     }
 }

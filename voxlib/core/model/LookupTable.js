@@ -1,4 +1,7 @@
-
+/**
+ * @class
+ * @constructor
+ */
 function vxlLookupTable(){
 	this.ID = null;
 	this.map = null;
