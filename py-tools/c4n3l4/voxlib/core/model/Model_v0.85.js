@@ -1,5 +1,197 @@
-function vxlModel(a){this.name=a;this.indices=null;this.vertices=null;this.scalars=null;this.diffuse=null;this.normals=null;this.wireframe=null;this.centre=null;this.outline=null}vxlModel.prototype.load=function(a,b){this.name=a;if(b.obj_name!=null){this.name=b.obj_name}this.vertices=b.vertices;this.indices=b.indices;this.diffuse=b.diffuse;this.scalars=b.scalars;this.wireframe=b.wireframe;this.colors=b.colors;if(!this.normals&&!this.wireframe){this.getNormals()}if(!this.color){this.color=vxl.def.model.color.slice(0)
-}if(this.wireframe==null){this.getWireframeIndices()}this.getOutline();this.getCentre()};vxlModel.prototype.getNormals=function(e){if(e==undefined){e=false}var o=this.vertices;var a=this.indices;var l=0;var g=1;var f=2;var h=[];for(var b=0;b<o.length;b=b+3){h[b+l]=0;h[b+g]=0;h[b+f]=0}for(var b=0;b<a.length;b=b+3){var m=[];var k=[];var d=[];m[l]=o[3*a[b+2]+l]-o[3*a[b+1]+l];m[g]=o[3*a[b+2]+g]-o[3*a[b+1]+g];m[f]=o[3*a[b+2]+f]-o[3*a[b+1]+f];k[l]=o[3*a[b]+l]-o[3*a[b+1]+l];k[g]=o[3*a[b]+g]-o[3*a[b+1]+g];
-k[f]=o[3*a[b]+f]-o[3*a[b+1]+f];d[l]=m[g]*k[f]-m[f]*k[g];d[g]=m[f]*k[l]-m[l]*k[f];d[f]=m[l]*k[g]-m[g]*k[l];if(e){d[l]=-d[l];d[g]=-d[g];d[f]=-d[f]}for(j=0;j<3;j++){h[3*a[b+j]+l]=h[3*a[b+j]+l]+d[l];h[3*a[b+j]+g]=h[3*a[b+j]+g]+d[g];h[3*a[b+j]+f]=h[3*a[b+j]+f]+d[f]}}for(var b=0;b<o.length;b=b+3){var n=[];n[l]=h[b+l];n[g]=h[b+g];n[f]=h[b+f];var c=Math.sqrt((n[l]*n[l])+(n[g]*n[g])+(n[f]*n[f]));if(c==0){c=1}n[l]=n[l]/c;n[g]=n[g]/c;n[f]=n[f]/c;h[b+l]=n[l];h[b+g]=n[g];h[b+f]=n[f]}this.normals=h};vxlModel.prototype.getWireframeIndices=function(){var d=this.indices;
-var c=[];var a=0;for(var b=0;b<d.length;b=b+3){c[a]=d[b];c[a+1]=d[b+1];c[a+2]=d[b+1];c[a+3]=d[b+2];c[a+4]=d[b+2];c[a+5]=d[b];a=a+6}this.wireframe=c};vxlModel.prototype.getCentre=function(){var a=this.outline;var b=[0,0,0];b[0]=(a[3]+a[0])/2;b[1]=(a[4]+a[1])/2;b[2]=(a[5]+a[2])/2;this.centre=b};vxlModel.prototype.getOutline=function(){var c=this.vertices;var b=[c[0],c[1],c[2],c[0],c[1],c[2]];for(var a=0;a<c.length;a=a+3){b[0]=Math.min(b[0],c[a]);b[1]=Math.min(b[1],c[a+1]);b[2]=Math.min(b[2],c[a+2]);
-b[3]=Math.max(b[3],c[a]);b[4]=Math.max(b[4],c[a+1]);b[5]=Math.max(b[5],c[a+2])}this.outline=b};
+/*-------------------------------------------------------------------------
+    This file is part of Voxelent's Nucleo
+
+    Nucleo is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation version 3.
+
+    Nucleo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------------------------------------------*/ 
+
+/**
+ * Models are totally independend of views and of the rendering process
+ * @class
+ * @constructor
+ * @author Diego Cantor
+ */
+function vxlModel(name){
+	this.name = name;
+	this.indices 	= null;
+	this.vertices 	= null;
+	this.scalars 	= null;
+	this.diffuse	= null;
+	this.normals 	= null;
+	this.wireframe 	= null;
+	this.centre 	= null;
+	this.outline 	= null;
+	//texture
+
+}
+
+/**
+ * Populates this model with the payload (JSON object)
+ * @param {String} nm the name given to this model
+ * @param {Object} payload the JSON object that describes the model
+ */
+vxlModel.prototype.load = function(nm,payload){
+	this.name		= nm;
+	if (payload.obj_name != null){
+		this.name = payload.obj_name;
+	}
+	this.vertices 	= payload.vertices;
+	this.indices 	= payload.indices;
+	this.diffuse 	= payload.diffuse;
+	this.scalars 	= payload.scalars;
+	this.wireframe  = payload.wireframe;
+	this.colors     = payload.colors;	
+
+	if(!this.normals && !this.wireframe){
+		this.getNormals();
+	}
+	
+	
+	if(!this.color){
+		this.color = vxl.def.model.color.slice(0); //so posterior modifications of the default don't affect this model
+	}
+	if (this.wireframe == null){
+		this.getWireframeIndices();
+	}
+	
+	this.getOutline();
+	this.getCentre();
+}
+
+
+/**
+ * Calculates the normals for this model in case that the JSON object does not include them
+ * 
+ * @param {bool} reverse if true will calculate the reversed normals
+ * 
+ */
+vxlModel.prototype.getNormals = function(reverse){
+	if (reverse == undefined){
+		reverse = false;
+	}
+  //face normal calculation
+    var vs = this.vertices;
+	var ind = this.indices;
+	var x=0; 
+    var y=1;
+	var z=2;
+	
+	var ns = [];
+	for(var i=0;i<vs.length;i=i+3){ //for each index, initialize normal x, normal y, normal z
+		ns[i+x]=0.0;
+		ns[i+y]=0.0;
+		ns[i+z]=0.0;
+	}
+	
+	for(var i=0;i<ind.length;i=i+3){ //we work on triads of vertex to calculate normals so i = i+3 (i = indices index)
+		var v1 = [];
+		var v2 = [];
+		var normal = [];	
+		//p2 - p1
+		v1[x] = vs[3*ind[i+2]+x] - vs[3*ind[i+1]+x];
+		v1[y] = vs[3*ind[i+2]+y] - vs[3*ind[i+1]+y];
+		v1[z] = vs[3*ind[i+2]+z] - vs[3*ind[i+1]+z];
+		//p0 - p1
+		v2[x] = vs[3*ind[i]+x] - vs[3*ind[i+1]+x];
+		v2[y] = vs[3*ind[i]+y] - vs[3*ind[i+1]+y];
+		v2[z] = vs[3*ind[i]+z] - vs[3*ind[i+1]+z];
+		//cross product
+		normal[x] = v1[y]*v2[z] - v1[z]*v2[y];
+		normal[y] = v1[z]*v2[x] - v1[x]*v2[z];
+		normal[z] = v1[x]*v2[y] - v1[y]*v2[x];
+		
+		if (reverse){
+			normal[x] = -normal[x];
+			normal[y] = -normal[y]; 
+			normal[z] = -normal[z]; 
+		}
+		
+		for(j=0;j<3;j++){ //update the normals of the triangle
+			ns[3*ind[i+j]+x] =  ns[3*ind[i+j]+x] + normal[x];
+			ns[3*ind[i+j]+y] =  ns[3*ind[i+j]+y] + normal[y];
+			ns[3*ind[i+j]+z] =  ns[3*ind[i+j]+z] + normal[z];
+		}
+	}
+		
+	//normalize the result
+	for(var i=0;i<vs.length;i=i+3){ //the increment here is because each vertex occurs with an offset of 3 in the array (due to x, y, z contiguous values)
+	
+	    var nn=[];
+		nn[x] = ns[i+x];
+		nn[y] = ns[i+y];
+		nn[z] = ns[i+z];
+		
+		var len = Math.sqrt((nn[x]*nn[x])+(nn[y]*nn[y])+(nn[z]*nn[z]));
+		if (len == 0) len = 1.0;
+		
+		nn[x] = nn[x]/len;
+		nn[y] = nn[y]/len;
+		nn[z] = nn[z]/len;
+		
+		ns[i+x] = nn[x];
+		ns[i+y] = nn[y];
+		ns[i+z] = nn[z];
+	}
+	this.normals = ns;
+}  
+
+/**
+ * Generate the wireframe indices using the model indices
+ */  
+vxlModel.prototype.getWireframeIndices = function(){
+	var ind = this.indices;
+    var wfi = [];
+	var j = 0;
+	for(var i=0; i<ind.length; i=i+3){
+	   wfi[j] = ind[i];
+	   wfi[j+1] = ind[i+1];
+	   wfi[j+2] = ind[i+1];
+	   wfi[j+3] = ind[i+2];
+	   wfi[j+4] = ind[i+2];
+	   wfi[j+5] = ind[i];
+	   j = j+6;
+	}
+	this.wireframe = wfi;
+  }
+/**
+ * Calculate the centre of this model
+ */  
+vxlModel.prototype.getCentre = function(){
+	  var bb = this.outline;
+      var c = [0, 0, 0];
+	  
+  	  c[0] = (bb[3] + bb[0]) /2;
+	  c[1] = (bb[4] + bb[1]) /2;
+	  c[2] = (bb[5] + bb[2]) /2;
+	  
+	  this.centre = c;
+	}
+
+/**
+ * Calculate the outline of this model (bounding box)
+ */
+vxlModel.prototype.getOutline = function(){	
+	var vs = this.vertices;
+	var bb  = [vs[0],vs[1],vs[2],vs[0],vs[1],vs[2]];
+	  
+	for(var i=0;i<vs.length;i=i+3){
+		bb[0] = Math.min(bb[0],vs[i]);
+		bb[1] = Math.min(bb[1],vs[i+1]);
+		bb[2] = Math.min(bb[2],vs[i+2]);
+		bb[3] = Math.max(bb[3],vs[i]);
+		bb[4] = Math.max(bb[4],vs[i+1]);
+		bb[5] = Math.max(bb[5],vs[i+2]);
+	}
+	this.outline = bb;
+}
+
+

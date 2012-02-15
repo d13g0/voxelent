@@ -58,7 +58,7 @@ vxl.def = {
 	
 	model			: {
 						folder:"voxdata/models",
-						color: [0.9,0.9,0.9]
+						color: [0.9,0.9,0.9,1.0]
 					},
     
     color			: {

@@ -1,10 +1,302 @@
-function vxlProgram(a){this._gl=a;this._codebase={};this._webGLProgram={};this._attributeList={};this._uniformList={};this._uniformType={};this._uniform_cache={};this._currentWebGLProgram=null;this._currentProgramID="";this._currentUniformLocation={}}vxlProgram.prototype.register=function(b,a){vxl.go.console("Registering program "+b);this._codebase[b]=a};vxlProgram.prototype.isRegistered=function(a){return(this._codebase[a]!=undefined)};vxlProgram.prototype._createShader=function(a,c){var d=this._gl;
-var b=null;if(a==vxl.def.glsl.VERTEX_SHADER){b=d.createShader(d.VERTEX_SHADER)}else{if(a==vxl.def.glsl.FRAGMENT_SHADER){b=d.createShader(d.FRAGMENT_SHADER)}}if(c==undefined||c==null){alert("Error getting the code for shader of type "+a)}d.shaderSource(b,c);d.compileShader(b);if(!d.getShaderParameter(b,d.COMPILE_STATUS)){alert(d.getShaderInfoLog(b))}return b};vxlProgram.prototype.loadProgram=function(f){var b=this._codebase[f];var d=this._gl;var c=d.createProgram();if(b.VERTEX_SHADER){var e=this._createShader(vxl.def.glsl.VERTEX_SHADER,b.VERTEX_SHADER);
-d.attachShader(c,e)}if(b.FRAGMENT_SHADER){var a=this._createShader(vxl.def.glsl.FRAGMENT_SHADER,b.FRAGMENT_SHADER);d.attachShader(c,a)}d.linkProgram(c);if(!d.getProgramParameter(c,d.LINK_STATUS)){alert("Program: Could not link the shading program")}else{vxl.go.console("Program: the program "+f+" has been loaded")}this._webGLProgram[f]=c};vxlProgram.prototype.isLoaded=function(a){return(this._webGLProgram[a]!=undefined)};vxlProgram.prototype._parseUniforms=function(d){vs=this._codebase[this._currentProgramID].VERTEX_SHADER;
-fs=this._codebase[this._currentProgramID].FRAGMENT_SHADER;uNames=this._codebase[this._currentProgramID].UNIFORMS;uTypes={};for(var a=0;a<uNames.length;a++){var b=uNames[a];var c=new RegExp("uniform.*"+b,"g");if(vs.search(c)!=-1){uTypes[b]=vs.substring(vs.search(c),vs.length).substring(0,vs.indexOf(";")).split(" ")[1]}else{if(fs.search(c)!=1){uTypes[b]=fs.substring(fs.search(c),fs.length).substring(0,fs.indexOf(";")).split(" ")[1]}else{alert("Program: In the program "+this._currentProgramID+" the uniform "+b+" is listed but not used")
-}}}this._uniformList[this._currentProgramID]=uNames;this._uniformType[this._currentProgramID]=uTypes};vxlProgram.prototype.useProgram=function(c){var b=this._gl;var a=this._webGLProgram[c];if(c in this._webGLProgram){b.linkProgram(a);b.useProgram(a);this._currentWebGLProgram=a;this._currentProgramID=c;this._parseUniforms();vxl.go.console("Program: the program "+c+" has been linked and is the current program")}else{alert("Program: the program "+c+" has NOT been loaded")}};vxlProgram.prototype.loadDefaults=function(){var b=this._codebase[this._currentProgramID];
-if("DEFAULTS" in b){vxl.go.console("Program: defaults for program "+this._currentProgramID+" found. Loading..");var c=b.DEFAULTS;for(var a in c){this.setUniform(a,c[a]);vxl.go.console("Program: Uniform:"+a+", Default Value:"+c[a])}}else{vxl.go.console("Program: WARNING: defaults for program "+this._currentProgramID+" NOT found")}};vxlProgram.prototype.setUniforms=function(a){for(uni in a){this.setUniform(uni,a[uni])}};vxlProgram.prototype.setUniform=function(e,d,f){var b=this._currentWebGLProgram;
-var c=this._uniformList[this._currentProgramID];var a=this._currentUniformLocation;var g=this._uniform_cache;if(c.hasObject(e)){a[e]=this._gl.getUniformLocation(b,e)}else{alert("Program: the uniform "+e+" is not defined for the program "+this._currentProgramID);return}g[e]=d;this._setPolymorphicUniform(e,a[e],d,f)};vxlProgram.prototype.getUniform=function(a){return this._uniform_cache[a]};vxlProgram.prototype._getAttributeLocation=function(a){if(!(a in this._attributeList)){this._attributeList[a]=this._gl.getAttribLocation(this._currentWebGLProgram,a)
-}return this._attributeList[a]};vxlProgram.prototype._setPolymorphicUniform=function(d,b,c,f){var e=this._gl;var a=this._uniformType[this._currentProgramID][d];if(a=="bool"){e.uniform1i(b,c);return}else{if(a=="float"){e.uniform1f(b,c);return}else{if(a=="int"){e.uniform1i(b,c);return}else{if(a=="mat4"){if(!(c instanceof vxlMatrix4x4)){vxl.go.console("Program: the uniform "+d+" is defined as mat4 in GLSL. However the JS variable is not.")}e.uniformMatrix4fv(b,false,c.getAsFloat32Array());return}else{if(c instanceof Array){if(f=="int"){switch(c.length){case 1:e.uniform1iv(b,c);
-break;case 2:e.uniform2iv(b,c);break;case 3:e.uniform3iv(b,c);break;case 4:e.uniform4iv(b,c);break;default:alert("ERROR")}}else{switch(c.length){case 1:e.uniform1fv(b,c);break;case 2:e.uniform2fv(b,c);break;case 3:e.uniform3fv(b,c);break;case 4:e.uniform4fv(b,c);break;default:alert("ERROR")}}}else{alert("Program: ERROR. The uniform  "+d+" could not be mapped")}}}}}};vxlProgram.prototype.setVertexAttribPointer=function(d,b,f,e,g,h){var c=this._getAttributeLocation(d);this._gl.vertexAttribPointer(c,b,f,e,g,h)
-};vxlProgram.prototype.enableVertexAttribArray=function(c){var b=this._getAttributeLocation(c);this._gl.enableVertexAttribArray(b)};vxlProgram.prototype.disableVertexAttribArray=function(c){var b=this._getAttributeLocation(c);this._gl.disableVertexAttribArray(b)};vxlProgram.prototype.setMatrixUniform=function(c,a){var b=this._gl.getUniformLocation(this._currentWebGLProgram,c);this._gl.uniformMatrix4fv(b,false,a.getAsFloat32Array())};
+/*-------------------------------------------------------------------------
+    This file is part of Voxelent's Nucleo
+
+    Nucleo is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation version 3.
+
+    Nucleo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------------------------------------------*/  
+
+/**
+ * @class
+ * @constructor
+ */
+function vxlProgram (gl) {
+    this._gl                = gl;
+    this._codebase          = {};
+
+    this._webGLProgram      = {};
+    this._attributeList     = {};
+    this._uniformList       = {};
+    this._uniformType       = {};
+
+    this._uniform_cache     = {};
+    
+    this._currentWebGLProgram     =  null;
+    this._currentProgramID        = "";
+    this._currentUniformLocation  = {};
+};
+
+vxlProgram.prototype.register = function(id,code){
+	vxl.go.console('Registering program '+ id);
+    this._codebase[id] = code;
+};
+
+vxlProgram.prototype.isRegistered = function(id){
+	return (this._codebase[id] != undefined);
+}
+    
+vxlProgram.prototype._createShader = function(type,code){
+    var gl      = this._gl;
+    var shader = null;
+    
+    if (type == vxl.def.glsl.VERTEX_SHADER){
+        shader = gl.createShader(gl.VERTEX_SHADER);
+    }
+    else if (type == vxl.def.glsl.FRAGMENT_SHADER){
+        shader = gl.createShader(gl.FRAGMENT_SHADER);
+    }
+    
+    if (code == undefined || code == null){
+        alert('Error getting the code for shader of type ' + type);
+    }
+    
+    gl.shaderSource(shader, code);
+    gl.compileShader(shader);
+
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        alert(gl.getShaderInfoLog(shader));
+    }
+    
+    return shader;
+};
+    
+vxlProgram.prototype.loadProgram = function(id){
+    
+    var programCode = this._codebase[id];
+    
+    var gl   = this._gl;
+    var webGLProgram  = gl.createProgram();
+    
+    
+    if (programCode.VERTEX_SHADER){
+        var vs = this._createShader(vxl.def.glsl.VERTEX_SHADER,programCode.VERTEX_SHADER);
+        gl.attachShader(webGLProgram, vs);
+    }
+    
+    if (programCode.FRAGMENT_SHADER){
+        var fs = this._createShader(vxl.def.glsl.FRAGMENT_SHADER,programCode.FRAGMENT_SHADER);
+        gl.attachShader(webGLProgram, fs);
+    }
+    
+    gl.linkProgram(webGLProgram);
+     
+    if (!gl.getProgramParameter(webGLProgram, gl.LINK_STATUS)) {
+        alert("Program: Could not link the shading program");
+    }
+    else{
+        vxl.go.console("Program: the program "+id+" has been loaded");
+    }
+    
+    this._webGLProgram[id] = webGLProgram;
+  
+};
+
+vxlProgram.prototype.isLoaded = function(id){
+	return (this._webGLProgram[id] != undefined);
+}
+
+vxlProgram.prototype._parseUniforms = function(id){
+	
+	vs = this._codebase[this._currentProgramID].VERTEX_SHADER;
+	fs = this._codebase[this._currentProgramID].FRAGMENT_SHADER;
+	uNames = this._codebase[this._currentProgramID].UNIFORMS;
+    
+    uTypes = {};
+	
+	
+	for (var i=0;i< uNames.length; i++){
+		var uniformID = uNames[i];
+		var rex = new RegExp('uniform.*'+uniformID,'g');
+		
+		if (vs.search(rex) != -1){
+			uTypes[uniformID] = vs.substring(vs.search(rex),vs.length).substring(0,vs.indexOf(';')).split(' ')[1];
+		}
+		
+		else if(fs.search(rex) != 1){
+			uTypes[uniformID] = fs.substring(fs.search(rex),fs.length).substring(0,fs.indexOf(';')).split(' ')[1];
+		}
+		
+		else{
+			alert('Program: In the program '+this._currentProgramID+' the uniform '+uniformID+' is listed but not used');
+		}
+	}
+	
+	
+	this._uniformList[this._currentProgramID] = uNames;
+	this._uniformType[this._currentProgramID] = uTypes; 
+}
+    
+vxlProgram.prototype.useProgram = function(id){
+    
+    var gl = this._gl;
+    var webGLProgram = this._webGLProgram[id];
+    
+    if (id in this._webGLProgram){
+        
+        gl.linkProgram(webGLProgram);
+        gl.useProgram (webGLProgram);
+        
+        
+        this._currentWebGLProgram = webGLProgram;
+        this._currentProgramID = id;
+        this._parseUniforms();
+        
+        vxl.go.console('Program: the program '+id+' has been linked and is the current program');
+    }
+    else{
+        alert("Program: the program " + id + " has NOT been loaded");
+    }
+};
+
+vxlProgram.prototype.loadDefaults = function(){
+    var code = this._codebase[this._currentProgramID];
+    
+    if ('DEFAULTS' in code){
+        vxl.go.console('Program: defaults for program '+this._currentProgramID+' found. Loading..');
+        var defaults = code.DEFAULTS;
+        for(var u in defaults){
+            this.setUniform(u,defaults[u]);
+            vxl.go.console('Program: Uniform:'+u+', Default Value:'+defaults[u]);
+        }
+    }
+    else{
+    	vxl.go.console('Program: WARNING: defaults for program '+this._currentProgramID+' NOT found');
+    }
+};
+
+vxlProgram.prototype.setUniforms = function(obj){
+	//obj is an object where every element is an uniform
+	for(uni in obj){
+		this.setUniform(uni,obj[uni]);
+	}
+}
+
+vxlProgram.prototype.setUniform = function(uniformID, value, hint){
+    
+    var webGLProgram 		= this._currentWebGLProgram;
+    var uniformList 		= this._uniformList[this._currentProgramID];
+    var uniformLoc  		= this._currentUniformLocation;
+    var uniform_cache 		= this._uniform_cache;
+    
+    if (uniformList.hasObject(uniformID)){
+        uniformLoc[uniformID] = this._gl.getUniformLocation(webGLProgram,uniformID);
+        
+    }
+    else{
+    	alert('Program: the uniform '+uniformID+' is not defined for the program '+this._currentProgramID);
+        return;
+    }
+    
+    uniform_cache[uniformID] = value;
+    this._setPolymorphicUniform(uniformID, uniformLoc[uniformID], value, hint);
+};
+
+
+vxlProgram.prototype.getUniform = function(uniformID){
+    //TODO: Think about this
+    //if(!(name in this._uniformList)){
+      //  alert('Program: the uniform ' + name + ' has not been set');
+        //return null;
+   //}
+    return this._uniform_cache[uniformID];
+};
+
+vxlProgram.prototype._getAttributeLocation = function(name){
+
+    if(!(name in this._attributeList)){
+        this._attributeList[name] = this._gl.getAttribLocation(this._currentWebGLProgram,name)
+    }
+
+    return this._attributeList[name];
+};
+
+vxlProgram.prototype._setPolymorphicUniform = function(uniformID, locationID,value,hint){
+
+	//In the extend of what it is reasonable,
+	//We cross check GLSL type information with actual javascript variable types 
+	//to make the right calls
+	//hint allows better casting of int and float values. If not specified default is float
+    
+    var gl = this._gl;
+    var glslType = this._uniformType[this._currentProgramID][uniformID];
+    
+    if (glslType == 'bool'){
+    	//if (typeof value != 'boolean') { 
+    	//	vxl.go.console('Program: the uniform '+uniformID+' is defined as bool in GLSL. However the JS variable is not');
+    	//}/
+        gl.uniform1i(locationID,value);
+        return;
+    }
+    
+    else if (glslType == 'float'){
+    	gl.uniform1f(locationID,value);
+    	return;
+    }
+    
+    else if (glslType == 'int'){
+        gl.uniform1i(locationID,value);
+        return;
+    }
+    
+    else if (glslType == 'mat4'){    
+    	if (!(value instanceof vxlMatrix4x4)){
+    		vxl.go.console('Program: the uniform '+uniformID+' is defined as mat4 in GLSL. However the JS variable is not.');
+    	}
+        gl.uniformMatrix4fv(locationID,false,value.getAsFloat32Array());
+        return;
+    }
+    
+    
+    else if (value instanceof Array){
+        if (hint  == 'int'){
+            switch(value.length){
+                case 1: { gl.uniform1iv(locationID,value); break };
+                case 2: { gl.uniform2iv(locationID,value); break };
+                case 3: { gl.uniform3iv(locationID,value); break };
+                case 4: { gl.uniform4iv(locationID,value); break };
+                default: alert('ERROR');
+            }
+       }
+       else{
+            switch(value.length){
+                case 1 : { gl.uniform1fv(locationID,value); break; }
+                case 2 : { gl.uniform2fv(locationID,value); break; }
+                case 3 : { gl.uniform3fv(locationID,value); break; }
+                case 4 : { gl.uniform4fv(locationID,value); break; }
+                default: alert('ERROR');
+            }
+       }
+    }
+    
+    else {
+    	alert('Program: ERROR. The uniform  '+uniformID+ ' could not be mapped');
+    }
+};
+
+vxlProgram.prototype.setVertexAttribPointer = function(name, numElements, type, norm,stride,offset){
+    var a = this._getAttributeLocation(name);
+    this._gl.vertexAttribPointer(a,numElements, type, norm, stride, offset);
+};
+
+vxlProgram.prototype.enableVertexAttribArray = function(name){
+    var a = this._getAttributeLocation(name);
+    this._gl.enableVertexAttribArray(a);
+};
+
+vxlProgram.prototype.disableVertexAttribArray = function(name){
+    var a = this._getAttributeLocation(name);
+    this._gl.disableVertexAttribArray(a);
+};
+
+vxlProgram.prototype.setMatrixUniform = function(name,m){
+	var u = this._gl.getUniformLocation(this._currentWebGLProgram,name);
+	this._gl.uniformMatrix4fv(u,false,m.getAsFloat32Array());
+};

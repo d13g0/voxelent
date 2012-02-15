@@ -4,7 +4,7 @@ print '-- START --'
 VERSION_TAG = "_v0.85"
 SLUG = "c4n3l4"
 
-minify = True
+minify = False
 #Here is one of the beauties of this script: It does not matter how the files are organized into folders. This will always be the order. regardless.
 core = [
          'VXL',

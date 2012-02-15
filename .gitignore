@@ -23,8 +23,11 @@ Thumbs.db
 [Dd]ebug*/
 *.lib
 *.sbr
+
 obj/
 [Rr]elease*/
 _ReSharper*/
 [Tt]est[Rr]esult*
-c4rd4m0m
+c4rd4m0m/
+c4n3l4/
+.DS_Store
