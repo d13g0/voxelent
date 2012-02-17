@@ -1,0 +1,154 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="NAME">vxl.demo</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">demo</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>  2</span> 
+<span class='line'>  3</span> </span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">demo</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>  4</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>  5</span> </span><span class="WHIT">   </span><span class="WHIT">
+<span class='line'>  6</span> </span><span class="WHIT"> </span><span class="COMM">/*
+<span class='line'>  7</span>  * First example
+<span class='line'>  8</span>  * shows:
+<span class='line'>  9</span>  * - mouse interaction
+<span class='line'> 10</span>  * - solid color
+<span class='line'> 11</span>  * - change color
+<span class='line'> 12</span>  * - bounding box
+<span class='line'> 13</span>  * - camera auto positions according to bounding box
+<span class='line'> 14</span>  */</span><span class="WHIT">
+<span class='line'> 15</span> </span><span class="WHIT"> </span><span class="NAME">demo.prototype.cone</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 16</span> </span><span class="WHIT">	</span><span class="NAME">vxl.api.resetScene</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 17</span> </span><span class="WHIT">	</span><span class="NAME">vxl.api.loadFile</span><span class="PUNC">(</span><span class="STRN">"cone.vtk"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 18</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 19</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'> 20</span> </span><span class="WHIT"> </span><span class="COMM">/*
+<span class='line'> 21</span>  * Second example
+<span class='line'> 22</span>  * shows: 
+<span class='line'> 23</span>  * - different colors
+<span class='line'> 24</span>  * - transparency
+<span class='line'> 25</span>  * - introduction to the 'Public API'
+<span class='line'> 26</span>  * - picking lookup table (basic)
+<span class='line'> 27</span>  */</span><span class="WHIT">
+<span class='line'> 28</span> </span><span class="WHIT"> </span><span class="NAME">demo.prototype.cube</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 29</span> </span><span class="WHIT">	</span><span class="NAME">vxl.api.resetScene</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 30</span> </span><span class="WHIT">	</span><span class="NAME">vxl.api.loadFile</span><span class="PUNC">(</span><span class="STRN">"cube1.vtk"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 31</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 32</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'> 33</span> </span><span class="WHIT">  </span><span class="NAME">demo.prototype.test</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 34</span> </span><span class="WHIT">	</span><span class="NAME">vxl.api.resetScene</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 35</span> </span><span class="WHIT">	</span><span class="NAME">vxl.api.loadFile</span><span class="PUNC">(</span><span class="STRN">"testcube.vtk"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 36</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 37</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'> 38</span> </span><span class="WHIT"> </span><span class="COMM">/*
+<span class='line'> 39</span> *  Third example
+<span class='line'> 40</span> *  shows:
+<span class='line'> 41</span> * - rendering a complex model
+<span class='line'> 42</span> * - mesh view
+<span class='line'> 43</span> * - set camera look points, save, retrieve, preset (up, left, right, down, 30x30, 45x45)
+<span class='line'> 44</span> */</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'> 45</span> </span><span class="WHIT"> </span><span class="NAME">demo.prototype.bunny</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 46</span> </span><span class="WHIT">	</span><span class="NAME">vxl.api.resetScene</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 47</span> </span><span class="WHIT">	</span><span class="NAME">vxl.api.loadFileList</span><span class="PUNC">(</span><span class="PUNC">[</span><span class="STRN">"bunny_0.vtk"</span><span class="PUNC">,</span><span class="STRN">"bunny_1.vtk"</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 48</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 49</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'> 50</span> </span><span class="WHIT"> </span><span class="COMM">/*
+<span class='line'> 51</span>  *	Four example
+<span class='line'> 52</span>  *	shows:
+<span class='line'> 53</span>  * - rendering of very complex models
+<span class='line'> 54</span>  * - reindexing algorithm
+<span class='line'> 55</span>  * - advance use of lookup tables
+<span class='line'> 56</span>  * - change lookup tables
+<span class='line'> 57</span>  */</span><span class="WHIT">
+<span class='line'> 58</span> </span><span class="WHIT"> </span><span class="NAME">demo.prototype.brain</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 59</span> </span><span class="WHIT">	</span><span class="NAME">vxl.api.resetScene</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 60</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">filelist</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="STRN">"corticalmesh_rotated_0.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 61</span> </span><span class="WHIT">				  </span><span class="STRN">"corticalmesh_rotated_1.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 62</span> </span><span class="WHIT">				  </span><span class="STRN">"corticalmesh_rotated_2.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 63</span> </span><span class="WHIT">				  </span><span class="STRN">"corticalmesh_rotated_3.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 64</span> </span><span class="WHIT">				  </span><span class="STRN">"corticalmesh_rotated_4.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 65</span> </span><span class="WHIT">				  </span><span class="STRN">"corticalmesh_rotated_5.vtk"</span><span class="WHIT">
+<span class='line'> 66</span> </span><span class="WHIT">				  </span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 67</span> </span><span class="WHIT">	</span><span class="NAME">vxl.api.loadFileList</span><span class="PUNC">(</span><span class="NAME">filelist</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 69</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT"> </span><span class="COMM">/*
+<span class='line'> 71</span>  *	Fifth example
+<span class='line'> 72</span>  *	shows:
+<span class='line'> 73</span>  * - animation control 
+<span class='line'> 74</span>  * - start, stop, rewind, goto, fforward
+<span class='line'> 75</span>  * - animation rate
+<span class='line'> 76</span>  * - mani
+<span class='line'> 77</span>  */</span><span class="WHIT">
+<span class='line'> 78</span> </span><span class="WHIT"> </span><span class="NAME">demo.prototype.heart</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 79</span> </span><span class="WHIT">	</span><span class="NAME">vxl.api.resetScene</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="WHIT">	</span><span class="NAME">vxl.go.animationFrames</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">20</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">filelist</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="STRN">"MYO_01.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_01.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_01.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 82</span> </span><span class="WHIT">                    </span><span class="STRN">"MYO_02.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_02.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_02.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 83</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_03.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_03.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_03.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 84</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_04.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_04.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_04.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 85</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_05.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_05.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_05.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 86</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_06.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_06.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_06.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 87</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_07.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_07.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_07.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 88</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_08.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_08.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_08.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 89</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_09.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_09.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_09.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 90</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_10.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_10.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_10.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_11.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_11.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_11.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_12.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_12.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_12.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_13.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_13.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_13.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_14.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_14.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_14.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 95</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_15.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_15.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_15.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 96</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_16.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_16.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_16.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 97</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_17.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_17.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_17.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 98</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_18.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_18.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_18.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 99</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_19.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_19.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_19.vtk"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>100</span> </span><span class="WHIT">					</span><span class="STRN">"MYO_20.vtk"</span><span class="PUNC">,</span><span class="STRN">"RAV_20.vtk"</span><span class="PUNC">,</span><span class="STRN">"LAA_20.vtk"</span><span class="WHIT">
+<span class='line'>101</span> </span><span class="WHIT">					</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>102</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'>103</span> </span><span class="WHIT">	</span><span class="NAME">actortoframe</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">,</span><span class="NUMB">1</span><span class="PUNC">,</span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">                      </span><span class="NUMB">2</span><span class="PUNC">,</span><span class="NUMB">2</span><span class="PUNC">,</span><span class="NUMB">2</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">					  </span><span class="NUMB">3</span><span class="PUNC">,</span><span class="NUMB">3</span><span class="PUNC">,</span><span class="NUMB">3</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>106</span> </span><span class="WHIT">					  </span><span class="NUMB">4</span><span class="PUNC">,</span><span class="NUMB">4</span><span class="PUNC">,</span><span class="NUMB">4</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>107</span> </span><span class="WHIT">					  </span><span class="NUMB">5</span><span class="PUNC">,</span><span class="NUMB">5</span><span class="PUNC">,</span><span class="NUMB">5</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>108</span> </span><span class="WHIT">					  </span><span class="NUMB">6</span><span class="PUNC">,</span><span class="NUMB">6</span><span class="PUNC">,</span><span class="NUMB">6</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>109</span> </span><span class="WHIT">					  </span><span class="NUMB">7</span><span class="PUNC">,</span><span class="NUMB">7</span><span class="PUNC">,</span><span class="NUMB">7</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>110</span> </span><span class="WHIT">					  </span><span class="NUMB">8</span><span class="PUNC">,</span><span class="NUMB">8</span><span class="PUNC">,</span><span class="NUMB">8</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>111</span> </span><span class="WHIT">					  </span><span class="NUMB">9</span><span class="PUNC">,</span><span class="NUMB">9</span><span class="PUNC">,</span><span class="NUMB">9</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>112</span> </span><span class="WHIT">					  </span><span class="NUMB">10</span><span class="PUNC">,</span><span class="NUMB">10</span><span class="PUNC">,</span><span class="NUMB">10</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>113</span> </span><span class="WHIT">					  </span><span class="NUMB">11</span><span class="PUNC">,</span><span class="NUMB">11</span><span class="PUNC">,</span><span class="NUMB">11</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>114</span> </span><span class="WHIT">					  </span><span class="NUMB">12</span><span class="PUNC">,</span><span class="NUMB">12</span><span class="PUNC">,</span><span class="NUMB">12</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>115</span> </span><span class="WHIT">					  </span><span class="NUMB">13</span><span class="PUNC">,</span><span class="NUMB">13</span><span class="PUNC">,</span><span class="NUMB">13</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>116</span> </span><span class="WHIT">					  </span><span class="NUMB">14</span><span class="PUNC">,</span><span class="NUMB">14</span><span class="PUNC">,</span><span class="NUMB">14</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="WHIT">					  </span><span class="NUMB">15</span><span class="PUNC">,</span><span class="NUMB">15</span><span class="PUNC">,</span><span class="NUMB">15</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>118</span> </span><span class="WHIT">					  </span><span class="NUMB">16</span><span class="PUNC">,</span><span class="NUMB">16</span><span class="PUNC">,</span><span class="NUMB">16</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>119</span> </span><span class="WHIT">					  </span><span class="NUMB">17</span><span class="PUNC">,</span><span class="NUMB">17</span><span class="PUNC">,</span><span class="NUMB">17</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>120</span> </span><span class="WHIT">					  </span><span class="NUMB">18</span><span class="PUNC">,</span><span class="NUMB">18</span><span class="PUNC">,</span><span class="NUMB">18</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>121</span> </span><span class="WHIT">					  </span><span class="NUMB">19</span><span class="PUNC">,</span><span class="NUMB">19</span><span class="PUNC">,</span><span class="NUMB">19</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>122</span> </span><span class="WHIT">					  </span><span class="NUMB">20</span><span class="PUNC">,</span><span class="NUMB">20</span><span class="PUNC">,</span><span class="NUMB">20</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>123</span> 
+<span class='line'>124</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'>125</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'>126</span> </span><span class="WHIT">	</span><span class="NAME">vxl.api.loadFileList</span><span class="PUNC">(</span><span class="NAME">filelist</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>127</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.animation</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">vxlAnimation</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>128</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.animation.setup</span><span class="PUNC">(</span><span class="NAME">vxl.c.view</span><span class="PUNC">,</span><span class="NAME">filelist</span><span class="PUNC">,</span><span class="NAME">actortoframe</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">    </span><span class="COMM">//vxl.c.animation.start();</span><span class="WHIT">
+<span class='line'>130</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>131</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>133</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>134</span> </span><span class="WHIT"> </span><span class="NAME">demo.prototype.car</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>135</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">e</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>136</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">e</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">e</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">180</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">filelist</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>138</span> </span><span class="WHIT">	</span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">1</span><span class="PUNC">;</span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">e</span><span class="PUNC">;</span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>139</span> </span><span class="WHIT">		</span><span class="NAME">filelist.push</span><span class="PUNC">(</span><span class="STRN">'pr'</span><span class="PUNC">+</span><span class="NAME">i</span><span class="PUNC">+</span><span class="STRN">'.json'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>140</span> </span><span class="WHIT">		</span><span class="NAME">message</span><span class="PUNC">(</span><span class="STRN">'pr'</span><span class="PUNC">+</span><span class="NAME">i</span><span class="PUNC">+</span><span class="STRN">'.json'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>141</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>142</span> </span><span class="WHIT">	</span><span class="NAME">vxl.api.resetScene</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>143</span> </span><span class="WHIT">	</span><span class="NAME">vxl.api.loadFileList</span><span class="PUNC">(</span><span class="NAME">filelist</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>144</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.view.zNear</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">10</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>145</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>146</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>147</span> </span><span class="WHIT"> </span></pre></body></html>

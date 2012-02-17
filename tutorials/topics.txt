@@ -1,0 +1,83 @@
+----------------------------
+VOXELENT TUTORIALS OUTLINE
+----------------------------
+
+1. Installing and using Voxelent
+    * download and add to a web page
+    * accessing the public API
+    * API docs
+    * Where to look for help
+    * How to request a feature
+
+2. Assets
+    * Loading a simple object
+    * Loading several objects
+    * Loading mechanisms
+    * adding features on the go
+    * load callbacks
+    * adding local objects to the scene
+    * API summary
+
+3. Actors
+    * What is an actor and how it is independent from an Asset
+    * Actor properties
+    * Moving, rotating, scaling
+    * API summary
+
+4. Cameras
+    * camera management
+    * camera types (orbiting, tracking)
+    * setting camera coordinates, focal point, azimut y elevacion
+    * saving and using camera landmarks
+    * creating a second camera
+    * camera switching
+    * camera behaviour
+    * camera interactors
+    * API summary
+
+5. Lights
+    * creating a second light source
+    * defining light properties
+    * adding ligths to voxelent
+    * API summary
+
+6. Textures
+    * texture coordinates
+    * texture manipulation
+
+7. Picking
+    * setting picking color
+    * Using voxelent's picker
+    * picking callbacks
+    * API summary
+     
+8. Animation
+    * matrix stack 
+    * frame animation
+    * inverse kinematics
+    * parametric animation
+    * API summary
+
+9. Multiviews
+    * setting multiple views
+    * sharing a scene
+    * intro to networking
+    * API summary
+    
+10. GLSL Programming
+    * program database
+    * installing a new program
+    * uniform cache
+    * program switching
+    * API summary
+
+11. Lookup Tables
+    * what is a lookup table
+    * using lookup tables
+    * API summary
+
+12. Networking
+    * how to join a scene
+    * how to request full control 
+    * how to propagate changes
+    * API summary

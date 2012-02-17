@@ -1,0 +1,41 @@
+-------------------------------------------------------------------------------------------
+VERSION 0.85 - Diego's Birthday
+-------------------------------------------------------------------------------------------
+1. Ambient Lights were removed from vxlView and vxl.api
+This is an attribute that is dependent from the selected GLSL program and it should not be here.
+
+2. The method vxlActor.clone was created. YAY!
+
+3. The auxiliary Scene objects (vxlAxis, vxlBoundingBox, vxlFloor) were removed from the
+actor list inside vxlScene so they do not interfere with actor counting and actor operations
+
+4. The auxiliary Scene objects were encapsulated in a new class: vxlSceneToys
+
+5. The vxlActor.setColor method was removed. Again, this is GLSL program dependent.
+The more generic approach vxlActor.setProperty was created instead
+
+6. The method vxlScene.setColor was removed with no replacement
+
+7.vxlProgram was updated. The syntax to enable/disable attributes and to refer to attribute
+pointers is simpler. Also the methods to register/load/use programs were updated.
+
+8. vxl.api was updated. The name of methods that referred to Current Objects (vxl.c) was updated. 
+For instance, instead of having vxl.api.getActiveCamera, now we have vxl.api.getCurrentCamera.
+This improves consistency in the ontology of the API.
+
+9. The documentation of the namespaces vxl, vxl.go, vxl.c, vxl.def and vxl.api was improved
+
+10. Actors can now be translated and scaled
+
+12. The code for vxlCamera was updated. The commented code that was not being used was removed
+
+13. The folder structure of the library was updated to include: API docs, tutorials, and minified versions.
+
+14. Actors can have different rendering programs
+
+-------------------------------------------------------------------------------------------
+VERSION 0.84 - The beatles arrive into JFK
+-------------------------------------------------------------------------------------------
+1. First version to offer in the website
+2. Support for multiple views accessing the same scene was included
+3. DS_Store (Mac metafiles) were removed from source control

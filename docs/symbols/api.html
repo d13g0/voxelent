@@ -1,0 +1,2141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="generator" content="JsDoc Toolkit" />
+		
+		<title>JsDoc Reference - api</title>
+
+		<style type="text/css">
+			/* default.css */
+body, html {
+	background-color: #FAFAFA;
+	border-top: 2px solid #00A9E0;
+	border-bottom: 2px solid #FF7F21;
+	font: 13px "Lucida Grande", Tahoma, Arial, Helvetica, sans-serif;
+	margin: 0;
+
+	color: #292929;
+}
+
+a{ color:#00A9E0; text-decoration:none;}
+
+a:hover{ color:#1874CD; text-decoration:underline;}
+
+.header
+{
+	clear: both;
+	background-color: #FFFFFF;
+	padding: 8px;
+}
+
+h1
+{
+	font-family: "VegurRegular", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size:33px; color:#00A9E0; font-weight:lighter;
+}
+
+hr
+{
+	border: none 0;
+	border-top: 1px solid #292929;
+	height: 1px;
+}
+
+pre.code
+{
+	display: block;
+	padding: 8px;
+	border: 1px dashed #ccc;
+}
+
+#index
+{
+float:right;
+width:230px;
+background:#f3f3f3;
+padding:10px;
+}
+
+#content
+{
+float:left;
+width:700px;
+padding:10px;
+}
+
+.classList
+{
+	#list-style-type: none;
+	#padding: 0;
+	#margin: 0 0 0 8px;
+	#font-family: arial, sans-serif;
+	#font-size: 1em;
+	#overflow: auto;
+}
+
+.classList li
+{
+	#padding: 0;
+	#margin: 0 0 8px 0;
+}
+
+.summaryTable { width: 100%; }
+
+h1.classTitle
+{
+	color: #00A9E0;
+    font-family: "VegurRegular","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 30px;
+    font-weight: normal;
+}
+
+h2 { font-size: 14px; }
+caption, div.sectionTitle
+{
+	background-color: #292929;
+	color: #fff;
+	font-size:130%;
+	text-align: left;
+	padding: 2px 6px 2px 6px;
+	border: 1px #292929 solid;
+}
+
+div.sectionTitle { margin-bottom: 8px; }
+.summaryTable thead { display: none; }
+
+.summaryTable td
+{
+	vertical-align: top;
+	padding: 4px;
+	border-bottom: 1px #292929 solid;
+	border-right: 1px #292929 solid;
+}
+
+/*col#summaryAttributes {}*/
+.summaryTable td.attributes
+{
+	border-left: 1px #292929 solid;
+	width: 140px;
+	text-align: right;
+}
+
+td.attributes
+{
+	line-height: 15px;
+	color: #292929;
+	font-family: "Courier New",Courier,monospace;
+	font-size: 14px;
+}
+
+.fixedFont
+{
+	line-height: 15px;
+	color: #1874CD;
+	font-family: "Courier New",Courier,monospace;
+	font-size: 14px;
+}
+
+.summaryTable td.nameDescription
+{
+	text-align: left;
+	font-size: 13px;
+	line-height: 15px;
+}
+
+.summaryTable td.nameDescription, .description
+{
+	line-height: 15px;
+	padding: 4px;
+	padding-left: 4px;
+}
+
+.summaryTable { margin-bottom: 8px; }
+
+ul.inheritsList
+{
+	list-style: square;
+	margin-left: 20px;
+	padding-left: 0;
+}
+
+.details {
+    margin-top:30px;
+    margin-bottom:30px;
+}
+.detailList {
+	margin-left: 20px; 
+	line-height: 15px;
+}
+.detailList dt { margin-left: 20px; }
+
+.detailList .heading
+{
+	font-weight: bold;
+	padding-bottom: 6px;
+	margin-left: 0;
+}
+
+.light, td.attributes, .light a:link, .light a:visited
+{
+	color: #777;
+	font-style: italic;
+}
+
+.fineprint
+{
+	text-align: right;
+	font-size: 10px;
+}
+
+.header { background-color: #FFFFFF;}
+
+.header .header-shadow {
+	position: absolute;
+	bottom: -6px;
+	left: 0;
+	width: 100%;
+	height: 6px;
+	background-image: url(http://voxelent.com/dev/_style/img/header-shadow.png);
+}
+
+.header-inner {
+	position: relative;
+	margin:0 auto;
+	width:980px;
+}
+
+.header-inner .shadow { 
+	position: absolute;
+	bottom: -6px;
+	left: 0;
+	width: 100%;
+	height: 5px;
+	background: url(http://voxelent.com/dev/_style/img/inner-shadow.png) no-repeat 50% 0; 
+}
+
+#wrap {
+width:980px;
+margin:0 auto;
+padding-top:20px;
+min-height:800px;
+}
+
+
+
+#nav {
+background:#c99;
+}
+
+
+
+#main {
+float:left;
+width:700px;
+padding:10px;
+}
+
+#sidebar {
+float:right;
+width:230px;
+background:#f3f3f3;
+padding:10px;
+}
+
+
+
+#footer {
+background:#f3f3f3;
+border-top: 1px solid #e2e2e2;
+clear:both;
+height:135px;
+}
+
+.footer-inner {
+	position: relative;
+	margin:0 auto;
+	width:980px;
+	border-top: 1px dashed #e2e2e2;
+}
+
+.footer-logo {
+	display:block;
+	position:relative;
+	z-index:500;
+	float:left;
+	padding-right:30px;
+	
+}
+		</style>
+
+
+	</head>
+
+	<body>
+<!-- ============================== header ================================= -->
+		<!-- begin static/header.html -->
+		<div id="header">
+        <div class="col-width clearfix header-inner">
+<img src="http://voxelent.com/dev/_style/img/voxelent.png" />
+	<div class="shadow"></div>
+</div>
+<div class="header-shadow"></div>
+</div>
+
+
+
+		<!-- end static/header.html -->
+
+<!-- ============================== classes index ============================ -->
+		<div id="wrap">
+        <div id="index">
+			<!-- begin publish.classesIndex -->
+			<div align="center"><a href="../index.html">Class Index</a>
+| <a href="../files.html">File Index</a></div>
+<hr />
+<h2>Classes</h2>
+<ul class="classList">
+	
+	<li><i><a href="../symbols/_global_.html">_global_</a></i></li>
+	
+	<li><a href="../symbols/api.html">api</a></li>
+	
+	<li><a href="../symbols/Array.html">Array</a></li>
+	
+	<li><a href="../symbols/vxl.api.html">vxl.api</a></li>
+	
+	<li><a href="../symbols/vxl.def.html">vxl.def</a></li>
+	
+	<li><a href="../symbols/vxl.def.glsl.diffusive.html">vxl.def.glsl.diffusive</a></li>
+	
+	<li><a href="../symbols/vxl.def.glsl.phong.html">vxl.def.glsl.phong</a></li>
+	
+	<li><a href="../symbols/vxl.vec3.html">vxl.vec3</a></li>
+	
+	<li><a href="../symbols/vxlActor.html">vxlActor</a></li>
+	
+	<li><a href="../symbols/vxlAssetManager.html">vxlAssetManager</a></li>
+	
+	<li><a href="../symbols/vxlAxis.html">vxlAxis</a></li>
+	
+	<li><a href="../symbols/vxlBoundingBox.html">vxlBoundingBox</a></li>
+	
+	<li><a href="../symbols/vxlCamera.html">vxlCamera</a></li>
+	
+	<li><a href="../symbols/vxlCameraManager.html">vxlCameraManager</a></li>
+	
+	<li><a href="../symbols/vxlCameraState.html">vxlCameraState</a></li>
+	
+	<li><a href="../symbols/vxlFloor.html">vxlFloor</a></li>
+	
+	<li><a href="../symbols/vxlFrameAnimation.html">vxlFrameAnimation</a></li>
+	
+	<li><a href="../symbols/vxlLookupTable.html">vxlLookupTable</a></li>
+	
+	<li><a href="../symbols/vxlLookupTableManager.html">vxlLookupTableManager</a></li>
+	
+	<li><a href="../symbols/vxlModel.html">vxlModel</a></li>
+	
+	<li><a href="../symbols/vxlNotifier.html">vxlNotifier</a></li>
+	
+	<li><a href="../symbols/vxlProgram.html">vxlProgram</a></li>
+	
+	<li><a href="../symbols/vxlRenderer.html">vxlRenderer</a></li>
+	
+	<li><a href="../symbols/vxlScene.html">vxlScene</a></li>
+	
+	<li><a href="../symbols/vxlTransforms.html">vxlTransforms</a></li>
+	
+	<li><a href="../symbols/vxlView.html">vxlView</a></li>
+	
+	<li><a href="../symbols/vxlViewListener.html">vxlViewListener</a></li>
+	
+</ul>
+<hr />
+			<!-- end publish.classesIndex -->
+		</div>
+
+		<div id="content">
+<!-- ============================== class title ============================ -->
+			<h1 class="classTitle">
+				
+				Class api
+			</h1>
+
+<!-- ============================== class summary ========================== -->
+			<p class="description">
+				
+				
+
+				
+
+				
+					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_vxl_API.js.html">API.js</a>.
+				
+			</p>
+
+<!-- ============================== constructor summary ==================== -->
+			
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class api.">
+				<caption>Class Summary</caption>
+				<thead>
+					<tr>
+						<th scope="col">Constructor Attributes</th>
+						<th scope="col">Constructor Name and Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="attributes">&nbsp;</td>
+						<td class="nameDescription" >
+							<div class="fixedFont">
+								<b><a href="../symbols/api.html#constructor">api</a></b>()
+							</div>
+							<div class="description">Nucleo Application Programming Interface (NAPI)Using vxl.api in your programs you will be able to access many of the features offered by Voxelent's Nucleo library.</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+
+<!-- ============================== properties summary ===================== -->
+			
+
+<!-- ============================== methods summary ======================== -->
+			
+				
+				
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class api.">
+					<caption>Method Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#axisOFF">axisOFF</a></b>()
+								</div>
+								<div class="description">Hides the axis in the current view</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#axisON">axisON</a></b>()
+								</div>
+								<div class="description">Activates the axis in the current viewThe axis is always centered in the focal point of the camera</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#boundingBoxOFF">boundingBoxOFF</a></b>()
+								</div>
+								<div class="description">Shows the global bounding box of the current scene</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#boundingBoxON">boundingBoxON</a></b>()
+								</div>
+								<div class="description">Shows the global bounding box of the current scene</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#clearAnimation">clearAnimation</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#flipActorNormals">flipActorNormals</a></b>(flag)
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#getActorByName">getActorByName</a></b>(actorName, scene)
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#getCurrentActor">getCurrentActor</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#getCurrentCamera">getCurrentCamera</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#getCurrentView">getCurrentView</a></b>()
+								</div>
+								<div class="description">Returns the current view.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#getLookupTables">getLookupTables</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#go_above">go_above</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#go_below">go_below</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#go_left">go_left</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#go_right">go_right</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#loadAssets">loadAssets</a></b>(arguments, mode, scene)
+								</div>
+								<div class="description">Loads 3D models, textures and other assets to a Voxelent's scene.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#loadLUTS">loadLUTS</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#loadProgram">loadProgram</a></b>(code)
+								</div>
+								<div class="description">Loads a program</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#pointsON">pointsON</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#resetCamera">resetCamera</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#resetScene">resetScene</a></b>()
+								</div>
+								<div class="description">Go back to square one.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#retrieveCamera">retrieveCamera</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#saveCamera">saveCamera</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#setActorOpacity">setActorOpacity</a></b>(op)
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#setActorProperty">setActorProperty</a></b>(actor, the, the)
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#setAzimuth">setAzimuth</a></b>(a)
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#setBackgroundColor">setBackgroundColor</a></b>(color)
+								</div>
+								<div class="description">Sets the background colour of this view.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#setCameraDistance">setCameraDistance</a></b>(op)
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#setCurrentActor">setCurrentActor</a></b>(actor)
+								</div>
+								<div class="description">Sets the current actor</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#setCurrentCamera">setCurrentCamera</a></b>(a)
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#setCurrentView">setCurrentView</a></b>(the)
+								</div>
+								<div class="description">If the object passed as a parameter is a vxlView then it sets it up as the current view.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#setElevation">setElevation</a></b>(e)
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#setFrame">setFrame</a></b>(f)
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#setLookupTable">setLookupTable</a></b>(name)
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#setRenderRate">setRenderRate</a></b>(r)
+								</div>
+								<div class="description">Sets the rendering rate of the current view</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#setup">setup</a></b>(canvas_id, scene)
+								</div>
+								<div class="description">Creates and returns a vxlView object</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#startAnimation">startAnimation</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#stopAnimation">stopAnimation</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#surfaceON">surfaceON</a></b>()
+								</div>
+								<div class="description">If there is an act</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#toggleSpin">toggleSpin</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/api.html#wireframeON">wireframeON</a></b>()
+								</div>
+								<div class="description">If an actor has been selected (If there is an current actor in vxl.c.actor), changes its visualization mode to WIREFRAME.</div>
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+
+				
+			
+<!-- ============================== events summary ======================== -->
+			
+
+<!-- ============================== constructor details ==================== -->
+			
+			<div class="details"><a name="constructor"> </a>
+				<div class="sectionTitle">
+					Class Detail
+				</div>
+
+				<div class="fixedFont">
+						<b>api</b>()
+				</div>
+
+				<div class="description">
+					Nucleo Application Programming Interface (NAPI)Using vxl.api in your programs you will be able to access many of the features offered by Voxelent's Nucleo library.By design, type checking is enforced throughout the functions provided by the public API. The goal is to help novice programmers that will use the API more often than advanced programmers.
+					<br /><i>Author: </i>Diego Cantor.
+				</div>
+
+				
+
+
+					
+					
+					
+					
+					
+					
+					
+
+			</div>
+			
+
+<!-- ============================== field details ========================== -->
+			
+
+<!-- ============================== method details ========================= -->
+			
+				<div class="sectionTitle">
+					Method Detail
+				</div>
+				
+					<a name="axisOFF"> </a>
+					<div class="fixedFont">
+
+					
+					<b>axisOFF</b>()
+
+					</div>
+					<div class="description">
+						Hides the axis in the current view
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="axisON"> </a>
+					<div class="fixedFont">
+
+					
+					<b>axisON</b>()
+
+					</div>
+					<div class="description">
+						Activates the axis in the current viewThe axis is always centered in the focal point of the camera
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="boundingBoxOFF"> </a>
+					<div class="fixedFont">
+
+					
+					<b>boundingBoxOFF</b>()
+
+					</div>
+					<div class="description">
+						Shows the global bounding box of the current scene
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="boundingBoxON"> </a>
+					<div class="fixedFont">
+
+					
+					<b>boundingBoxON</b>()
+
+					</div>
+					<div class="description">
+						Shows the global bounding box of the current scene
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="clearAnimation"> </a>
+					<div class="fixedFont">
+
+					
+					<b>clearAnimation</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="flipActorNormals"> </a>
+					<div class="fixedFont">
+
+					
+					<b>flipActorNormals</b>(flag)
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{bool}</span> <b>flag</b>
+									
+								</dt>
+								<dd>if true this method will flip the normals. If false normals will becalculated the 'normal' way.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="getActorByName"> </a>
+					<div class="fixedFont">
+
+					
+					<b>getActorByName</b>(actorName, scene)
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>actorName</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>scene</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="getCurrentActor"> </a>
+					<div class="fixedFont">
+
+					
+					<b>getCurrentActor</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="getCurrentCamera"> </a>
+					<div class="fixedFont">
+
+					
+					<b>getCurrentCamera</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="getCurrentView"> </a>
+					<div class="fixedFont">
+
+					<span class="light">{<a href="../symbols/vxlView.html">vxlView</a>}</span>
+					<b>getCurrentView</b>()
+
+					</div>
+					<div class="description">
+						Returns the current view. This is the view that is receiving all the API calls
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/vxlView.html">vxlView</a>}</span> the current view</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getLookupTables"> </a>
+					<div class="fixedFont">
+
+					
+					<b>getLookupTables</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="go_above"> </a>
+					<div class="fixedFont">
+
+					
+					<b>go_above</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="go_below"> </a>
+					<div class="fixedFont">
+
+					
+					<b>go_below</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="go_left"> </a>
+					<div class="fixedFont">
+
+					
+					<b>go_left</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="go_right"> </a>
+					<div class="fixedFont">
+
+					
+					<b>go_right</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="loadAssets"> </a>
+					<div class="fixedFont">
+
+					
+					<b>loadAssets</b>(arguments, mode, scene)
+
+					</div>
+					<div class="description">
+						Loads 3D models, textures and other assets to a Voxelent's scene.This method is very flexible. It can load one or multiple assets depending on the type of the first parameter. If it is a String, it will try to find the file with that name in Voxelent's data folder(voxdata by default). Otherwise, if  the parameter 'arguments' is an Array, loadAssets will iteratethrough it and will try to load every element of this list. Every element being the file name.Nucleo supports three different loading modes which are defined in vxl.def.asset.loadingMode:LIVE: As each asset is loaded it is added immediately into the scene by creating the corresponding actorLATER: All the assets are loaded first THEN the actors are created. This is useful when you want to display a full scene instead of showing incremental updates.DETACHED: The assets are loaded into the AssetManager object but actors are never created.This allows background loading.
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String|<a href="../symbols/Array.html">Array</a>}</span> <b>arguments</b>
+									
+								</dt>
+								<dd>the name of the asset or the list of assets (each element being the file name).</dd>
+							
+								<dt>
+									<span class="light fixedFont">{vxl.def.asset.loadingMode}</span> <b>mode</b>
+									
+								</dt>
+								<dd>the loading mode</dd>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/vxlScene.html">vxlScene</a>}</span> <b>scene</b>
+									
+								</dt>
+								<dd>the scene in case we do not want to load these assets in the current one</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">See:</dt>
+							
+								<dd></dd>
+							
+								<dd></dd>
+							
+								<dd></dd>
+							
+							</dl>
+						
+
+					<hr />
+				
+					<a name="loadLUTS"> </a>
+					<div class="fixedFont">
+
+					
+					<b>loadLUTS</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="loadProgram"> </a>
+					<div class="fixedFont">
+
+					
+					<b>loadProgram</b>(code)
+
+					</div>
+					<div class="description">
+						Loads a program
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>code</b>
+									
+								</dt>
+								<dd>one of voxelent's programs</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="pointsON"> </a>
+					<div class="fixedFont">
+
+					
+					<b>pointsON</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="resetCamera"> </a>
+					<div class="fixedFont">
+
+					
+					<b>resetCamera</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="resetScene"> </a>
+					<div class="fixedFont">
+
+					
+					<b>resetScene</b>()
+
+					</div>
+					<div class="description">
+						Go back to square one. A clean scene with no actors
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="retrieveCamera"> </a>
+					<div class="fixedFont">
+
+					
+					<b>retrieveCamera</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="saveCamera"> </a>
+					<div class="fixedFont">
+
+					
+					<b>saveCamera</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setActorOpacity"> </a>
+					<div class="fixedFont">
+
+					
+					<b>setActorOpacity</b>(op)
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>op</b>
+									
+								</dt>
+								<dd>opacity value between 0 and 1 (float)</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setActorProperty"> </a>
+					<div class="fixedFont">
+
+					
+					<b>setActorProperty</b>(actor, the, the)
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>actor</b>
+									
+								</dt>
+								<dd>it can be a vxlActor or a String with the actor name</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>the</b>
+									
+								</dt>
+								<dd>property to change</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>the</b>
+									
+								</dt>
+								<dd>new value</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setAzimuth"> </a>
+					<div class="fixedFont">
+
+					
+					<b>setAzimuth</b>(a)
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>a</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setBackgroundColor"> </a>
+					<div class="fixedFont">
+
+					
+					<b>setBackgroundColor</b>(color)
+
+					</div>
+					<div class="description">
+						Sets the background colour of this view.
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>color</b>
+									
+								</dt>
+								<dd>a 4-valued array containing the [r,g,b,a] values to use.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setCameraDistance"> </a>
+					<div class="fixedFont">
+
+					
+					<b>setCameraDistance</b>(op)
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>op</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setCurrentActor"> </a>
+					<div class="fixedFont">
+
+					
+					<b>setCurrentActor</b>(actor)
+
+					</div>
+					<div class="description">
+						Sets the current actor
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/vxlActor.html">vxlActor</a>|String}</span> <b>actor</b>
+									
+								</dt>
+								<dd>This could be an actor object or an actor nameIf the actor name is passed to this method, there must be a current scene. Otherwise an exception will raise.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setCurrentCamera"> </a>
+					<div class="fixedFont">
+
+					
+					<b>setCurrentCamera</b>(a)
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>a</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setCurrentView"> </a>
+					<div class="fixedFont">
+
+					
+					<b>setCurrentView</b>(the)
+
+					</div>
+					<div class="description">
+						If the object passed as a parameter is a vxlView then it sets it up as the current view.All subsequent calls to API functions that reference the current view will be redirectedto affect the newly set object.
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{a}</span> <b>the</b>
+									
+								</dt>
+								<dd>vxlView object that we want to make the current one</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setElevation"> </a>
+					<div class="fixedFont">
+
+					
+					<b>setElevation</b>(e)
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>e</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setFrame"> </a>
+					<div class="fixedFont">
+
+					
+					<b>setFrame</b>(f)
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>f</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setLookupTable"> </a>
+					<div class="fixedFont">
+
+					
+					<b>setLookupTable</b>(name)
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>name</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setRenderRate"> </a>
+					<div class="fixedFont">
+
+					
+					<b>setRenderRate</b>(r)
+
+					</div>
+					<div class="description">
+						Sets the rendering rate of the current view
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>r</b>
+									
+								</dt>
+								<dd>the new rendering rate given as a number in milliseconds</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">See:</dt>
+							
+								<dd><a href="../symbols/api.html#setCurrentView">api#setCurrentView</a></dd>
+							
+							</dl>
+						
+
+					<hr />
+				
+					<a name="setup"> </a>
+					<div class="fixedFont">
+
+					<span class="light">{<a href="../symbols/vxlView.html">vxlView</a>}</span>
+					<b>setup</b>(canvas_id, scene)
+
+					</div>
+					<div class="description">
+						Creates and returns a vxlView object
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>canvas_id</b>
+									
+								</dt>
+								<dd>The canvas' Document Object Model (DOM) id.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/vxlScene.html">vxlScene</a>}</span> <b>scene</b>
+									
+								</dt>
+								<dd>optional, the scene associated to this view</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/vxlView.html">vxlView</a>}</span> a new vxlView object</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="startAnimation"> </a>
+					<div class="fixedFont">
+
+					
+					<b>startAnimation</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="stopAnimation"> </a>
+					<div class="fixedFont">
+
+					
+					<b>stopAnimation</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="surfaceON"> </a>
+					<div class="fixedFont">
+
+					
+					<b>surfaceON</b>()
+
+					</div>
+					<div class="description">
+						If there is an act
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="toggleSpin"> </a>
+					<div class="fixedFont">
+
+					
+					<b>toggleSpin</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="wireframeON"> </a>
+					<div class="fixedFont">
+
+					
+					<b>wireframeON</b>()
+
+					</div>
+					<div class="description">
+						If an actor has been selected (If there is an current actor in vxl.c.actor), changes its visualization mode to WIREFRAME. Otherwise,shows all the scene in WIREFRAME mode.
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					
+				
+			
+
+<!-- ============================== event details ========================= -->
+			
+
+			<hr />
+		
+
+
+<!-- ============================== footer ================================= -->
+		<div style="clear:both">
+			
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Feb 16 2012 19:25:21 GMT-0500 (EST)
+		</div>
+        </div>
+        </div>
+        <div id="footer">
+<div style="padding:30px;"></div>
+<div class="col-width clearfix footer-inner">
+<div class="footer-logo"><img src="http://voxelent.com/dev/_style/img/voxelent_footer.png" /> </div>
+<div style="padding:12px;"></div>
+Copyright &copy; 2012 Voxelent Inc., Privacy Statement Terms and Conditions.
+	<div class="shadow"></div>
+</div>
+</div>   
+	</body>
+</html>
