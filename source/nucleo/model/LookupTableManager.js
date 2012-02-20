@@ -10,7 +10,7 @@ function vxlLookupTableManager(){
 	this.tables = [];
 	vxl.go.notifier.addSource(vxl.events.DEFAULT_LUT_LOADED,this);
 	this.loadAll();
-}
+};
 
 /**
  * Load a lookup table file
@@ -32,9 +32,9 @@ vxlLookupTableManager.prototype.load = function(name){
 				self.handle(name,JSON.parse(request.responseText));
 			}
 		  }
-	    }
+	    };
 		request.send();
-}
+};
 /**
  * Once the lookup table file is retrieved, this method adds it to the lookup table manager
  */
@@ -46,7 +46,7 @@ vxlLookupTableManager.prototype.handle = function (ID, payload) {
 	if (lut.ID == vxl.def.lut.main){
 		vxl.go.notifier.fire(vxl.events.DEFAULT_LUT_LOADED);
 	}
-}
+};
 /**
  * Check if a lookup table has been loaded by this lookup table manager
  * @param {String} ID the id of the table to check
@@ -56,7 +56,7 @@ vxlLookupTableManager.prototype.isLoaded = function(ID){
 		if (this.tables[i].ID == ID) return true;
 	}
 	return false;
-}
+};
 
 /**
  * Retrieves a lookup table
@@ -67,7 +67,7 @@ vxlLookupTableManager.prototype.get = function(ID){
 		if (this.tables[i].ID == ID) return this.tables[i];
 	}
 	return null;
-}
+};
 
 /**
  * Returns a list with the names of all of the lookup tables that have been loaded.
@@ -79,7 +79,7 @@ vxlLookupTableManager.prototype.getAllLoaded = function(){
         tablenames[i] = this.tables[i].ID;
     }
     return tablenames;
-}
+};
 
 /**
  * Checks if all the lookup tables have been loaded
@@ -87,7 +87,7 @@ vxlLookupTableManager.prototype.getAllLoaded = function(){
 vxlLookupTableManager.prototype.allLoaded = function(){
 	//@TODO: think of a timeout to alter this state in the case not all tables are loaded (can this happen?)
 	return (vxl.def.lut.list.length == this.tables.length);
-}
+};
 
 /**
  * Loads all the lookup tables defined in vxl.def.luts
@@ -96,7 +96,7 @@ vxlLookupTableManager.prototype.loadAll = function(){
 	for(var i=0;i<vxl.def.lut.list.length;i++){
 		this.load(vxl.def.lut.list[i]);
 	}
-}
+};
 
 /**
  * Creates the global lookup table manager and load all the lookup tables at once

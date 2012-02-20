@@ -14,84 +14,160 @@
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/   
 
-/*------------------------------------------------------------*/
-// Section 1: General 
-/*------------------------------------------------------------*/
+if (!jQuery){
+	alert('Voxelent: jQuery is not loaded. Please include JQuery in your page');	
+}
 
-if (typeof(vxl) == 'undefined'){vxl = {};} //Library namespace
 
-vxl.nucleo = 
-{
-	ver : '0.2',
-	codename : 'bochica',
-};
-
-vxl.d = {};
-vxl.glsl ={};
-/*------------------------------------------------------------*/
-// Section 2: Defaults / Definitions
-/*------------------------------------------------------------*/
 /**
- * Voxelent Definitions
- * @class
- * @property {Object} loadingMode modes to load assets
+* @namespace Voxelent Namespace
+* @property {vxl.version}   version     version 
+* @property {vxl.def}       def         definition objects
+* @property {vxl.go}        go          global objects
+* @property {vxl.c}         c           current objects
+* 
+*/
+var vxl = {
+
+/**
+* Version
+* @namespace Voxelent Version
+* @property {String} number         the number of the current version
+* @property {String} codename       the codename of the current version
+* @property {Array}  plugins        installed plugins if any
+*/
+version : 
+{
+   	number : '0.85',
+   	codename : 'c4n314',
+   	plugins  : []
+},
+
+/**
+ * @namespace Voxelent Default/Definition Objects
+ * @property {vxl.def.glsl}     glsl    GLSL constants
+ * @property {vxl.def.lut}      lut     Lookup Table Definitions
+ * @property {vxl.def.model}    model   Default values for models
+ * @property {vxl.def.view}     view    Default values for views 
+ * 
  */
-vxl.def = {
+def : {
+    /**
+     * @namespace GLSL constants
+     * @property {String} VERTEX_SHADER Vertex Shader Id
+     * @property {String} FRAGMENT_SHADER Fragment Shader Id
+     */
+	glsl			: { 
+						VERTEX_SHADER   : 'VERTEX_SHADER',
+                       
+						FRAGMENT_SHADER : 'FRAGMENT_SHADER'
+					},
+    /** 
+     * @namespace Lookup Table Definitions 
+     * @property {Array}       list         List of lookup tables available
+     * @property {String}      main         Lookup table loaded by default
+     * @property {String}      folder       Folder relative to the web page where lookup tables can be found
+     */                
+	lut             : {
+             
+						list : ["default","aal","autumn","blackbody","bone","brodmann","cardiac",
+								"copper","cortex","cte","french","fs","ge_color","gold","gooch",
+								"hot","hotiron","hsv","jet","nih","nih_fire","nih_ice","pink",
+								"rainramp","spectrum","surface","x_hot","x_rain"],
+      
+						main:"default",
 
-    lutFolder       : "voxdata/luts",
-    modelsFolder    : "voxdata/models",
+						folder:"voxdata/luts"
+				    },
+	/**
+    * @namespace Default values for models
+    * @property {String} folder     Default folder where voxelent will look up for models. This folder is relative to the web page
+    * @property {Array}  diffuse    A 4-valued array that contains the color for actor's default diffuse property. This array has the format [r,g,b,a]
+    */
+	model			: { 
+						folder:"voxdata/models",
+						diffuse: [0.9,0.0,0.0,1.0],
+						/** @namespace Enumeration with the different loading modes provided by Voxelent
+                          * @property {String} LIVE     Each asset is added to the scene as soon as it is downloaded
+                          * @property {String} LATER    The assets are added to the scene only when ALL of them ahve been downloaded
+                          * @property {String} DETACHED The assets are never added to the scene. The programmer decides when to do this.
+                          */
+                         loadingMode     : { LIVE:'LIVE', LATER:'LATER', DETACHED:'DETACHED'}
+					},
+    /**
+    * @namespace Default values for views
+    * @property {Array} background  A 4-valued array that contains the default background colour for view. The format is [r,g,b,a]
+    */
+    view			: {
+    					background: [135/256,135/256,135/256,1.0]
+    				},			      
+	/**
+    * @namespace Default values for actors
+    * @property {vxl.def.actor.mode}    mode    Actor rendering modes
+    */
+	actor			: {
+                        /** @namespace Actor Rendering Modes 
+                        * @property {String} SOLID 
+                        * @property {String} WIREFRAME
+                        * @property {String} POINTS
+                        */
+						mode: {	SOLID:'SOLID', WIREFRAME:'WIREFRAME', POINTS:'POINTS'}
+					},
+	/**
+    * @namespace Default values for cameras
+    * @property {vxl.def.camera.task} task Enumeration of common camera tasks
+    * @property {vxl.def.camera.type} type Camera types available in Voxelent
+    */
+	camera          : {
+                        /** @namespace Enumeration of common camera tasks
+                        * @property {Number} NONE
+                        * @property {Number} PAN
+                        * @property {Number} ROTATE
+                        * @property {Number} DOLLY
+                        */
+						task      : {	NONE : 0,	PAN : 1,	ROTATE : 2,	DOLLY : 3	},
+                        /** @namespace Camera types available in Voxelent
+                        * @property {String} ORBITING   Orbiting Camera - Around the World
+                        * @property {String} TRACKING   Tracking Camera - First Person Camera
+                        */
+    					type      : { ORBITING: 'ORBITING', TRACKING : 'TRACKING'}
+					},
+				 	
+    /**
+    * @namespace Default values for renderers
+    * @property {vxl.def.renderer.mode} mode The rendering mode
+    * @property {vxl.def.renderer.rate} rate The rendering rat
+    */
+	renderer 		: {
+			        mode: { TIMER:'TIMER', ANIMFRAME:'ANIFRAME'}, //EXPERIMENTAL NOT WAY TO CANCEL YET },
+			        rate : { SLOW: 10000,  NORMAL: 500 }
+					}
+},
 
-	luts : ["default","aal","autumn","blackbody","bone","brodmann","cardiac",
-			"copper","cortex","cte","french","fs","ge_color","gold","gooch",
-			"hot","hotiron","hsv","jet","nih","nih_fire","nih_ice","pink",
-			"rainramp","spectrum","surface","x_hot","x_rain"],
-
-	lut             : "default",
-	
-	
-	modelColor      : [0.9,0.9,0.9],
-	ambientColor    : [0.5,0.5,0.5],
-	backgroundColor : [135/256,135/256,135/256],
-	
-	visMode         : {	SOLID:'SOLID', WIREFRAME:'WIREFRAME', POINTS:'POINTS'},
-
-	cameraTask      : {	NONE : 0,	PAN : 1,	ROTATE : 2,	DOLLY : 3	},
-    cameraType      : { ORBITING: 'ORBITING', TRACKING : 'TRACKING'},
-   
-    loadingMode     : { LIVE:'LIVE', LATER:'LATER', DETACHED:'DETACHED'},
-
-	VERTEX_SHADER   : 'VERTEX_SHADER',
-	FRAGMENT_SHADER : 'FRAGMENT_SHADER',
-
-	renderer : {
-        mode: {
-            TIMER:'TIMER',
-            ANIMFRAME:'ANIFRAME' //EXPERIMENTAL NOT WAY TO CANCEL YET
-        },
-        rate : {
-            SLOW: 10000,
-            NORMAL: 500
-        }
-	}
-    
-};
-
-vxl.events = {
+/**
+* @namespace Voxelent Events
+* @property {String} DEFAULT_LUT_LOADED
+* @property {String} SCENE_UPDATED
+* @property {String} MODELS_LOADED
+*/
+events : {
 	DEFAULT_LUT_LOADED 	: 'vxl.events.DEFAULT_LUT_LOADED',
 	SCENE_UPDATED		: 'vxl.events.SCENE_UPDATED',
 	MODELS_LOADED		: 'vxl.events.MODELS_LOADED'
-};
-/*------------------------------------------------------------*/
-// Section 3: Globals Objects (go)
-/*------------------------------------------------------------*/
+},
 
-vxl.go = {
-    animationMode 	    : false,
-    animationFrames	    : 1,
-    modelToFrame 	    : [],
-    axisOn 			    : true,
-    console 		    : true,					  
-    views 			    : [], //array
+
+/**
+* @namespace Voxelent Global Objects
+* @property {Boolean}                   debug
+* @property {vxlNotifier}               notifier
+* @property {vxlModelManager}           modelManager
+* @property {vxlLookupTableManager}     lookupTableManager
+*
+*/
+go : {
+    debug 	 		    : true,					  
+    views 			    : [], //TODO: REFACTOR THIS.Remember is here for JQuery focus and blur bindings
 	_rates			    : [],
     timid 			    : 0,
     notifier            : undefined,
@@ -124,28 +200,34 @@ vxl.go = {
 		for(var i = 0; i < vxl.go.views.length; i++){
 			vxl.go.views[i].renderer.setRenderRate(vxl.go._rates[i]);
 		}
+	},
+	
+	console : function(txt,flag) { 
+		if (this.debug == true || flag){
+			console.info(txt);
+		}
 	}
-};
+},
 
-
-
-/*------------------------------------------------------------*/
-// Section 4: Current 
-/*------------------------------------------------------------*/
-
-vxl.c = {
+/**
+* @namespace Voxelent Current Objects
+* @property {vxlScene}          scene       the current scene
+* @property {vxlView}           view        the current view
+* @property {vxlCamera}         camera      the current camera
+* @property {vxlActor}          actor       the current actor
+* @property {vxlFrameAnimation} animation   the current animation
+*/
+c : {
 	scene		: undefined,
 	view		: undefined,
 	camera 		: undefined,
-	actor 		: undefined,
+	actor		: undefined,  
 	animation 	: undefined
 }
 
+};
 
 
-/*------------------------------------------------------------*/	
-//  Section 5: Improvements
-/*------------------------------------------------------------*/
 
 Array.prototype.max = function(){
 	return Math.max.apply(Math, this);
@@ -194,16 +276,7 @@ window.cancelRequestAnimFrame = ( function() {
         window.oCancelRequestAnimationFrame     ||
         window.msCancelRequestAnimationFrame        ||
         clearTimeout
-} )();
-
-
-function message(v) { 
-	var cl  = arguments.callee.caller.name;
-	if (vxl.go.console == true){
-		console.info(v);
-	}
-}
-
+})();
 
 
 $(window).bind('focus', vxl.go.normalRendering);
@@ -222,7 +295,7 @@ function vxlNotifier(){
 }
 
 vxlNotifier.prototype.addTarget = function(event,t){
-	message('vxlNotifier: adding target for event '+event);
+	vxl.go.console('vxlNotifier: adding target for event '+event);
 	var targetList = this.targetList;
 	if (targetList[event]== undefined){
 		targetList[event] = [];
@@ -232,7 +305,7 @@ vxlNotifier.prototype.addTarget = function(event,t){
 
 
 vxlNotifier.prototype.addSource = function(event,src){
-	message('vxlNotifier: adding source for event '+event);
+	vxl.go.console('vxlNotifier: adding source for event '+event);
 	var targetList = this.targetList;
 	var sourceList = this.sourceList;
 	
@@ -254,7 +327,7 @@ vxlNotifier.prototype.addSource = function(event,src){
 vxlNotifier.prototype.fire = function(event){
 	var targetList = this.targetList;
 	var src = this.sourceList[event];
-	message('vxlNotifier: firing ' +event);
+	vxl.go.console('vxlNotifier: firing ' +event);
 	$(document).trigger(event,[event,src,targetList]);
 }
 
@@ -284,6 +357,7 @@ vxlNotifier.prototype.getTargetsFor = function(event){
 
 /**
  * @class
+ * 3-tuple vector operations
  */
 vxl.vec3 = {};
 
@@ -293,7 +367,7 @@ vxl.vec3.dot = function(a,b){
 		return null;
 	}
 	return ((a.x*b.x) + (a.y*b.y) + (a.z*b.z));
-}
+};
 
 vxl.vec3.cross = function(a,b){
 	if (!(a instanceof vxlVector3) || !(b instanceof vxlVector3)) {
@@ -305,7 +379,7 @@ vxl.vec3.cross = function(a,b){
 	var Zy = a.z * b.x - a.x * b.z;
 	var Zz = a.x * b.y - a.y * b.x;
 	return new vxlVector3(Zx,Zy,Zz);
-}
+};
  
 vxl.vec3.subtract = function (a,b){
 	if (!(a instanceof vxlVector3) || !(b instanceof vxlVector3)) {
@@ -313,7 +387,7 @@ vxl.vec3.subtract = function (a,b){
 		return null;
 	}
 	return new vxlVector3(a.x - b.x, a.y - b.y, a.z - b.z);
-}
+};
 
 vxl.vec3.scale = function(v,s){
 	if (!(v instanceof vxlVector3)){
@@ -325,15 +399,15 @@ vxl.vec3.scale = function(v,s){
 	vv.y = v.y * s;
 	vv.z = v.z * s;
 	return vv;
-}
+};
 
 vxl.vec3.negate  = function(v){
 	return vxl.vec3.scale(v,-1);
-}
+};
 
 vxl.vec3.length = function(v){
  return Math.sqrt((v.x*v.x) + (v.y*v.y) + (v.z*v.z));
-}
+};
 
 vxl.vec3.round = function(v,n){
 	var v = this;
@@ -345,7 +419,7 @@ vxl.vec3.round = function(v,n){
 	v.x = Math.round(v.x*10*n)/(10*n);
 	v.y = Math.round(v.y*10*n)/(10*n);
 	v.z = Math.round(v.z*10*n)/(10*n);
-}
+};
 
 vxl.vec3.normalize = function(v){
 	var le = vxl.vec3.length(v);
@@ -353,7 +427,7 @@ vxl.vec3.normalize = function(v){
 	v.x = v.x / le;
 	v.y = v.y / le;
 	v.z = v.z / le;
-}
+};
 
 vxl.vec3.set = function(a,b){
 	if (a instanceof Array) {
@@ -362,14 +436,14 @@ vxl.vec3.set = function(a,b){
 		b.z = a[2];
     }
 	else if (a instanceof vxlVector3){
-		b.x = a.x;
-		b.y = a.y;
-		b.z = a.z;
+		b['x'] = a['x'];
+		b['y'] = a['y'];
+		b['z'] = a['z'];
 	}
 	else {
 		b.x = 0; b.y =0; b.z =0;
 	}
-}
+};
 
 function vxlVector3(x,y,z){
 	this.x = 0;
@@ -378,7 +452,7 @@ function vxlVector3(x,y,z){
 	if (x != null) {this.x = x;}
 	if (y != null) {this.y = y;}
 	if (z != null) {this.z = z;}
-}
+};
 
 vxlVector3.prototype.toString = function(p,n){
 	
@@ -400,11 +474,11 @@ vxlVector3.prototype.toString = function(p,n){
 		return name+':(' + v.x.toFixed(p) +','+v.y.toFixed(p)+','+v.z.toFixed(p)+')';
 	}
 	
-}
+};
 
 vxl.vec3.create = function(v){
 	return new vxlVector3(v[0], v[1], v[2]);	
-}
+};
 
 
 function vxlVector4(x,y,z,h){
@@ -416,7 +490,7 @@ function vxlVector4(x,y,z,h){
 	if (y != null) {this.y = y;}
 	if (z != null) {this.z = z;}
 	if (h != null) {this.h = h;}
-}
+};
 
 vxlVector4.prototype.toString = function(p,n){
 	
@@ -438,15 +512,23 @@ vxlVector4.prototype.toString = function(p,n){
 		return name+':(' + v.x.toFixed(p) +','+v.y.toFixed(p)+','+v.z.toFixed(p)+','+v.h.toFixed(p)+')';
 	}
 	
-}
-
+};
+/**
+ * @class
+ * 4-tuple vector operations
+ */
 vxl.vec4 = {};
 
 vxl.vec4.create = function(v){
 	return new vxlVector4(v[0], v[1], v[2], v[3]);	
-}
+};
 
-vxl.mat4 = {}
+
+/**
+ * @class
+ * 4x4 Matrix operations
+ */
+vxl.mat4 = {};
 
 vxl.mat4.set = function(src, dst){
 	if (arguments.length == 2) {
@@ -496,7 +578,7 @@ vxl.mat4.set = function(src, dst){
             return;
         }
     }
-}
+};
 
 vxl.mat4.identity = function (m){
 	m.m11 = 1;
@@ -518,7 +600,7 @@ vxl.mat4.identity = function (m){
     m.m42 = 0;
     m.m43 = 0;
     m.m44 = 1;
-}
+};
 
 vxl.mat4.transpose = function(m){
 	var tmp = m.m12;
@@ -544,7 +626,7 @@ vxl.mat4.transpose = function(m){
     tmp = m.m34;
     m.m34 = m.m43;
     m.m43 = tmp;
-}
+};
 
 
 vxl.mat4.inverse = function(m,dest){
@@ -554,9 +636,9 @@ vxl.mat4.inverse = function(m,dest){
     // then the inverse matrix is not unique.
     var det = vxl.mat4._determinant4x4(m);
 
-    if (Math.abs(det) < 1e-8)
+    if (Math.abs(det) < 1e-8){
         return null;
-
+    }
     vxl.mat4._makeAdjoint(m);
 
     // Scale the adjoint matrix to get the inverse
@@ -579,7 +661,7 @@ vxl.mat4.inverse = function(m,dest){
     m.m42 /= det;
     m.m43 /= det;
     m.m44 /= det;
-}
+};
 
 vxl.mat4.multVec3 = function (m,vec){
 	
@@ -587,7 +669,7 @@ vxl.mat4.multVec3 = function (m,vec){
 	var v  = new vxlVector3();
 	
 	if (vec instanceof Array) {
-		v = vxl.vec3.create(vec)
+		v = vxl.vec3.create(vec);
 	}
 	else if (vec instanceof vxlVector3){
 		v = vec;
@@ -601,7 +683,7 @@ vxl.mat4.multVec3 = function (m,vec){
 	vv.z = m.m31 * v.x + m.m32 * v.y + m.m33 * v.z;
 	
 	return vv;
-} 
+};
 
 
 vxl.mat4.multVec4 = function(m,vec){
@@ -626,7 +708,7 @@ vxl.mat4.multVec4 = function(m,vec){
 	vv.h = m.m41 * v.x + m.m42 * v.y + m.m43 * v.z + m.m44 * v.h;
 
 	return vv;
-}
+};
 
 vxl.mat4.translate = function(m,v){
 	m.m41 = m.m11 * v.x + m.m21 * v.y + m.m31 * v.z + m.m41;
@@ -635,30 +717,24 @@ vxl.mat4.translate = function(m,v){
 	m.m44 = m.m14 * v.x + m.m24 * v.y + m.m34 * v.z + m.m44;
 	return m;
     
-}
+};
 
 vxl.mat4.scale = function(m,v){
 
-    if (v.x == undefined)
-        v.x = 1;
-    if (v.z == undefined) {
-        if (v.y == undefined) {
-            v.y = v.x;
-            v.z = v.x;
-        }
-        else
-            v.z = 1;
-    }
-    else if (v.y == undefined)
-        v.y = v.x;
-    
-    var matrix = new vxlMatrix4x4();
-    matrix.m11 = v.x;
-    matrix.m22 = v.y;
-    matrix.m33 = v.z;
-    
-    vxl.mat4.multRight(m,matrix);
-}
+    m.m11 *= v.x;
+    m.m12 *= v.x;
+    m.m13 *= v.x;
+    m.m14 *= v.x;
+    m.m21 *= v.y;
+    m.m22 *= v.y;
+    m.m23 *= v.y;
+    m.m24 *= v.y;
+    m.m31 *= v.z;
+    m.m32 *= v.z;
+    m.m33 *= v.z;
+    m.m34 *= v.z;
+   
+};
 
 vxl.mat4.rotate = function(m,angle,v){
 
@@ -744,7 +820,7 @@ vxl.mat4.rotate = function(m,angle,v){
         mat.m44 = 1;
     }
 	vxl.mat4.multRight(m,mat);
-}
+};
 
 
 vxl.mat4.rotateX = function(mat, angle, dest) {
@@ -756,7 +832,7 @@ vxl.mat4.rotateX = function(mat, angle, dest) {
         var a20 = mat.m31, a21 = mat.m32, a22 = mat.m33, a23 = mat.m34;
 
         if(!dest) { 
-                dest = mat 
+                dest = mat;
         } else if(mat != dest) { // If the source and destination differ, copy the unchanged rows
                 dest.m11 = mat.m11;
                 dest.m12 = mat.m12;
@@ -791,8 +867,9 @@ vxl.mat4.rotateY = function(mat, angle, dest) {
         var a20 = mat.m31, a21 = mat.m32, a22 = mat.m33, a23 = mat.m34;
         
         if(!dest) { 
-                dest = mat 
-        } else if(mat != dest) { // If the source and destination differ, copy the unchanged rows
+                dest = mat;
+        } 
+        else if(mat != dest) { // If the source and destination differ, copy the unchanged rows
                 dest.m21 = mat.m21;
                 dest.m22 = mat.m22;
                 dest.m23 = mat.m23;
@@ -874,7 +951,7 @@ vxl.mat4.multRight = function(m,mat){
     m.m42 = m42;
     m.m43 = m43;
     m.m44 = m44;
-}
+};
 
 vxl.mat4.multLeft = function(m,mat){
     var m11 = (mat.m11 * m.m11 + mat.m12 * m.m21
@@ -932,7 +1009,7 @@ vxl.mat4.multLeft = function(m,mat){
     m.m42 = m42;
     m.m43 = m43;
     m.m44 = m44;
-}
+};
 
 vxl.mat4.ortho = function(m,left, right, bottom, top, near, far){
     var tx = (left + right) / (left - right);
@@ -958,7 +1035,7 @@ vxl.mat4.ortho = function(m,left, right, bottom, top, near, far){
     matrix.m44 = 1;
     
     vxl.mat4.multRight(m,matrix);
-}
+};
 
 vxl.mat4.frustum = function(m,left, right, bottom, top, near, far){
     var matrix = new vxlMatrix4x4();
@@ -988,7 +1065,7 @@ vxl.mat4.frustum = function(m,left, right, bottom, top, near, far){
     matrix.m44 = 0;
     
     vxl.mat4.multRight(m,matrix);
-}
+};
 
 vxl.mat4.perspective = function(m,fovy, aspect, zNear, zFar){
     var top = Math.tan(fovy * Math.PI / 360) * zNear;
@@ -996,7 +1073,7 @@ vxl.mat4.perspective = function(m,fovy, aspect, zNear, zFar){
     var left = aspect * bottom;
     var right = aspect * top;
     vxl.mat4.frustum(m,left, right, bottom, top, zNear, zFar);
-}
+};
 
 vxl.mat4.lookat = function(m,eyex, eyey, eyez, centerx, centery, centerz, upx, upy, upz){
     var matrix = new vxlMatrix4x4();
@@ -1068,18 +1145,18 @@ vxl.mat4.lookat = function(m,eyex, eyey, eyez, centerx, centery, centerz, upx, u
     matrix.translate(-eyex, -eyey, -eyez);
     
     vxl.mat4.multRight(m,matrix);
-}
+};
 
 
 vxl.mat4._determinant2x2 = function(a, b, c, d){
     return a * d - b * c;
-}
+};
 
 vxl.mat4._determinant3x3 = function(a1, a2, a3, b1, b2, b3, c1, c2, c3){
     return a1 * vxl.mat4._determinant2x2(b2, b3, c2, c3)
          - b1 * vxl.mat4._determinant2x2(a2, a3, c2, c3)
          + c1 * vxl.mat4._determinant2x2(a2, a3, b2, b3);
-}
+};
 
 vxl.mat4._determinant4x4 = function(m){
     var a1 = m.m11;
@@ -1106,7 +1183,7 @@ vxl.mat4._determinant4x4 = function(m){
          - b1 * vxl.mat4._determinant3x3(a2, a3, a4, c2, c3, c4, d2, d3, d4)
          + c1 * vxl.mat4._determinant3x3(a2, a3, a4, b2, b3, b4, d2, d3, d4)
          - d1 * vxl.mat4._determinant3x3(a2, a3, a4, b2, b3, b4, c2, c3, c4);
-}
+};
 
 vxl.mat4._makeAdjoint = function(m){
     var a1 = m.m11;
@@ -1149,7 +1226,7 @@ vxl.mat4._makeAdjoint = function(m){
     m.m24  =   vxl.mat4._determinant3x3(a1, a2, a3, c1, c2, c3, d1, d2, d3);
     m.m34  = - vxl.mat4._determinant3x3(a1, a2, a3, b1, b2, b3, d1, d2, d3);
     m.m44  =   vxl.mat4._determinant3x3(a1, a2, a3, b1, b2, b3, c1, c2, c3);
-}
+};
 
 vxlMatrix4x4 = function(m){
    
@@ -1176,7 +1253,7 @@ vxlMatrix4x4 = function(m){
    if (arguments.length == 1 && m instanceof vxlMatrix){
 		vxl.mat4.set(m, this);
    }
-}
+};
 
 vxlMatrix4x4.prototype.getAsArray = function(){
     return [
@@ -1185,22 +1262,20 @@ vxlMatrix4x4.prototype.getAsArray = function(){
         this.m31, this.m32, this.m33, this.m34, 
         this.m41, this.m42, this.m43, this.m44
     ];
-}
+};
 
 vxlMatrix4x4.prototype.getAsFloat32Array = function(){
     return new Float32Array(this.getAsArray());
-}
+};
 
 vxlMatrix4x4.prototype.toString = function(){
-	return debugMatrix(this);
-}
-
-debugMatrix = function(m){
+    var m = this;
 	return 'Matrix\n'+m.m11.toFixed(2)+' '+m.m12.toFixed(2)+' '+m.m13.toFixed(2)+' '+m.m14.toFixed(2)+'\n'+
-	''+m.m21.toFixed(2)+' '+m.m22.toFixed(2)+' '+m.m23.toFixed(2)+' '+m.m24.toFixed(2)+'\n'+
-	''+m.m31.toFixed(2)+' '+m.m32.toFixed(2)+' '+m.m33.toFixed(2)+' '+m.m34.toFixed(2)+'\n'+
-	''+m.m41.toFixed(2)+' '+m.m42.toFixed(2)+' '+m.m43.toFixed(2)+' '+m.m44.toFixed(2)+'\n';
-}
+    ''+m.m21.toFixed(2)+' '+m.m22.toFixed(2)+' '+m.m23.toFixed(2)+' '+m.m24.toFixed(2)+'\n'+
+    ''+m.m31.toFixed(2)+' '+m.m32.toFixed(2)+' '+m.m33.toFixed(2)+' '+m.m34.toFixed(2)+'\n'+
+    ''+m.m41.toFixed(2)+' '+m.m42.toFixed(2)+' '+m.m43.toFixed(2)+' '+m.m44.toFixed(2)+'\n';
+};
+
 
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
@@ -1221,7 +1296,7 @@ debugMatrix = function(m){
  * Creates a vxlCameraState object and associates it with a vxlCamera. 
  * 
  * This association is unique. each camera has one vxlCameraState object. The vxlCameraState object allows to save/retrive 
- * camera states forthe camera it is associated with during the construction.
+ * camera states for the camera it is associated with during the construction.
  * 
  * 
  * @class 
@@ -1292,7 +1367,6 @@ vxlCameraState.prototype.save = function() {
 /**
  * Updates the camera with the state stored in vxlCameraState.
  */
-
 vxlCameraState.prototype.retrieve = function() {
 	var c = this.c;
 	c.azimuth = this.azimuth;
@@ -1365,7 +1439,7 @@ function vxlCamera(vw,t) {
         this.type = t;
     }
     else {
-        this.type = vxl.def.cameraType.ORBITING;
+        this.type = vxl.def.camera.type.ORBITING;
     }
     
 
@@ -1377,12 +1451,12 @@ function vxlCamera(vw,t) {
 
 /**
  * Establishes the type of camera
- * @param {vxl.def.cameraType} t
+ * @param {vxl.def.camera.type} t
  */
 vxlCamera.prototype.setType = function(t){
-    if (t != vxl.def.cameraType.ORBITING && t != vxl.def.cameraType.TRACKING) {
+    if (t != vxl.def.camera.type.ORBITING && t != vxl.def.camera.type.TRACKING) {
         alert('Wrong Camera Type!. Setting Orbitting type by default');
-        this.type = vxl.def.cameraType.ORBITING;
+        this.type = vxl.def.camera.type.ORBITING;
     }
     else{
         this.type = t;
@@ -1414,41 +1488,13 @@ vxlCamera.prototype.goHome = function(h){
 };
 
 
-
-/**
- * Calculates the distance to the current focal point
- */
-vxlCamera.prototype.computeDistance = function() {
-	console.info('compute distance called');
-	/*var c = this;
-
-	var d = vxl.vec3.subtract(c.focalPoint, c.position);
-	c.distance = vxl.vec3.length(d);
-
-	//message(c.focalPoint.toString(1,'fp') + ' distance=' + c.distance);
-
-	if(c.distance < 1e-20) {
-		c.distance = 1e-20;
-		this.debugMessage(" Distance is set to minimum.");
-		var vec = this.normal;
-
-		// recalculate FocalPoint
-		c.focalPoint.x = c.focalPoint.x + vec.x * c.distance;
-		c.focalPoint.y = c.focalPoint.y + vec.y * c.distance;
-		c.focalPoint.z = c.focalPoint.z + vec.z * c.distance;
-	}
-
-	this.normal.x = d.x / c.distance;
-	this.normal.y = d.y / c.distance;
-	this.normal.z = d.z / c.distance;*/
-};
-
 /**
  * Sets the distance from the current focal point
  * @param {Number} d 
+ * @TODO: REVIEW AND IMPLEMENT
  */
 vxlCamera.prototype.setDistance = function(d) {
-	console.info('set distance called');
+	vxl.go.console('set distance called');
 	/*if(this.distance == d) {
 		return;
 	}
@@ -1475,53 +1521,6 @@ vxlCamera.prototype.setDistance = function(d) {
 	this.status('setDistance DONE =');*/
 };
 
-vxlCamera.prototype.computeViewTransform = function() {
-	console.info('compute view transform called');
-	/*var c = this;
-    this.update();*/
-	/*var m = c.transform;
-
-	
-	//1. find the direction of plane normal
-	c.normal = vxl.vec3.subtract(c.position, c.focalPoint);
-	vxl.vec3.normalize(c.normal);
-
-
-	//2. right vector
-	c.right = vxl.vec3.cross(c.up, c.normal);
-	vxl.vec3.normalize(c.right);
-
-
-	//3. orthogonalize view up vector
-	c.up = vxl.vec3.cross(c.normal, c.right);
-	vxl.vec3.normalize(c.up);
-
-
-	vxl.mat4.identity(m);
-	m.m11 = c.right.x;
-	m.m12 = c.right.y;
-	m.m13 = c.right.z;
-
-	m.m21 = c.up.x;
-	m.m22 = c.up.y;
-	m.m23 = c.up.z;
-
-	m.m31 = c.normal.x;
-	m.m32 = c.normal.y;
-	m.m33 = c.normal.z;
-
-	//4. translate position to origin
-	var delta = new vxlVector4(-c.position.x, -c.position.y, -c.position.z, 0);
-	delta = vxl.mat4.multVec4(m, delta);
-	m.m14 = delta.x;
-	m.m24 = delta.y;
-	m.m34 = delta.z;
-	m.m44 = 1;
-
-	vxl.mat4.set(m, c.viewTransform);
-	vxl.mat4.transpose(c.viewTransform);*/
-    
-};
 
 /**
  * Sets the camera position in the scene
@@ -1531,7 +1530,7 @@ vxlCamera.prototype.setPosition = function(p) {
 	
     vxl.vec3.set(vxl.vec3.create(p), this.position);
     this.update();
-	this.debugMessage('vxlCamera: Updated position: ' + this.position.toString(1));
+	this.debugMessage('Camera: Updated position: ' + this.position.toString(1));
 };
 
 /**
@@ -1541,12 +1540,12 @@ vxlCamera.prototype.setPosition = function(p) {
 vxlCamera.prototype.setFocus = function(f){
 	vxl.vec3.set(vxl.vec3.create(f), this.focus);
 	this.update();
-	this.debugMessage('vxlCamera: Updated focus: ' + this.focus.toString(1));
+	this.debugMessage('Camera: Updated focus: ' + this.focus.toString(1));
 };
 
 
 vxlCamera.prototype.pan = function(dx, dy) {
-	console.info(' pan called');
+	vxl.go.console('Camera: pan called');
 	/*@TODO: Review buggy*/
 	/*message('dx = ' + dx);
 	message('dy = ' + dy);
@@ -1554,10 +1553,10 @@ vxlCamera.prototype.pan = function(dx, dy) {
 	c.setPosition(c.position.x + dx * c.right.x, c.position.y + dy * c.up.y, c.position.z);
 	c.setFocalPoint(c.focalPoint.x + dx * c.right.x, c.focalPoint.y + dy * c.up.y, c.focalPoint.z);*/
 
-}
+};
 
 vxlCamera.prototype.dolly = function(value) {
-	console.info(' dolly called');
+	vxl.go.console('Camera: dolly called');
 	/*var c = this;
 	if(value <= 0.0)
 		return;
@@ -1633,7 +1632,7 @@ vxlCamera.prototype.update = function(){
 	
 	this.computeAxis();
     
-    if (this.type == vxl.def.cameraType.TRACKING){
+    if (this.type == vxl.def.camera.type.TRACKING){
         vxl.mat4.translate(this.matrix, this.position);
         vxl.mat4.rotateY(this.matrix, this.azimuth * Math.PI/180);
         vxl.mat4.rotateX(this.matrix, this.elevation * Math.PI/180);
@@ -1658,7 +1657,7 @@ vxlCamera.prototype.update = function(){
     * you don't believe me, go ahead and comment the if clause...
     * Why do you think we do not update the position?
     */
-    if(this.type == vxl.def.cameraType.TRACKING){
+    if(this.type == vxl.def.camera.type.TRACKING){
         vxl.mat4.multVec4(this.matrix, new vxlVector4(0, 0, 0, 1), this.position);
     }
     
@@ -1668,7 +1667,7 @@ vxlCamera.prototype.update = function(){
     this.debugMessage(' right: ' + this.right.toString(2)+', up: ' + this.up.toString(2)+', normal: ' + this.normal.toString(2));
     this.debugMessage('   pos: ' + this.position.toString(2));
     this.debugMessage('   azimuth: ' + this.azimuth +', elevation: '+ this.elevation);
-}
+};
 
 /**
  * Inverts the camera mattrix to obtain the correspondent Model-View Transform
@@ -1679,7 +1678,7 @@ vxlCamera.prototype.getViewTransform = function(){
     vxl.mat4.set(this.matrix, m);
     vxl.mat4.inverse(m);
     return m;
-}
+};
 
 /**
  * This method updates the 3D scene
@@ -1705,7 +1704,7 @@ vxlCamera.prototype.shot = function(bb){
 	}
 	
 	this.setFocus(centre);
-}
+};
 
 /**
  * The camera moves to a position where all the actors in the scene are viewed. The actors
@@ -1715,7 +1714,7 @@ vxlCamera.prototype.shot = function(bb){
  */
 vxlCamera.prototype.longShot = function() {
 	this.shot(this.view.scene.bb);
-}
+};
 
 /**
  * Saves the current camera state in a memento (vxlCameraState)
@@ -1725,7 +1724,7 @@ vxlCamera.prototype.save = function() {
 	var c = this;
 	c.state.save(this);
 	this.debugMessage('Viewpoint saved');
-}
+};
 
 /**
  * Retrieves the last saved camera state from the memento (vxlCameraState)
@@ -1735,7 +1734,7 @@ vxlCamera.prototype.retrieve = function() {
 	var c = this;
 	c.state.retrieve();
 	this.debugMessage('Viewpoint restored');
-}
+};
 
 /**
  * Resets the memento to the original camera state
@@ -1743,8 +1742,8 @@ vxlCamera.prototype.retrieve = function() {
 vxlCamera.prototype.reset = function() {
 	var c = this;
 	c.state.reset();
-	message('camera.reset');
-}
+	vxl.go.console('Camera: reset');
+};
 
 
 vxlCamera.prototype.above = function() {
@@ -1756,7 +1755,7 @@ vxlCamera.prototype.above = function() {
 	vxl.vec3.set([0, 0, -1], c.up);
 	vxl.vec3.set([1, 0, 0], c.right);
 	c.setPosition(0, c.distance, 0);
-	message('camera.reset');
+	vxl.go.console('Camera: above');
 };
 
 vxlCamera.prototype.below = function() {
@@ -1768,8 +1767,8 @@ vxlCamera.prototype.below = function() {
 	vxl.vec3.set([0, 0, 1], c.up);
 	vxl.vec3.set([1, 0, 0], c.right);
 	c.setPosition(0, -c.distance, 0);
-	message('camera.reset');
-}
+	vxl.go.console('Camera: below');
+};
 
 vxlCamera.prototype.right = function() {
 	var c = this;
@@ -1780,8 +1779,8 @@ vxlCamera.prototype.right = function() {
 	vxl.vec3.set([0, 1, 0], c.up);
 	vxl.vec3.set([0, 0, 1], c.right);
 	c.setPosition(-c.distance, 0, 0);
-	message('camera.reset');
-}
+	vxl.go.console('Camera: right');
+};
 
 vxlCamera.prototype.left = function() {
 	var c = this;
@@ -1792,48 +1791,23 @@ vxlCamera.prototype.left = function() {
 	vxl.vec3.set([0, 1, 0], c.up);
 	vxl.vec3.set([0, 0, 1], c.right);
 	c.setPosition(c.distance, 0, 0);
-	message('camera.reset');
-}
+	vxl.go.console('Camera: left');
+};
 
 vxlCamera.prototype.debugMessage = function(v) {
 	if(this.debug) {
-		message(v);
+		vxl.go.console(v);
 	}
 };
 
-/* -----------------------------------------------------------------------
-vxlCamera.prototype.spin = function() {
-	this.spining = !this.spining;
-	if(this.spining) {
-		this.spinTimerID = setInterval((function(self) {
-			return function() {
-				self.spinABit();
-			}
-		})(this), 50);
-		this.changeElevation(30);
-	} else {
-		clearInterval(this.spinTimerID);
-		this.changeElevation(-this.elevation);
-		this.changeAzimuth(-this.azimuth);
-	}
-}
-
-vxlCamera.prototype.spinABit = function() {
-	this.changeElevation(-30);
-	this.changeAzimuth(this.spinSpeed);
-	this.changeElevation(30);
-}
-
-vxlCamera.prototype.moveTo = function(x, y, z) {
-}
 
 vxlCamera.prototype.status = function(v) {
 	var c = this;
 	var p = 1;
-	//message(v+' ' + c.position.toString(p,'pos') + ' ' +	c.focalPoint.toString(p,'focalPoint') + ' ' +'distance: ' + c.distance.toFixed(p));
-	//message(c.up.toString(p,'up') + ' ' + c.right.toString(p,'right') + ' ' + 	'[ elevation:'+c.elevation.toFixed(p)+', azimuth:' + c.azimuth.toFixed(p)+']');
+	vxl.go.console('Camera:'+v+' ' + c.position.toString(p,'pos') + ' ' +	c.focus.toString(p,'focalPoint') + ' ' +'distance: ' + c.distance.toFixed(p));
+	vxl.go.console(c.up.toString(p,'up') + ' ' + c.right.toString(p,'right') + ' ' + 	'[ elevation:'+c.elevation.toFixed(p)+', azimuth:' + c.azimuth.toFixed(p)+']');
 
-};*/
+};
 
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
@@ -1850,25 +1824,45 @@ vxlCamera.prototype.status = function(v) {
     You should have received a copy of the GNU General Public License
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/  
-
+/**
+ * @class
+ * @constructor
+ * @param {vxlView} vw the view
+ * @see vxlCamera
+ * @see vxlView
+ */
 function vxlCameraManager(vw){
 	this.view = vw;
 	this.cameras = [];
 	this.active = this.createCamera();
+	if (vxl.c.camera == undefined){
+	    vxl.c.camera = this.active;
+	}
 }
 
+/**
+ * Resets the camera manager and creates one camera
+ * @param {vxl.def.camera.type} type the type of amera
+ */
 vxlCameraManager.prototype.reset = function(type){
 	this.cameras = [];
 	this.interactors = [];
 	this.active = this.createCamera(type);
-}
+};
 
+/**
+ * Utilitary method that check if the index idx is between 0 and the size of the camera array
+ * @param {Number} idx the index to check.
+ */
 vxlCameraManager.prototype.checkBoundary = function(idx){
 	if (idx <0 || idx >= this.cameras.length){
 		throw('The camera '+idx+' does not exist');
 	}
-}
-
+};
+/**
+ * Creates a camera
+ * @param {vxl.def.camera.type} type the type of camera to create
+ */
 vxlCameraManager.prototype.createCamera = function(type){
 	var camera = new vxlCamera(this.view, type);
 	camera.init();
@@ -1876,22 +1870,33 @@ vxlCameraManager.prototype.createCamera = function(type){
 	this.cameras.push(camera);
 	camera.idx = this.cameras.length - 1;
 	return camera;
-}
+};
 
+/**
+ * Returns the camera with index idx
+ * @param {Number} idx the index of the camera to return
+ */
 vxlCameraManager.prototype.getCamera = function(idx){
 	this.checkBoundary(idx);
 	return this.cameras[idx];
-}
+};
 
+/**
+ * Returns a reference to the current camera. There is always an active camera
+ */
 vxlCameraManager.prototype.getActiveCamera = function(){
 	return this.active;
-}
+};
 
+/**
+ * Changes the active camera to the camera with index idx
+ * @param {Number} idx the index of the camera to make active
+ */
 vxlCameraManager.prototype.switchTo = function(idx){
 	this.checkBoundary(idx);
 	this.active = this.cameras[idx];
 	return this.active;
-}
+};
 
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
@@ -1955,12 +1960,12 @@ function vxlViewListener(vw){
 	this.interactor = new vxlTrackballCameraInteractor();
 	this.picker = new vxlPickerInteractor();
 	this.update();
-}
+};
 
 vxlViewListener.prototype.setInteractor = function(i){
 	this.interactor = i;
 	this.update();
-}
+};
 
 
 vxlViewListener.prototype.update = function(){
@@ -1986,12 +1991,12 @@ vxlViewListener.prototype.update = function(){
 	
 	window.onkeydown = function(ev){
 		interactor.onKeyDown(ev);
-	}
+	};
 	
 	window.onkeyup = function(ev){
 		interactor.onKeyUp(ev);
-	}
-}
+	};
+};
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
@@ -2013,7 +2018,7 @@ vxlTrackballCameraInteractor.prototype = new vxlCameraInteractor();
 
 function vxlTrackballCameraInteractor(c){
 	this.MOTION_FACTOR = 10.0;
-	this.task = vxl.def.cameraTask.NONE;
+	this.task = vxl.def.camera.task.NONE;
 	this.x = 0;
 	this.y = 0;
 	this.lastX = 0;
@@ -2032,21 +2037,21 @@ vxlTrackballCameraInteractor.prototype.onMouseUp = function(ev){
 	//Only for debug purposes
 	/*var task = this.task;
 	var c = this.camera;
-	if (task == vxl.def.cameratask.PAN){
-			message('New Focal Point : ' + c.focalPoint.toString(1,'focalPoint'));
+	if (task == vxl.def.camera.task.PAN){
+			vxl.go.console('Trackball Camera INteractor: New Focal Point : ' + c.focalPoint.toString(1,'focalPoint'));
 	}*/
 	
-	task = vxl.def.cameraTask.NONE;
+	task = vxl.def.camera.task.NONE;
 	
 	this.dragging = false;
-}
+};
 
 vxlTrackballCameraInteractor.prototype.onMouseDown = function(ev){
 	this.x = ev.clientX;
 	this.y = ev.clientY;
 	this.dragging = true;
 	this.button = ev.button;
-}
+};
 
 vxlTrackballCameraInteractor.prototype.onMouseMove = function(ev){
 
@@ -2078,7 +2083,7 @@ vxlTrackballCameraInteractor.prototype.onMouseMove = function(ev){
 	this.lastX = this.x;
     this.lastY = this.y; 
 
-}
+};
 
 vxlTrackballCameraInteractor.prototype.onKeyDown = function(ev){
 	var camera = this.camera;
@@ -2113,7 +2118,7 @@ vxlTrackballCameraInteractor.prototype.onKeyDown = function(ev){
 	else if(this.ctrlPressed && this.keyPressed !=17) {
 		var px = 0;
 		var py = 0;
-		message(ev);
+		vxl.go.console(ev);
 		if (this.keyPressed == 38){
 			py = 10;
 		}
@@ -2130,16 +2135,16 @@ vxlTrackballCameraInteractor.prototype.onKeyDown = function(ev){
 			this.pan(px,py);
 		}
 	}
-}
+};
 
 vxlTrackballCameraInteractor.prototype.onKeyUp = function(ev){
 	if (ev.keyCode == 17){
 		this.ctrlPressed = false;
 	}
-}
+};
 
 vxlTrackballCameraInteractor.prototype.dolly = function(value){
-	this.task = vxl.def.cameraTask.DOLLY;
+	this.task = vxl.def.camera.task.DOLLY;
 	var camera = this.camera;
 	var dv = 2 * this.MOTION_FACTOR * value / camera.view.canvas.height;
 	
@@ -2148,10 +2153,10 @@ vxlTrackballCameraInteractor.prototype.dolly = function(value){
 
 	camera.refresh();
 	
-}
+};
 
 vxlTrackballCameraInteractor.prototype.rotate = function(dx, dy){
-	this.task = vxl.def.cameraTask.ROTATE;
+	this.task = vxl.def.camera.task.ROTATE;
 	
 	var camera = this.camera;
 	var canvas = camera.view.canvas;
@@ -2166,10 +2171,10 @@ vxlTrackballCameraInteractor.prototype.rotate = function(dx, dy){
 	camera.changeElevation(nElevation);
 	camera.refresh();
 	
-}
+};
 
 vxlTrackballCameraInteractor.prototype.pan = function(dx,dy){
-	this.task = vxl.def.cameraTask.PAN;
+	this.task = vxl.def.camera.task.PAN;
 	
 	var camera = this.camera;
 	var canvas = camera.view.canvas;
@@ -2186,7 +2191,7 @@ vxlTrackballCameraInteractor.prototype.pan = function(dx,dy){
 	camera.pan(ndx,ndy);
 	camera.refresh();
 	
-}
+};
 
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
@@ -2291,7 +2296,7 @@ vxlPickerInteractor.prototype.get2DCoords = function(ev){
 }
 
 vxlPickerInteractor.prototype._compare = function(readout, color){
-    //console.info('comparing object '+object.alias+' diffuse ('+Math.round(color[0]*255)+','+Math.round(color[1]*255)+','+Math.round(color[2]*255)+') == readout ('+ readout[0]+','+ readout[1]+','+ readout[2]+')');
+    vxl.go.console('PickerInteractor: comparing object '+object.alias+' diffuse ('+Math.round(color[0]*255)+','+Math.round(color[1]*255)+','+Math.round(color[2]*255)+') == readout ('+ readout[0]+','+ readout[1]+','+ readout[2]+')');
     return (Math.abs(Math.round(color[0]*255) - readout[0]) <= 1 &&
 			Math.abs(Math.round(color[1]*255) - readout[1]) <= 1 && 
 			Math.abs(Math.round(color[2]*255) - readout[2]) <= 1);
@@ -2442,8 +2447,8 @@ vxlTransforms.prototype.updatePerspective = function(){
 };
 
 vxlTransforms.prototype.push = function(){
-	var memento =  vxl.mat4.create();
-	mat4.set(this.mvMatrix, memento);
+	var memento =  new vxlMatrix4x4();
+	vxl.mat4.set(this.mvMatrix, memento);
 	this.stack.push(memento);
 };
 
@@ -2469,9 +2474,9 @@ vxlTransforms.prototype.pop = function(){
 /**
  * @class
  */
-vxl.glsl.diffusive = {
+vxl.def.glsl.diffusive = {
 	
-	NAME : 'diffusive',
+	ID : 'diffusive',
 
 	ATTRIBUTES : [
 	"aVertexPosition", 
@@ -2479,75 +2484,79 @@ vxl.glsl.diffusive = {
 	"aVertexNormal"],
 	
 	UNIFORMS : [
-	"uPMatrix",
-	"uNMatrix",
 	"uMVMatrix",
-	"uOpacity",
+	"uNMatrix",
+	"uPMatrix",
 	"uPointSize",
+	"uLightDirection",
+	"uLightAmbient",
+	"uLightDiffuse",
+	"uMaterialDiffuse",
 	"uUseVertexColors",
-	"uObjectColor",
 	"uUseShading",
-	"uAmbientColor",
-	"uDirectionalColor",
-	"uLightingDirection",
-	"uUseVertexColors"
-	],
+	"uUseLightTranslation"],
 	
 	
     VERTEX_SHADER : [
-
-    "attribute vec3 aVertexPosition; ",
-    "attribute vec3 aVertexNormal; ",
-    "attribute vec4 aVertexColor;",
-    "uniform mat4 uMVMatrix; ",
-    "uniform mat4 uPMatrix; ",
-    "uniform mat4 uNMatrix; ",
-    "uniform vec3 uLightingDirection;",
-    "uniform vec3 uDirectionalColor;",
-    "uniform vec3 uAmbientColor;",
-    "uniform vec3 uObjectColor;",
-    "uniform bool uUseShading;",
-    "uniform bool uUseVertexColors;",
+    
+    "attribute vec3 aVertexPosition;",
+	"attribute vec3 aVertexNormal;",
+	"attribute vec3 aVertexColor;",
     "uniform float uPointSize;",
-    "varying vec4 vColor;",
-    "varying vec4 vAux;",
+	"uniform mat4 uMVMatrix;",
+	"uniform mat4 uPMatrix;",
+	"uniform mat4 uNMatrix;",
+	"uniform vec3 uLightDirection;",
+	"uniform vec4 uLightAmbient;",  
+	"uniform vec4 uLightDiffuse;",
+	"uniform vec4 uMaterialDiffuse;",
+	"uniform bool uUseShading;",
+    "uniform bool uUseVertexColors;",
+    "uniform bool uUseLightTranslation;",
+	"varying vec4 vFinalColor;",
+    
     "void main(void) {",
-    "   gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0); ",
-    "	if(uUseVertexColors) {",
-    "        vAux = aVertexColor;",
-    "   }",
-    "   else {",
-    "		 vAux = vec4(uObjectColor,1.0);",
-    "   }",
-    "   if(uUseShading) {",
-    "		vec4 transformedNormal = uNMatrix * vec4(aVertexNormal, 1.0);",
-    "	    float directionalLightWeighting = max(dot(transformedNormal.xyz,uLightingDirection),0.0);",
-    "	    vColor = vec4(vAux.rgb * (uAmbientColor + uDirectionalColor * directionalLightWeighting),1.0);",
+    "	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);",
+    "	gl_PointSize = uPointSize;",
+    "	if (uUseVertexColors) {",
+    "		vFinalColor = vec4(aVertexColor,1.0);",
+    "       return;",  
     "	}",
-    "   else {",
-    "		vColor = vAux;",
-    "   }",
-    "   gl_PointSize = uPointSize;",
-    "}"].join('\n'),
+    "	if (uUseShading){",
+    "		vec3 N = vec3(uNMatrix * vec4(aVertexNormal, 1.0));",
+	"		vec3 L = normalize(uLightDirection);",
+	"		if (uUseLightTranslation){ L = vec3(uNMatrix * vec4(L,1.0));}",
+	"		float lambertTerm = dot(N,-L);",
+	"		vec4 Ia = uLightAmbient;",
+	"		vec4 Id = uMaterialDiffuse * uLightDiffuse * lambertTerm;",
+    "		vFinalColor = Ia + Id;",
+	"		vFinalColor.a = uMaterialDiffuse.a;",
+	"	}", 
+	"	else {",
+	"		vFinalColor = uMaterialDiffuse;",
+	"	}",
+	"}"].join('\n'),
     
     FRAGMENT_SHADER : [
     "#ifdef GL_ES",
     "precision highp float;",
     "#endif",
 
-    "uniform float uOpacity;",
-    "varying vec4  vColor;",
+    "varying vec4  vFinalColor;",
 
     "void main(void)  {",
-    "		gl_FragColor = vec4(vColor.rgb,uOpacity);",
+    "		gl_FragColor = vFinalColor;",
     "}"].join('\n'),
     
     DEFAULTS : {
-        "uLightingDirection" : [0.0,0.0,1.0],
-        "uDirectionalColor"  : [0.68,0.68,0.68],
-        "uAmbientColor"      : [0.24,0.24,0.24]
+        "uLightDirection" 	: [0.0,0.0,-1.0],
+        "uLightAmbient"   	: [0.0,0.0,0.0,1.0],
+        "uLightDiffuse"   	: [1.0,1.0,1.0,1.0],
+        "uMaterialDiffuse" 	: [0.9,0.9,0.9,1.0],
+        "uPointSize"		: 1.0,
+        "uUseLightTranslation" : false
     }
-}/*-------------------------------------------------------------------------
+};/*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
     Nucleo is free software: you can redistribute it and/or modify
@@ -2565,9 +2574,9 @@ vxl.glsl.diffusive = {
 /**
  * @class
  */
-vxl.glsl.phong = {
+vxl.def.glsl.phong = {
 
-    NAME : 'phong',
+    ID : 'phong',
     
     ATTRIBUTES: [
     "aVertexPosition",
@@ -2580,6 +2589,7 @@ vxl.glsl.phong = {
     "uPMatrix",
     "uNMatrix",
     "uShininess",
+    "uPointSize",
     "uLightDirection",
     "uLightAmbient",
     "uLightDiffuse",
@@ -2587,52 +2597,56 @@ vxl.glsl.phong = {
     "uMaterialAmbient",
     "uMaterialDiffuse",
     "uMaterialSpecular",
-    "uOpacity",
-    "uPointSize",
 	"uUseVertexColors",
-	"uObjectColor",
 	"uUseShading",
-    ],
+    "uUseLightTranslation"],
     
     VERTEX_SHADER: [
     "attribute vec3 aVertexPosition;",
     "attribute vec3 aVertexNormal;",
     "attribute vec3 aVertexColor;",
+    "uniform float uPointSize;",
     "uniform mat4 uMVMatrix;",
     "uniform mat4 uPMatrix;",
     "uniform mat4 uNMatrix;",
     "uniform bool uUseVertexColors;",
     "varying vec3 vNormal;",
     "varying vec3 vEyeVec;",
-    "varying vec3 vAux;",
+    "varying vec4 vFinalColor;",
+    
     "void main(void) {",
-    "     vec4 vertex = uMVMatrix * vec4(aVertexPosition, 1.0);",
-    "     vNormal = vec3(uNMatrix * vec4(aVertexNormal, 1.0));",
-    "     vEyeVec = -vec3(vertex.xyz);",
-    "	if(uUseVertexColors) {",
-    "        vAux = aVertexColor;",
+    "  gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);",
+    "  gl_PointSize = uPointSize;",
+    "   if(uUseVertexColors) {",
+    "       vFinalColor = vec4(aVertexColor,1.0);",
+    "       return;",  
     "   }",
-    "     gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);",
+    "   vec4 vertex = uMVMatrix * vec4(aVertexPosition, 1.0);",
+    "   vNormal = vec3(uNMatrix * vec4(aVertexNormal, 1.0));",
+    "   vEyeVec = -vec3(vertex.xyz);",
     "}"].join('\n'),
 
     FRAGMENT_SHADER : [
     "#ifdef GL_ES",
     "precision highp float;",
     "#endif",
+    
     "uniform bool uUseShading;",
     "uniform bool uUseVertexColors;",
     "uniform float uShininess;      ",
     "uniform vec3 uLightDirection;  ",
+    
     "uniform vec4 uLightAmbient;    ",
     "uniform vec4 uLightDiffuse;    ",
     "uniform vec4 uLightSpecular;   ",
+    
     "uniform vec4 uMaterialAmbient; ",
     "uniform vec4 uMaterialDiffuse; ",
     "uniform vec4 uMaterialSpecular;",
-    "uniform float uOpacity;",
+    
     "varying vec3 vNormal;",
     "varying vec3 vEyeVec;",
-    "varying vec3 vAux;",
+    "varying vec4 vFinalColor;",
     "void main(void)",
     "{",
     
@@ -2644,28 +2658,28 @@ vxl.glsl.phong = {
      "  vec4 Is = vec4(0.0,0.0,0.0,1.0);",
      "  vec4 varMaterialDiffuse = uMaterialDiffuse;",
      "	if(uUseVertexColors) {",
-     "        varMaterialDiffuse = vec4(vAux,uOpacity);",
+     "        varMaterialDiffuse = vFinalColor;",
      "   }",
      "  if(uUseShading){  ",
-     "  if(lambertTerm > 0.0)",
-     "  {",
-     "       Id = uLightDiffuse * varMaterialDiffuse * lambertTerm;",
-     "       vec3 E = normalize(vEyeVec);",
-     "       vec3 R = reflect(L, N);",
-     "       float specular = pow( max(dot(R, E), 0.0), uShininess);",
-     "       Is = uLightSpecular * uMaterialSpecular * specular;",
-     "  }",
-     "  vec4 finalColor = Ia + Id + Is;",
-     "  finalColor.a = uOpacity;",
-     "  gl_FragColor = finalColor;",
-     "  } else {",
-     "  gl_FragColor = vec4(1.0,1.0,1.0,1.0); ",	
+     "      if(lambertTerm > 0.0)",
+     "      {",
+     "          Id = uLightDiffuse * varMaterialDiffuse * lambertTerm;",
+     "          vec3 E = normalize(vEyeVec);",
+     "          vec3 R = reflect(L, N);",
+     "          float specular = pow( max(dot(R, E), 0.0), uShininess);",
+     "          Is = uLightSpecular * uMaterialSpecular * specular;",
+     "      }",
+     "      gl_FragColor = Ia + Id + Is;",
+     "      gl_FragColor.a = uMaterialDiffuse.a;",
+     "  } ",
+     "  else {",
+     "      gl_FragColor = varMaterialDiffuse; ",	
      "  }",
      "}"].join('\n'),
 
     DEFAULTS : {
         "uShininess"        : 230.0,
-        "uLightDirection"   : [0.0, 0.0, -1.0],
+        "uLightDirection"   : [0.0, -1.0, -1.0],
         "uLightAmbient"     : [0.03,0.03,0.03,1.0],
         "uLightDiffuse"     : [1.0,1.0,1.0,1.0], 
         "uLightSpecular"    : [1.0,1.0,1.0,1.0],
@@ -2673,7 +2687,7 @@ vxl.glsl.phong = {
         "uMaterialDiffuse"  : [0.8,0.8,0.8,1.0],
         "uMaterialSpecular" : [1.0,1.0,1.0,1.0]
     }
-}/*-------------------------------------------------------------------------
+};/*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
     Nucleo is free software: you can redistribute it and/or modify
@@ -2697,7 +2711,7 @@ function vxlProgram (gl) {
     this._gl                = gl;
     this._codebase          = {};
 
-    this._webGLProgram      = {};
+    this._program           = {};
     this._attributeList     = {};
     this._uniformList       = {};
     this._uniformType       = {};
@@ -2709,151 +2723,135 @@ function vxlProgram (gl) {
     this._currentUniformLocation  = {};
 };
 
-vxlProgram.prototype.register = function(id,code){
-	console.info('Registering program '+ id);
-    this._codebase[id] = code;
+
+/**
+ * Register a program in the database
+ * @param {Object} the program to register
+ */
+vxlProgram.prototype.register = function(glslObject){
+	vxl.go.console('Registering program '+ glslObject.ID);
+    this._codebase[glslObject.ID] = glslObject;
 };
 
-vxlProgram.prototype.isRegistered = function(id){
-	return (this._codebase[id] != undefined);
-}
-    
-vxlProgram.prototype._createShader = function(type,code){
-    var gl      = this._gl;
-    var shader = null;
-    
-    if (type == vxl.def.VERTEX_SHADER){
-        shader = gl.createShader(gl.VERTEX_SHADER);
-    }
-    else if (type == vxl.def.FRAGMENT_SHADER){
-        shader = gl.createShader(gl.FRAGMENT_SHADER);
-    }
-    
-    if (code == undefined || code == null){
-        alert('Error getting the code for shader of type ' + type);
-    }
-    
-    gl.shaderSource(shader, code);
-    gl.compileShader(shader);
-
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        alert(gl.getShaderInfoLog(shader));
-    }
-    
-    return shader;
+/**
+ * Verifies whether a program is loaded in the database or not
+ * @param {String} ID program id
+ * @returns true if the program is registered, false otherwise
+ */
+vxlProgram.prototype.isRegistered = function(ID){
+	return (this._codebase[ID] != undefined);
 };
+
+/**
+ * Loads a program
+ * @param {String} ID the id of the program to load
+ */
+vxlProgram.prototype.loadProgram = function(ID){
     
-vxlProgram.prototype.loadProgram = function(id){
-    
-    var programCode = this._codebase[id];
+    var code = this._codebase[ID];
     
     var gl   = this._gl;
-    var webGLProgram  = gl.createProgram();
+    var WEB_GL_PROGRAM  = gl.createProgram();
     
     
-    if (programCode.VERTEX_SHADER){
-        var vs = this._createShader(vxl.def.VERTEX_SHADER,programCode.VERTEX_SHADER);
-        gl.attachShader(webGLProgram, vs);
+    if (code.VERTEX_SHADER){
+        var vs = this._createShader(vxl.def.glsl.VERTEX_SHADER,code.VERTEX_SHADER);
+        gl.attachShader(WEB_GL_PROGRAM, vs);
     }
     
-    if (programCode.FRAGMENT_SHADER){
-        var fs = this._createShader(vxl.def.FRAGMENT_SHADER,programCode.FRAGMENT_SHADER);
-        gl.attachShader(webGLProgram, fs);
+    if (code.FRAGMENT_SHADER){
+        var fs = this._createShader(vxl.def.glsl.FRAGMENT_SHADER,code.FRAGMENT_SHADER);
+        gl.attachShader(WEB_GL_PROGRAM, fs);
     }
     
-    gl.linkProgram(webGLProgram);
+    gl.linkProgram(WEB_GL_PROGRAM);
      
-    if (!gl.getProgramParameter(webGLProgram, gl.LINK_STATUS)) {
+    if (!gl.getProgramParameter(WEB_GL_PROGRAM, gl.LINK_STATUS)) {
         alert("Program: Could not link the shading program");
     }
     else{
-        console.info("Program: the program "+id+" has been loaded");
+        //vxl.go.console("Program: the program "+ID+" has been loaded");
     }
     
-    this._webGLProgram[id] = webGLProgram;
+    this._program[ID] = WEB_GL_PROGRAM;
   
 };
 
-vxlProgram.prototype.isLoaded = function(id){
-	return (this._webGLProgram[id] != undefined);
-}
+/**
+ * Verifies if a program is loaded
+ * @param {String} ID the program id
+ * @returns true if the program is loaded, false otherwise
+ */
+vxlProgram.prototype.isLoaded = function(ID){
+    return (this._program[ID] != undefined);
+};
 
-vxlProgram.prototype._parseUniforms = function(id){
-	
-	vs = this._codebase[this._currentProgramID].VERTEX_SHADER;
-	fs = this._codebase[this._currentProgramID].FRAGMENT_SHADER;
-	uNames = this._codebase[this._currentProgramID].UNIFORMS;
-    
-    uTypes = {};
-	
-	
-	for (var i=0;i< uNames.length; i++){
-		var uniformID = uNames[i];
-		var rex = new RegExp('uniform.*'+uniformID,'g');
-		
-		if (vs.search(rex) != -1){
-			uTypes[uniformID] = vs.substring(vs.search(rex),vs.length).substring(0,vs.indexOf(';')).split(' ')[1];
-		}
-		
-		else if(fs.search(rex) != 1){
-			uTypes[uniformID] = fs.substring(fs.search(rex),fs.length).substring(0,fs.indexOf(';')).split(' ')[1];
-		}
-		
-		else{
-			alert('Program: In the program '+this._currentProgramID+' the uniform '+uniformID+' is listed but not used');
-		}
-	}
-	
-	
-	this._uniformList[this._currentProgramID] = uNames;
-	this._uniformType[this._currentProgramID] = uTypes; 
-}
-    
-vxlProgram.prototype.useProgram = function(id){
-    
+/**
+ * Uses a program from the database.
+ * If you are not sure if the program you want to use is in the database then call vxlRenderer.setProgram instead
+ * @param {String} ID the program id
+ * @see vxlRenderer#setProgram
+ */
+vxlProgram.prototype.useProgram = function(ID){
+
     var gl = this._gl;
-    var webGLProgram = this._webGLProgram[id];
+    var WEB_GL_PROGRAM = this._program[ID];
     
-    if (id in this._webGLProgram){
+    if (WEB_GL_PROGRAM != undefined && WEB_GL_PROGRAM != null){
         
-        gl.linkProgram(webGLProgram);
-        gl.useProgram (webGLProgram);
+        if (WEB_GL_PROGRAM == this._currentWebGLProgram) return;
         
+        //gl.linkProgram(WEB_GL_PROGRAM);
+        gl.useProgram (WEB_GL_PROGRAM);
         
-        this._currentWebGLProgram = webGLProgram;
-        this._currentProgramID = id;
+        this._currentWebGLProgram = WEB_GL_PROGRAM;
+        this._currentProgramID = ID;
         this._parseUniforms();
         
-        console.info('Program: the program '+id+' has been linked and is the current program');
+        //vxl.go.console('Program: the program '+ID+' has been linked and is the current program');
     }
     else{
-        alert("Program: the program " + id + " has NOT been loaded");
+        alert("Program: the program " + ID + " has NOT been loaded");
     }
 };
 
+    
+/**
+ * Loads the uniform defaults for the current program
+ */
 vxlProgram.prototype.loadDefaults = function(){
     var code = this._codebase[this._currentProgramID];
     
     if ('DEFAULTS' in code){
-        console.info('Program: defaults for program '+this._currentProgramID+' found. Loading..');
+        //vxl.go.console('Program: defaults for program '+this._currentProgramID+' found. Loading..');
         var defaults = code.DEFAULTS;
         for(var u in defaults){
             this.setUniform(u,defaults[u]);
-            console.info('Program: Uniform:'+u+', Default Value:'+defaults[u]);
+            //vxl.go.console('Program: Uniform:'+u+', Default Value:'+defaults[u]);
         }
     }
     else{
-    	console.info('Program: WARNING: defaults for program '+this._currentProgramID+' NOT found');
+    	vxl.go.console('Program: WARNING: defaults for program '+this._currentProgramID+' NOT found');
     }
 };
 
+/**
+ * Sets all the uniforms defined by the object obj
+ * @param {Object} an object containing uniform names and values. Every property of this object
+ * will be considered a uniform
+ */
 vxlProgram.prototype.setUniforms = function(obj){
-	//obj is an object where every element is an uniform
 	for(uni in obj){
 		this.setUniform(uni,obj[uni]);
 	}
-}
+};
 
+/**
+ * Sets a uniform.
+ * Uses polymorphism to make the programmers life happier
+ * @param {String} uniform name
+ * @param {Object} the value
+ */
 vxlProgram.prototype.setUniform = function(uniformID, value, hint){
     
     var webGLProgram 		= this._currentWebGLProgram;
@@ -2874,7 +2872,10 @@ vxlProgram.prototype.setUniform = function(uniformID, value, hint){
     this._setPolymorphicUniform(uniformID, uniformLoc[uniformID], value, hint);
 };
 
-
+/**
+ * Returns a uniform value from the cache maintained by vxlProgram
+ * @param {String} the uniform id
+ */
 vxlProgram.prototype.getUniform = function(uniformID){
     //TODO: Think about this
     //if(!(name in this._uniformList)){
@@ -2884,15 +2885,121 @@ vxlProgram.prototype.getUniform = function(uniformID){
     return this._uniform_cache[uniformID];
 };
 
+/**
+ * This method tells the WebGL context how to access the information contained in the
+ * WebGL buffer associated with the attribute
+ * @param {String} name name of the attribute
+ * 
+ */
+vxlProgram.prototype.setAttributePointer = function(name, numElements, type, norm,stride,offset){
+    var a = this._getAttributeLocation(name);
+    this._gl.vertexAttribPointer(a,numElements, type, norm, stride, offset);
+};
+
+/**
+ * Enables a vertex attribute array
+ * @param {String} name the name of the attribute array to enable
+ */
+vxlProgram.prototype.enableAttribute = function(name){
+   var a = this._getAttributeLocation(name);
+   this._gl.enableVertexAttribArray(a);
+};
+
+/**
+ * Disables a vertex attribute array
+ * @param {String} name the name of the attribute array to disable
+ * 
+ */
+vxlProgram.prototype.disableAttribute = function(name){
+    var a = this._getAttributeLocation(name);
+    this._gl.disableVertexAttribArray(a);
+};
+
+/**
+ * Creates a WebGL shader
+ * This method is private.
+ */
+vxlProgram.prototype._createShader = function(type,code){
+    var gl      = this._gl;
+    var shader = null;
+    
+    if (type == vxl.def.glsl.VERTEX_SHADER){
+        shader = gl.createShader(gl.VERTEX_SHADER);
+    }
+    else if (type == vxl.def.glsl.FRAGMENT_SHADER){
+        shader = gl.createShader(gl.FRAGMENT_SHADER);
+    }
+    
+    if (code == undefined || code == null){
+        alert('Error getting the code for shader of type ' + type);
+    }
+    
+    gl.shaderSource(shader, code);
+    gl.compileShader(shader);
+
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        alert(gl.getShaderInfoLog(shader));
+    }
+    
+    return shader;
+};
+    
+
+/**
+ * Parses uniforms
+ * This method is private
+ */
+vxlProgram.prototype._parseUniforms = function(id){
+    
+    vs = this._codebase[this._currentProgramID].VERTEX_SHADER;
+    fs = this._codebase[this._currentProgramID].FRAGMENT_SHADER;
+    uNames = this._codebase[this._currentProgramID].UNIFORMS;
+    
+    uTypes = {};
+    
+    
+    for (var i=0;i< uNames.length; i++){
+        var uniformID = uNames[i];
+        var rex = new RegExp('uniform.*'+uniformID,'g');
+        
+        if (vs.search(rex) != -1){
+            uTypes[uniformID] = vs.substring(vs.search(rex),vs.length).substring(0,vs.indexOf(';')).split(' ')[1];
+        }
+        
+        else if(fs.search(rex) != 1){
+            uTypes[uniformID] = fs.substring(fs.search(rex),fs.length).substring(0,fs.indexOf(';')).split(' ')[1];
+        }
+        
+        else{
+            alert('Program: In the program '+this._currentProgramID+' the uniform '+uniformID+' is listed but not used');
+        }
+    }
+    
+    
+    this._uniformList[this._currentProgramID] = uNames;
+    this._uniformType[this._currentProgramID] = uTypes; 
+};
+
+/**
+ * Obtains an attribute location
+ * This method is private
+ * @param {String} name
+ */
 vxlProgram.prototype._getAttributeLocation = function(name){
 
     if(!(name in this._attributeList)){
-        this._attributeList[name] = this._gl.getAttribLocation(this._currentWebGLProgram,name)
+        this._attributeList[name] = this._gl.getAttribLocation(this._currentWebGLProgram,name);
     }
 
     return this._attributeList[name];
 };
 
+/**
+ * This is one of the jewels of Voxelent. Based on the information contained in the 
+ * program database, it will do the appropriate gl call to set the uniform
+ * This method is private. Use setUniform instead.
+ * @see vxlProgram#setUniform
+ */
 vxlProgram.prototype._setPolymorphicUniform = function(uniformID, locationID,value,hint){
 
 	//In the extend of what it is reasonable,
@@ -2905,7 +3012,7 @@ vxlProgram.prototype._setPolymorphicUniform = function(uniformID, locationID,val
     
     if (glslType == 'bool'){
     	//if (typeof value != 'boolean') { 
-    	//	console.info('Program: the uniform '+uniformID+' is defined as bool in GLSL. However the JS variable is not');
+    	//	vxl.go.console('Program: the uniform '+uniformID+' is defined as bool in GLSL. However the JS variable is not');
     	//}/
         gl.uniform1i(locationID,value);
         return;
@@ -2923,7 +3030,7 @@ vxlProgram.prototype._setPolymorphicUniform = function(uniformID, locationID,val
     
     else if (glslType == 'mat4'){    
     	if (!(value instanceof vxlMatrix4x4)){
-    		console.info('Program: the uniform '+uniformID+' is defined as mat4 in GLSL. However the JS variable is not.');
+    		vxl.go.console('Program: the uniform '+uniformID+' is defined as mat4 in GLSL. However the JS variable is not.');
     	}
         gl.uniformMatrix4fv(locationID,false,value.getAsFloat32Array());
         return;
@@ -2933,10 +3040,10 @@ vxlProgram.prototype._setPolymorphicUniform = function(uniformID, locationID,val
     else if (value instanceof Array){
         if (hint  == 'int'){
             switch(value.length){
-                case 1: { gl.uniform1iv(locationID,value); break };
-                case 2: { gl.uniform2iv(locationID,value); break };
-                case 3: { gl.uniform3iv(locationID,value); break };
-                case 4: { gl.uniform4iv(locationID,value); break };
+                case 1: { gl.uniform1iv(locationID,value); break; };
+                case 2: { gl.uniform2iv(locationID,value); break; };
+                case 3: { gl.uniform3iv(locationID,value); break; };
+                case 4: { gl.uniform4iv(locationID,value); break; };
                 default: alert('ERROR');
             }
        }
@@ -2954,26 +3061,6 @@ vxlProgram.prototype._setPolymorphicUniform = function(uniformID, locationID,val
     else {
     	alert('Program: ERROR. The uniform  '+uniformID+ ' could not be mapped');
     }
-};
-
-vxlProgram.prototype.setVertexAttribPointer = function(name, numElements, type, norm,stride,offset){
-    var a = this._getAttributeLocation(name);
-    this._gl.vertexAttribPointer(a,numElements, type, norm, stride, offset);
-};
-
-vxlProgram.prototype.enableVertexAttribArray = function(name){
-    var a = this._getAttributeLocation(name);
-    this._gl.enableVertexAttribArray(a);
-};
-
-vxlProgram.prototype.disableVertexAttribArray = function(name){
-    var a = this._getAttributeLocation(name);
-    this._gl.disableVertexAttribArray(a);
-};
-
-vxlProgram.prototype.setMatrixUniform = function(name,m){
-	var u = this._gl.getUniformLocation(this._currentWebGLProgram,name);
-	this._gl.uniformMatrix4fv(u,false,m.getAsFloat32Array());
 };
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
@@ -3012,6 +3099,7 @@ function vxlRenderer(vw){
     
     this.gl  = this.getWebGLContext();
     this.prg = new vxlProgram(this.gl);
+    
     this.setDefaultProgram();
     
     this.transforms = new vxlTransforms(vw);
@@ -3024,7 +3112,7 @@ function vxlRenderer(vw){
  */
 vxlRenderer.prototype.getWebGLContext = function(){
 	
-	var _webGLContext = null;
+	var WEB_GL_CONTEXT = null;
 	var canvas = this.view.canvas;
 	this.width = canvas.width;
 	this.height = canvas.height;
@@ -3033,52 +3121,54 @@ vxlRenderer.prototype.getWebGLContext = function(){
 	
 	for (var i = 0; i < names.length; ++i) {
 		try {
-			_webGLContext = canvas.getContext(names[i]);
+			WEB_GL_CONTEXT = canvas.getContext(names[i]);
 		} 
 		catch(e) {}
-		if (_webGLContext) {
+		if (WEB_GL_CONTEXT) {
 			break;
 		}
 	}
-	if (_webGLContext == null) {
+	if (WEB_GL_CONTEXT == null) {
 		alert("Could not intiailise WebGL");
 		throw("Could not initialise WebGL"); 
 		return;
 	}
 	else {
-		var _gl = _webGLContext;
+		var _gl = WEB_GL_CONTEXT;
 		_gl.enable(_gl.DEPTH_TEST);
 		_gl.enable(_gl.BLEND);
 		_gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
-		_gl.depthFunc(_gl.LEQUAL);
+		_gl.depthFunc(_gl.LESS);
 	}
-    return _webGLContext;
-}
+    return WEB_GL_CONTEXT;
+};
 
 /**
  * Sets the program 'diffusive' as the program by default to be used by this renderer
  */
 vxlRenderer.prototype.setDefaultProgram = function(){
-    this.setProgram(vxl.glsl.diffusive.NAME, vxl.glsl.diffusive);
-}
+    this.setProgram(vxl.def.glsl.diffusive);
+};
 
 /**
  * Tries to add a new program definition to this renderer
- * @param {String} id program name or program alias that we will use to recognize this program in the system
- * @param {String} code contains the GLSL definition of the program
+ * @param {Object} program definition. See the diffuse and phong examples below.
+ * @see {vxl.def.glsl.phong}
+ * @see {vxl.def.glsl.diffuse}
  */
-vxlRenderer.prototype.setProgram = function(id, code){
+vxlRenderer.prototype.setProgram = function(glslObject){
 	var prg = this.prg;
-	if (!prg.isRegistered(id)){
-		prg.register(id,code);
+
+	if (!prg.isRegistered(glslObject.ID)){
+		prg.register(glslObject);
 	}
 	
-	if (!prg.isLoaded(id)){
-		prg.loadProgram(id);
+	if (!prg.isLoaded(glslObject.ID)){
+		prg.loadProgram(glslObject.ID);
 	}
-	prg.useProgram(id);
+	prg.useProgram(glslObject.ID);
 	prg.loadDefaults();
-}
+};
 
 /**
  * Clears the rendering context
@@ -3090,21 +3180,21 @@ vxlRenderer.prototype.clear = function(){
 	//vxl.mat4.identity(this.pMatrix);
 	//vxl.mat4.perspective(this.pMatrix, this.view.fovy, this.view.width/this.view.height, this.view.zNear, this.view.zFar);
 	this.transforms.calculatePerspective();
-}
+};
 
 /**
  * Starts the renderer
  */
 vxlRenderer.prototype.start = function(){
 	if(this.mode == vxl.def.renderer.mode.TIMER){
-		//message('Renderer: starting rendering for view ['+this.view.name+'] at '+this.renderRate+ 'ms');
+		//vxl.go.console('Renderer: starting rendering for view ['+this.view.name+'] at '+this.renderRate+ 'ms');
 		this.timerID = setInterval((function(self) {return function() {self.render();}})(this),this.renderRate); 
 	}
 	else if(this.mode == vxl.def.renderer.mode.ANIMFRAME){
 		//vxl.go.render();
-		message('vxl.go.render invoked');
+		message('Renderer for animation invoked');
 	}
-}
+};
 
 /**
  * Stops the renderer
@@ -3116,21 +3206,17 @@ vxlRenderer.prototype.stop = function(){
 	else if (this.mode == vxl.def.renderer.mode.ANIMFRAME){
 		//vxl.go.cancelRender();
 	}
-}
+};
 
 /**
  * Sets the rendering rate in ms
- * @param {Number} ms the new rendering rate in milliseconds
+ * @param {Number} rate the new rendering rate in milliseconds
  */
 vxlRenderer.prototype.setRenderRate = function(rate){ //rate in ms
 	
 	this.renderRate = rate;
 	this.stop();
 
-	if (this.animation && this.animation.running){
-		this.animation.stop();
-		this.animation.start();
-	}
 	
 	if (rate == null || rate <=0){
 		//this.mode = vxl.def.renderer.ANIMFRAME; //disabled for now
@@ -3139,12 +3225,12 @@ vxlRenderer.prototype.setRenderRate = function(rate){ //rate in ms
 	}	
 	else{
 		this.mode = vxl.def.renderer.mode.TIMER;
-		message('Renderer: view['+this.view.name+'] mode = TIMER, render rate = ' + rate);
+		vxl.go.console('Renderer: view['+this.view.name+'] mode = TIMER, render rate = ' + rate,true);
 	}
 	
 	this.start();
 	
-}
+};
 
 /**
  * Sets the color used to clear the rendering context
@@ -3152,8 +3238,8 @@ vxlRenderer.prototype.setRenderRate = function(rate){ //rate in ms
  * @see vxlView#setBackgroundColor
  */
 vxlRenderer.prototype.clearColor = function(cc){
-	this.gl.clearColor(cc[0], cc[1], cc[2], 1.0);
-}
+	this.gl.clearColor(cc[0], cc[1], cc[2], cc[3]);
+};
 
 /**
  * Sets the clear depth for the rendering context
@@ -3161,36 +3247,15 @@ vxlRenderer.prototype.clearColor = function(cc){
  */
 vxlRenderer.prototype.clearDepth = function(d){
 	this.gl.clearDepth(d);
-}
-
-
-/**
- * Passes the matrices to the shading program
- */
-vxlRenderer.prototype._setMatrices = function(){
-    
-    this.transforms.update();
-    
-    var prg = this.prg;
-    
-    prg.setUniform("uMVMatrix",this.transforms.mvMatrix);
-    prg.setUniform("uPMatrix", this.transforms.pMatrix);
-    prg.setUniform("uNMatrix", this.transforms.nMatrix);
- };
-
+};
 
 /**
  * Renders the scene by delegating the rendering to each actor present in the scene
  */
 vxlRenderer.prototype.render = function(){	
-	//console.info('Rendering view ['+this.view.name+']');
-    var scene = this.view.scene;   
-	this.view.prepareForRendering();
-    this._setMatrices();
-	//scene.allocate(this);
-    scene.render(this);
-}
-
+	this.view.resize();
+    this.view.scene.render();
+};
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
@@ -3218,7 +3283,7 @@ function vxlModel(name){
 	this.indices 	= null;
 	this.vertices 	= null;
 	this.scalars 	= null;
-	this.color 		= null;
+	this.diffuse	= null;
 	this.normals 	= null;
 	this.wireframe 	= null;
 	this.centre 	= null;
@@ -3237,28 +3302,30 @@ vxlModel.prototype.load = function(nm,payload){
 	if (payload.obj_name != null){
 		this.name = payload.obj_name;
 	}
+	//copy by reference (no slicing) as models are loaded once
 	this.vertices 	= payload.vertices;
 	this.indices 	= payload.indices;
-	this.color 		= payload.color;
+	this.diffuse 	= payload.diffuse;
 	this.scalars 	= payload.scalars;
 	this.wireframe  = payload.wireframe;
 	this.colors     = payload.colors;	
 
-	if(!this.normals && !this.wireframe){
+	if(this.normals == undefined && this.indices != undefined){
 		this.getNormals();
 	}
 	
-	
-	if(!this.color){
-		this.color = vxl.def.modelColor.slice(0); //so posterior modifications of the default don't affect this model
+	if(this.diffuse == undefined){
+		//We copy the default by value so posterior modifications of the default do not affect this model
+		this.diffuse = vxl.def.model.diffuse.slice(0); 
 	}
-	if (this.wireframe == null){
+	
+	if (this.wireframe == undefined){
 		this.getWireframeIndices();
 	}
 	
 	this.getOutline();
 	this.getCentre();
-}
+};
 
 
 /**
@@ -3335,8 +3402,8 @@ vxlModel.prototype.getNormals = function(reverse){
 		ns[i+z] = nn[z];
 	}
 	this.normals = ns;
-}  
-
+};
+  
 /**
  * Generate the wireframe indices using the model indices
  */  
@@ -3354,7 +3421,7 @@ vxlModel.prototype.getWireframeIndices = function(){
 	   j = j+6;
 	}
 	this.wireframe = wfi;
-  }
+};
 /**
  * Calculate the centre of this model
  */  
@@ -3367,7 +3434,7 @@ vxlModel.prototype.getCentre = function(){
 	  c[2] = (bb[5] + bb[2]) /2;
 	  
 	  this.centre = c;
-	}
+};
 
 /**
  * Calculate the outline of this model (bounding box)
@@ -3385,7 +3452,7 @@ vxlModel.prototype.getOutline = function(){
 		bb[5] = Math.max(bb[5],vs[i+2]);
 	}
 	this.outline = bb;
-}
+};
 
 
 /*-------------------------------------------------------------------------
@@ -3416,28 +3483,41 @@ vxlModel.prototype.getOutline = function(){
 function vxlActor(model){
   
   if (model){
-  	this.model 	= model;
-  	this.name 	= model.name;
-  	this.color 	= model.color;
+  	this.model 	 = model;
+  	this.name 	 = model.name;
+  	this.diffuse = model.diffuse;
   }
   
-  this.buffer = {
-    vertex:null, 
-    normal:null,
-    color:null,
-    index:null,
-    wireframe:null
-  }
+  this.allocated = false;
+  this.visible   = true;
+  this.mode = vxl.def.actor.mode.SOLID;
+  this.opacity = 1.0;
+  this.colors = model?(model.colors!=null?model.colors:null):null;	//it will create colors for this actor once a lookup table had been set up
+  
+  this.position 	= vxl.vec3.create([0, 0, 0]);
+  this.scale 		= vxl.vec3.create([1, 1, 1]);
+  this.rotation 	= vxl.vec3.create([0, 0, 0]);
+  
+  this.program      = vxl.def.glsl.diffusive;
   
   this.renderers = [];
   this.buffers = [];
-  
-  this.matrix = new vxlMatrix4x4();
-  this.allocated = false;
-  this.visible   = true;
-  this.mode = vxl.def.visMode.SOLID;
-  this.opacity = 1.0;
-  this.colors = model?(model.colors!=null?model.colors:null):null;	//it will create colors for this actor once a lookup table had been set up
+  this.clones  = 0;
+};
+
+/**
+ * If the property exists, then it updates it
+ * @param {String} property 
+ * @param {Object} value 
+ */
+vxlActor.prototype.setProperty = function(property, value){
+	if (this.hasOwnProperty(property)){
+		this[property] = value;
+		vxl.go.console('Actor: The actor '+this.name+' has been updated. ['+property+' = '+value+']');
+	}
+	else {
+		throw ('Actor: the property '+ property+' does not exist');
+	}
 };
 
 /**
@@ -3455,42 +3535,43 @@ vxlActor.prototype.allocate = function(renderer){
    		return;
    }
    
-   console.info('Preparing actor '+this.model.name+' for view '+ renderer.view.name)
+   vxl.go.console('Actor: Allocating actor '+this.model.name+' for view '+ renderer.view.name);
    	
 	var gl = renderer.gl;
 	var model = this.model;
-    var buffer = {};//this.buffer;
+    var buffer = {};
 	
 	buffer.vertex = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertex);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices), gl.STATIC_DRAW);
 	
 	if (model.normals){
 		buffer.normal = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, buffer.normal);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals.slice(0)), gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals), gl.STATIC_DRAW);
 	}
 	
-	if (model.scalars || model.colors){
+	if (model.scalars != undefined || model.colors != undefined){
 		buffer.color = gl.createBuffer(); //we don't BIND values or use the buffer until the lut is loaded and available
 	}
 	
-	gl.bindBuffer(gl.ARRAY_BUFFER, null);
 	
-	if (model.indices){
-		buffer.index = gl.createBuffer();
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.index);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices.slice(0)), gl.STATIC_DRAW);
-	}
 	
-	if (model.wireframe){
+	if (model.wireframe != undefined){
 		buffer.wireframe = gl.createBuffer();
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.wireframe);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe.slice(0)), gl.STATIC_DRAW);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
 	}
 	
+	if (model.indices != undefined){
+		buffer.index = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.index);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices), gl.STATIC_DRAW);
+	}
+	
+	gl.bindBuffer(gl.ARRAY_BUFFER, null);
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-	//this.allocated = true;
+	
 	this.renderers.push(renderer);
 	this.buffers.push(buffer);
 };
@@ -3499,18 +3580,36 @@ vxlActor.prototype.allocate = function(renderer){
 * Deletes the WebGL buffers used for this object. After this the actor will not be rendered until a new allocation takes place
 */
 vxlActor.prototype.deallocate = function(){
-  var buffer = this.buffer;
-  this.buffer.vertex    = null;
-  this.buffer.normal    = null;
-  this.buffer.color     = null;
-  this.buffer.index     = null;
-  this.buffer.wireframe = null;
-  this.allocated = false;
+
   throw('exception');
 };
 
+
+
+/**
+ * Passes the matrices to the shading program
+ * 
+ */
+vxlActor.prototype.updateMatrixStack = function(renderer){
+    
+    var r	= renderer,	trx = r.transforms,	prg = r.prg;
+    trx.calculateModelView();
+    trx.push();
+        vxl.mat4.scale      (trx.mvMatrix, this.scale);
+		vxl.mat4.translate	(trx.mvMatrix, this.position);
+		//TODO: Implement actor rotations
+	     prg.setUniform("uMVMatrix",r.transforms.mvMatrix);
+    trx.pop();
+    trx.calculateNormal(); 
+    prg.setUniform("uPMatrix", r.transforms.pMatrix);
+    prg.setUniform("uNMatrix", r.transforms.nMatrix);
+    
+ };
+
 /**
 * Performs the rendering of this actor using the WebGL context provided by the renderer
+* This method has the most WebGL code in all Nucleo.
+* 
 */
 vxlActor.prototype.render = function(renderer){
 	
@@ -3518,29 +3617,43 @@ vxlActor.prototype.render = function(renderer){
 		return;
 	}
 	
-	console.info('Rendering actor '+this.model.name+' for view '+renderer.view.name);
+	renderer.setProgram(this.program);
+	
 	var idx = this.renderers.indexOf(renderer);
 
 	var model = this.model;
-    var buffer = this.buffers[idx]; //this.buffer
+    var buffer = this.buffers[idx]; 
 	
-    //@The actor is a good renderer friend. It borrows its gl and prg objects to do its own rendering.
+    //The actor is a good renderer friend.
 	var gl = renderer.gl;
 	var prg = renderer.prg;
-
-
-	prg.setUniform("uOpacity",this.opacity); 
-	prg.setUniform("uObjectColor",this.color);
+	var trx = renderer.transforms;
+	
+	//First thing first. Handle actor transformations here
+	this.updateMatrixStack(renderer);
+	
+	if (this.opacity < 1.0){
+		gl.disable(gl.DEPTH_TEST);
+		gl.enable(gl.BLEND);
+		this.diffuse[3] = this.opacity;
+	}
+	else {
+		gl.enable(gl.DEPTH_TEST);
+		gl.disable(gl.BLEND);
+		this.diffuse[3] = 1.0;
+	}
+	
+	prg.setUniform("uMaterialDiffuse",this.diffuse);
 	prg.setUniform("uUseVertexColors", false);
     
-    prg.disableVertexAttribArray("aVertexColor");
-	prg.disableVertexAttribArray("aVertexNormal");
-	prg.enableVertexAttribArray("aVertexPosition");
+    prg.disableAttribute("aVertexColor");
+	prg.disableAttribute("aVertexNormal");
+	prg.enableAttribute("aVertexPosition");
 	try{
 		
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertex);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
-		prg.setVertexAttribPointer("aVertexPosition", 3, gl.FLOAT, false, 0, 0);
+		prg.setAttributePointer("aVertexPosition", 3, gl.FLOAT, false, 0, 0);
 	}
     catch(err){
         alert('There was a problem while rendering the actor ['+this.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
@@ -3553,8 +3666,8 @@ vxlActor.prototype.render = function(renderer){
 			gl.bindBuffer(gl.ARRAY_BUFFER, buffer.color);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.colors.slice(0)), gl.STATIC_DRAW);
 			
-			prg.enableVertexAttribArray("aVertexColor");
-			prg.setVertexAttribPointer("aVertexColor", 4, gl.FLOAT, false, 0, 0);
+			prg.enableAttribute("aVertexColor");
+			prg.setAttributePointer("aVertexColor", 4, gl.FLOAT, false, 0, 0);
 		}
 		catch(err){
         	alert('There was a problem while rendering the actor ['+this.name+']. The problem happened while handling the color buffer. Error =' +err.description);
@@ -3568,8 +3681,8 @@ vxlActor.prototype.render = function(renderer){
 			gl.bindBuffer(gl.ARRAY_BUFFER, buffer.normal);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals.slice(0)), gl.STATIC_DRAW);
 			
-			prg.enableVertexAttribArray("aVertexNormal");
-			prg.setVertexAttribPointer("aVertexNormal",3,gl.FLOAT, false, 0,0);
+			prg.enableAttribute("aVertexNormal");
+			prg.setAttributePointer("aVertexNormal",3,gl.FLOAT, false, 0,0);
 		}
 	    catch(err){
 	        alert('There was a problem while rendering the actor ['+this.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
@@ -3578,21 +3691,22 @@ vxlActor.prototype.render = function(renderer){
 	}
     
     try{
-		if (this.mode == vxl.def.visMode.SOLID){
+		if (this.mode == vxl.def.actor.mode.SOLID){
 			prg.setUniform("uUseShading",true);
-			prg.enableVertexAttribArray("aVertexNormal");
+			prg.enableAttribute("aVertexNormal");
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.index);
 			gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
 		}
-		else if (this.mode == vxl.def.visMode.WIREFRAME){
+		else if (this.mode == vxl.def.actor.mode.WIREFRAME){
 			prg.setUniform("uUseShading", false);
-			prg.disableVertexAttribArray("aVertexNormal");
+			prg.disableAttribute("aVertexNormal");
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.wireframe);
+			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
 			gl.drawElements(gl.LINES, model.wireframe.length, gl.UNSIGNED_SHORT,0);
 		}
-		else if (this.mode == vxl.def.visMode.POINTS){
+		else if (this.mode == vxl.def.actor.mode.POINTS){
 			prg.setUniform("uUseShading", true);
-			prg.enableVertexAttribArray("aVertexNormal");
+			prg.enableAttribute("aVertexNormal");
 			gl.drawArrays(gl.POINTS,0, this.model.vertices.length/3);
 		}
 		else{
@@ -3607,14 +3721,14 @@ vxlActor.prototype.render = function(renderer){
 		alert('Error rendering actor ['+this.name+']. Error =' +err.description);
 		throw('Error rendering actor ['+this.name+']. Error =' +err.description);
 	}
-}
+};
 
 /**
 * Sets the actor color. This color can be different from the original model color
 */
 vxlActor.prototype.setColor = function (c){
 	this.color = c.slice(0);
-	message('Actor '+this.name+': color changed to : (' + this.color[0] +','+ this.color[1] +','+ this.color[2]+')');
+	vxl.go.console('Actor '+this.name+': color changed to : (' + this.color[0] +','+ this.color[1] +','+ this.color[2]+')');
 };
 
 /**
@@ -3629,9 +3743,10 @@ vxlActor.prototype.setLookupTable = function(lutID,min,max){
 
 /**
 * Sets the visualization mode for this actor.
-* @param {vxl.def.visMode} mode mode needs to be one of the elments defined in vxl.def.visMode
+* @param {vxl.def.actor.mode} mode mode needs to be one of the elements defined in vxl.def.actor.mode
+* @TODO: VALIDATE
 */
-vxlActor.prototype.setMode = function(mode){
+vxlActor.prototype.setVisualizationMode = function(mode){
 	this.mode = mode;
 };
 
@@ -3652,21 +3767,61 @@ vxlActor.prototype.setOpacity = function(o){
 */
 vxlActor.prototype.flipNormals = function(){
 	this.model.getNormals(true);
-}
+};
 
 /**
 * Sets the visibility of the actor
+* @param flag true or false
 */
 vxlActor.prototype.setVisible = function(flag){
     this.visible = flag;
-}
+};
 
 /**
 * Is visible?
 */
 vxlActor.prototype.isVisible = function(){
     return this.visible;
-}
+};
+
+/**
+ * Duplicates this actor.
+ * 
+ * Properties copied by REFERENCE:
+ * model,
+ * buffers,
+ * renderers
+ * 
+ * Everything else is copied by VALUE.
+ * 
+ * This method is fundamental to replicate objects in the scene, without having to duplicate
+ * the shared model. A cloned actor however can have different position, colors, properties, etc.
+ * 
+ * If a cloned actor modifies his internal model, any other actor that shares the model will be
+ * affected. 
+ * 
+ * The returned actor is not added to the scene automatically. It is up the
+ * programmer to determine the scene the cloned actor needs to be added to if any.
+ * 
+ * @see vxlModel
+ * @returns {vxlActor} an actor 
+ */
+vxlActor.prototype.clone = function(){
+    this.clones++;
+	
+	var duplicate = new vxlActor(this.model);
+	duplicate['program']   = this['program'];
+	vxl.vec3.set(this.scale,    duplicate.scale);
+	vxl.vec3.set(this.position, duplicate.position);
+	
+	
+	//Now to save us some memory, let's SHARE the WebGL buffers that the current actor has already allocated'
+	duplicate.renderers = this.renderers;
+	duplicate.buffers   = this.buffers;
+	duplicate.model 	= this.model;
+	duplicate.name     += '-'+this.clones; 
+	return duplicate;
+};
 
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
@@ -3696,27 +3851,24 @@ vxlActor.prototype.isVisible = function(){
 */
 function vxlScene()
 {
-	this.views  = [];
-	this.actors = [];
-	this.loadingMode = vxl.def.loadingMode.LIVE;
-	this.normalsFlipped = false;
-	this.lutID = null;
-	this.timerID = null;
-	this.dispatchRate = 500;
-	this.scalarMIN = Number.MAX_VALUE;
-	this.scalarMAX = Number.MIN_VALUE;
-	this.bb = [];
-	this.centre = [];
-	this.axisActor = new vxlAxis();
-	this.boundingBoxActor = new vxlBoundingBox();
-	this.actors.push(this.axisActor);
-	this.actors.push(this.boundingBoxActor);
-
-	vxl.c.scene = this;
+	this.views  				= [];
+	this.actors 				= [];
+	this.toys					= new vxlSceneToys(this);
+	this.loadingMode 			= vxl.def.model.loadingMode.LIVE;
+	this.normalsFlipped 		= false;
+	this.lutID 					= null;
+	this.timerID				= null;
+	this.dispatchRate 			= 500;
+	this.scalarMIN 				= Number.MAX_VALUE;
+	this.scalarMAX 				= Number.MIN_VALUE;
+	this.bb 					= [];
+	this.centre 				= [];
+	this.frameAnimation			= null;
+	if (vxl.c.scene  == null) vxl.c.scene 	= this;
 	vxl.go.notifier.addTarget(vxl.events.MODELS_LOADED,this);
 	vxl.go.notifier.addTarget(vxl.events.DEFAULT_LUT_LOADED,this);
 	vxl.go.notifier.addSource(vxl.events.SCENE_UPDATED, this);
-}
+};
 
 /**
  * Handles events sent by vxlNotifier
@@ -3733,19 +3885,20 @@ vxlScene.prototype.handleEvent = function(event,src){
 		this.lutID = 'default';
 		this.setLookupTable(this.lutID);
 	}
-}
+};
 
 
 
 vxlScene.prototype.setLoadingMode = function(mode){
 	if (mode == undefined || mode == null || 
-		(mode != vxl.def.loadingMode.LIVE && 
-		 mode != vxl.def.loadingMode.LATER &&
-		 mode != vxl.def.loadingMode.DETACHED)){
+		(mode != vxl.def.model.loadingMode.LIVE && 
+		 mode != vxl.def.model.loadingMode.LATER &&
+		 mode != vxl.def.model.loadingMode.DETACHED)){
 		 	throw('the mode '+mode+ 'is not a valid loading mode');
 		 }
 	this.loadingMode = mode;
-}
+};
+
 
 
 
@@ -3753,7 +3906,7 @@ vxlScene.prototype.setLoadingMode = function(mode){
  * Calculates the global bounding box and the centre for the scene. 
  */
 vxlScene.prototype.updateMetrics = function(b){
-        console.info('Scene: updating metrics with ('+ b[0]+','+b[1]+','+b[2]+') - ('+b[3]+','+b[4]+','+b[5]+')');
+        vxl.go.console('Scene: updating metrics with ('+ b[0]+','+b[1]+','+b[2]+') - ('+b[3]+','+b[4]+','+b[5]+')');
         var bb = this.bb;
         var cc = this.centre;
         
@@ -3772,9 +3925,9 @@ vxlScene.prototype.updateMetrics = function(b){
 		cc[1] = Math.round(cc[1]*1000)/1000;
 		cc[2] = Math.round(cc[2]*1000)/1000;
 		
-        this.axisActor.setCentre(this.centre);
-        this.boundingBoxActor.setBoundingBox(this.bb);
-}
+		this.toys.update();
+
+};
 
 /**
  * Calculates the global bounding box and the center of the scene.
@@ -3784,10 +3937,9 @@ vxlScene.prototype.computeMetrics = function() {
 	this.bb = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
 	this.centre = [0.0, 0.0, 0.0];
 	for(var i=0; i<this.actors.length; i++){
-		if (this.actors[i].witness) continue; 
 		this.updateMetrics(this.actors[i].model.outline);
 	}
-}
+};
 
 
 vxlScene.prototype.createActor = function(model){
@@ -3802,23 +3954,24 @@ vxlScene.prototype.createActor = function(model){
 	}
     
 	this.actors.push(actor);
-    this.updateMetrics(actor.model.outline);
+    this.updateMetrics(actor.model.outline); //TODO: What if the actor moves? use actor bounding box instead
     
-	message('Scene: Actor for model '+model.name+' created');
+	vxl.go.console('Scene: Actor for model '+model.name+' created');
+	vxl.c.actor = actor;
     vxl.go.notifier.fire(vxl.events.SCENE_UPDATED);
 	return actor;
-}
+};
 
 /**
  * Creates multiples actors at once
  * @param models a list of models to create actors from
  */
 vxlScene.prototype.createActors = function(models){
-	message('Scene: Creating all the actors now');
+	vxl.go.console('Scene: Creating all the actors now');
 	for (var i = 0; i < models.length; i++){
 		this.createActor(models[i]);
 	}	
-}
+};
 /**
  * Adds one actor
  * @param actor the actor to be added to the scene
@@ -3826,8 +3979,8 @@ vxlScene.prototype.createActors = function(models){
 vxlScene.prototype.addActor = function(actor){
 	this.actors.push(actor);
     this.updateMetrics(actor.model.outline);
-    vxl.go.notifier.fire(vxl.events.UPDATED_SCENE);
-}
+    vxl.go.notifier.fire(vxl.events.SCENE_UPDATED);
+};
 
 /**
  * Removes one actor
@@ -3837,7 +3990,7 @@ vxlScene.prototype.removeActor = function(actor){
 	var idx = this.actors.indexOf(actor);
 	this.actors.splice(idx,1);
     this.computeMetrics();
-}
+};
 
 /**
  * Updates the Scene's scalarMAX and scalarMIN properties.
@@ -3848,7 +4001,7 @@ vxlScene.prototype.updateScalarRange = function(){
 		if (actor.model.scalars && actor.model.scalars.max() > this.scalarMAX) this.scalarMAX = actor.model.scalars.max();
 		if (actor.model.scalars && actor.model.scalars.min() < this.scalarMIN) this.scalarMIN = actor.model.scalars.min();
 	}
-}
+};
 
 /**
  * Sets a new lookup table by passing the lookup table id
@@ -3862,7 +4015,7 @@ vxlScene.prototype.setLookupTable = function(lutID){
 			actor.setLookupTable(lutID,this.scalarMIN, this.scalarMAX);
 		}
 	}
-}
+};
 /**
  * Allocates WebGL memory for the actors in this scene
  * @param renderer the renderer that will render the scene
@@ -3883,10 +4036,8 @@ vxlScene.prototype.reset = function(){
 	}
 	this.actors = [];
 	vxl.c.actor = null;
-	this.actors.push(this.axisActor);
-	this.actors.push(this.boundingBoxActor);
 	this.computeMetrics();
-}
+};
 
 /**
  * Retrieves an actor object by name
@@ -3898,8 +4049,8 @@ vxlScene.prototype.getActorByName = function(name){
 			return this.actors[i];
 		}
 	}
-	return null;
-}
+	return undefined;
+};
 
 /**
  * Changes the opacity for one or all actors in the scene
@@ -3918,7 +4069,7 @@ vxlScene.prototype.setOpacity = function(o,name){
 		actor.setOpacity(o);
 	}
 
-}
+};
 
 /**
  * Flips the normals for all the actors in the scene. This will
@@ -3931,24 +4082,6 @@ vxlScene.prototype.flipNormals = function(flag){
 	}
 };
 
-/**
- * Sets the diffusive color for one of all the actors in the scene
- * @param c the color [r,g,b,a]
- * @param name the name of the actor whose color will be changed
- */
-vxlScene.prototype.setColor = function(c, name){
-	if (name == null){
-		message('Scene: set color for all actors');
-		for(var i=0; i<this.actors.length; i++){
-			this.actors[i].setColor(c);
-		}
-	}
-	else{
-		message('Scene: set color for active actor:'+name);
-		var actor = this.getActorByName(name);
-		actor.setColor(c);
-	}
-}
 
 /**
  * Changes the visualization mode for all the objects in the scene
@@ -3959,24 +4092,118 @@ vxlScene.prototype.setVisualizationMode = function(mode){
 	for(var i=0; i<this.actors.length; i++){
 			this.actors[i].setVisualizationMode(mode);
 	}
-}
+};
 
 /**
- * Delegates rendering to each one of the actors in the actor list. It passes
- * the renderer object that contains the WebGL context to perform the rendering.
+ * Calls the renderer process for all the views this scene is associated with
  */
-vxlScene.prototype.render = function(ren){
-	//ignore renderer parameter
-	for (var v = 0, viewCount = this.views.length; v<viewCount; v+=1){
-		var renderer = this.views[v].renderer;
-		for(var a=0, actorCount = this.actors.length; a<actorCount; a+=1){
-		   this.actors[a].allocate(renderer);
-	       this.actors[a].render(renderer);
+vxlScene.prototype.render = function(){
+
+	for (var i = 0, viewCount = this.views.length; i < viewCount; i+=1){
+		var r = this.views[i].renderer;
+		
+		r.clear();
+		
+		this.toys.render(r);
+		
+		if (this.frameAnimation != undefined){
+			this.frameAnimation.render(r);
+		}
+		else{
+			for(var a=0, actorCount = this.actors.length; a < actorCount; a+=1){
+				   this.actors[a].allocate(r);
+			       this.actors[a].render(r);
+			}
 	    }
 	}
-}
+};
 
 /**
+ * Sets the animation for this scene
+ * @param {vxlFrameAnimation} animation the animation to set on this scene
+ * @see vxlFrameAnimation
+ */
+vxlScene.prototype.setAnimation = function(animation){
+	if (animation instanceof vxlFrameAnimation){
+		this.frameAnimation = animation;
+		this.frameAnimation.scene = this;
+		vxl.go.console('Scene: animation added');
+	}
+};
+/**
+ * Removes the animation if there is one associated to this scene
+ * @see vxlFrameAnimation
+ */
+vxlScene.prototype.clearAnimation = function(){
+	if (this.frameAnimation) {
+		this.frameAnimation.scene = null;
+		this.frameAnimation = null;
+	}
+};
+
+/**
+ * Returns a list with the actor names
+ * @returns {Array} a list with the actor names
+ */
+vxlScene.prototype.getActorNames = function(){
+	var list = [];
+	for(var a=0, actorCount = this.actors.length; a < actorCount; a+=1){
+		list.push(this.actors[a].name);
+	}
+	return list;
+};
+/*-------------------------------------------------------------------------
+    This file is part of Voxelent's Nucleo
+
+    Nucleo is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation version 3.
+
+    Nucleo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------------------------------------------*/  
+
+/**
+ * @class Manages the axis, the bounding box and the floor
+ * These are auxiliary objects or 'toys'
+ */
+function vxlSceneToys(scn){
+    
+    this.scene = scn
+    this.list   = [];
+
+	this.axis 				= new vxlAxis();
+	this.boundingbox 		= new vxlBoundingBox();
+	this.floor  			= new vxlFloor();
+	
+	this.list.push(this.axis);
+    this.list.push(this.boundingbox);
+    this.list.push(this.floor);
+};
+
+/**
+ * Updates the toys according to information from the scene
+ * 
+ */
+vxlSceneToys.prototype.update = function(){
+    this.axis.setCentre(this.scene.centre);
+    this.boundingbox.setBoundingBox(this.scene.bb);
+};
+/**
+ * Renders the toys
+ * @param {vxlRenderer} r the renderer
+ */
+vxlSceneToys.prototype.render = function(r){
+    for(var t = 0, max = this.list.length; t < max; t +=1){
+        this.list[t].allocate(r);
+        this.list[t].render(r);
+    }
+};/**
  * @class
  * @constructor
  */
@@ -4050,7 +4277,7 @@ function vxlLookupTableManager(){
 	this.tables = [];
 	vxl.go.notifier.addSource(vxl.events.DEFAULT_LUT_LOADED,this);
 	this.loadAll();
-}
+};
 
 /**
  * Load a lookup table file
@@ -4061,20 +4288,20 @@ vxlLookupTableManager.prototype.load = function(name){
 		if (this.isLoaded(name)) return;
 
 	    var request = new XMLHttpRequest();
-	    request.open("GET", vxl.def.lutFolder+'/'+name+'.lut');
+	    request.open("GET", vxl.def.lut.folder+'/'+name+'.lut');
 	    request.onreadystatechange = function() {
 	      if (request.readyState == 4) {
 		    if(request.status == 404) {
 				alert (name + ' does not exist');
-				message(name + ' does not exist');
+				vxl.go.console('LookupTableManager: '+name + ' does not exist');
 			 }
 			else {
 				self.handle(name,JSON.parse(request.responseText));
 			}
 		  }
-	    }
+	    };
 		request.send();
-}
+};
 /**
  * Once the lookup table file is retrieved, this method adds it to the lookup table manager
  */
@@ -4083,10 +4310,10 @@ vxlLookupTableManager.prototype.handle = function (ID, payload) {
 	lut.load(ID,payload);
 	this.tables.push(lut);
 	
-	if (lut.ID == vxl.def.lut){
+	if (lut.ID == vxl.def.lut.main){
 		vxl.go.notifier.fire(vxl.events.DEFAULT_LUT_LOADED);
 	}
-}
+};
 /**
  * Check if a lookup table has been loaded by this lookup table manager
  * @param {String} ID the id of the table to check
@@ -4096,7 +4323,7 @@ vxlLookupTableManager.prototype.isLoaded = function(ID){
 		if (this.tables[i].ID == ID) return true;
 	}
 	return false;
-}
+};
 
 /**
  * Retrieves a lookup table
@@ -4107,7 +4334,7 @@ vxlLookupTableManager.prototype.get = function(ID){
 		if (this.tables[i].ID == ID) return this.tables[i];
 	}
 	return null;
-}
+};
 
 /**
  * Returns a list with the names of all of the lookup tables that have been loaded.
@@ -4119,24 +4346,24 @@ vxlLookupTableManager.prototype.getAllLoaded = function(){
         tablenames[i] = this.tables[i].ID;
     }
     return tablenames;
-}
+};
 
 /**
  * Checks if all the lookup tables have been loaded
  */
 vxlLookupTableManager.prototype.allLoaded = function(){
 	//@TODO: think of a timeout to alter this state in the case not all tables are loaded (can this happen?)
-	return (vxl.def.luts.length == this.tables.length);
-}
+	return (vxl.def.lut.list.length == this.tables.length);
+};
 
 /**
  * Loads all the lookup tables defined in vxl.def.luts
  */
 vxlLookupTableManager.prototype.loadAll = function(){
-	for(var i=0;i<vxl.def.luts.length;i++){
-		this.load(vxl.def.luts[i]);
+	for(var i=0;i<vxl.def.lut.list.length;i++){
+		this.load(vxl.def.lut.list[i]);
 	}
-}
+};
 
 /**
  * Creates the global lookup table manager and load all the lookup tables at once
@@ -4158,10 +4385,9 @@ vxl.go.lookupTableManager = new vxlLookupTableManager();
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/  
 
-if (vxl.def.model == undefined) vxl.def.model = {};
 
 vxl.def.model.boundingBox = new vxlModel();
-vxl.def.model.boundingBox.load('bounding box', { "vertices" : [], "wireframe":[0,1,1,2,2,3,3,0,0,4,4,5,5,6,6,7,7,4,1,5,2,6,3,7], "color":[1.0,1.0,1.0]});
+vxl.def.model.boundingBox.load('bounding box', { "vertices" : [], "wireframe":[0,1,1,2,2,3,3,0,0,4,4,5,5,6,6,7,7,4,1,5,2,6,3,7], "diffuse":[1.0,1.0,1.0,1.0]});
 
 //vxlBoundingBox IS a vxlActor                                               
 vxlBoundingBox.prototype = new vxlActor();
@@ -4175,9 +4401,9 @@ vxlBoundingBox.prototype.constructor = vxlBoundingBox;
 function vxlBoundingBox() {
 	vxlActor.call(this, vxl.def.model.boundingBox);
 	this.bb 		= [];
-    this.mode 		= vxl.def.visMode.WIREFRAME;
+    this.mode 		= vxl.def.actor.mode.WIREFRAME;
     this.visible 	= false;
-    this.witness	= true;
+    this.toy    	= true;
 }	
 
 /**
@@ -4219,18 +4445,17 @@ vxlBoundingBox.prototype.setBoundingBox = function(b){
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/ 
 
-if (vxl.def.model == undefined) vxl.def.model = {};
 
 vxl.def.model.axis = new vxlModel();
 vxl.def.model.axis.load('axis', {
-                    "vertices": [	-1, 0, 0, 	 1, 0, 0, 	 0,-2, 0,	 0, 2, 0,	 0, 0,-1,	 0, 0, 1	],
-                    "wireframe": [ 	0, 1, 	2, 3, 	4, 5	],
-                    "colors": [	1, 1, 0 ,1,	  1, 1, 0 ,1,	0, 1 ,0 ,1,	 0, 1 ,0 ,1,  0, 0, 1 ,1,	 0, 0, 1 ,1	]
-                    });
+                    	"vertices": [	-1, 0, 0, 	 1, 0, 0, 	 0,-2, 0,	 0, 2, 0,	 0, 0,-1,	 0, 0, 1	],
+                    	"wireframe": [ 	0, 1, 	2, 3, 	4, 5	],
+                    	"colors": [	1, 1, 0 ,1,	  1, 1, 0 ,1,	0, 1 ,0 ,1,	 0, 1 ,0 ,1,  0, 0, 1 ,1,	 0, 0, 1 ,1	]
+                    	});
  
 
- vxlAxis.prototype = new vxlActor();
-vxlAxis.prototype.constructor = vxlAxis;
+vxlAxis.prototype 				= new vxlActor();
+vxlAxis.prototype.constructor 	= vxlAxis;
 
 /**
  * @class
@@ -4240,9 +4465,9 @@ vxlAxis.prototype.constructor = vxlAxis;
 function vxlAxis() {
 	vxlActor.call(this,vxl.def.model.axis);
 	this.centre 	= [0,0,0];
-	this.mode 		= vxl.def.visMode.WIREFRAME;
+	this.mode 		= vxl.def.actor.mode.WIREFRAME;
 	this.visible 	= false;
-	this.witness 	= true;
+	this.toy     	= true;
 };
 
 /**
@@ -4298,6 +4523,82 @@ vxlAxis.prototype.setCentre = function (ctr){
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/  
 
+
+vxl.def.model.floor = new vxlModel();
+vxl.def.model.floor.load('floor',{"vertices":[],"indices":[],"diffuse":[1.0,1.0,1.0,1.0]});
+
+vxlFloor.prototype = new vxlActor();
+vxlFloor.prototype.constructor = vxlFloor;
+
+/**
+ * @class
+ * @constructor
+ * @extends vxlActor
+ */
+function vxlFloor(){
+	vxlActor.call(this, vxl.def.model.floor);
+	this.mode 		= vxl.def.actor.mode.WIREFRAME;
+    this.visible 	= false;
+    this.toy    	= true;
+};
+
+/**
+ * Creates the grid
+ */
+vxlFloor.prototype.setGrid =function(dimension, spacing){
+
+	var dim = dimension;
+    var lines = 2*dim/spacing;
+    var inc = 2*dim/lines;
+    var v = [];
+    var i = [];
+
+    for(var l=0;l<=lines;l++){
+        v[6*l] = -dim; 
+        v[6*l+1] = 0;
+        v[6*l+2] = -dim+(l*inc);
+        
+        v[6*l+3] = dim;
+        v[6*l+4] = 0;
+        v[6*l+5] = -dim+(l*inc);
+        
+        v[6*(lines+1)+6*l] = -dim+(l*inc); 
+        v[6*(lines+1)+6*l+1] = 0;
+        v[6*(lines+1)+6*l+2] = -dim;
+        
+        v[6*(lines+1)+6*l+3] = -dim+(l*inc);
+        v[6*(lines+1)+6*l+4] = 0;
+        v[6*(lines+1)+6*l+5] = dim;
+        
+        i[2*l] = 2*l;
+        i[2*l+1] = 2*l+1;
+        i[2*(lines+1)+2*l] = 2*(lines+1)+2*l;
+        i[2*(lines+1)+2*l+1] = 2*(lines+1)+2*l+1;        
+    }
+    this.model.vertices = v.slice(0);
+    this.model.wireframe = i.slice(0);
+    this.visible = true;
+};
+
+
+
+
+/*-------------------------------------------------------------------------
+    This file is part of Voxelent's Nucleo
+
+    Nucleo is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation version 3.
+
+    Nucleo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------------------------------------------*/  
+
 /**
 * Each HTML5 canvas is assigned a view object (vxlView) in Voxelent's Nucleo.
 * 
@@ -4322,18 +4623,14 @@ function vxlView(canvasID, scene){
 		throw('The canvas ' + canvasID+ ' does not exist.');
 	}
 	
-	
-		
-	//View properties
-	this.ready = false;
+
 	this.width = this.canvas.width;
 	this.height = this.canvas.height;
 	this.clearDepth = 10000;
 	this.zNear = 0.1;
 	this.zFar = 10000;
 	this.fovy = 10;
-	this.backgroundColor = vxl.def.backgroundColor.slice(0);
-	this.ambientColor = vxl.def.ambientColor.slice(0);
+	this.backgroundColor = vxl.def.view.background.slice(0);
 
 	//Create Renderer
 	this.renderer = new vxlRenderer(this);
@@ -4350,7 +4647,7 @@ function vxlView(canvasID, scene){
 	if (scene != null && scene instanceof vxlScene){
 		this.scene = scene;
 	}
-	else if (vxl.c.scene){
+	else if (vxl.c.scene != undefined){
 		this.scene = vxl.c.scene;
 	}
 	else{
@@ -4364,8 +4661,11 @@ function vxlView(canvasID, scene){
 	vxl.go.notifier.addTarget(vxl.events.SCENE_UPDATED, this);
 	vxl.go.notifier.addTarget(vxl.events.DEFAULT_LUT_LOADED,this);
 	
-	 this.ready = true;
-	 message('vxlView: the view '+ this.name+' has been created');
+	if (vxl.c.view == undefined){
+		vxl.c.view = this;
+	}
+
+	 vxl.go.console('vxlView: the view '+ this.name+' has been created');
 };
 
 
@@ -4375,9 +4675,9 @@ function vxlView(canvasID, scene){
  * @param {Object} source the origin of the event. Useful to do callbacks if necessary
  */
 vxlView.prototype.handleEvent = function(event, source){
-	message('vxlView: receiving event '+event);
+	vxl.go.console('vxlView: receiving event '+event);
 	if (event == vxl.events.DEFAULT_LUT_LOADED){
-		this.scene.setLookupTable(vxl.def.lut);
+		this.scene.setLookupTable(vxl.def.lut.main);
 	}
 	if (event == vxl.events.SCENE_UPDATED){
 		this.cameraman.getActiveCamera().longShot();	
@@ -4400,15 +4700,6 @@ vxlView.prototype.resize = function(){
 	this.height = this.canvas.height;
 };
 
-/** 
-* Prepares the view for rendering
-* @TODO: Frown :-/ This method is a callback from the Renderer
-*/
-vxlView.prototype.prepareForRendering = function(){
-	if (!this.ready) return; //not ready yet?
-	this.resize();
-	this.clear();
-};
 
 /**
  * Starts the view
@@ -4433,7 +4724,7 @@ vxlView.prototype.reset = function(){
 	this.scene.reset();
 	this.cameraman.reset();
 	this.start();
-}
+};
 
 /**
  * Sets the background color. Delegated to the renderer
@@ -4445,15 +4736,6 @@ vxlView.prototype.setBackgroundColor = function(v){
 	this.renderer.clearColor(this.backgroundColor);
 };
 
-/**
- * Sets the ambient color
- * @param {Array} v the new ambient color given as an array of three numbers
- * 
- */
-vxlView.prototype.setAmbientColor = function(v){
-	this.ambientColor = v.slice(0);
-	this.renderer.prg.setUniform("uAmbientColor", this.ambientColor);
-};
 
 /**
  * Sets the clear depth
@@ -4461,7 +4743,7 @@ vxlView.prototype.setAmbientColor = function(v){
  * @see vxlRenderer#clearDepth
  */
 vxlView.prototype.setClearDepth = function(d){
-	this.renderer.clearDepth(d)
+	this.renderer.clearDepth(d);
 };
 
 /**
@@ -4490,65 +4772,67 @@ vxlView.prototype.refresh = function(){
 /**
  * Creates vxlModel objects and assigns them to a vxlScene. 
  * 
- * vxlAssetManager provides methods for loading remote and local models.
+ * vxlModelManager provides methods for loading remote and local models.
  * 
  * 
  * @class
  * @constructor
  * @author Diego Cantor
  */
-function vxlAssetManager(){
+function vxlModelManager(){
 	this.firstLoadedModel = false; //analyze
 	this.toLoad = new Array(); //analyze
-	this.assets = [];
+	this.models = [];
 	vxl.go.notifier.addSource(vxl.events.MODELS_LOADED,this);
 };
 
 
 /**
- * Creates an asset from a JSON object specification.
+ * Creates an model from a JSON object specification.
  * @param {Object} json the JSON object to load
- * @param {String} name the name that the asset will be identified by. This name should be unique.
- * @param {vxlScene} scene optional parameter. The scene that will contain an actor for this asset.
+ * @param {String} name the name that the model will be identified by. This name should be unique.
+ * @param {vxlScene} scene optional parameter. The scene that will contain an actor for this model.
  */
-vxlAssetManager.prototype.add = function(json, name, scene){
-	this.createAsset(json,name, scene);
+vxlModelManager.prototype.add = function(json, name, scene){
+	//this.createAsset(json,name, scene);
+	//TODO: remove, duplicate method
+	alert('vxlModelManager: deprecated');
 };
 
 /**
- * Uses a JSON/Ajax mechanism to load assets from the webserver.
+ * Uses a JSON/Ajax mechanism to load models from the webserver.
  * @param {String} name name of the file that will be loaded. Voxelent will look for this file inside of the 
- * 						folder defined by the configuration variable vxl.def.modelsFolder
- * @param {vxlScene} optional parameter. The scene that will contain an actor for this asset.
+ * 						folder defined by the configuration variable vxl.def.model.folder
+ * @param {vxlScene} optional parameter. The scene that will contain an actor for this model.
  */  
-vxlAssetManager.prototype.load = function(name, scene) {
+vxlModelManager.prototype.load = function(name, scene) {
     var manager = this;
 	if (manager.isModelLoaded(name)) return;
 	
-	message('Requesting '+name+'...');
+	vxl.go.console('ModelManager: Requesting '+name+'...');
     var request = new XMLHttpRequest();
-    request.open("GET", vxl.def.modelsFolder+'/'+name);
+    request.open("GET", vxl.def.model.folder+'/'+name);
     request.onreadystatechange = function() {
       if (request.readyState == 4) {
 	    if(request.status == 404) {
-			alert ('vxl.go.assetManager says: '+ name + ' does not exist');
+			alert ('vxl.go.modelManager says: '+ name + ' does not exist');
 		 }
 		else {
-			manager.createAsset(name,JSON.parse(request.responseText),scene);
+			manager.createModel(name,JSON.parse(request.responseText),scene);
 		}
 	  }
-    }
+    };
     request.send();
 };
 
 /**
- * Loads a list of assets and assigns them to a scene
+ * Loads a list of models and assigns them to a scene
  * @param {Array} list list of files to load 
- * @param {vxlScene} scene scene to callback when the assets are loaded 
+ * @param {vxlScene} scene scene to callback when the models are loaded 
  */
-vxlAssetManager.prototype.loadList = function(list,scene){
+vxlModelManager.prototype.loadList = function(list,scene){
 	this.toLoad = list.slice(0); 
-	message('models to load: ' + this.toLoad.length);
+	vxl.go.console('models to load: ' + this.toLoad.length);
    	for(var i=0;i<this.toLoad.length; i++){
 		this.load(this.toLoad[i],scene);
    	}
@@ -4556,11 +4840,11 @@ vxlAssetManager.prototype.loadList = function(list,scene){
 
 /**
  * 
- * @param {String} name name of the asset to be created
- * @param {Object} payload the JSON object that contains the definition of the asset
- * @param {vxlScene} scene the scene to be called back when the asset is created
+ * @param {String} name name of the model to be created
+ * @param {Object} payload the JSON object that contains the definition of the model
+ * @param {vxlScene} scene the scene to be called back when the model is created
  */
-vxlAssetManager.prototype.createAsset = function(name,payload,scene){
+vxlModelManager.prototype.createModel = function(name,payload,scene){
 	var model = new vxlModel();
 	
 	model.load(name,payload);
@@ -4571,20 +4855,20 @@ vxlAssetManager.prototype.createAsset = function(name,payload,scene){
 	}
 		
 	model.loaded = true;
-	this.assets.push(model);
-	message('AssetManager: asset '+model.name+' created.'); 
+	this.models.push(model);
+	vxl.go.console('ModelManager: model '+model.name+' created.'); 
 	
 	if (scene != undefined && scene instanceof vxlScene){
-		message('AssetManager: notifying the scene...');
-		if (scene.loadingMode == vxl.def.loadingMode.LIVE){
+		vxl.go.console('ModelManager: notifying the scene...');
+		if (scene.loadingMode == vxl.def.model.loadingMode.LIVE){
 			scene.createActor(model);
 		}
-		else if (scene.loadingMode == vxl.def.loadingMode.LATER){
-			if(assetManager.allLoaded()){
-				scene.createActors(assetManager.assets);
+		else if (scene.loadingMode == vxl.def.model.loadingMode.LATER){
+			if(this.allLoaded()){
+				scene.createActors(this.models);
 			}
 		}
-		else if (scene.loadingMode == vxl.def.loadingMode.DETACHED){
+		else if (scene.loadingMode == vxl.def.model.loadingMode.DETACHED){
 			//do nothing
 		}
 	}
@@ -4595,15 +4879,15 @@ vxlAssetManager.prototype.createAsset = function(name,payload,scene){
  };
  
 /**
- * It will delete all of the loaded assets
+ * It will delete all of the loaded models
  */  
-vxlAssetManager.prototype.reset = function(){
+vxlModelManager.prototype.reset = function(){
 	this.firstLoadedModel = false;
-	for (var i=0; i <this.assets.length; i++){
-		this.assets[i] = null;
+	for (var i=0; i <this.models.length; i++){
+		this.models[i] = null;
 	}
 	
-	this.assets        = [];
+	this.models        = [];
 	this.toLoad        = [];
 };
 
@@ -4611,9 +4895,9 @@ vxlAssetManager.prototype.reset = function(){
  * Checks if a model has been loaded yet
  * @param {String} name the name of the model to check
  */
-vxlAssetManager.prototype.isModelLoaded = function(name){
-	for(var i=0;i<this.assets.length;i++){
-		if (this.assets[i].name == name) return true;
+vxlModelManager.prototype.isModelLoaded = function(name){
+	for(var i=0;i<this.models.length;i++){
+		if (this.models[i].name == name) return true;
 	}
 	return false;
 };
@@ -4621,90 +4905,26 @@ vxlAssetManager.prototype.isModelLoaded = function(name){
 /**
  * Returns true if all the models in the list passed to the method loadList.
  */
-vxlAssetManager.prototype.allLoaded = function(){
-	return (this.assets.length == this.toLoad.length); //TODO: Verify one by one
-}
+vxlModelManager.prototype.allLoaded = function(){
+	return (this.models.length == this.toLoad.length); //TODO: Verify one by one
+};
 
 
 /**
- * Returns the asset if it has been loaded by this asset manager, null otherwise.
- * @param {String} name the name of the asset to retrieve
+ * Returns the model if it has been loaded by this model manager, null otherwise.
+ * @param {String} name the name of the model to retrieve
  */
-vxlAssetManager.prototype.getAssetByName = function(name){
- 	for(var i=0, max = this.assets.length; i<max; i+=1){
-		if (this.assets[i].name == name) return this.assets[i];
+vxlModelManager.prototype.getModelByName = function(name){
+ 	for(var i=0, max = this.models.length; i<max; i+=1){
+		if (this.models[i].name == name) return this.models[i];
 	}
 	return null;
 };
 
 /**
- * Defines the global Asset Manager 
+ * Defines the global Model Manager 
  */
-vxl.go.assetManager = new vxlAssetManager();/*-------------------------------------------------------------------------
-    This file is part of Voxelent's Nucleo
-
-    Nucleo is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation version 3.
-
-    Nucleo is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
----------------------------------------------------------------------------*/  
-/**
- * @class
- * @TODO: CONVERT TO A REAL ACTOR
- */
-var Floor = {
-    alias       : 'floor',
-    wireframe   : true,
-    dim         : 50,
-    lines       : 50,
-    vertices    : [],
-    indices     : [],
-    diffuse : [0.7,0.7,0.7,1.0],
-    build : function(d,e){
-                    if (d) Floor.dim = d;
-                    if (e) Floor.lines = 2*Floor.dim/e;
-                    var inc = 2*Floor.dim/Floor.lines;
-                    var v = [];
-                    var i = [];
-
-                    for(var l=0;l<=Floor.lines;l++){
-                        v[6*l] = -Floor.dim; 
-                        v[6*l+1] = 0;
-                        v[6*l+2] = -Floor.dim+(l*inc);
-                        
-                        v[6*l+3] = Floor.dim;
-                        v[6*l+4] = 0;
-                        v[6*l+5] = -Floor.dim+(l*inc);
-                        
-                        v[6*(Floor.lines+1)+6*l] = -Floor.dim+(l*inc); 
-                        v[6*(Floor.lines+1)+6*l+1] = 0;
-                        v[6*(Floor.lines+1)+6*l+2] = -Floor.dim;
-                        
-                        v[6*(Floor.lines+1)+6*l+3] = -Floor.dim+(l*inc);
-                        v[6*(Floor.lines+1)+6*l+4] = 0;
-                        v[6*(Floor.lines+1)+6*l+5] = Floor.dim;
-                        
-                        i[2*l] = 2*l;
-                        i[2*l+1] = 2*l+1;
-                        i[2*(Floor.lines+1)+2*l] = 2*(Floor.lines+1)+2*l;
-                        i[2*(Floor.lines+1)+2*l+1] = 2*(Floor.lines+1)+2*l+1;        
-                    }
-                    Floor.vertices = v;
-                    Floor.indices = i;
-              }
-}
-
-
-
-
-/*-------------------------------------------------------------------------
+vxl.go.modelManager = new vxlModelManager();/*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
     Nucleo is free software: you can redistribute it and/or modify
@@ -4719,27 +4939,16 @@ var Floor = {
     You should have received a copy of the GNU General Public License
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/ 
- /*
-  * @namespace Application Programing Interface namespace
-  */
- vxl.api = new api();
-
 /**
- * Nucleo Application Programming Interface (NAPI)
- * 
+ * @namespace Application Programing Interface namespace.
+ *  
  * Using vxl.api in your programs you will be able to access many of the features offered by 
  * Voxelent's Nucleo library.
  * 
  * By design, type checking is enforced throughout the functions provided by the public API. 
  * The goal is to help novice programmers that will use the API more often than advanced programmers.
- * 
- * 
- * @class
- * @constructor
- * @author Diego Cantor
- *  
- */ 
- function api(){}
+  */
+vxl.api = {
  
  /**
   * Creates and returns a vxlView object
@@ -4747,27 +4956,27 @@ var Floor = {
   * @param {vxlScene} scene optional, the scene associated to this view
   * @returns {vxlView} a new vxlView object
   */
- api.prototype.setup = function(canvas_id, scene){
+ setup : function(canvas_id, scene){
  	if (scene != null && !(scene instanceof vxlScene)) throw ('api.setup: scene parameter is invalid');
  	return new vxlView(canvas_id,scene);
- }
+ },
   
   /**
    * Sets the rendering rate of the current view
    * @param {Number} r the new rendering rate given as a number in milliseconds
-   * @see api#setActiveView
+   * @see api#setCurrentView
    */
-  api.prototype.setRenderRate = function(r){
+ setRenderRate : function(r){
 	vxl.c.view.renderer.setRenderRate(r);
-  }
+  },
   
   /**
    * @TODO: is this deprecated?
    */
- api.prototype.setCameraDistance = function(op){
+ setCameraDistance :  function(op){
 	 g_fovy = op;
-	 message('fovY = ' + op);
- }
+	 vxl.go.console('fovY = ' + op);
+ },
  
  /**
   * If the object passed as a parameter is a vxlView then it sets it up as the current view.
@@ -4775,211 +4984,239 @@ var Floor = {
   * to affect the newly set object.
   * @param {a} the vxlView object that we want to make the current one
   */
- api.prototype.setActiveView = function(a){
+ setCurrentView :  function(a){
 	if (a instanceof vxlView){
-		vxl.c.view = a
+		vxl.c.view = a;
 	}
- } 
+ },
 
  /**
   * Returns the current view. This is the view that is receiving all the API calls
   * @returns {vxlView} the current view
   */
- api.prototype.getActiveView = function(){
+ getCurrentView :  function(){
 	return vxl.c.view;
- }
+ },
  
  
- api.prototype.setActiveActor = function(a){
-	if (a instanceof vxlActor){
-		vxl.c.actor = a;
+ /**
+  * Sets the current actor
+  * @param {vxlActor, String} actor This could be an actor object or an actor name
+  * 
+  * If the actor name is passed to this method, there must be a current scene. 
+  * Otherwise an exception will raise.
+  */
+ setCurrentActor :  function(actor){
+	if (actor instanceof vxlActor){
+		vxl.c.actor = actor;
 	}
- }
+	else if (typeof actor == 'string'){
+		if (vxl.c.scene == undefined) throw ('vxl.api.setCurrentActor: there is no Current scene. Please call vxl.api.setCurrentScene');
+		var theActor = vxl.c.scene.getActorByName(actor);
+		if (theActor != undefined){
+			vxl.c.actor = theActor;
+		}
+		else {
+			throw ('vxl.api.setCurrentActor: the actor '+actor+' does not exist in the current scene');
+		}
+	}
+ },
  
- api.prototype.getActiveActor = function(){
+ getCurrentActor :  function(){
 	return vxl.c.actor;
- }
+ },
 
- api.prototype.setActiveCamera = function(a){
+ setCurrentCamera :  function(a){
 	if (a instanceof vxlCamera){
 		vxl.c.camera = a;
 	}
- }
+ },
  
- api.prototype.getActiveCamera = function(){
+ getCurrentCamera :  function(){
 	return vxl.c.camera;
- }
+ },
 
- api.prototype.setLookupTable = function(name){
+ setLookupTable :  function(name){
  	if (!vxl.go.lookupTableManager.isLoaded(name)){
-		message('Lookup Table '+name+' has not been loaded');
+		vxl.go.console('Lookup Table '+name+' has not been loaded');
 		return;
 	}
 	
 	vxl.c.view.scene.setLookupTable(name);
- }
+ },
  
- api.prototype.loadLUTS = function(){
+ loadLUTS :  function(){
 	vxl.go.lookupTableManager.loadAll();
- }
+ },
 
  /**
   * Go back to square one. A clean scene with no actors
-  * @TODO: Provide the option to keep the assets in the cache (vxlAssetManager)
+  * @TODO: Provide the option to keep the models in the cache (vxlModelManager)
   */
- api.prototype.resetScene = function(){
+ resetScene :  function(){
     if (vxl.c.animation) vxl.c.animation.stop();
 	vxl.c.view.reset();
-	vxl.go.assetManager.reset();
- }
+	vxl.go.modelManager.reset();
+ },
  
  /**
-  * Loads 3D models, textures and other assets to a Voxelent's scene.
+  * Loads 3D models, textures and other models to a Voxelent's scene.
   * 
-  * This method is very flexible. It can load one or multiple assets depending on the type of the 
+  * This method is very flexible. It can load one or multiple models depending on the type of the 
   * first parameter. If it is a String, it will try to find the file with that name in Voxelent's data folder
-  * (voxdata by default). Otherwise, if  the parameter 'arguments' is an Array, loadAssets will iterate
+  * (voxdata by default). Otherwise, if  the parameter 'arguments' is an Array, load will iterate
   * through it and will try to load every element of this list. Every element being the file name.
   * 
   * Nucleo supports three different loading modes which are defined in 
-  * vxl.def.loadingMode:
+  * vxl.def.model.loadingMode:
   * 
   * LIVE: As each asset is loaded it is added immediately into the scene by creating the corresponding actor
   * 
-  * LATER: All the assets are loaded first THEN the actors are created. 
+  * LATER: All the models are loaded first THEN the actors are created. 
   * This is useful when you want to display a full scene instead of showing incremental updates.
   * 
-  * DETACHED: The assets are loaded into the AssetManager object but actors are never created.
+  * DETACHED: The models are loaded into the vxlModelManager object but actors are never created.
   * This allows background loading.
   * 
-  * @param {String|Array} arguments the name of the asset or the list of assets (each element being the file name).
-  * @param {vxl.def.loadingMode} mode the loading mode
-  * @param {vxlScene} scene the scene in case we do not want to load these assets in the current one
+  * @param {String|Array} arguments the name of the asset or the list of models (each element being the file name).
+  * @param {vxl.def.model.loadingMode} mode the loading mode
+  * @param {vxlScene} scene the scene in case we do not want to load these models in the current one
   * 
-  * @see {vxl#def#loadingMode}
+  * @see {vxl#def#asset#loadingMode}
   * @see {vxlAssetManager}
   * @see {vxlScene#setLoadingMode}
   */
- api.prototype.loadAssets = function(arguments,mode,scene){
+ load :  function(arguments,mode,scene){
  	
  	var scene = scene==null?vxl.c.scene:scene;
- 	var assets = [];
+ 	var models = [];
  	if (typeof(arguments) == 'string' || arguments instanceof String){
- 		assets.push(arguments);
+ 		models.push(arguments);
  	}
  	else if (arguments instanceof Array){
  		for(var i=0; i<arguments.length;i++){
-			assets.push(arguments[i]);
+			models.push(arguments[i]);
 		}
  	}
  	if (mode != undefined && mode != null){
 		scene.setLoadingMode(mode);
 	}
 	
-	vxl.go.assetManager.loadList(assets, scene);
- }
+	vxl.go.modelManager.loadList(models, scene);
+ },
  
  
  /**
   * Activates the axis in the current view
   * The axis is always centered in the focal point of the camera
   */
- api.prototype.axisON = function(){
-	vxl.c.view.scene.axis.setVisible(true);
+ axisON :  function(){
+	vxl.c.view.scene.toys.axis.setVisible(true);
 	vxl.c.camera.refresh();
- }
+ },
  
  /**
   * Hides the axis in the current view
   */
- api.prototype.axisOFF = function(){
-	vxl.c.view.scene.axis.setVisible(false);
+ axisOFF :  function(){
+	vxl.c.view.scene.toys.axis.setVisible(false);
 	vxl.c.camera.refresh();
- }
+ },
  
  /**
   * Shows the global bounding box of the current scene 
   * @TODO: move the bounding box to the scene object
   */
- api.prototype.boundingBoxON = function(){
-	vxl.c.view.scene.boundingBox.visible = true;
+ boundingBoxON :  function(){
+	vxl.c.view.scene.toys.boundingbox.setVisible(true);
 	vxl.c.camera.refresh();
- }
+ },
  
   /**
   * Shows the global bounding box of the current scene 
   * @TODO: move the bounding box to the scene object
   */
- api.prototype.boundingBoxOFF= function(){
-	vxl.c.view.scene.boundingBox.visible = false;
+ boundingBoxOFF:  function(){
+	vxl.c.view.scene.toys.boundingbox.setVisible(false);
 	vxl.c.camera.refresh();
- }
+ },
  
  /**
   * @TODO: Reimplement behaviour in the camera
   */
- api.prototype.toggleSpin = function(){
-	vxl.c.camera.spin();
- }
+ toggleSpin :  function(){
+	//TODO: RECODE IT.
+	alert('not implemented');
+ },
  
- 
- api.prototype.setAmbientColor = function(r,g,b) { 
-	vxl.c.view.setAmbientColor([r,g,b]);
- }
- 
- api.prototype.setBackgroundColor = function(r,g,b){
-	vxl.c.view.setBackgroundColor([r,g,b]);
-} 
 
- api.prototype.setAmbientLight = function(l){
-	this.setAmbientColor(l,l,l);
-	vxl.c.view.refresh();
-	message('Ambient light changed to '+(l*100)+'%');
-	return true;
- }
+/**
+ * Sets the background colour of this view.
+ * @param color a 4-valued array containing the [r,g,b,a] values to use.
+ */ 
+ setBackgroundColor :  function(color){
+	vxl.c.view.setBackgroundColor(color);
+ },
+
 
 
 /**
- * If an actor has been selected (If there is an active actor in vxl.c.actor), changes its visualization mode to WIREFRAME. Otherwise,
+ * If an actor has been selected (If there is an current actor in vxl.c.actor), changes its visualization mode to WIREFRAME. Otherwise,
  * shows all the scene in WIREFRAME mode.
  * 
  */ 
-api.prototype.wireframeON = function(){
+wireframeON :  function(){
 	if (vxl.c.actor){
-		vxl.c.actor.setVisualizationMode(vxl.def.visMode.WIREFRAME);
+		vxl.c.actor.setVisualizationMode(vxl.def.actor.mode.WIREFRAME);
 	}
 	else {
-		vxl.c.view.scene.setVisualizationMode(vxl.def.visMode.WIREFRAME);
+		vxl.c.view.scene.setVisualizationMode(vxl.def.actor.mode.WIREFRAME);
 	}
-	message('Wireframe is shown.');
- }
+	vxl.go.console('API:Wireframe is shown.');
+ },
  
  /**
   * If there is an act
   */
- api.prototype.surfaceON = function(){
+ surfaceON :  function(){
 	if (vxl.c.actor){
-		vxl.c.actor.setVisualizationMode(vxl.def.visMode.SOLID);
+		vxl.c.actor.setVisualizationMode(vxl.def.actor.mode.SOLID);
 	}
 	else {
-		vxl.c.view.scene.setVisualizationMode(vxl.def.visMode.SOLID);
+		vxl.c.view.scene.setVisualizationMode(vxl.def.actor.mode.SOLID);
 	}
-	message('Wireframe is hidden.');
- }
+	vxl.go.console('API:Wireframe is hidden.');
+ },
  
- api.prototype.pointsON = function(){
+ pointsON :  function(){
 	if (vxl.c.actor){
-		vxl.c.actor.setVisualizationMode(vxl.def.visMode.POINTS);
+		vxl.c.actor.setVisualizationMode(vxl.def.actor.mode.POINTS);
 	}
 	else {
-		vxl.c.view.scene.setVisualizationMode(vxl.def.visMode.POINTS);
+		vxl.c.view.scene.setVisualizationMode(vxl.def.actor.mode.POINTS);
 	}
- }
+ },
+ 
+ 
+ getActorByName :  function(actorName,scene){
+ 	var _scene = scene;
+ 	if (_scene == undefined){ //look in the current scene
+ 		if (vxl.c.scene == undefined){
+ 			throw ('vxl.api.getActorByName: There is no current scene. Please the scene you want to look the actor '+actorName+' into');
+ 		}
+ 		else{
+ 			_scene = vxl.c.scene;
+ 		}
+ 	}
+ 	
+ 	return _scene.getActorByName(actorName);
+ },
  
  /**
   * @param {Number} op  opacity value between 0 and 1 (float)
+  * @TODO: Reevaluate this method. Opacity is shader dependent
   */
- api.prototype.setActorOpacity = function(op){
+ setActorOpacity :  function(op){
     var opacity = Math.min(Math.max(0,Math.abs(op)),1);
 	if (vxl.c.actor){
 		vxl.c.actor.setOpacity(op);
@@ -4988,31 +5225,35 @@ api.prototype.wireframeON = function(){
 		vxl.c.view.scene.setOpacity(opacity);
 	}
 	vxl.c.view.refresh();
-	message('Opacity changed to '+(op*100)+'%');
-  }
+	vxl.go.console('API:Opacity changed to '+(op*100)+'%');
+  },
   
  
  /**
-  * @param {Number} r the red component
-  * @param {Number} g the green component
-  * @param {Number} b the blue component
+  * @param actor it can be a vxlActor or a String with the actor name
+  * @param {String} the property to change 
+  * @param {Object} the new value
   */
- api.prototype.setActorColor = function (r,g,b){
-	var color = [r,g,b];
-	if (vxl.c.actor){
-		vxl.c.actor.setColor(color);
+ setActorProperty :  function (actor, property, value){
+	
+	if (vxl.c.scene == undefined) throw ('vxl.api.setActorProperty: there is no current scene. Please call vxl.api.setCurrentScene');
+	
+	var scene = vxl.c.scene;
+	var _actor = actor;
+	if (_actor instanceof vxlActor){
+		_actor.setProperty(property,value);
 	}
-	else{
-		vxl.c.view.scene.setColor(color);
+	else{ //TODO: assuming string.VALIDATE!
+		_actor = scene.getActorByName(_actor);
+		_actor.setPropert(property,value);
 	}
-	vxl.c.view.refresh();
- }
+ },
  
  /**
   * @param {bool} flag if true this method will flip the normals. If false normals will be
   * calculated the 'normal' way.
   */
- api.prototype.flipActorNormals = function (flag){
+ flipActorNormals :  function (flag){
 	if (vxl.c.actor){
 		vxl.c.actor.flipNormals(flag);
 	}
@@ -5020,18 +5261,18 @@ api.prototype.wireframeON = function(){
 		vxl.c.view.scene.flipNormals(flag);
 	}
 	vxl.c.view.refresh();
- }
+ },
  
  
- api.prototype.stopAnimation = function(){
-	if(vxl.c.animation != null) vxl.c.view.stop();
- }
+ stopAnimation :  function(){
+	if(vxl.c.animation != null) vxl.c.animation.stop();
+ },
  
- api.prototype.startAnimation = function(){
-	if(vxl.c.animation != null) vxl.c.view.start();
- }
+ startAnimation :  function(){
+	if(vxl.c.animation != null) vxl.c.animation.start();
+ },
  
- api.prototype.setFrame = function(f){
+ setFrame :  function(f){
 	if (vxl.c.animation == null) return;
 	var a = vxl.c.animation;
 	a.stop();
@@ -5039,70 +5280,71 @@ api.prototype.wireframeON = function(){
 		a.setFrame(f);
 	}
 	else{
-		message('frame ' + f +' does not exist. Animation goes back to the beginning');
+		vxl.go.console('API:frame ' + f +' does not exist. Animation goes back to the beginning');
 		a.setFrame(1);
 	}
- }
+ },
 
- api.prototype.clearAnimation = function(){
+ clearAnimation :  function(){
 	if(vxl.c.animation){
 		vxl.c.animation.stop();
 		vxl.c.animation = null;
-		vxl.c.view.animation = null;
 	}
- } 
+ },
  
- api.prototype.resetCamera = function(){
+ resetCamera :  function(){
 	vxl.c.camera.reset();
- }
+ },
  
- api.prototype.saveCamera = function(){
+ saveCamera :  function(){
 	vxl.c.camera.save();
- }
+ },
  
- api.prototype.retrieveCamera = function(){
+ retrieveCamera :  function(){
 	vxl.c.camera.retrieve();
- }
+ },
  
- api.prototype.setAzimuth = function(a){
+ setAzimuth :  function(a){
 	vxl.c.camera.changeAzimuth(a);
- }
+ },
  
- api.prototype.setElevation = function(e){
+ setElevation :  function(e){
 	vxl.c.camera.changeElevation(e);
- }
+ },
  
- api.prototype.go_above = function(){
+ go_above :  function(){
 	vxl.c.camera.above();
- }
+ },
  
- api.prototype.go_below = function(){
+ go_below :  function(){
 	vxl.c.camera.below();
- }
+ },
  
- api.prototype.go_left = function(){
+ go_left :  function(){
 	vxl.c.camera.left();
- }
+ },
  
- api.prototype.go_right = function(){
+ go_right :  function(){
 	vxl.c.camera.right();
- }
+ },
  
- api.prototype.getLookupTables = function(){
+ getLookupTables :  function(){
     return vxl.go.lookupTableManager.getAllLoaded();
- }
+ },
  
- //api.prototype.runScript = function(file){
+ //runScript :  function(file){
  //use JQuery here.
  //}
  
  /**
   * Loads a program
+  * @param definition one of voxelent's programs
   */
- api.prototype.loadProgram = function(code){
-    vxl.c.view.renderer.setProgram(code.NAME,code);
+ setProgram :  function(definition){
+    vxl.c.view.renderer.setProgram(definition);
  }
- 
+
+ }; 
  /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
@@ -5119,126 +5361,131 @@ api.prototype.wireframeON = function(){
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/  
 /*
-* Idea: to use a lightweight pattern. A pool of vxlModels that are reused. Every frame the information is copied to the buffers, instead of saving as many gl vbos as models
+* Idea: to use a lightweight pattern. A pool of vxlModels that are reused.
+* Every frame the information is copied to the buffers, instead of saving as many gl vbos as models
 */
 /**
  * Provides frame-to-frame animation
  * 
  * @class
+ * @constructor
+ * @param map  JSON object where each property name is one frame and each property value
+ * is a list of actors 
+ * var map = {"frame1":["actor1","actor2"], "frame2":["actor3","actor4"]}
  */
-function vxlAnimation(){
-	
+function vxlFrameAnimation(map){
+	this.scene = null;
 	this.timerID = 0;
-	this.view = null;
-	this.map = [];
+	this.actorByFrameMap = [];
 	this.activeFrame = 1;
 	this.mark = 1;
 	this.running = false;
     this.frameCount = 0;
+    this.renderRate = 500;
+    this._setup(map);
+    if (vxl.c.animation == null) vxl.c.animation = this;
 };
 
-vxlAnimation.prototype.setup = function(vw,filelist,mtf){
-	
+vxlFrameAnimation.prototype.addActorToFrame = function(frame,actorName){
+	if (typeof(this.actorByFrameMap[frame])=='undefined'){
+		this.actorByFrameMap[frame] = new Array();
+	}
+	if (this.actorByFrameMap[frame].indexOf(actorName) == -1){
+		this.actorByFrameMap[frame].push(actorName);
+	}
+    if (frame>this.frameCount) this.frameCount = frame;
+};
+
+/**
+ * Map is a JSON object where each property name is one frame and each property value
+ * is a list of actors 
+ * 
+ * var map = {"frame1":["actor1","actor2"], "frame2":["actor3","actor4"]}
+ * 
+ */
+vxlFrameAnimation.prototype._setup = function(map){
 	this.activeFrame = 1;
-	this.view = vw;
-	this.view.animation = this;
-	for (var i=0; i<filelist.length; i++){
-		this.addModelToFrame(filelist[i],mtf[i]);
+
+	for (var f in map){
+		var actorList = map[f];
+		var frame = parseInt(f.substr(5,f.length));
+		for(var i=0, max = actorList.length; i < max; i+=1){
+			this.addActorToFrame(frame,actorList[i]);
+		}
 	}
-	message('animation setup');
-	
+	vxl.go.console('FrameAnimation: Setup finished.');
 };
 
-vxlAnimation.prototype.start = function(){
-	if (!this.view){
-		alert('animation not initiated to any view');
-		return;
-	}
-    
+/**
+ * Starts the animation loop
+ */
+vxlFrameAnimation.prototype.start = function(){
+	if (this.scene == null) throw 'FrameAnimation: the animation is not associated with any scene. Please use scene.setFrameAnimation method';
+
     this.running = true;
-	
-	this.timerID = setInterval((function(self) {return function() {self.nextFrame();}})(this),500);
-
+	this.timerID = setInterval((function(self) {return function() {self.nextFrame();}})(this),this.renderRate);
 };
 
-vxlAnimation.prototype.stop = function(){
+/**
+ * Stops the animation loop
+ */
+vxlFrameAnimation.prototype.stop = function(){
 	clearInterval(this.timerID);
     this.running = false;
 };
 
-vxlAnimation.prototype.addModelToFrame = function(modelName, frame){
-	if (typeof(this.map[frame])=='undefined'){
-		this.map[frame] = new Array();
-	}
-	this.map[frame].push(modelName);
-    if (frame>this.frameCount) this.frameCount = frame;
-};
+vxlFrameAnimation.prototype.setFrameRate = function(rate){
+	if (rate <=0) return;
+	this.renderRate = rate;
+	this.stop();
+	this.start();
+}
 
-vxlAnimation.prototype.render = function(){
-	if (!this.running) return;
+
+/**
+ * Performs the animation rendering. The Scene delegates the rendering to a FrameAnimation object
+ * when this object is registered with the scene.
+ */
+vxlFrameAnimation.prototype.render = function(renderer){
+	if (this.scene == null) throw 'FrameAnimation: the animation is not associated with any scene. Please use scene.setFrameAnimation method';
+	//if (!this.running) return;
 	
-	for (var i=0; i<this.map[this.activeFrame].length; i++){
-		var modelName = this.map[this.activeFrame][i];
-		var actor = this.view.actorManager.getActorByName(modelName);
+	for (var i=0; i<this.actorByFrameMap[this.activeFrame].length; i++){
+		var actorName = this.actorByFrameMap[this.activeFrame][i];
+		var actor = this.scene.getActorByName(actorName);
 		if (actor != null){
-			actor.allocate(this.view.renderer);
-			actor.render(this.view.renderer);
-			//actor.deallocate(); hypothesis. it removes the reference but it does not remove the buffer from ctx
+			actor.allocate(renderer);
+			actor.render(renderer);
 		}
 	}
-	
-	
-	/*if (this.activeFrame == this.mark){
-		var prv = this.getPreviousFrames(2);
-		var nxt = this.getNextFrames(2);
-	
-		for (var i=0; i<2; i++){
-			//this.allocateFrame(nxt[i]);
-			this.deallocateFrame(prv[i]);
-		}
-		this.mark = nxt[1]; // whenever we reach the mark, slide the window.
-	}*/
 };
 
-vxlAnimation.prototype.isValidFrame = function(f){
+/**
+ * Verifies if the frame number passed as parameter is in the range of the current animation
+ * @param f a frame number
+ * @returns true if the number passed as parameter is a valid frame number, false otherwise
+ */
+vxlFrameAnimation.prototype.isValidFrame = function(f){
  return (f>=1 && f<= this.frameCount);
 };
 
-vxlAnimation.prototype.allocateFrame = function(f){
-	if (!this.isValidFrame(f)) return; //fail quick and safe
-	for (var i=0; i<this.map[f].length; i++){
-		var modelName = this.map[f][i];
-		var actor = this.view.actorManager.getActorByName(modelName);
-		if (actor != null){
-			actor.allocate(this.view);
-		}
-	}
-	
-};
-
-vxlAnimation.prototype.deallocateFrame = function(f){
-	if(!this.isValidFrame(f)) return; //fail quick and safe
-	for (var i=0; i<this.map[f].length; i++){
-		var modelName = this.map[f][i];
-		var actor = this.view.actorManager.getActorByName(modelName);
-		if (actor != null){
-			actor.deallocate();
-		}
-	}
-};
-
-
-vxlAnimation.prototype.nextFrame = function(){
-	//message('next frame:' + vxl.c.animation.activeFrame);
-	if (vxl.c.animation.activeFrame < this.frameCount){
-		vxl.c.animation.activeFrame++;
+/**
+ * Moves the animation to the next valid frame. If the activeFrame is the last frame in the animation, then
+ * the animation is reset to the first frame.
+ */
+vxlFrameAnimation.prototype.nextFrame = function(){
+	if (this.activeFrame < this.frameCount){
+		this.activeFrame++;
 	}
 	else{
-		vxl.c.animation.activeFrame = 1;
+		this.activeFrame = 1;
 	}
 };
 
-vxlAnimation.prototype.getNextFrames = function(n){
+/**
+ * Gets the next n valid frames. Works as a circular buffer.
+ */
+vxlFrameAnimation.prototype.getNextFrames = function(n){
 	var list = [];
 	var c = this.activeFrame;
 	if (n> this.frameCount) n = this.frameCount;
@@ -5251,11 +5498,14 @@ vxlAnimation.prototype.getNextFrames = function(n){
 			list.push(next-this.frameCount);
 		}
 	}
-	message('next frames: ' + list);
+	vxl.go.console('Animation: next frames: ' + list);
 	return list;
 };
 
-vxlAnimation.prototype.getPreviousFrames = function(n){
+/**
+ * Gets the previous n frames. Works as a circular buffer.
+ */
+vxlFrameAnimation.prototype.getPreviousFrames = function(n){
 	var list = [];
 	var c = this.activeFrame;
 	if (n> this.frameCount) n = this.frameCount;
@@ -5268,25 +5518,18 @@ vxlAnimation.prototype.getPreviousFrames = function(n){
 			list.push(this.frameCount+previous);
 		}
 	}
-	message('previous frames: ' + list);
+	vxl.go.console('Animation: previous frames: ' + list);
 	return list;
 };
 
-vxlAnimation.prototype.setFrame = function (f){
+/**
+ * Sets f as the active frame
+ * @param f the frame to set as active
+ */
+vxlFrameAnimation.prototype.setFrame = function (f){
 	if (f>=1 && f <= this.frameCount){
-		vxl.c.animation.activeFrame = f;
+		this.activeFrame = f;
 		this.render();
 	}
 };
 
-function vxlMain(){
-    
-    
-    vxl.go.gui.doBinding();
-
-	var v = new vxlView("vxl-id-canvas");
-	v.init();
-	v.start();
-    
-  }
-  

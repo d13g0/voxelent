@@ -5,19 +5,19 @@
 @font-face {
     font-family: Eurofurence;
     font-style:italic;
-    src: url(f/eurof56.ttf) format("truetype");
+    src: url(font/eurof56.ttf) format("truetype");
 }
 
 @font-face {
     font-family: Eurofurence;
     font-weight:normal;
-    src: url(f/eurof55.ttf) format("truetype");
+    src: url(font/eurof55.ttf) format("truetype");
 }
 
 @font-face {
     font-family: Eurofurence;
     font-weight:bold;
-    src: url(f/eurof75.ttf) format("truetype");
+    src: url(font/eurof75.ttf) format("truetype");
 
 }
 

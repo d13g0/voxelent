@@ -1,4 +1,18 @@
 -------------------------------------------------------------------------------------------
+VERSION 0.86 - Family Day
+-------------------------------------------------------------------------------------------
+1. All the references to vxlAsseManager have been replaced by vxlModelManager. The goal of 
+this change is to unify the ontology (Asset, Model).
+
+2. vxl.def.asset has been merged into vxl.def.model
+
+3. The method vxl.api.loadAssets has been changed to vxl.api.load
+
+4. The uniform 'uUseLightTranslation' is set to true by default in the phong and diffuse shaders
+
+5. vxlActor.setMode changed to vxlActor.setVisualizationMode
+
+-------------------------------------------------------------------------------------------
 VERSION 0.85 - Diego's Birthday
 -------------------------------------------------------------------------------------------
 1. Ambient Lights were removed from vxlView and vxl.api

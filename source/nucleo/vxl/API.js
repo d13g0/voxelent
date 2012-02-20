@@ -125,58 +125,58 @@ vxl.api = {
 
  /**
   * Go back to square one. A clean scene with no actors
-  * @TODO: Provide the option to keep the assets in the cache (vxlAssetManager)
+  * @TODO: Provide the option to keep the models in the cache (vxlModelManager)
   */
  resetScene :  function(){
     if (vxl.c.animation) vxl.c.animation.stop();
 	vxl.c.view.reset();
-	vxl.go.assetManager.reset();
+	vxl.go.modelManager.reset();
  },
  
  /**
-  * Loads 3D models, textures and other assets to a Voxelent's scene.
+  * Loads 3D models, textures and other models to a Voxelent's scene.
   * 
-  * This method is very flexible. It can load one or multiple assets depending on the type of the 
+  * This method is very flexible. It can load one or multiple models depending on the type of the 
   * first parameter. If it is a String, it will try to find the file with that name in Voxelent's data folder
-  * (voxdata by default). Otherwise, if  the parameter 'arguments' is an Array, loadAssets will iterate
+  * (voxdata by default). Otherwise, if  the parameter 'arguments' is an Array, load will iterate
   * through it and will try to load every element of this list. Every element being the file name.
   * 
   * Nucleo supports three different loading modes which are defined in 
-  * vxl.def.asset.loadingMode:
+  * vxl.def.model.loadingMode:
   * 
   * LIVE: As each asset is loaded it is added immediately into the scene by creating the corresponding actor
   * 
-  * LATER: All the assets are loaded first THEN the actors are created. 
+  * LATER: All the models are loaded first THEN the actors are created. 
   * This is useful when you want to display a full scene instead of showing incremental updates.
   * 
-  * DETACHED: The assets are loaded into the AssetManager object but actors are never created.
+  * DETACHED: The models are loaded into the vxlModelManager object but actors are never created.
   * This allows background loading.
   * 
-  * @param {String|Array} arguments the name of the asset or the list of assets (each element being the file name).
-  * @param {vxl.def.asset.loadingMode} mode the loading mode
-  * @param {vxlScene} scene the scene in case we do not want to load these assets in the current one
+  * @param {String|Array} arguments the name of the asset or the list of models (each element being the file name).
+  * @param {vxl.def.model.loadingMode} mode the loading mode
+  * @param {vxlScene} scene the scene in case we do not want to load these models in the current one
   * 
   * @see {vxl#def#asset#loadingMode}
   * @see {vxlAssetManager}
   * @see {vxlScene#setLoadingMode}
   */
- loadAssets :  function(arguments,mode,scene){
+ load :  function(arguments,mode,scene){
  	
  	var scene = scene==null?vxl.c.scene:scene;
- 	var assets = [];
+ 	var models = [];
  	if (typeof(arguments) == 'string' || arguments instanceof String){
- 		assets.push(arguments);
+ 		models.push(arguments);
  	}
  	else if (arguments instanceof Array){
  		for(var i=0; i<arguments.length;i++){
-			assets.push(arguments[i]);
+			models.push(arguments[i]);
 		}
  	}
  	if (mode != undefined && mode != null){
 		scene.setLoadingMode(mode);
 	}
 	
-	vxl.go.assetManager.loadList(assets, scene);
+	vxl.go.modelManager.loadList(models, scene);
  },
  
  
@@ -241,7 +241,7 @@ vxl.api = {
  */ 
 wireframeON :  function(){
 	if (vxl.c.actor){
-		vxl.c.actor.setMode(vxl.def.actor.mode.WIREFRAME);
+		vxl.c.actor.setVisualizationMode(vxl.def.actor.mode.WIREFRAME);
 	}
 	else {
 		vxl.c.view.scene.setVisualizationMode(vxl.def.actor.mode.WIREFRAME);
@@ -254,7 +254,7 @@ wireframeON :  function(){
   */
  surfaceON :  function(){
 	if (vxl.c.actor){
-		vxl.c.actor.setMode(vxl.def.actor.mode.SOLID);
+		vxl.c.actor.setVisualizationMode(vxl.def.actor.mode.SOLID);
 	}
 	else {
 		vxl.c.view.scene.setVisualizationMode(vxl.def.actor.mode.SOLID);
@@ -264,7 +264,7 @@ wireframeON :  function(){
  
  pointsON :  function(){
 	if (vxl.c.actor){
-		vxl.c.actor.setMode(vxl.def.actor.mode.POINTS);
+		vxl.c.actor.setVisualizationMode(vxl.def.actor.mode.POINTS);
 	}
 	else {
 		vxl.c.view.scene.setVisualizationMode(vxl.def.actor.mode.POINTS);

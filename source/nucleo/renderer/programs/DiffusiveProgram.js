@@ -92,11 +92,11 @@ vxl.def.glsl.diffusive = {
     "}"].join('\n'),
     
     DEFAULTS : {
-        "uLightDirection" 	: [0.0,-1.0,-1.0],
+        "uLightDirection" 	: [0.0,0.0,-1.0],
         "uLightAmbient"   	: [0.0,0.0,0.0,1.0],
         "uLightDiffuse"   	: [1.0,1.0,1.0,1.0],
         "uMaterialDiffuse" 	: [0.9,0.9,0.9,1.0],
         "uPointSize"		: 1.0,
-        "uUseLightTranslation" : true
+        "uUseLightTranslation" : false
     }
 };

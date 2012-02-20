@@ -13,8 +13,8 @@
         <link rel="shortcut icon" href="/vox-icon.ico" />
 		<link rel="apple-touch-icon" href="/vox-icon.png" />
         <link href='css/vox.css' type='text/css' rel='stylesheet' />
-        <script type='text/javascript' src='jquery.js'></script>
-        <script type='text/javascript' src='voxelent_v0.85.js'></script>
+        <script type='text/javascript' src='lib/jquery.js'></script>
+        <script type='text/javascript' src='lib/voxelent_v0.86.js'></script>
         
         
         
@@ -24,7 +24,7 @@
         var view;
         function runVoxelentApp(){
             view = vxl.api.setup('view-1');
-            vxl.api.loadAssets('cone2.json');
+            vxl.api.load('cone2.json');
             view.start();
             
         }

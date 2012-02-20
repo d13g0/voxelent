@@ -22,12 +22,12 @@ function vxlViewListener(vw){
 	this.interactor = new vxlTrackballCameraInteractor();
 	this.picker = new vxlPickerInteractor();
 	this.update();
-}
+};
 
 vxlViewListener.prototype.setInteractor = function(i){
 	this.interactor = i;
 	this.update();
-}
+};
 
 
 vxlViewListener.prototype.update = function(){
@@ -53,9 +53,9 @@ vxlViewListener.prototype.update = function(){
 	
 	window.onkeydown = function(ev){
 		interactor.onKeyDown(ev);
-	}
+	};
 	
 	window.onkeyup = function(ev){
 		interactor.onKeyUp(ev);
-	}
-}
+	};
+};

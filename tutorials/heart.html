@@ -1,20 +1,21 @@
 <html>
 	<head>
 		<title>Voxelent: Learn & Play: Heart Demo</title>
-		<script type='text/javascript' src='jquery.js'></script>
-		<script type='text/javascript' src='voxelent_v0.85.js'></script>
+		<script type='text/javascript' src='lib/jquery.js'></script>
+		<script type='text/javascript' src='lib/voxelent_v0.86.js'></script>
 		<script type='text/javascript' id='code-js'>
 			
-			var view, animation;
+			var view, scene, animation;
 			
 			function runVoxApp() {
 				//1. Setup the view
 				view = vxl.api.setup('view-1');
+				scene = view.scene;
 				
 				//2. Load assets
 				vxl.def.model.folder = 'voxdata/models/heart';
 				var filelist = ["MYO_01.vtk", "RAV_01.vtk", "LAA_01.vtk", "MYO_02.vtk", "RAV_02.vtk", "LAA_02.vtk", "MYO_03.vtk", "RAV_03.vtk", "LAA_03.vtk", "MYO_04.vtk", "RAV_04.vtk", "LAA_04.vtk", "MYO_05.vtk", "RAV_05.vtk", "LAA_05.vtk", "MYO_06.vtk", "RAV_06.vtk", "LAA_06.vtk", "MYO_07.vtk", "RAV_07.vtk", "LAA_07.vtk", "MYO_08.vtk", "RAV_08.vtk", "LAA_08.vtk", "MYO_09.vtk", "RAV_09.vtk", "LAA_09.vtk", "MYO_10.vtk", "RAV_10.vtk", "LAA_10.vtk", "MYO_11.vtk", "RAV_11.vtk", "LAA_11.vtk", "MYO_12.vtk", "RAV_12.vtk", "LAA_12.vtk", "MYO_13.vtk", "RAV_13.vtk", "LAA_13.vtk", "MYO_14.vtk", "RAV_14.vtk", "LAA_14.vtk", "MYO_15.vtk", "RAV_15.vtk", "LAA_15.vtk", "MYO_16.vtk", "RAV_16.vtk", "LAA_16.vtk", "MYO_17.vtk", "RAV_17.vtk", "LAA_17.vtk", "MYO_18.vtk", "RAV_18.vtk", "LAA_18.vtk", "MYO_19.vtk", "RAV_19.vtk", "LAA_19.vtk", "MYO_20.vtk", "RAV_20.vtk", "LAA_20.vtk"];
-				vxl.api.loadAssets(filelist);
+				vxl.api.load(filelist);
 				
 				//3. Define animation map
 				var map = {
@@ -40,7 +41,7 @@
 					frame20 : ["MYO_20.vtk", "RAV_20.vtk", "LAA_20.vtk"]
 				};
 				animation = new vxlFrameAnimation(map);
-				view.scene.setFrameAnimation(animation);
+				scene.setAnimation(animation);
 				
 				//4. Start rendering and start animation	
 				view.start();
@@ -62,7 +63,7 @@
 					animation.setFrameRate(100);
 				}
 				else if (event == vxl.events.SCENE_UPDATED){
-					var loaded = view.scene.actors.length-3;
+					var loaded = view.scene.actors.length;
 					$('#status').html('Objects loaded: '+ loaded+' out of 60');
 				}
 			}

@@ -33,12 +33,12 @@ function vxlRenderer(vw){
     
     this.view       = vw;
     
-    this.gl  = this.getWebGLContext();
-    this.prg = new vxlProgram(this.gl);
+    this.gl         = this.getWebGLContext();
+    this.prg        =   new vxlProgram(this.gl);
+     
+    this.transforms = new vxlTransforms(vw);
     
     this.setDefaultProgram();
-    
-    this.transforms = new vxlTransforms(vw);
 }
 
 /**

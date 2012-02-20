@@ -27,18 +27,23 @@
  * var map = {"frame1":["actor1","actor2"], "frame2":["actor3","actor4"]}
  */
 function vxlFrameAnimation(map){
-	this.scene = null;
-	this.timerID = 0;
-	this.actorByFrameMap = [];
-	this.activeFrame = 1;
-	this.mark = 1;
-	this.running = false;
-    this.frameCount = 0;
-    this.renderRate = 500;
+	this.scene             = null;
+	this.timerID           = 0;
+	this.actorByFrameMap   = [];
+	this.activeFrame       = 1;
+	this.mark              = 1;
+	this.running           = false;
+    this.frameCount        = 0;
+    this.renderRate        = 500;
     this._setup(map);
     if (vxl.c.animation == null) vxl.c.animation = this;
 };
 
+/**
+ * The actor will appear in the indicated frame of this animation
+ * @param {Number} frame the frame
+ * @param {String} actorName the name of the actor. It must exist.
+ */
 vxlFrameAnimation.prototype.addActorToFrame = function(frame,actorName){
 	if (typeof(this.actorByFrameMap[frame])=='undefined'){
 		this.actorByFrameMap[frame] = new Array();
@@ -101,7 +106,7 @@ vxlFrameAnimation.prototype.setFrameRate = function(rate){
  */
 vxlFrameAnimation.prototype.render = function(renderer){
 	if (this.scene == null) throw 'FrameAnimation: the animation is not associated with any scene. Please use scene.setFrameAnimation method';
-	if (!this.running) return;
+	//if (!this.running) return;
 	
 	for (var i=0; i<this.actorByFrameMap[this.activeFrame].length; i++){
 		var actorName = this.actorByFrameMap[this.activeFrame][i];

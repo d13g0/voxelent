@@ -289,7 +289,7 @@ vxlActor.prototype.setLookupTable = function(lutID,min,max){
 * @param {vxl.def.actor.mode} mode mode needs to be one of the elements defined in vxl.def.actor.mode
 * @TODO: VALIDATE
 */
-vxlActor.prototype.setMode = function(mode){
+vxlActor.prototype.setVisualizationMode = function(mode){
 	this.mode = mode;
 };
 

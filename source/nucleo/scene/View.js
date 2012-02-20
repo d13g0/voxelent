@@ -139,7 +139,7 @@ vxlView.prototype.reset = function(){
 	this.scene.reset();
 	this.cameraman.reset();
 	this.start();
-}
+};
 
 /**
  * Sets the background color. Delegated to the renderer
@@ -158,7 +158,7 @@ vxlView.prototype.setBackgroundColor = function(v){
  * @see vxlRenderer#clearDepth
  */
 vxlView.prototype.setClearDepth = function(d){
-	this.renderer.clearDepth(d)
+	this.renderer.clearDepth(d);
 };
 
 /**

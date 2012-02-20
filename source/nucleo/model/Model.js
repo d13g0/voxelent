@@ -67,7 +67,7 @@ vxlModel.prototype.load = function(nm,payload){
 	
 	this.getOutline();
 	this.getCentre();
-}
+};
 
 
 /**
@@ -144,8 +144,8 @@ vxlModel.prototype.getNormals = function(reverse){
 		ns[i+z] = nn[z];
 	}
 	this.normals = ns;
-}  
-
+};
+  
 /**
  * Generate the wireframe indices using the model indices
  */  
@@ -163,7 +163,7 @@ vxlModel.prototype.getWireframeIndices = function(){
 	   j = j+6;
 	}
 	this.wireframe = wfi;
-  }
+};
 /**
  * Calculate the centre of this model
  */  
@@ -176,7 +176,7 @@ vxlModel.prototype.getCentre = function(){
 	  c[2] = (bb[5] + bb[2]) /2;
 	  
 	  this.centre = c;
-	}
+};
 
 /**
  * Calculate the outline of this model (bounding box)
@@ -194,6 +194,6 @@ vxlModel.prototype.getOutline = function(){
 		bb[5] = Math.max(bb[5],vs[i+2]);
 	}
 	this.outline = bb;
-}
+};
 
 

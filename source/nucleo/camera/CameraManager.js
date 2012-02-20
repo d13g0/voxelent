@@ -37,7 +37,7 @@ vxlCameraManager.prototype.reset = function(type){
 	this.cameras = [];
 	this.interactors = [];
 	this.active = this.createCamera(type);
-}
+};
 
 /**
  * Utilitary method that check if the index idx is between 0 and the size of the camera array
@@ -47,7 +47,7 @@ vxlCameraManager.prototype.checkBoundary = function(idx){
 	if (idx <0 || idx >= this.cameras.length){
 		throw('The camera '+idx+' does not exist');
 	}
-}
+};
 /**
  * Creates a camera
  * @param {vxl.def.camera.type} type the type of camera to create
@@ -59,7 +59,7 @@ vxlCameraManager.prototype.createCamera = function(type){
 	this.cameras.push(camera);
 	camera.idx = this.cameras.length - 1;
 	return camera;
-}
+};
 
 /**
  * Returns the camera with index idx
@@ -68,14 +68,14 @@ vxlCameraManager.prototype.createCamera = function(type){
 vxlCameraManager.prototype.getCamera = function(idx){
 	this.checkBoundary(idx);
 	return this.cameras[idx];
-}
+};
 
 /**
  * Returns a reference to the current camera. There is always an active camera
  */
 vxlCameraManager.prototype.getActiveCamera = function(){
 	return this.active;
-}
+};
 
 /**
  * Changes the active camera to the camera with index idx
@@ -85,5 +85,5 @@ vxlCameraManager.prototype.switchTo = function(idx){
 	this.checkBoundary(idx);
 	this.active = this.cameras[idx];
 	return this.active;
-}
+};
 

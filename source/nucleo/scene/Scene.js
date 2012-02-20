@@ -29,7 +29,7 @@ function vxlScene()
 	this.views  				= [];
 	this.actors 				= [];
 	this.toys					= new vxlSceneToys(this);
-	this.loadingMode 			= vxl.def.asset.loadingMode.LIVE;
+	this.loadingMode 			= vxl.def.model.loadingMode.LIVE;
 	this.normalsFlipped 		= false;
 	this.lutID 					= null;
 	this.timerID				= null;
@@ -66,9 +66,9 @@ vxlScene.prototype.handleEvent = function(event,src){
 
 vxlScene.prototype.setLoadingMode = function(mode){
 	if (mode == undefined || mode == null || 
-		(mode != vxl.def.asset.loadingMode.LIVE && 
-		 mode != vxl.def.asset.loadingMode.LATER &&
-		 mode != vxl.def.asset.loadingMode.DETACHED)){
+		(mode != vxl.def.model.loadingMode.LIVE && 
+		 mode != vxl.def.model.loadingMode.LATER &&
+		 mode != vxl.def.model.loadingMode.DETACHED)){
 		 	throw('the mode '+mode+ 'is not a valid loading mode');
 		 }
 	this.loadingMode = mode;

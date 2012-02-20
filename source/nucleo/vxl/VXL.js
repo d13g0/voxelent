@@ -86,7 +86,13 @@ def : {
     */
 	model			: { 
 						folder:"voxdata/models",
-						diffuse: [0.9,0.0,0.0,1.0]
+						diffuse: [0.9,0.0,0.0,1.0],
+						/** @namespace Enumeration with the different loading modes provided by Voxelent
+                          * @property {String} LIVE     Each asset is added to the scene as soon as it is downloaded
+                          * @property {String} LATER    The assets are added to the scene only when ALL of them ahve been downloaded
+                          * @property {String} DETACHED The assets are never added to the scene. The programmer decides when to do this.
+                          */
+                         loadingMode     : { LIVE:'LIVE', LATER:'LATER', DETACHED:'DETACHED'}
 					},
     /**
     * @namespace Default values for views
@@ -126,18 +132,7 @@ def : {
                         */
     					type      : { ORBITING: 'ORBITING', TRACKING : 'TRACKING'}
 					},
-	/**
-    * @namespace Default values for assets
-    * @property {vxl.def.asset.loadingMode} loadingMode Enumeration with the different loading modes provided by Voxelent
-    *
-    */
-	asset			: {  /** @namespace Enumeration with the different loading modes provided by Voxelent
-                          * @property {String} LIVE     Each asset is added to the scene as soon as it is downloaded
-                          * @property {String} LATER    The assets are added to the scene only when ALL of them ahve been downloaded
-                          * @property {String} DETACHED The assets are never added to the scene. The programmer decides when to do this.
-                          */
-						 loadingMode     : { LIVE:'LIVE', LATER:'LATER', DETACHED:'DETACHED'}
-					},				 	
+				 	
     /**
     * @namespace Default values for renderers
     * @property {vxl.def.renderer.mode} mode The rendering mode
@@ -166,7 +161,7 @@ events : {
 * @namespace Voxelent Global Objects
 * @property {Boolean}                   debug
 * @property {vxlNotifier}               notifier
-* @property {vxlAssetManager}           assetManager
+* @property {vxlModelManager}           modelManager
 * @property {vxlLookupTableManager}     lookupTableManager
 *
 */
@@ -176,7 +171,7 @@ go : {
 	_rates			    : [],
     timid 			    : 0,
     notifier            : undefined,
-    assetManager        : undefined,
+    modelManager        : undefined,
     lookupTableManager  : undefined,
     gui                 : undefined,
     

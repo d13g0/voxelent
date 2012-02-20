@@ -1,0 +1,120 @@
+<html>
+<head>
+<title>Voxelent: Learn & Play: Brain Mesh Demo</title>
+
+<!-- Demo Presentation Assets//-->
+<link href='css/codeview.css'   type='text/css' rel='stylesheet'>
+<link href='css/sunburst.css'  type='text/css' rel='stylesheet'/>
+<link href='css/vox.css' type='text/css' rel='stylesheet' />
+<link href='css/smoothness/jquery-ui-1.8.13.custom.css' type='text/css' rel='stylesheet' />
+
+<script type='text/javascript' src='lib/jquery.js'></script>
+<script type='text/javascript' src='lib/jquery-ui.js'></script> 
+<script type='text/javascript' src='lib/prettify.js'></script>
+<script type='text/javascript' src='lib/codeview.js'></script>
+
+<!-- Voxelent Code //-->
+<script type='text/javascript' src='lib/voxelent_v0.86.js'></script>
+		
+<script type='text/javascript' id='code-js'>
+
+function runVoxApp(){
+    vxl.api.setup('canvas-element-id');
+    var list = ["brain/part1.json",
+                    "brain/part2.json",
+                    "brain/part3.json",
+                    "brain/part4.json",
+                    "brain/part5.json",
+                    "brain/part6.json",
+                   ];
+    
+    vxl.api.load(list,vxl.def.model.loadingMode.LATER);
+    vxl.api.setBackgroundColor([41/256,41/256,41/256,1.0]);
+    vxl.c.view.start();
+    vxl.api.setLookupTable('default');
+}
+</script>
+        
+ <!-- Analytics //-->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-26954785-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>       
+</head>
+
+<body onload='runVoxApp()'>
+
+
+    <table class = 'compact'>
+    <tr>
+        <td><img src='../r/im/vox_small.jpg' height='85px' width='168px'/></td>
+        </tr><tr>
+        <td><h1>Rendering a Brain Mesh</h1></td>
+    </tr>    
+    </table>
+
+
+<div id='contents'>
+    <div id='canvasContainer'>
+        
+        <canvas id='canvas-element-id' width='480' height='400'>
+            Your browser does not support the HTML5 canvas element.
+        </canvas>
+        
+     <br/>
+    </div>
+
+</div>
+
+<div id='bottom'>
+
+ <h2>Mouse Interaction</h2>
+    <p>Rotate the brain by dragging the left mouse button over the canvas.
+    You can zoom in and out by holding the Ctrl key pressed while you drag your mouse</p>
+ 
+ 
+    <h2>Multiple representations</h2>
+    <ul>
+        <li> Open the JavaScript console. In Firefox press <code>Ctrl+Shift+K</code>, in Chrome <code>Ctrl+Shift+J</code></li>
+        <li> Try <code>vxl.api.wireframeON()</code> </li>
+        <li> Enter <code>vxl.api.surfaceON()</code> to go back to surface mode</li>
+        <li> Now try <code>vxl.api.pointsON()</code>. What do you see?</li>
+    </ul>    
+
+    
+    <h2>Changing the Lookup Table</h2>
+    <ul>
+        <li> Open the JavaScript console. In Firefox press <code>Ctrl+Shift+K</code>, in Chrome <code>Ctrl+Shift+J</code></li>
+        <li> Enter <code>vxl.api.getLookupTables()</code>. Voxelent will return the list of lookup tables that are loaded </li>
+        <li> Enter <code>vxl.api.setLookupTable('cortex')</code> </li>
+        <li> What happened. Try any other LUT from the list </li>
+    </ul>
+ 
+</div>
+<script>cview.run(cview.MODE_VIEW,false,400);</script>
+<script type="text/javascript" charset="utf-8">
+  var is_ssl = ("https:" == document.location.protocol);
+  var asset_host = is_ssl ? "https://s3.amazonaws.com/getsatisfaction.com/" : "http://s3.amazonaws.com/getsatisfaction.com/";
+  document.write(unescape("%3Cscript src='" + asset_host + "javascripts/feedback-v2.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+<script type="text/javascript" charset="utf-8">
+  var feedback_widget_options = {};
+
+  feedback_widget_options.display = "overlay";  
+  feedback_widget_options.company = "voxelent";
+  feedback_widget_options.placement = "right";
+  feedback_widget_options.color = "#222";
+  feedback_widget_options.style = "idea";
+  
+  var feedback_widget = new GSFN.feedback_widget(feedback_widget_options);
+</script>
+</body>
+</html>
