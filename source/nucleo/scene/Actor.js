@@ -41,19 +41,25 @@ function vxlActor(model){
   this.scale 		= vxl.vec3.create([1, 1, 1]);
   this.rotation 	= vxl.vec3.create([0, 0, 0]);
   
-  this.program      = vxl.def.glsl.diffusive;
+  this.program       = undefined;
+  this.picking_color = undefined;
   
   this.renderers = [];
   this.buffers = [];
   this.clones  = 0;
 };
 
+
 /**
  * If the property exists, then it updates it
  * @param {String} property 
  * @param {Object} value 
+ * @TODO: if the property is position or scale then call the respective methods from here
  */
 vxlActor.prototype.setProperty = function(property, value){
+    if (property == 'position') throw 'Actor.setProperty(position), please use setPosition instead';
+    if (property == 'scale')    throw 'Actor.setProperty(scale), please use setScale instead';
+    
 	if (this.hasOwnProperty(property)){
 		this[property] = value;
 		vxl.go.console('Actor: The actor '+this.name+' has been updated. ['+property+' = '+value+']');
@@ -61,6 +67,16 @@ vxlActor.prototype.setProperty = function(property, value){
 	else {
 		throw ('Actor: the property '+ property+' does not exist');
 	}
+};
+
+vxlActor.prototype.setPosition = function (position){
+    this.position = vxl.vec3.create(position);
+    //TODO: Recalculate bounding box
+};
+
+vxlActor.prototype.setScale = function(scale){
+    this.scale = vxl.vec3.create(scale);
+    //TODO: Recalculate bounding box
 };
 
 /**
@@ -78,7 +94,7 @@ vxlActor.prototype.allocate = function(renderer){
    		return;
    }
    
-   vxl.go.console('Actor: Allocating actor '+this.model.name+' for view '+ renderer.view.name);
+   vxl.go.console('Actor: Allocating actor '+this.name+' for view '+ renderer.view.name);
    	
 	var gl = renderer.gl;
 	var model = this.model;
@@ -131,7 +147,10 @@ vxlActor.prototype.deallocate = function(){
 
 /**
  * Passes the matrices to the shading program
- * 
+ * @param renderer determines the context for the transformations, 
+ * different rendereres can have different matrices transformations 
+ * we will update each Model-View matrix of each renderer according to
+ * the actor position,scale and rotation.
  */
 vxlActor.prototype.updateMatrixStack = function(renderer){
     
@@ -156,11 +175,18 @@ vxlActor.prototype.updateMatrixStack = function(renderer){
 */
 vxlActor.prototype.render = function(renderer){
 	
+	
 	if (!this.visible){ 
 		return;
 	}
+
+	//if (this.program){
+	  //renderer.setProgram(this.program);
+	//} 
+	//else {
+	  //  renderer.setProgram(renderer.defaultProgram);
+//	}
 	
-	renderer.setProgram(this.program);
 	
 	var idx = this.renderers.indexOf(renderer);
 
@@ -241,8 +267,10 @@ vxlActor.prototype.render = function(renderer){
 			gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
 		}
 		else if (this.mode == vxl.def.actor.mode.WIREFRAME){
-			prg.setUniform("uUseShading", false);
-			prg.disableAttribute("aVertexNormal");
+			prg.setUniform("uUseShading", true);
+			if (this.name == 'floor'){
+			     prg.disableAttribute("aVertexNormal");
+			}
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.wireframe);
 			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
 			gl.drawElements(gl.LINES, model.wireframe.length, gl.UNSIGNED_SHORT,0);
@@ -259,11 +287,14 @@ vxlActor.prototype.render = function(renderer){
 		}
 		 gl.bindBuffer(gl.ARRAY_BUFFER, null);
 	     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	     
+
     }
 	catch(err){
 		alert('Error rendering actor ['+this.name+']. Error =' +err.description);
 		throw('Error rendering actor ['+this.name+']. Error =' +err.description);
 	}
+	
 };
 
 /**
@@ -359,9 +390,9 @@ vxlActor.prototype.clone = function(){
 	
 	
 	//Now to save us some memory, let's SHARE the WebGL buffers that the current actor has already allocated'
-	duplicate.renderers = this.renderers;
-	duplicate.buffers   = this.buffers;
-	duplicate.model 	= this.model;
+	//duplicate.renderers = this.renderers;
+	//duplicate.buffers   = this.buffers;
+	//duplicate.model 	= this.model;
 	duplicate.name     += '-'+this.clones; 
 	return duplicate;
 };

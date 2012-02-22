@@ -291,7 +291,7 @@ height:135px;
 			<!-- begin publish.classesIndex -->
 			<div align="center"><a href="../index.html">Class Index</a></div>
 <hr />
-<h3>Current Version:  0.85</h3>
+<h3>Current Version:  0.87</h3>
 <p>Download it <a href='http://voxelent.com/developers/dev/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -311,10 +311,6 @@ height:135px;
 	
 	<li><a href="../symbols/vxl.def.actor.mode.html">vxl.def.actor.mode</a></li>
 	
-	<li><a href="../symbols/vxl.def.asset.html">vxl.def.asset</a></li>
-	
-	<li><a href="../symbols/vxl.def.asset.loadingMode.html">vxl.def.asset.loadingMode</a></li>
-	
 	<li><a href="../symbols/vxl.def.camera.html">vxl.def.camera</a></li>
 	
 	<li><a href="../symbols/vxl.def.camera.task.html">vxl.def.camera.task</a></li>
@@ -330,6 +326,8 @@ height:135px;
 	<li><a href="../symbols/vxl.def.lut.html">vxl.def.lut</a></li>
 	
 	<li><a href="../symbols/vxl.def.model.html">vxl.def.model</a></li>
+	
+	<li><a href="../symbols/vxl.def.model.loadingMode.html">vxl.def.model.loadingMode</a></li>
 	
 	<li><a href="../symbols/vxl.def.renderer.html">vxl.def.renderer</a></li>
 	
@@ -348,8 +346,6 @@ height:135px;
 	<li><a href="../symbols/vxl.version.html">vxl.version</a></li>
 	
 	<li><a href="../symbols/vxlActor.html">vxlActor</a></li>
-	
-	<li><a href="../symbols/vxlAssetManager.html">vxlAssetManager</a></li>
 	
 	<li><a href="../symbols/vxlAxis.html">vxlAxis</a></li>
 	
@@ -371,6 +367,8 @@ height:135px;
 	
 	<li><a href="../symbols/vxlModel.html">vxlModel</a></li>
 	
+	<li><a href="../symbols/vxlModelManager.html">vxlModelManager</a></li>
+	
 	<li><a href="../symbols/vxlNotifier.html">vxlNotifier</a></li>
 	
 	<li><a href="../symbols/vxlProgram.html">vxlProgram</a></li>
@@ -381,11 +379,11 @@ height:135px;
 	
 	<li><a href="../symbols/vxlSceneToys.html">vxlSceneToys</a></li>
 	
+	<li><a href="../symbols/vxlTrackerInteractor.html">vxlTrackerInteractor</a></li>
+	
 	<li><a href="../symbols/vxlTransforms.html">vxlTransforms</a></li>
 	
 	<li><a href="../symbols/vxlView.html">vxlView</a></li>
-	
-	<li><a href="../symbols/vxlViewListener.html">vxlViewListener</a></li>
 	
 </ul>
 <hr />
@@ -453,26 +451,6 @@ height:135px;
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								<b><a href="../symbols/vxl.go.html#assetManager">assetManager</a></b>
-								</div>
-								<div class="description"></div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								vxl.go.<b><a href="../symbols/vxl.go.html#.assetManager">assetManager</a></b>
-								</div>
-								<div class="description">Defines the global Asset Manager</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
 								<b><a href="../symbols/vxl.go.html#debug">debug</a></b>
 								</div>
 								<div class="description"></div>
@@ -496,6 +474,26 @@ height:135px;
 								<b><a href="../symbols/vxl.go.html#lookupTableManager">lookupTableManager</a></b>
 								</div>
 								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/vxl.go.html#modelManager">modelManager</a></b>
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								vxl.go.<b><a href="../symbols/vxl.go.html#.modelManager">modelManager</a></b>
+								</div>
+								<div class="description">Defines the global Model Manager</div>
 							</td>
 						</tr>
 					
@@ -620,53 +618,6 @@ height:135px;
 					Field Detail
 				</div>
 				
-					<a name="assetManager"> </a>
-					<div class="fixedFont">
-
-					<span class="light">{<a href="../symbols/vxlAssetManager.html">vxlAssetManager</a>}</span>
-					<b>assetManager</b>
-
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name=".assetManager"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-
-					
-					<span class="light">vxl.go.</span><b>assetManager</b>
-
-					</div>
-					<div class="description">
-						Defines the global Asset Manager
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/source_nucleo_model_AssetManager.js.html">AssetManager.js</a>.
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
 					<a name="debug"> </a>
 					<div class="fixedFont">
 
@@ -723,6 +674,53 @@ height:135px;
 					</div>
 					<div class="description">
 						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="modelManager"> </a>
+					<div class="fixedFont">
+
+					<span class="light">{<a href="../symbols/vxlModelManager.html">vxlModelManager</a>}</span>
+					<b>modelManager</b>
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".modelManager"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+
+					
+					<span class="light">vxl.go.</span><b>modelManager</b>
+
+					</div>
+					<div class="description">
+						Defines the global Model Manager
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/source_nucleo_model_ModelManager.js.html">ModelManager.js</a>.
 						
 						
 					</div>
@@ -920,7 +918,7 @@ height:135px;
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Feb 17 2012 02:04:06 GMT-0500 (EST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Feb 22 2012 17:51:41 GMT-0500 (EST)
 		</div>
         </div>
         </div>

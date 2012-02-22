@@ -50,6 +50,10 @@ function vxlCamera(vw,t) {
 	this.steps		= 0;
     this.home 		= vxl.vec3.create([0,0,0]);
     this.id         = 0;
+    this.FOV        = 30;
+    this.Z_NEAR     = 0.1;    
+    this.Z_FAR      = 10000;     
+    
 	
    
 	
@@ -174,12 +178,32 @@ vxlCamera.prototype.pan = function(dx, dy) {
 };
 
 vxlCamera.prototype.dolly = function(value) {
-	vxl.go.console('Camera: dolly called');
-	/*var c = this;
-	if(value <= 0.0)
-		return;
-	var d = c.distance * value;
-	c.setPosition(c.focalPoint.x - d * c.normal.x, c.focalPoint.y - d * c.normal.y, c.focalPoint.z - d * c.normal.z);*/
+    var c = this;
+    
+    var p =  vxl.vec3.create();
+    var n =  vxl.vec3.create();
+    
+    p = c.position;
+    
+    var step = value - c.steps;
+    
+    vxl.vec3.normalize(c.normal,n);
+    
+    var newPosition = vxl.vec3.create();
+    
+    if(c.type == vxl.def.camera.type.TRACKING){
+        newPosition.x = p.x - step*n.x;
+        newPosition.y = p.y - step*n.y;
+        newPosition.z = p.z - step*n.z;
+    }
+    else{
+        newPosition.x = p.x;
+        newPosition.y = p.y;
+        newPosition.z = p.z - step; 
+    }
+    
+    c.setPosition([newPosition.x, newPosition.y, newPosition.z]); //@TODO: fix this syntax ambivalence
+    c.steps = value;
 };
 
 /**
@@ -317,7 +341,7 @@ vxlCamera.prototype.shot = function(bb){
 	var centre = this.view.scene.centre;
 	
 	if(maxDim != 0) {
-		var distance = 1.5 * maxDim / (Math.tan(this.view.fovy * Math.PI / 180));
+		var distance = 1.5 * maxDim / (Math.tan(this.FOV * Math.PI / 180));
 		this.setPosition([centre[0], centre[1], centre[2]+ distance]);
 	}
 	

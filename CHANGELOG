@@ -1,4 +1,23 @@
 -------------------------------------------------------------------------------------------
+VERSION 0.87 - Kitware Visit
+-------------------------------------------------------------------------------------------
+1. The folder tutorials was renamed to demos
+2. The demos were renamed to eliminate the word 'demo' from the filename
+3. The demo hello.html and sphere.html were modified:
+* hello.html adds one line to set up the camera to a reasonable distance
+* sphere.html shows how the JS window object can listen for Voxelent events
+
+4. python tools were renamed using the underscore instead of the dash. For instance:
+vxl-documenter.py was renamed to vxl_documenter.py. The goal is to allow calling
+modules from other python modules (not possible with a dash in the name of the module).
+
+The new python module vxl_pack_and_document.py was created
+
+5. The demos: picking, multiview and bouncing balls need to be updated with the latest 
+voxelent version. They have OLD CODE.
+
+
+-------------------------------------------------------------------------------------------
 VERSION 0.86 - Family Day
 -------------------------------------------------------------------------------------------
 1. All the references to vxlAsseManager have been replaced by vxlModelManager. The goal of 
@@ -11,6 +30,26 @@ this change is to unify the ontology (Asset, Model).
 4. The uniform 'uUseLightTranslation' is set to true by default in the phong and diffuse shaders
 
 5. vxlActor.setMode changed to vxlActor.setVisualizationMode
+
+6. Tools are renamed from vox- to vxl- for naming consistency
+
+7. vxlCameraInteractor disappears. vxlViewListener and vxlCameraInteractor are integrated into
+vxlViewInteractor.
+
+8. The folder view is created in the source code. It groups vxlView, vxlViewInteractor and the
+interactors folder
+
+9. The interactors now descend from vxlViewInteractor
+
+10. vxlTrackballCameraInteractor is now known as vxlTrackerInteractor
+
+11. vxlView has now the method setInteractor(i:vxlViewInteractor):void
+
+12. Now the models and the actor names do not carry the suffix .json
+
+13. vxlActor.setPosition and vxlActor.setScale are created
+
+14. FOV, Z_NEAR and Z_FAR are now vxlCamera properties
 
 -------------------------------------------------------------------------------------------
 VERSION 0.85 - Diego's Birthday

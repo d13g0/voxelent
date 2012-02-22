@@ -86,6 +86,7 @@ vxl.api = {
 	}
 	else if (typeof actor == 'string'){
 		if (vxl.c.scene == undefined) throw ('vxl.api.setCurrentActor: there is no Current scene. Please call vxl.api.setCurrentScene');
+		
 		var theActor = vxl.c.scene.getActorByName(actor);
 		if (theActor != undefined){
 			vxl.c.actor = theActor;
@@ -93,6 +94,9 @@ vxl.api = {
 		else {
 			throw ('vxl.api.setCurrentActor: the actor '+actor+' does not exist in the current scene');
 		}
+	}
+	else{
+	    vxl.c.actor = actor;
 	}
  },
  
@@ -244,7 +248,7 @@ wireframeON :  function(){
 		vxl.c.actor.setVisualizationMode(vxl.def.actor.mode.WIREFRAME);
 	}
 	else {
-		vxl.c.view.scene.setVisualizationMode(vxl.def.actor.mode.WIREFRAME);
+		vxl.c.scene.setVisualizationMode(vxl.def.actor.mode.WIREFRAME);
 	}
 	vxl.go.console('API:Wireframe is shown.');
  },
@@ -414,9 +418,24 @@ wireframeON :  function(){
   * Loads a program
   * @param definition one of voxelent's programs
   */
- setProgram :  function(definition){
-    vxl.c.view.renderer.setProgram(definition);
- }
+ setDefaultProgram :  function(program){
+    vxl.c.view.renderer.setDefaultProgram(program);
+    
+ },
+ 
+ /**
+  * Sets a uniform
+  */
+  setUniform: function(uniformID, value,hint){
+      vxl.c.view.renderer.prg.setUniform(uniformID, value,hint);
+  },
+  
+  /**
+   * Return the uniform names of the current program
+   */
+  getUniformNames: function(){
+      return vxl.c.view.renderer.prg._uniformList[vxl.c.view.renderer.prg._currentProgramID].slice(0);
+  }
 
  }; 
  

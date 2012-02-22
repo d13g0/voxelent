@@ -39,6 +39,7 @@ function vxlScene()
 	this.bb 					= [];
 	this.centre 				= [];
 	this.frameAnimation			= null;
+
 	if (vxl.c.scene  == null) vxl.c.scene 	= this;
 	vxl.go.notifier.addTarget(vxl.events.MODELS_LOADED,this);
 	vxl.go.notifier.addTarget(vxl.events.DEFAULT_LUT_LOADED,this);
@@ -116,24 +117,17 @@ vxlScene.prototype.computeMetrics = function() {
 	}
 };
 
-
+/**
+ * This function creates AND ADD a new actor to this scene
+ * @param {vxlModel} the model from which a new actor will be created AND added to this scene
+ * 
+ * If you are looking to create but not adding an actor call new vxlActor(model) instead.
+ * 
+ * @returns actor the actor that was created and added to the scene, from the model passed as parameter
+ */
 vxlScene.prototype.createActor = function(model){
-	
 	var actor = new vxlActor(model);
-	if (this.normalsFlipped){
-		actor.flipNormals(true);
-	}
-	
-	if (this.lutID != null){
-		actor.setLookupTable(this.lutID, this.scalarMIN, this.scalarMAX);
-	}
-    
-	this.actors.push(actor);
-    this.updateMetrics(actor.model.outline); //TODO: What if the actor moves? use actor bounding box instead
-    
-	vxl.go.console('Scene: Actor for model '+model.name+' created');
-	vxl.c.actor = actor;
-    vxl.go.notifier.fire(vxl.events.SCENE_UPDATED);
+	this.addActor(actor);
 	return actor;
 };
 
@@ -148,12 +142,24 @@ vxlScene.prototype.createActors = function(models){
 	}	
 };
 /**
- * Adds one actor
+ * Adds one actor.
+ * The added actor becomes the current one (vxl.c.actor)
  * @param actor the actor to be added to the scene
  */
 vxlScene.prototype.addActor = function(actor){
-	this.actors.push(actor);
-    this.updateMetrics(actor.model.outline);
+    if (this.normalsFlipped){
+        actor.flipNormals(true);
+    }
+    
+    if (this.lutID != null){
+        actor.setLookupTable(this.lutID, this.scalarMIN, this.scalarMAX);
+    }
+    
+    this.actors.push(actor);
+    this.updateMetrics(actor.model.outline); //TODO: What if the actor moves? use actor bounding box instead
+    
+    vxl.go.console('Scene: Actor for model '+actor.model.name+' added');
+    vxl.c.actor = actor;
     vxl.go.notifier.fire(vxl.events.SCENE_UPDATED);
 };
 
@@ -327,3 +333,6 @@ vxlScene.prototype.getActorNames = function(){
 	}
 	return list;
 };
+
+
+

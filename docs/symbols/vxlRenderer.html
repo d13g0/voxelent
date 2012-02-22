@@ -291,7 +291,7 @@ height:135px;
 			<!-- begin publish.classesIndex -->
 			<div align="center"><a href="../index.html">Class Index</a></div>
 <hr />
-<h3>Current Version:  0.85</h3>
+<h3>Current Version:  0.87</h3>
 <p>Download it <a href='http://voxelent.com/developers/dev/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -311,10 +311,6 @@ height:135px;
 	
 	<li><a href="../symbols/vxl.def.actor.mode.html">vxl.def.actor.mode</a></li>
 	
-	<li><a href="../symbols/vxl.def.asset.html">vxl.def.asset</a></li>
-	
-	<li><a href="../symbols/vxl.def.asset.loadingMode.html">vxl.def.asset.loadingMode</a></li>
-	
 	<li><a href="../symbols/vxl.def.camera.html">vxl.def.camera</a></li>
 	
 	<li><a href="../symbols/vxl.def.camera.task.html">vxl.def.camera.task</a></li>
@@ -330,6 +326,8 @@ height:135px;
 	<li><a href="../symbols/vxl.def.lut.html">vxl.def.lut</a></li>
 	
 	<li><a href="../symbols/vxl.def.model.html">vxl.def.model</a></li>
+	
+	<li><a href="../symbols/vxl.def.model.loadingMode.html">vxl.def.model.loadingMode</a></li>
 	
 	<li><a href="../symbols/vxl.def.renderer.html">vxl.def.renderer</a></li>
 	
@@ -348,8 +346,6 @@ height:135px;
 	<li><a href="../symbols/vxl.version.html">vxl.version</a></li>
 	
 	<li><a href="../symbols/vxlActor.html">vxlActor</a></li>
-	
-	<li><a href="../symbols/vxlAssetManager.html">vxlAssetManager</a></li>
 	
 	<li><a href="../symbols/vxlAxis.html">vxlAxis</a></li>
 	
@@ -371,6 +367,8 @@ height:135px;
 	
 	<li><a href="../symbols/vxlModel.html">vxlModel</a></li>
 	
+	<li><a href="../symbols/vxlModelManager.html">vxlModelManager</a></li>
+	
 	<li><a href="../symbols/vxlNotifier.html">vxlNotifier</a></li>
 	
 	<li><a href="../symbols/vxlProgram.html">vxlProgram</a></li>
@@ -381,11 +379,11 @@ height:135px;
 	
 	<li><a href="../symbols/vxlSceneToys.html">vxlSceneToys</a></li>
 	
+	<li><a href="../symbols/vxlTrackerInteractor.html">vxlTrackerInteractor</a></li>
+	
 	<li><a href="../symbols/vxlTransforms.html">vxlTransforms</a></li>
 	
 	<li><a href="../symbols/vxlView.html">vxlView</a></li>
-	
-	<li><a href="../symbols/vxlViewListener.html">vxlViewListener</a></li>
 	
 </ul>
 <hr />
@@ -493,16 +491,25 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/vxlRenderer.html#render">render</a></b>()
 								</div>
-								<div class="description">Renders the scene by delegating the rendering to each actor present in the scene</div>
+								<div class="description">Delegates rendering to the scene</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlRenderer.html#setDefaultProgram">setDefaultProgram</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/vxlRenderer.html#setDefaultProgram">setDefaultProgram</a></b>(program)
 								</div>
 								<div class="description">Sets the program 'diffusive' as the program by default to be used by this renderer</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/vxlRenderer.html#setMode">setMode</a></b>(mode)
+								</div>
+								<div class="description">Sets the rendering mode.</div>
 							</td>
 						</tr>
 					
@@ -738,7 +745,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						Renders the scene by delegating the rendering to each actor present in the scene
+						Delegates rendering to the scene
 						
 						
 					</div>
@@ -759,7 +766,7 @@ height:135px;
 					<div class="fixedFont">
 
 					
-					<b>setDefaultProgram</b>()
+					<b>setDefaultProgram</b>(program)
 
 					</div>
 					<div class="description">
@@ -770,6 +777,53 @@ height:135px;
 
 					
 
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{vxl.def.glsl.program}</span> <b>program</b>
+									
+								</dt>
+								<dd>to make default</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setMode"> </a>
+					<div class="fixedFont">
+
+					
+					<b>setMode</b>(mode)
+
+					</div>
+					<div class="description">
+						Sets the rendering mode. Options are in vxl.def.renderer.modeThis method updates the rendering mode and tries to restart the rendering process
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>mode</b>
+									
+								</dt>
+								<dd>the mode to set</dd>
+							
+							</dl>
 						
 						
 						
@@ -923,7 +977,7 @@ height:135px;
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Feb 17 2012 02:04:07 GMT-0500 (EST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Feb 22 2012 17:51:42 GMT-0500 (EST)
 		</div>
         </div>
         </div>

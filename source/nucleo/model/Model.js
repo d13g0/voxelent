@@ -18,9 +18,12 @@
  * Models are totally independend of views and of the rendering process
  * @class
  * @constructor
+ * @param {String} name the name for this model
+ * @param {Object} JSON_OBJECT the JSON Object that defines this model (Optional)
+ * @see vxlModel#load
  * @author Diego Cantor
  */
-function vxlModel(name){
+function vxlModel(name, JSON_OBJECT){
 	this.name = name;
 	this.indices 	= null;
 	this.vertices 	= null;
@@ -31,26 +34,29 @@ function vxlModel(name){
 	this.centre 	= null;
 	this.outline 	= null;
 	//texture
-
+    
+    if (JSON_OBJECT != undefined){
+        this.load(this.name, JSON_OBJECT);
+    }
 }
 
 /**
- * Populates this model with the payload (JSON object)
+ * Populates this model with the JSON_OBJECT (JSON object)
  * @param {String} nm the name given to this model
- * @param {Object} payload the JSON object that describes the model
+ * @param {Object} JSON_OBJECT the JSON object that describes the model
  */
-vxlModel.prototype.load = function(nm,payload){
+vxlModel.prototype.load = function(nm,JSON_OBJECT){
 	this.name		= nm;
-	if (payload.obj_name != null){
-		this.name = payload.obj_name;
+	if (JSON_OBJECT.name != null){
+		this.name = JSON_OBJECT.name;
 	}
 	//copy by reference (no slicing) as models are loaded once
-	this.vertices 	= payload.vertices;
-	this.indices 	= payload.indices;
-	this.diffuse 	= payload.diffuse;
-	this.scalars 	= payload.scalars;
-	this.wireframe  = payload.wireframe;
-	this.colors     = payload.colors;	
+	this.vertices 	= JSON_OBJECT.vertices;
+	this.indices 	= JSON_OBJECT.indices;
+	this.diffuse 	= JSON_OBJECT.diffuse;
+	this.scalars 	= JSON_OBJECT.scalars;
+	this.wireframe  = JSON_OBJECT.wireframe;
+	this.colors     = JSON_OBJECT.colors;	
 
 	if(this.normals == undefined && this.indices != undefined){
 		this.getNormals();

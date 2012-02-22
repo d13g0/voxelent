@@ -175,7 +175,7 @@ vxlProgram.prototype.setUniform = function(uniformID, value, hint){
         
     }
     else{
-    	alert('Program: the uniform '+uniformID+' is not defined for the program '+this._currentProgramID);
+    	throw('Program: the uniform '+uniformID+' is not defined for the program '+this._currentProgramID);
         return;
     }
     

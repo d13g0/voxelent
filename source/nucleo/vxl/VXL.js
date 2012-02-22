@@ -38,7 +38,7 @@ var vxl = {
 */
 version : 
 {
-   	number : '0.85',
+   	number : '0.86',
    	codename : 'c4n314',
    	plugins  : []
 },
@@ -166,14 +166,14 @@ events : {
 *
 */
 go : {
-    debug 	 		    : true,					  
+    debug 	 		    : false,					  
     views 			    : [], //TODO: REFACTOR THIS.Remember is here for JQuery focus and blur bindings
 	_rates			    : [],
     timid 			    : 0,
     notifier            : undefined,
     modelManager        : undefined,
     lookupTableManager  : undefined,
-    gui                 : undefined,
+
     
 	render : function(){
 		vxl.c.view.renderer.render(); 
@@ -186,20 +186,23 @@ go : {
 	},
 	
 	slowRendering : function(){
-		//message('slow rendering...');
-		vxl.go._rates = [];
+
+		/*vxl.go._rates = [];
 		for(var i = 0; i < vxl.go.views.length; i++){
-			//message('saving previous rate: ' +i+' - '+ vxl.go.views[i].renderer.renderRate);
+		    if (vxl.go.views[i].renderer.mode == vxl.def.renderer.mode.ANIMFRAME) continue;
+			vxl.go.console('vxl.go.slowRendering: slow rendering on view '+vxl.go.views[i].name,true);
 			vxl.go._rates.push(vxl.go.views[i].renderer.renderRate);
 			vxl.go.views[i].renderer.setRenderRate(vxl.def.renderer.rate.SLOW);
-		}
+		}*/
 	},
 	
 	normalRendering : function(){
-		//message('back to normal rendering....');
-		for(var i = 0; i < vxl.go.views.length; i++){
+		
+		/*for(var i = 0; i < vxl.go.views.length; i++){
+		    if (vxl.go.views[i].renderer.mode == vxl.def.renderer.mode.ANIMFRAME) continue;
+			vxl.go.console('vxl.go.normalRendering: go back to normal rendering on view '+vxl.go.views[i].name,true);
 			vxl.go.views[i].renderer.setRenderRate(vxl.go._rates[i]);
-		}
+		}*/
 	},
 	
 	console : function(txt,flag) { 

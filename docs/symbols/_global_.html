@@ -291,7 +291,7 @@ height:135px;
 			<!-- begin publish.classesIndex -->
 			<div align="center"><a href="../index.html">Class Index</a></div>
 <hr />
-<h3>Current Version:  0.85</h3>
+<h3>Current Version:  0.87</h3>
 <p>Download it <a href='http://voxelent.com/developers/dev/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -311,10 +311,6 @@ height:135px;
 	
 	<li><a href="../symbols/vxl.def.actor.mode.html">vxl.def.actor.mode</a></li>
 	
-	<li><a href="../symbols/vxl.def.asset.html">vxl.def.asset</a></li>
-	
-	<li><a href="../symbols/vxl.def.asset.loadingMode.html">vxl.def.asset.loadingMode</a></li>
-	
 	<li><a href="../symbols/vxl.def.camera.html">vxl.def.camera</a></li>
 	
 	<li><a href="../symbols/vxl.def.camera.task.html">vxl.def.camera.task</a></li>
@@ -330,6 +326,8 @@ height:135px;
 	<li><a href="../symbols/vxl.def.lut.html">vxl.def.lut</a></li>
 	
 	<li><a href="../symbols/vxl.def.model.html">vxl.def.model</a></li>
+	
+	<li><a href="../symbols/vxl.def.model.loadingMode.html">vxl.def.model.loadingMode</a></li>
 	
 	<li><a href="../symbols/vxl.def.renderer.html">vxl.def.renderer</a></li>
 	
@@ -348,8 +346,6 @@ height:135px;
 	<li><a href="../symbols/vxl.version.html">vxl.version</a></li>
 	
 	<li><a href="../symbols/vxlActor.html">vxlActor</a></li>
-	
-	<li><a href="../symbols/vxlAssetManager.html">vxlAssetManager</a></li>
 	
 	<li><a href="../symbols/vxlAxis.html">vxlAxis</a></li>
 	
@@ -371,6 +367,8 @@ height:135px;
 	
 	<li><a href="../symbols/vxlModel.html">vxlModel</a></li>
 	
+	<li><a href="../symbols/vxlModelManager.html">vxlModelManager</a></li>
+	
 	<li><a href="../symbols/vxlNotifier.html">vxlNotifier</a></li>
 	
 	<li><a href="../symbols/vxlProgram.html">vxlProgram</a></li>
@@ -381,11 +379,11 @@ height:135px;
 	
 	<li><a href="../symbols/vxlSceneToys.html">vxlSceneToys</a></li>
 	
+	<li><a href="../symbols/vxlTrackerInteractor.html">vxlTrackerInteractor</a></li>
+	
 	<li><a href="../symbols/vxlTransforms.html">vxlTransforms</a></li>
 	
 	<li><a href="../symbols/vxlView.html">vxlView</a></li>
-	
-	<li><a href="../symbols/vxlViewListener.html">vxlViewListener</a></li>
 	
 </ul>
 <hr />
@@ -441,15 +439,6 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/_global_.html#vxlCameraInteractor">vxlCameraInteractor</a></b>()
-								</div>
-								<div class="description"></div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/_global_.html#vxlMatrix4x4">vxlMatrix4x4</a></b>(m)
 								</div>
 								<div class="description"></div>
@@ -459,16 +448,7 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/_global_.html#vxlPickerInteractor">vxlPickerInteractor</a></b>(camera)
-								</div>
-								<div class="description"></div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/_global_.html#vxlTrackballCameraInteractor">vxlTrackballCameraInteractor</a></b>(c)
+								<div class="fixedFont"><b><a href="../symbols/_global_.html#vxlPickerInteractor">vxlPickerInteractor</a></b>(view, camera)
 								</div>
 								<div class="description"></div>
 							</td>
@@ -487,6 +467,15 @@ height:135px;
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/_global_.html#vxlVector4">vxlVector4</a></b>(x, y, z, h)
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/_global_.html#vxlViewInteractor">vxlViewInteractor</a></b>(view, camera)
 								</div>
 								<div class="description"></div>
 							</td>
@@ -525,34 +514,6 @@ height:135px;
 						
 							<br />
 							<i>Defined in: </i> <a href="../symbols/src/source_nucleo_vxl_Demo.js.html">Demo.js</a>.
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="vxlCameraInteractor"> </a>
-					<div class="fixedFont">
-
-					
-					<b>vxlCameraInteractor</b>()
-
-					</div>
-					<div class="description">
-						
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/source_nucleo_camera_interactor_CameraInteractor.js.html">CameraInteractor.js</a>.
 						
 						
 					</div>
@@ -612,14 +573,14 @@ height:135px;
 					<div class="fixedFont">
 
 					
-					<b>vxlPickerInteractor</b>(camera)
+					<b>vxlPickerInteractor</b>(view, camera)
 
 					</div>
 					<div class="description">
 						
 						
 							<br />
-							<i>Defined in: </i> <a href="../symbols/src/source_nucleo_camera_interactor_PickerInteractor.js.html">PickerInteractor.js</a>.
+							<i>Defined in: </i> <a href="../symbols/src/source_nucleo_view_interactor_PickerInteractor.js.html">PickerInteractor.js</a>.
 						
 						
 					</div>
@@ -631,46 +592,13 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>camera</b>
+									<b>view</b>
 									
 								</dt>
 								<dd></dd>
 							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="vxlTrackballCameraInteractor"> </a>
-					<div class="fixedFont">
-
-					
-					<b>vxlTrackballCameraInteractor</b>(c)
-
-					</div>
-					<div class="description">
-						
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/source_nucleo_camera_interactor_TrackballCameraInteractor.js.html">TrackballCameraInteractor.js</a>.
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
 								<dt>
-									<b>c</b>
+									<b>camera</b>
 									
 								</dt>
 								<dd></dd>
@@ -792,6 +720,51 @@ height:135px;
 						
 						
 
+					<hr />
+				
+					<a name="vxlViewInteractor"> </a>
+					<div class="fixedFont">
+
+					
+					<b>vxlViewInteractor</b>(view, camera)
+
+					</div>
+					<div class="description">
+						
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/source_nucleo_view_interactor_ViewInteractor.js.html">ViewInteractor.js</a>.
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>view</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>camera</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
 					
 				
 			
@@ -806,7 +779,7 @@ height:135px;
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Feb 17 2012 02:04:06 GMT-0500 (EST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Feb 22 2012 17:51:41 GMT-0500 (EST)
 		</div>
         </div>
         </div>

@@ -291,7 +291,7 @@ height:135px;
 			<!-- begin publish.classesIndex -->
 			<div align="center"><a href="../index.html">Class Index</a></div>
 <hr />
-<h3>Current Version:  0.85</h3>
+<h3>Current Version:  0.87</h3>
 <p>Download it <a href='http://voxelent.com/developers/dev/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -311,10 +311,6 @@ height:135px;
 	
 	<li><a href="../symbols/vxl.def.actor.mode.html">vxl.def.actor.mode</a></li>
 	
-	<li><a href="../symbols/vxl.def.asset.html">vxl.def.asset</a></li>
-	
-	<li><a href="../symbols/vxl.def.asset.loadingMode.html">vxl.def.asset.loadingMode</a></li>
-	
 	<li><a href="../symbols/vxl.def.camera.html">vxl.def.camera</a></li>
 	
 	<li><a href="../symbols/vxl.def.camera.task.html">vxl.def.camera.task</a></li>
@@ -330,6 +326,8 @@ height:135px;
 	<li><a href="../symbols/vxl.def.lut.html">vxl.def.lut</a></li>
 	
 	<li><a href="../symbols/vxl.def.model.html">vxl.def.model</a></li>
+	
+	<li><a href="../symbols/vxl.def.model.loadingMode.html">vxl.def.model.loadingMode</a></li>
 	
 	<li><a href="../symbols/vxl.def.renderer.html">vxl.def.renderer</a></li>
 	
@@ -348,8 +346,6 @@ height:135px;
 	<li><a href="../symbols/vxl.version.html">vxl.version</a></li>
 	
 	<li><a href="../symbols/vxlActor.html">vxlActor</a></li>
-	
-	<li><a href="../symbols/vxlAssetManager.html">vxlAssetManager</a></li>
 	
 	<li><a href="../symbols/vxlAxis.html">vxlAxis</a></li>
 	
@@ -371,6 +367,8 @@ height:135px;
 	
 	<li><a href="../symbols/vxlModel.html">vxlModel</a></li>
 	
+	<li><a href="../symbols/vxlModelManager.html">vxlModelManager</a></li>
+	
 	<li><a href="../symbols/vxlNotifier.html">vxlNotifier</a></li>
 	
 	<li><a href="../symbols/vxlProgram.html">vxlProgram</a></li>
@@ -381,11 +379,11 @@ height:135px;
 	
 	<li><a href="../symbols/vxlSceneToys.html">vxlSceneToys</a></li>
 	
+	<li><a href="../symbols/vxlTrackerInteractor.html">vxlTrackerInteractor</a></li>
+	
 	<li><a href="../symbols/vxlTransforms.html">vxlTransforms</a></li>
 	
 	<li><a href="../symbols/vxlView.html">vxlView</a></li>
-	
-	<li><a href="../symbols/vxlViewListener.html">vxlViewListener</a></li>
 	
 </ul>
 <hr />
@@ -554,6 +552,15 @@ height:135px;
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.getUniformNames">getUniformNames</a></b>()
+								</div>
+								<div class="description">Return the uniform names of the current program</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.go_above">go_above</a></b>()
 								</div>
 								<div class="description"></div>
@@ -590,9 +597,9 @@ height:135px;
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.loadAssets">loadAssets</a></b>(arguments, mode, scene)
+								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.load">load</a></b>(arguments, mode, scene)
 								</div>
-								<div class="description">Loads 3D models, textures and other assets to a Voxelent's scene.</div>
+								<div class="description">Loads 3D models, textures and other models to a Voxelent's scene.</div>
 							</td>
 						</tr>
 					
@@ -725,6 +732,15 @@ height:135px;
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.setDefaultProgram">setDefaultProgram</a></b>(definition)
+								</div>
+								<div class="description">Loads a program</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.setElevation">setElevation</a></b>(e)
 								</div>
 								<div class="description"></div>
@@ -752,18 +768,18 @@ height:135px;
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.setProgram">setProgram</a></b>(definition)
+								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.setRenderRate">setRenderRate</a></b>(r)
 								</div>
-								<div class="description">Loads a program</div>
+								<div class="description">Sets the rendering rate of the current view</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.setRenderRate">setRenderRate</a></b>(r)
+								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.setUniform">setUniform</a></b>(uniformID, value, hint)
 								</div>
-								<div class="description">Sets the rendering rate of the current view</div>
+								<div class="description">Sets a uniform</div>
 							</td>
 						</tr>
 					
@@ -1179,6 +1195,31 @@ height:135px;
 
 					<hr />
 				
+					<a name=".getUniformNames"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+
+					
+					<span class="light">vxl.api.</span><b>getUniformNames</b>()
+
+					</div>
+					<div class="description">
+						Return the uniform names of the current program
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name=".go_above"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 
@@ -1279,15 +1320,15 @@ height:135px;
 
 					<hr />
 				
-					<a name=".loadAssets"> </a>
+					<a name=".load"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 
 					
-					<span class="light">vxl.api.</span><b>loadAssets</b>(arguments, mode, scene)
+					<span class="light">vxl.api.</span><b>load</b>(arguments, mode, scene)
 
 					</div>
 					<div class="description">
-						Loads 3D models, textures and other assets to a Voxelent's scene.This method is very flexible. It can load one or multiple assets depending on the type of the first parameter. If it is a String, it will try to find the file with that name in Voxelent's data folder(voxdata by default). Otherwise, if  the parameter 'arguments' is an Array, loadAssets will iteratethrough it and will try to load every element of this list. Every element being the file name.Nucleo supports three different loading modes which are defined in vxl.def.asset.loadingMode:LIVE: As each asset is loaded it is added immediately into the scene by creating the corresponding actorLATER: All the assets are loaded first THEN the actors are created. This is useful when you want to display a full scene instead of showing incremental updates.DETACHED: The assets are loaded into the AssetManager object but actors are never created.This allows background loading.
+						Loads 3D models, textures and other models to a Voxelent's scene.This method is very flexible. It can load one or multiple models depending on the type of the first parameter. If it is a String, it will try to find the file with that name in Voxelent's data folder(voxdata by default). Otherwise, if  the parameter 'arguments' is an Array, load will iteratethrough it and will try to load every element of this list. Every element being the file name.Nucleo supports three different loading modes which are defined in vxl.def.model.loadingMode:LIVE: As each asset is loaded it is added immediately into the scene by creating the corresponding actorLATER: All the models are loaded first THEN the actors are created. This is useful when you want to display a full scene instead of showing incremental updates.DETACHED: The models are loaded into the vxlModelManager object but actors are never created.This allows background loading.
 						
 						
 					</div>
@@ -1302,10 +1343,10 @@ height:135px;
 									<span class="light fixedFont">{String|<a href="../symbols/Array.html">Array</a>}</span> <b>arguments</b>
 									
 								</dt>
-								<dd>the name of the asset or the list of assets (each element being the file name).</dd>
+								<dd>the name of the asset or the list of models (each element being the file name).</dd>
 							
 								<dt>
-									<span class="light fixedFont">{<a href="../symbols/vxl.def.asset.loadingMode.html">vxl.def.asset.loadingMode</a>}</span> <b>mode</b>
+									<span class="light fixedFont">{<a href="../symbols/vxl.def.model.loadingMode.html">vxl.def.model.loadingMode</a>}</span> <b>mode</b>
 									
 								</dt>
 								<dd>the loading mode</dd>
@@ -1314,7 +1355,7 @@ height:135px;
 									<span class="light fixedFont">{<a href="../symbols/vxlScene.html">vxlScene</a>}</span> <b>scene</b>
 									
 								</dt>
-								<dd>the scene in case we do not want to load these assets in the current one</dd>
+								<dd>the scene in case we do not want to load these models in the current one</dd>
 							
 							</dl>
 						
@@ -1788,6 +1829,42 @@ height:135px;
 
 					<hr />
 				
+					<a name=".setDefaultProgram"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+
+					
+					<span class="light">vxl.api.</span><b>setDefaultProgram</b>(definition)
+
+					</div>
+					<div class="description">
+						Loads a program
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>definition</b>
+									
+								</dt>
+								<dd>one of voxelent's programs</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name=".setElevation"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 
@@ -1896,42 +1973,6 @@ height:135px;
 
 					<hr />
 				
-					<a name=".setProgram"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-
-					
-					<span class="light">vxl.api.</span><b>setProgram</b>(definition)
-
-					</div>
-					<div class="description">
-						Loads a program
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<b>definition</b>
-									
-								</dt>
-								<dd>one of voxelent's programs</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
 					<a name=".setRenderRate"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 
@@ -1971,6 +2012,54 @@ height:135px;
 								<dd>api#setCurrentView</dd>
 							
 							</dl>
+						
+
+					<hr />
+				
+					<a name=".setUniform"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+
+					
+					<span class="light">vxl.api.</span><b>setUniform</b>(uniformID, value, hint)
+
+					</div>
+					<div class="description">
+						Sets a uniform
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>uniformID</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>value</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>hint</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
 						
 
 					<hr />
@@ -2161,7 +2250,7 @@ height:135px;
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Feb 17 2012 02:04:06 GMT-0500 (EST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Feb 22 2012 17:51:41 GMT-0500 (EST)
 		</div>
         </div>
         </div>

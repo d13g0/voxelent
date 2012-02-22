@@ -36,6 +36,9 @@ vxlTransforms.prototype.calculateModelView = function(){
     
 };
 
+/**
+ * Calculates the normal matrix corresponding to the current Model-View matrix
+ */
 vxlTransforms.prototype.calculateNormal = function(){
 	vxl.mat4.identity(this.nMatrix);
     vxl.mat4.set(this.mvMatrix, this.nMatrix);
@@ -43,20 +46,31 @@ vxlTransforms.prototype.calculateNormal = function(){
     vxl.mat4.transpose(this.nMatrix);
 };
 
+/**
+ * Calculates the perspective matrix given the current camera
+ */
 vxlTransforms.prototype.calculatePerspective = function(){
+    var c = this.view.cameraman.active;
+    var vw = this.view;
 	vxl.mat4.identity(this.pMatrix);
-	vxl.mat4.perspective(this.pMatrix, this.view.fovy, this.view.width/this.view.height, this.view.zNear, this.view.zFar);
+	vxl.mat4.perspective(this.pMatrix, c.FOV, vw.width/vw.height, c.Z_NEAR, c.Z_FAR);
 };
 
+/**
+ * Calculate the transforms for the current view.renderer
+ * 
+ */
 vxlTransforms.prototype.update = function(){
     this.calculateModelView();
     this.calculatePerspective();
     this.calculateNormal();
 };
 
-vxlTransforms.prototype.updatePerspective = function(){
-	vxl.mat4.perspective(this.transforms.pMatrix, this.view.fovy, this.view.width/this.view.height, this.view.zNear, this.view.zFar);
-};
+/**
+ * Saves the current Model-View matrix in the stack. This
+ * operation is called by vxlActor.updateMatrixStack
+ * @see vxlActor#updateMatrixStack
+ */
 
 vxlTransforms.prototype.push = function(){
 	var memento =  new vxlMatrix4x4();
@@ -64,6 +78,10 @@ vxlTransforms.prototype.push = function(){
 	this.stack.push(memento);
 };
 
+/**
+ * Retrieves the last Model-View transformation in the matrix stack.
+ * This operation is called by vxlActor.updateMatrixStack
+ */
 vxlTransforms.prototype.pop = function(){
 	if(this.stack.length == 0) return;
 	this.mvMatrix  =  this.stack.pop();

@@ -64,12 +64,21 @@ vxl.vec3.round = function(v,n){
 	v.z = Math.round(v.z*10*n)/(10*n);
 };
 
-vxl.vec3.normalize = function(v){
+vxl.vec3.normalize = function(v,n){
 	var le = vxl.vec3.length(v);
-	if (le ==0) message('ERROR: normalizing a vector by a zero norm');
-	v.x = v.x / le;
-	v.y = v.y / le;
-	v.z = v.z / le;
+	
+	if (le ==0) throw('ERROR: normalizing a vector by a zero norm');
+	
+	if (n == undefined){
+	   v.x = v.x / le;
+	   v.y = v.y / le;
+	   v.z = v.z / le;
+	}
+	else{
+	    n.x = v.x / le;
+	    n.y = v.y / le;
+	    n.z = v.z / le;
+	}
 };
 
 vxl.vec3.set = function(a,b){
@@ -120,7 +129,12 @@ vxlVector3.prototype.toString = function(p,n){
 };
 
 vxl.vec3.create = function(v){
-	return new vxlVector3(v[0], v[1], v[2]);	
+    if (v != undefined){
+	   return new vxlVector3(v[0], v[1], v[2]);
+	}
+	else {
+	   return new vxlVector3();
+	}	
 };
 
 

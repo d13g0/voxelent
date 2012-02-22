@@ -35,10 +35,14 @@ function vxlRenderer(vw){
     
     this.gl         = this.getWebGLContext();
     this.prg        =   new vxlProgram(this.gl);
-     
+
+      
     this.transforms = new vxlTransforms(vw);
     
-    this.setDefaultProgram();
+    this.currentProgram      = undefined;
+    this.defaultProgram      = undefined;
+    this.setDefaultProgram(vxl.def.glsl.diffusive);
+   
 }
 
 /**
@@ -65,8 +69,7 @@ vxlRenderer.prototype.getWebGLContext = function(){
 		}
 	}
 	if (WEB_GL_CONTEXT == null) {
-		alert("Could not intiailise WebGL");
-		throw("Could not initialise WebGL"); 
+		alert("Sorry: WebGL is not available on this browser. Have you tried the newest version of Firefox, Chrome or Safari?"); 
 		return;
 	}
 	else {
@@ -81,10 +84,15 @@ vxlRenderer.prototype.getWebGLContext = function(){
 
 /**
  * Sets the program 'diffusive' as the program by default to be used by this renderer
+ * @param {vxl.def.glsl.program} program to make default
  */
-vxlRenderer.prototype.setDefaultProgram = function(){
-    this.setProgram(vxl.def.glsl.diffusive);
+vxlRenderer.prototype.setDefaultProgram = function(program){
+    this.setProgram(program);
+    this.defaultProgram = program;
 };
+
+
+
 
 /**
  * Tries to add a new program definition to this renderer
@@ -92,19 +100,29 @@ vxlRenderer.prototype.setDefaultProgram = function(){
  * @see {vxl.def.glsl.phong}
  * @see {vxl.def.glsl.diffuse}
  */
-vxlRenderer.prototype.setProgram = function(glslObject){
-	var prg = this.prg;
+vxlRenderer.prototype.setProgram = function(program){
+    
+    if(this.currentProgram != undefined && this.currentProgram == program){
+        return;
+    }
+    
+    var prg = this.prg;
 
-	if (!prg.isRegistered(glslObject.ID)){
-		prg.register(glslObject);
+	if (!prg.isRegistered(program.ID)){
+		prg.register(program);
 	}
 	
-	if (!prg.isLoaded(glslObject.ID)){
-		prg.loadProgram(glslObject.ID);
+	if (!prg.isLoaded(program.ID)){
+		prg.loadProgram(program.ID);
 	}
-	prg.useProgram(glslObject.ID);
+	prg.useProgram(program.ID);
 	prg.loadDefaults();
+	
+	this.currentProgram = program;
 };
+
+
+
 
 /**
  * Clears the rendering context
@@ -112,9 +130,6 @@ vxlRenderer.prototype.setProgram = function(glslObject){
 vxlRenderer.prototype.clear = function(){
 	this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 	this.gl.viewport(0, 0, this.view.canvas.width, this.view.canvas.height);
-	
-	//vxl.mat4.identity(this.pMatrix);
-	//vxl.mat4.perspective(this.pMatrix, this.view.fovy, this.view.width/this.view.height, this.view.zNear, this.view.zFar);
 	this.transforms.calculatePerspective();
 };
 
@@ -123,14 +138,25 @@ vxlRenderer.prototype.clear = function(){
  */
 vxlRenderer.prototype.start = function(){
 	if(this.mode == vxl.def.renderer.mode.TIMER){
-		//vxl.go.console('Renderer: starting rendering for view ['+this.view.name+'] at '+this.renderRate+ 'ms');
+		vxl.go.console('Renderer: starting rendering for view ['+this.view.name+'] at '+this.renderRate+ 'ms');
 		this.timerID = setInterval((function(self) {return function() {self.render();}})(this),this.renderRate); 
 	}
 	else if(this.mode == vxl.def.renderer.mode.ANIMFRAME){
-		//vxl.go.render();
-		message('Renderer for animation invoked');
+	    vxl.go.console('Renderer: starting rendering at the fastest speed',true);
+		vxl.go.render();
 	}
 };
+
+/**
+ * Sets the rendering mode. Options are in vxl.def.renderer.mode
+ * This method updates the rendering mode and tries to restart the rendering process
+ * @param {String} mode the mode to set
+ */
+vxlRenderer.prototype.setMode = function(mode){
+    this.stop();
+    this.mode = mode;
+    this.start();   
+}
 
 /**
  * Stops the renderer
@@ -149,23 +175,21 @@ vxlRenderer.prototype.stop = function(){
  * @param {Number} rate the new rendering rate in milliseconds
  */
 vxlRenderer.prototype.setRenderRate = function(rate){ //rate in ms
-	
-	this.renderRate = rate;
+    
+    if (rate == undefined || rate <=0){ 
+        throw 'vxlRenderer.setRenderRate: the rate cannot be zero or undefined';
+    } 
+    
+    if (this.mode == vxl.def.renderer.mode.ANIMFRAME){
+        throw 'vxlRenderer.setRenderRate: if the mode is ANIMFRAME render rate is irrelevant';
+    }
+      
 	this.stop();
-
-	
-	if (rate == null || rate <=0){
-		//this.mode = vxl.def.renderer.ANIMFRAME; //disabled for now
-		//message('vxlRenderer.mode = ANIMFRAME');	
-		return;
-	}	
-	else{
-		this.mode = vxl.def.renderer.mode.TIMER;
-		vxl.go.console('Renderer: view['+this.view.name+'] mode = TIMER, render rate = ' + rate,true);
-	}
-	
+	this.renderRate = rate;
 	this.start();
-	
+    
+    vxl.go.console('Renderer: view['+this.view.name+'], render rate = ' + rate,true);
+
 };
 
 /**
@@ -186,7 +210,7 @@ vxlRenderer.prototype.clearDepth = function(d){
 };
 
 /**
- * Renders the scene by delegating the rendering to each actor present in the scene
+ * Delegates rendering to the scene
  */
 vxlRenderer.prototype.render = function(){	
 	this.view.resize();

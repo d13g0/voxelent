@@ -32,37 +32,28 @@ function vxlModelManager(){
 
 
 /**
- * Creates an model from a JSON object specification.
- * @param {Object} json the JSON object to load
- * @param {String} name the name that the model will be identified by. This name should be unique.
- * @param {vxlScene} scene optional parameter. The scene that will contain an actor for this model.
- */
-vxlModelManager.prototype.add = function(json, name, scene){
-	//this.createAsset(json,name, scene);
-	//TODO: remove, duplicate method
-	alert('vxlModelManager: deprecated');
-};
-
-/**
  * Uses a JSON/Ajax mechanism to load models from the webserver.
- * @param {String} name name of the file that will be loaded. Voxelent will look for this file inside of the 
+ * @param {String} filename name of the file that will be loaded. Voxelent will look for this file inside of the 
  * 						folder defined by the configuration variable vxl.def.model.folder
  * @param {vxlScene} optional parameter. The scene that will contain an actor for this model.
+ * @param {Array} attributes to add to the respective actor once the model is being loaded
+ * @param {Function} callback function once the model is loaded
  */  
-vxlModelManager.prototype.load = function(name, scene) {
+vxlModelManager.prototype.load = function(filename, scene) {
     var manager = this;
-	if (manager.isModelLoaded(name)) return;
+	if (manager.isModelLoaded(filename)) return;
 	
-	vxl.go.console('ModelManager: Requesting '+name+'...');
+	vxl.go.console('ModelManager.load: Requesting '+filename+'...');
     var request = new XMLHttpRequest();
-    request.open("GET", vxl.def.model.folder+'/'+name);
+    request.open("GET", vxl.def.model.folder+'/'+filename);
     request.onreadystatechange = function() {
       if (request.readyState == 4) {
 	    if(request.status == 404) {
-			alert ('vxl.go.modelManager says: '+ name + ' does not exist');
+			throw 'ModelManager.load: '+ filename + ' does not exist';
 		 }
 		else {
-			manager.createModel(name,JSON.parse(request.responseText),scene);
+		    
+			manager.add(JSON.parse(request.responseText),filename,scene);
 		}
 	  }
     };
@@ -76,7 +67,7 @@ vxlModelManager.prototype.load = function(name, scene) {
  */
 vxlModelManager.prototype.loadList = function(list,scene){
 	this.toLoad = list.slice(0); 
-	vxl.go.console('models to load: ' + this.toLoad.length);
+	vxl.go.console('ModelManager.loadList: models to load ->' + this.toLoad.length);
    	for(var i=0;i<this.toLoad.length; i++){
 		this.load(this.toLoad[i],scene);
    	}
@@ -84,14 +75,14 @@ vxlModelManager.prototype.loadList = function(list,scene){
 
 /**
  * 
+ * @param {Object} JSON_OBJECT the JSON object that contains the definition of the model
  * @param {String} name name of the model to be created
- * @param {Object} payload the JSON object that contains the definition of the model
  * @param {vxlScene} scene the scene to be called back when the model is created
  */
-vxlModelManager.prototype.createModel = function(name,payload,scene){
-	var model = new vxlModel();
+vxlModelManager.prototype.add = function(JSON_OBJECT,name,scene){
 	
-	model.load(name,payload);
+	var model = new vxlModel(name, JSON_OBJECT);
+	
 	
 	if (!this.firstLoadedModel){
 		scene.bb = model.outline;

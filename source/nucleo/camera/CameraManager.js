@@ -82,8 +82,16 @@ vxlCameraManager.prototype.getActiveCamera = function(){
  * @param {Number} idx the index of the camera to make active
  */
 vxlCameraManager.prototype.switchTo = function(idx){
+    var view = this.view;
 	this.checkBoundary(idx);
 	this.active = this.cameras[idx];
+    
+    if (view.interactor != undefined) {
+        view.interactor.connectCamera(this.active);
+    }
+    else{
+        vxl.go.console('Camera Manager: switching to camera ['+idx+'] while the view '+view.name+' does not have an interactor set');
+    }
 	return this.active;
 };
 
