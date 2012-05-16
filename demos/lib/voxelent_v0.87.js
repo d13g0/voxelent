@@ -38,7 +38,7 @@ var vxl = {
 */
 version : 
 {
-   	number : '0.86',
+   	number : '0.88',
    	codename : 'c4n314',
    	plugins  : []
 },
@@ -295,7 +295,7 @@ function vxlNotifier(){
 	this.targetList = {};
 	this.sourceList = {};
     
-}
+};
 
 vxlNotifier.prototype.addTarget = function(event,t){
 	vxl.go.console('vxlNotifier: adding target for event '+event);
@@ -304,7 +304,7 @@ vxlNotifier.prototype.addTarget = function(event,t){
 		targetList[event] = [];
 	}
 	targetList[event].push(t);
-}
+};
 
 
 vxlNotifier.prototype.addSource = function(event,src){
@@ -325,14 +325,14 @@ vxlNotifier.prototype.addSource = function(event,src){
 			targetList[event][index].handleEvent(event,src);
 		}
 	});
-}
+};
 
 vxlNotifier.prototype.fire = function(event){
 	var targetList = this.targetList;
 	var src = this.sourceList[event];
 	vxl.go.console('vxlNotifier: firing ' +event);
 	$(document).trigger(event,[event,src,targetList]);
-}
+};
 
 vxlNotifier.prototype.getEvents = function(){
 	var list = [];
@@ -340,7 +340,7 @@ vxlNotifier.prototype.getEvents = function(){
 		list.push(event);
 	}
 	return list;
-}
+};
 
 vxlNotifier.prototype.getTargetsFor = function(event){
 	var targets = this.targetList[event];
@@ -349,7 +349,7 @@ vxlNotifier.prototype.getTargetsFor = function(event){
 		list.push(getObjectName(targets[index]));
 	}
 	return list;
-}
+};
 
 
  
@@ -3288,7 +3288,7 @@ vxlRenderer.prototype.setMode = function(mode){
     this.stop();
     this.mode = mode;
     this.start();   
-}
+};
 
 /**
  * Stops the renderer
@@ -4312,7 +4312,7 @@ vxlScene.prototype.getActorNames = function(){
  */
 function vxlSceneToys(scn){
     
-    this.scene = scn
+    this.scene = scn;
     this.list   = [];
 
 	this.axis 				= new vxlAxis();
@@ -4542,7 +4542,7 @@ function vxlBoundingBox() {
     this.mode 		= vxl.def.actor.mode.WIREFRAME;
     this.visible 	= false;
     this.toy    	= true;
-}	
+}	;
 
 /**
 * Sets the bounding box
@@ -4563,7 +4563,7 @@ vxlBoundingBox.prototype.setBoundingBox = function(b){
 		];
         
     this.model.vertices = this.bb;
-}
+};
 
 
 
@@ -5598,7 +5598,7 @@ vxlFrameAnimation.prototype.setFrameRate = function(rate){
 	this.renderRate = rate;
 	this.stop();
 	this.start();
-}
+};
 
 
 /**

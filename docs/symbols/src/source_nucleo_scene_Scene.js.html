@@ -285,11 +285,11 @@
 <span class='line'>278</span> </span><span class="COMM">/**
 <span class='line'>279</span>  * Calls the renderer process for all the views this scene is associated with
 <span class='line'>280</span>  */</span><span class="WHIT">
-<span class='line'>281</span> </span><span class="NAME">vxlScene.prototype.render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>281</span> </span><span class="NAME">vxlScene.prototype.render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">renderer</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'>282</span> 
-<span class='line'>283</span> </span><span class="WHIT">	</span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">viewCount</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.views.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">viewCount</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">+</span><span class="PUNC">=</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>284</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">r</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.views</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">renderer</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>285</span> </span><span class="WHIT">		</span><span class="WHIT">
+<span class='line'>283</span> </span><span class="WHIT">	</span><span class="COMM">//for (var i = 0, viewCount = this.views.length; i &lt; viewCount; i+=1){</span><span class="WHIT">
+<span class='line'>284</span> </span><span class="WHIT">	</span><span class="COMM">//	var r = this.views[i].renderer;</span><span class="WHIT">
+<span class='line'>285</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">r</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">renderer</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>286</span> </span><span class="WHIT">		</span><span class="NAME">r.clear</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>287</span> </span><span class="WHIT">		</span><span class="WHIT">
 <span class='line'>288</span> </span><span class="WHIT">		</span><span class="NAME">this.toys.render</span><span class="PUNC">(</span><span class="NAME">r</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
@@ -303,7 +303,7 @@
 <span class='line'>296</span> </span><span class="WHIT">			       </span><span class="NAME">this.actors</span><span class="PUNC">[</span><span class="NAME">a</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">render</span><span class="PUNC">(</span><span class="NAME">r</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>297</span> </span><span class="WHIT">			</span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>298</span> </span><span class="WHIT">	    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>299</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>299</span> </span><span class="WHIT">	</span><span class="COMM">//}</span><span class="WHIT">
 <span class='line'>300</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>301</span> 
 <span class='line'>302</span> </span><span class="COMM">/**

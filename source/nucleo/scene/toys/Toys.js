@@ -20,7 +20,7 @@
  */
 function vxlSceneToys(scn){
     
-    this.scene = scn
+    this.scene = scn;
     this.list   = [];
 
 	this.axis 				= new vxlAxis();

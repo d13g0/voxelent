@@ -340,10 +340,7 @@ vxlProgram.prototype._setPolymorphicUniform = function(uniformID, locationID,val
     }
     
     else if (glslType == 'mat4'){    
-    	if (!(value instanceof vxlMatrix4x4)){
-    		vxl.go.console('Program: the uniform '+uniformID+' is defined as mat4 in GLSL. However the JS variable is not.');
-    	}
-        gl.uniformMatrix4fv(locationID,false,value.getAsFloat32Array());
+        gl.uniformMatrix4fv(locationID,false,value);
         return;
     }
     

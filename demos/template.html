@@ -1,6 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 	<head>
 		<meta charset="utf-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
@@ -9,30 +7,29 @@
 		<meta name="viewport" content="width=device-width; initial-scale=1.0" />
 		<link href='css/voxelent.css' type='text/css' rel='stylesheet' />
 		<script type='text/javascript' src='lib/jquery.js'></script>
-		<script type='text/javascript' src='lib/voxelent_v0.86.js'></script>
+		<script type='text/javascript' src='lib/voxelent_v0.88.js'></script>
 		
 		<title></title>
 	</head>
-	<body>
-		<div id="header">
-			<div class="col-width clearfix header-inner"><img src=
-				"css/img/voxelent.png" />
-				<div class="shadow"></div>
-			</div>
-			<div class="header-shadow"></div>
-		</div>
-		
-			<div id='contents'></div>
-	
-		<div id="footer">
-			<div class="col-width clearfix footer-inner">
-				<div class="footer-logo"><img src=
-					"http://voxelent.com/dev/_style/img/voxelent_footer.png" />
-				</div>
-				<div style="padding:12px;"></div>
-				Copyright &copy; 2012 Voxelent Inc., Privacy Statement Terms and
-				Conditions. <div class="shadow"></div>
-			</div>
-		</div>
+	<body onload='runVoxApp()'>
+		<table>
+			<tr>
+				<td>
+				<div class="col-width clearfix header-inner"><img src=
+					"css/img/voxelent.png" />
+					<div class="shadow"></div>
+				</div><div class="header-shadow"></div>
+                </td>
+			</tr>
+			<tr>
+				<td>
+				<canvas id = 'view-1' width='1200' height='500'>
+					<p>
+						Your browser does not support WebGL :-(
+					</p>
+				</canvas>
+                </td>
+			</tr>
+		</table>
 	</body>
 </html>

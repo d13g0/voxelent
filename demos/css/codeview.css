@@ -27,7 +27,7 @@
 #codeContainer{
 	margin:0px; 
 	position:absolute; 
-	top:0px; 
+	top:-11px; 
 	left:0px; 
 	overflow:auto; 
 	width:60%; 
@@ -43,6 +43,8 @@
     width:39%; 
     height:400px; 
     display:none;
+
+	background-image: url(http://voxelent.com/wp-content/themes/voxelent/assets/images/bodybg/bg-10.png);
 }
 
 #buttons{

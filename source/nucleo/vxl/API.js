@@ -418,10 +418,17 @@ wireframeON :  function(){
   * Loads a program
   * @param definition one of voxelent's programs
   */
- setDefaultProgram :  function(program){
-    vxl.c.view.renderer.setDefaultProgram(program);
+ setProgram :  function(view,program){
+    view.renderer.setProgram(program);
     
  },
+ 
+ //TODO: Wwork in progress... sorry for the mess.
+ //buildProgramFromDOM: function(id,VERTEX_SHADER_DOM_ID,FRAGMENT_SHADER_DOM_ID){
+ //       var vshader= document.getElementById(VERTEX_SHADER_DOM_ID);
+        
+     
+ //},
  
  /**
   * Sets a uniform

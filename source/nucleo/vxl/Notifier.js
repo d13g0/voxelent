@@ -9,7 +9,7 @@ function vxlNotifier(){
 	this.targetList = {};
 	this.sourceList = {};
     
-}
+};
 
 vxlNotifier.prototype.addTarget = function(event,t){
 	vxl.go.console('vxlNotifier: adding target for event '+event);
@@ -18,7 +18,7 @@ vxlNotifier.prototype.addTarget = function(event,t){
 		targetList[event] = [];
 	}
 	targetList[event].push(t);
-}
+};
 
 
 vxlNotifier.prototype.addSource = function(event,src){
@@ -39,14 +39,14 @@ vxlNotifier.prototype.addSource = function(event,src){
 			targetList[event][index].handleEvent(event,src);
 		}
 	});
-}
+};
 
 vxlNotifier.prototype.fire = function(event){
 	var targetList = this.targetList;
 	var src = this.sourceList[event];
 	vxl.go.console('vxlNotifier: firing ' +event);
 	$(document).trigger(event,[event,src,targetList]);
-}
+};
 
 vxlNotifier.prototype.getEvents = function(){
 	var list = [];
@@ -54,7 +54,7 @@ vxlNotifier.prototype.getEvents = function(){
 		list.push(event);
 	}
 	return list;
-}
+};
 
 vxlNotifier.prototype.getTargetsFor = function(event){
 	var targets = this.targetList[event];
@@ -63,7 +63,7 @@ vxlNotifier.prototype.getTargetsFor = function(event){
 		list.push(getObjectName(targets[index]));
 	}
 	return list;
-}
+};
 
 
  

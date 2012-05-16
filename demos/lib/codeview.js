@@ -1,8 +1,8 @@
 var cview = new CodeViewer();
 
-$(window).resize(function(){cview.updateCanvasSize();});
+//$(window).resize(function(){cview.updateCanvasSize();});
 
-function CodeViewer(){
+function CodeViewer(view){
 	this.code = [];
     
 	this.TIMER = 0;
@@ -16,19 +16,19 @@ function CodeViewer(){
     this.height = 400;
 }
 
+
 CodeViewer.prototype.loadSource = function(idx){
 	
 	if (idx>=0 && idx <this.code.length){
-		$('#codeContainer').empty();
-		var c  = document.createElement("code");
-		c.id = 'codeArea';
-		c.innerHTML = this.code[idx];
-		$('#codeContainer').append(c);
+		var code_area  = $('#codeArea');
+		code_area.empty();
+		code_area.html(this.code[idx]);
+
 	}
 }
 CodeViewer.prototype.showViewAndCode = function(){
     $('#canvasContainer, #codeContainer, #buttonsCode, #bottom').fadeOut(600).hide();
-    this.updateHeight(400);
+    this.updateHeight(this.height);
 	$('#bottom').width('100%');
     $('#buttons').after($('#bottom').detach());
    	$('#canvasContainer').width('39%');
@@ -39,7 +39,7 @@ CodeViewer.prototype.showViewAndCode = function(){
 
 CodeViewer.prototype.showViewAndControls = function(){
 	$('#canvasContainer, #codeContainer, #buttonsCode, #bottom').fadeOut(600).hide();
-	this.updateHeight(400);
+	this.updateHeight(this.height);
     $('#contents').prepend($('#bottom').detach());
 	$('#canvasContainer').width('39%');
 	$('#bottom').width('60%');
@@ -63,6 +63,7 @@ CodeViewer.prototype.updateCanvasSize = function(){
     c_height = $('#canvasContainer').height();
     $('canvas').attr('width',c_width);
     $('canvas').attr('height',c_height);
+    if (vxl.c.view) { vxl.c.view.resize();}
 }
 
 CodeViewer.prototype.updateHeight = function(h){
@@ -80,10 +81,8 @@ CodeViewer.prototype.updateGUI = function(){
     var buttons_code = document.createElement('div');
     buttons_code.id = 'buttonsCode';
     buttons_code.innerHTML = 
-    "<input type='radio' id='btnSourceCode' name='radio' onclick='cview.loadSource(0)' checked='checked'/><label for='btnSourceCode'>WebGL JS</label>"+
-    "<input type='radio' id='btnVertexShader' name='radio' onclick='cview.loadSource(1)'  /><label for='btnVertexShader'>Vertex Shader</label>"+	
-    "<input type='radio' id='btnFragmentShader' name='radio' onclick='cview.loadSource(2)' /><label for='btnFragmentShader'>Fragment Shader</label>"+
-    "<input type='radio' id='btnHTML' name='radio' onclick='cview.loadSource(3)' /><label for='btnHTML'>HTML</label>";
+    "<input type='radio' id='btnSourceCode' name='radio' onclick='cview.loadSource(0)' checked='checked'/><label for='btnSourceCode'>Voxelent</label>"+
+    "<input type='radio' id='btnHTML' name='radio' onclick='cview.loadSource(1)' /><label for='btnHTML'>HTML</label>";
     
     var buttons_canvas = document.createElement('div');
     buttons_canvas.id = 'buttonsCanvas';
@@ -126,12 +125,11 @@ CodeViewer.prototype.updateGUI = function(){
     buttons.appendChild(buttons_code);
     buttons.appendChild(buttons_canvas);
     
-    var code_container = document.createElement('pre');
+    var code_container = document.createElement('div');
     code_container.id = 'codeContainer';
-    code_container.class = 'prettyprint linenums';
-    
-    var code_area = document.createElement('code');
-    code_area.id = 'codeArea';
+    var code_area =  document.createElement('pre');
+    code_area.className = 'prettyprint linenums';
+    code_area.id ='codeArea';
 
     code_container.appendChild(code_area);
 	
@@ -150,9 +148,10 @@ CodeViewer.prototype.updateGUI = function(){
     else if (this.mode == this.MODE_CODE_AND_VIEW){
         code_container.style.display    = 'block';
         buttons_code.style.display      = 'block';
-		
+		canvas_container.style.width    = '39%';
         btnFullView.checked             = false;
 		bottom.style.display			= 'block';
+		bottom.style.position         = 'relative';
 
     }
     else if (this.mode == this.MODE_VIEW_AND_CONTROLS){
@@ -204,6 +203,9 @@ CodeViewer.prototype.updateGUI = function(){
 	else if (this.mode == this.MODE_VIEW_AND_CONTROLS){
 		selector = '#canvasContainer, #bottom';
 	}
+	else{
+	    selector ='#canvasContainer, #codeContainer';
+	}
 	
 	$(selector).fadeIn(600);
 }
@@ -224,17 +226,32 @@ CodeViewer.prototype.run = function(m,nc,h){
 CodeViewer.prototype.execute = function(){
 	
 	if(this.TIMER) clearInterval(this.TIMER);
+	var jscode = $("#code-js").html();
+	jscode = jscode.trim();
+	jscode = jscode.replace(/ /g,"&nbsp;");
+	var jscodearr = jscode.split("\n");
 	
-	this.code[0] = window.prettyPrintOne($('#code-js').html(),'js',true);
+	var newcode ="";
+	for (var i=0, n = jscodearr.length; i < n; i+=1){
+	    newcode += jscodearr[i] + "<br />";
+	}
 	
-	this.code[1] = window.prettyPrintOne($('#shader-vs').html(),'js',true);
+	this.code[0] = window.prettyPrintOne(newcode,'js',true);
 	
-	this.code[2] = window.prettyPrintOne($('#shader-fs').html(),'js',true);
-	
+
 	$('#codeContainer, #cview').remove();
     var html = $(document.body).html().replace(/</g,'&lt;').replace(/>/g,'&gt;');
-	html = "&lt;body onLoad='runWebGLApp()'&gt;" + html + "&lt;/body&gt;"; 
-	this.code[3] = window.prettyPrintOne(html,'html',true);
+    
+   html = html.trim();
+   html = html.replace(/ /g,'&nbsp;');
+   var htmlcodearr = html.split("\n");
+   var htmlcode ="";
+    for (var i=0, n = htmlcodearr.length; i < n; i+=1){
+        htmlcode += htmlcodearr[i] + "<br />";
+    }
+    
+    
+	this.code[1] = window.prettyPrintOne(htmlcode,'html',true);
 	
 	this.updateGUI();
  	

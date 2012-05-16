@@ -97,7 +97,7 @@ vxlFrameAnimation.prototype.setFrameRate = function(rate){
 	this.renderRate = rate;
 	this.stop();
 	this.start();
-}
+};
 
 
 /**

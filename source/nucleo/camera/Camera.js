@@ -39,16 +39,16 @@
 function vxlCamera(vw,t) {
 
 	this.view 		= vw;
-    this.matrix 	= new vxlMatrix4x4();
-    this.up 		= vxl.vec3.create([0, 1, 0]);
-	this.right 		= vxl.vec3.create([1, 0, 0]);
-	this.normal 	= vxl.vec3.create([0, 0, 0]);
-    this.position 	= vxl.vec3.create([0, 0, 1]);
-    this.focus		= vxl.vec3.create([0, 0, 0]);
+    this.matrix 	= mat4.identity();
+    this.up 		= vec3.create([0, 1, 0]);
+	this.right 		= vec3.create([1, 0, 0]);
+	this.normal 	= vec3.create([0, 0, 0]);
+    this.position 	= vec3.create([0, 0, 1]);
+    this.focus		= vec3.create([0, 0, 0]);
     this.azimuth 	= 0;
     this.elevation 	= 0;
 	this.steps		= 0;
-    this.home 		= vxl.vec3.create([0,0,0]);
+    this.home 		= vec3.create([0,0,0]);
     this.id         = 0;
     this.FOV        = 30;
     this.Z_NEAR     = 0.1;    
@@ -92,7 +92,7 @@ vxlCamera.prototype.init = function() {
 	var c = this;
 	this.goHome([0,0,1]);
 	this.setFocus([0,0,0]);
-	vxl.mat4.identity(this.matrix);
+	mat4.identity(this.matrix);
 };
 
 /**
@@ -101,7 +101,7 @@ vxlCamera.prototype.init = function() {
  */
 vxlCamera.prototype.goHome = function(h){
     if (h != null){
-        this.home = vxl.vec3.create(h);
+        this.home = vec3.create(h);
     }
     this.setPosition(h);
     this.setAzimuth(0);
@@ -150,7 +150,7 @@ vxlCamera.prototype.setDistance = function(d) {
  */
 vxlCamera.prototype.setPosition = function(p) {
 	
-    vxl.vec3.set(vxl.vec3.create(p), this.position);
+    vec3.set(vec3.create(p), this.position);
     this.update();
 	this.debugMessage('Camera: Updated position: ' + this.position.toString(1));
 };
@@ -160,7 +160,7 @@ vxlCamera.prototype.setPosition = function(p) {
  * @param {Array} f the focus point
  */
 vxlCamera.prototype.setFocus = function(f){
-	vxl.vec3.set(vxl.vec3.create(f), this.focus);
+	vec3.set(vec3.create(f), this.focus);
 	this.update();
 	this.debugMessage('Camera: Updated focus: ' + this.focus.toString(1));
 };
@@ -180,16 +180,16 @@ vxlCamera.prototype.pan = function(dx, dy) {
 vxlCamera.prototype.dolly = function(value) {
     var c = this;
     
-    var p =  vxl.vec3.create();
-    var n =  vxl.vec3.create();
+    var p =  vec3.create();
+    var n =  vec3.create();
     
     p = c.position;
     
     var step = value - c.steps;
     
-    vxl.vec3.normalize(c.normal,n);
+    vec3.normalize(c.normal,n);
     
-    var newPosition = vxl.vec3.create();
+    var newPosition = vec3.create();
     
     if(c.type == vxl.def.camera.type.TRACKING){
         newPosition.x = p.x - step*n.x;
@@ -260,9 +260,9 @@ vxlCamera.prototype.changeElevation = function(el){
  */
 vxlCamera.prototype.computeAxis = function(){
 	var m       = this.matrix;
-    this.right  = vxl.mat4.multVec3(m, [1, 0, 0]);
-    this.up     = vxl.mat4.multVec3(m, [0, 1, 0]);
-    this.normal = vxl.mat4.multVec3(m, [0, 0, 1]);
+    this.right  = mat4.multiplyVec3(m, [1, 0, 0]);
+    this.up     = mat4.multiplyVec3(m, [0, 1, 0]);
+    this.normal = mat4.multiplyVec3(m, [0, 0, 1]);
 };
 
 /**
@@ -270,22 +270,24 @@ vxlCamera.prototype.computeAxis = function(){
  * and rotation (azimuth, elevation)
  */
 vxlCamera.prototype.update = function(){
-	vxl.mat4.identity(this.matrix);
+	mat4.identity(this.matrix);
 	
 	this.computeAxis();
     
     if (this.type == vxl.def.camera.type.TRACKING){
-        vxl.mat4.translate(this.matrix, this.position);
-        vxl.mat4.rotateY(this.matrix, this.azimuth * Math.PI/180);
-        vxl.mat4.rotateX(this.matrix, this.elevation * Math.PI/180);
+        mat4.translate(this.matrix, this.position);
+        mat4.rotateY(this.matrix, this.azimuth * Math.PI/180);
+        mat4.rotateX(this.matrix, this.elevation * Math.PI/180);
     }
     else {
-        var trxLook = new vxlMatrix4x4();
-        vxl.mat4.translate(this.matrix, this.focus);
-        vxl.mat4.rotateY(this.matrix, this.azimuth * Math.PI/180);
-        vxl.mat4.rotateX(this.matrix, this.elevation * Math.PI/180);
-        vxl.mat4.translate(this.matrix, vxl.vec3.negate(this.focus));
-        vxl.mat4.translate(this.matrix,this.position);
+        var trxLook = mat4.identity();
+        var negfocus = vec3.create();
+        mat4.translate(this.matrix, this.focus);
+        mat4.rotateY(this.matrix, this.azimuth * Math.PI/180);
+        mat4.rotateX(this.matrix, this.elevation * Math.PI/180);
+        vec3.negate(this.focus, negfocus);
+        mat4.translate(this.matrix, negfocus);
+        mat4.translate(this.matrix,this.position);
         //mat4.lookAt(this.position, this.focus, this.up, trxLook);
         //mat4.inverse(trxLook);
         //mat4.multiply(this.matrix,trxLook);
@@ -300,7 +302,7 @@ vxlCamera.prototype.update = function(){
     * Why do you think we do not update the position?
     */
     if(this.type == vxl.def.camera.type.TRACKING){
-        vxl.mat4.multVec4(this.matrix, new vxlVector4(0, 0, 0, 1), this.position);
+        mat4.multiplyVec4(this.matrix, vec4.create([0, 0, 0, 1]), this.position);
     }
     
     
@@ -313,12 +315,12 @@ vxlCamera.prototype.update = function(){
 
 /**
  * Inverts the camera mattrix to obtain the correspondent Model-View Transform
- * @returns {vxlMatrix4x4} m the Model-View Transform
+ * @returns {mat4} m the Model-View Transform
  */
 vxlCamera.prototype.getViewTransform = function(){
-    var m = new vxlMatrix4x4();
-    vxl.mat4.set(this.matrix, m);
-    vxl.mat4.inverse(m);
+    var m = mat4.identity();
+    mat4.set(this.matrix, m);
+    mat4.inverse(m);
     return m;
 };
 
@@ -394,8 +396,8 @@ vxlCamera.prototype.above = function() {
 	this.azimuth = 0;
 	this.xTr = 0;
 	this.yTr = 0;
-	vxl.vec3.set([0, 0, -1], c.up);
-	vxl.vec3.set([1, 0, 0], c.right);
+	vec3.set([0, 0, -1], c.up);
+	vec3.set([1, 0, 0], c.right);
 	c.setPosition(0, c.distance, 0);
 	vxl.go.console('Camera: above');
 };
@@ -406,8 +408,8 @@ vxlCamera.prototype.below = function() {
 	this.azimuth = 0;
 	this.xTr = 0;
 	this.yTr = 0;
-	vxl.vec3.set([0, 0, 1], c.up);
-	vxl.vec3.set([1, 0, 0], c.right);
+	vec3.set([0, 0, 1], c.up);
+	vec3.set([1, 0, 0], c.right);
 	c.setPosition(0, -c.distance, 0);
 	vxl.go.console('Camera: below');
 };
@@ -418,8 +420,8 @@ vxlCamera.prototype.right = function() {
 	this.azimuth = -90;
 	this.xTr = 0;
 	this.yTr = 0;
-	vxl.vec3.set([0, 1, 0], c.up);
-	vxl.vec3.set([0, 0, 1], c.right);
+	vec3.set([0, 1, 0], c.up);
+	vec3.set([0, 0, 1], c.right);
 	c.setPosition(-c.distance, 0, 0);
 	vxl.go.console('Camera: right');
 };
@@ -430,8 +432,8 @@ vxlCamera.prototype.left = function() {
 	this.azimuth = 90;
 	this.xTr = 0;
 	this.yTr = 0;
-	vxl.vec3.set([0, 1, 0], c.up);
-	vxl.vec3.set([0, 0, 1], c.right);
+	vec3.set([0, 1, 0], c.up);
+	vec3.set([0, 0, 1], c.right);
 	c.setPosition(c.distance, 0, 0);
 	vxl.go.console('Camera: left');
 };

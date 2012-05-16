@@ -33,19 +33,19 @@ function vxlCameraState(camera) {
 		return null;
 	}
 
-	this.c = camera;
-	this.position = new vxlVector3(0, 0, 1);
-	this.focalPoint = new vxlVector3(0, 0, 0);
+	this.c             = camera;
+	this.position      = vec3.createFrom(0, 0, 1);
+	this.focalPoint    = vec3.createFrom(0, 0, 0);
 	
-    this.up = new vxlVector3(0, 1, 0);
-	this.right = new vxlVector3(1, 0, 0);
+    this.up            = vec3.createFrom(0, 1, 0);
+	this.right         = vec3.createFrom(1, 0, 0);
     
-	this.distance = 0;
-	this.azimuth = 0;
-	this.elevation = 0;
+	this.distance      = 0;
+	this.azimuth       = 0;
+	this.elevation     = 0;
     
-	this.xTr = 0;
-	this.yTr = 0;
+	this.xTr           = 0;
+	this.yTr           = 0;
 };
 
 /**
@@ -56,14 +56,14 @@ function vxlCameraState(camera) {
  */
 vxlCameraState.prototype.reset = function() {
 	var c = this.c;
-	c.focalPoint = new vxlVector3(0, 0, 0);
-	c.up = new vxlVector3(0, 1, 0);
-	c.right = new vxlVector3(1, 0, 0);
-	c.distance = 0;
-	c.elevation = 0;
-	c.azimuth = 0;
-	c.xTr = 0;
-	c.yTr = 0;
+	c.focalPoint       = vec3.createFrom(0, 0, 0);
+	c.up               = vec3.createFrom(0, 1, 0);
+	c.right            = vec3.createFrom(1, 0, 0);
+	c.distance         = 0;
+	c.elevation        = 0;
+	c.azimuth          = 0;
+	c.xTr              = 0;
+	c.yTr              = 0;
 	c.setPosition(0, 0, 1);
 	c.setOptimalDistance();
 };
@@ -79,10 +79,10 @@ vxlCameraState.prototype.save = function() {
 	this.elevation = c.elevation;
 	this.xTr = c.xTr;
 	this.yTr = c.yTr;
-	vxl.vec3.set(c.position, this.position);
-	vxl.vec3.set(c.focalPoint, this.focalPoint);
-	vxl.vec3.set(c.up, this.up);
-	vxl.vec3.set(c.right, this.right);
+	vec3.set(c.position, this.position);
+	vec3.set(c.focalPoint, this.focalPoint);
+	vec3.set(c.up, this.up);
+	vec3.set(c.right, this.right);
 };
 
 /**
@@ -95,9 +95,9 @@ vxlCameraState.prototype.retrieve = function() {
 	c.xTr = this.xTr;
 	c.yTr = this.yTr;
 
-	vxl.vec3.set(this.focalPoint, c.focalPoint);
-	vxl.vec3.set(this.up, c.up);
-	vxl.vec3.set(this.right, c.right);
+	vec3.set(this.focalPoint, c.focalPoint);
+	vec3.set(this.up, c.up);
+	vec3.set(this.right, c.right);
 
 	c.setPosition(this.position.x, this.position.y, this.position.z);
 };

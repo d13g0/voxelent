@@ -278,11 +278,11 @@ vxlScene.prototype.setVisualizationMode = function(mode){
 /**
  * Calls the renderer process for all the views this scene is associated with
  */
-vxlScene.prototype.render = function(){
+vxlScene.prototype.render = function(renderer){
 
-	for (var i = 0, viewCount = this.views.length; i < viewCount; i+=1){
-		var r = this.views[i].renderer;
-		
+	//for (var i = 0, viewCount = this.views.length; i < viewCount; i+=1){
+	//	var r = this.views[i].renderer;
+		var r = renderer;
 		r.clear();
 		
 		this.toys.render(r);
@@ -296,7 +296,7 @@ vxlScene.prototype.render = function(){
 			       this.actors[a].render(r);
 			}
 	    }
-	}
+	//}
 };
 
 /**

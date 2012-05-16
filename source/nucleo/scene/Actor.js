@@ -37,9 +37,9 @@ function vxlActor(model){
   this.opacity = 1.0;
   this.colors = model?(model.colors!=null?model.colors:null):null;	//it will create colors for this actor once a lookup table had been set up
   
-  this.position 	= vxl.vec3.create([0, 0, 0]);
-  this.scale 		= vxl.vec3.create([1, 1, 1]);
-  this.rotation 	= vxl.vec3.create([0, 0, 0]);
+  this.position 	= vec3.create([0, 0, 0]);
+  this.scale 		= vec3.create([1, 1, 1]);
+  this.rotation 	= vec3.create([0, 0, 0]);
   
   this.program       = undefined;
   this.picking_color = undefined;
@@ -70,12 +70,12 @@ vxlActor.prototype.setProperty = function(property, value){
 };
 
 vxlActor.prototype.setPosition = function (position){
-    this.position = vxl.vec3.create(position);
+    this.position = vec3.create(position);
     //TODO: Recalculate bounding box
 };
 
 vxlActor.prototype.setScale = function(scale){
-    this.scale = vxl.vec3.create(scale);
+    this.scale = vec3.create(scale);
     //TODO: Recalculate bounding box
 };
 
@@ -157,10 +157,10 @@ vxlActor.prototype.updateMatrixStack = function(renderer){
     var r	= renderer,	trx = r.transforms,	prg = r.prg;
     trx.calculateModelView();
     trx.push();
-        vxl.mat4.scale      (trx.mvMatrix, this.scale);
-		vxl.mat4.translate	(trx.mvMatrix, this.position);
+        mat4.scale      (trx.mvMatrix, this.scale);
+		mat4.translate	(trx.mvMatrix, this.position);
 		//TODO: Implement actor rotations
-	     prg.setUniform("uMVMatrix",r.transforms.mvMatrix);
+	    prg.setUniform("uMVMatrix",r.transforms.mvMatrix);
     trx.pop();
     trx.calculateNormal(); 
     prg.setUniform("uPMatrix", r.transforms.pMatrix);
@@ -299,6 +299,7 @@ vxlActor.prototype.render = function(renderer){
 
 /**
 * Sets the actor color. This color can be different from the original model color
+* @TODO: Deprecated
 */
 vxlActor.prototype.setColor = function (c){
 	this.color = c.slice(0);
@@ -385,8 +386,8 @@ vxlActor.prototype.clone = function(){
 	
 	var duplicate = new vxlActor(this.model);
 	duplicate['program']   = this['program'];
-	vxl.vec3.set(this.scale,    duplicate.scale);
-	vxl.vec3.set(this.position, duplicate.position);
+	vec3.set(this.scale,    duplicate.scale);
+	vec3.set(this.position, duplicate.position);
 	
 	
 	//Now to save us some memory, let's SHARE the WebGL buffers that the current actor has already allocated'

@@ -41,7 +41,8 @@ function vxlView(canvasID, scene){
 
 	this.width = this.canvas.width;
 	this.height = this.canvas.height;
-	this.clearDepth = 10000;
+	
+	this.clearDepth = 1.0;
 	this.backgroundColor = vxl.def.view.background.slice(0);
 
 	//Create Renderer
@@ -69,16 +70,20 @@ function vxlView(canvasID, scene){
 	//Add this view to the scene;
 	this.scene.views.push(this);
 	
-	//Register events to listen to
-	vxl.go.notifier.addTarget(vxl.events.DEFAULT_LUT_LOADED,this);
+	
+	//Namespace access updates
+	
+
+	vxl.go.notifier.addTarget(vxl.events.DEFAULT_LUT_LOADED,this);     //Register events to listen to
 	
 	if (vxl.c.view == undefined){
 		vxl.c.view = this;
 	}
 	
 	vxl.go.views.push(this);
+	this.setAutoResize(true);
 
-	 vxl.go.console('View: the view '+ this.name+' has been created');
+	vxl.go.console('View: the view '+ this.name+' has been created');
 };
 
 
@@ -103,14 +108,29 @@ vxlView.prototype.clear = function(){
 };
 
 /**
- * Update the width and height of this view with the width and height of the canvas.
- * @TODO: review the JQuery binding that calls this function
+ * Resizes the canvas so it fits its parent node in the DOM tree
  */
 vxlView.prototype.resize = function(){
-	this.width = this.canvas.width;
-	this.height = this.canvas.height;
-};
+    var parent = this.canvas.parentNode;
+    this.width = $(parent).width()-5;       //@TODO: Review this -5 business here.... March 12/2012
+    this.height = $(parent).height()-5;
+    $(this.canvas).attr('width', this.width);
+    $(this.canvas).attr('height', this.height);
+}
 
+/**
+ * Enables automatic resizing of the view when the browser window is resized
+ * @param flag enbles automatic resizing if true, disables it if false
+ */
+vxlView.prototype.setAutoResize = function(flag){
+    if (flag){
+         this.resize(); //first time
+        $(window).resize((function(self){return function(){self.resize();}})(this));
+    }
+    else{
+        $(window).unbind('resize');
+    }
+}
 
 /**
  * Starts the view

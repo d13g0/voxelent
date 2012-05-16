@@ -1,0 +1,80 @@
+<html>
+	<head>
+		<title>Voxelent: Learn & Play: MultiView Demo</title>
+		<!-- Demo Presentation Assets//-->
+		<link href='css/voxelent.css' type='text/css' rel='stylesheet' />
+		<script type='text/javascript' src='lib/jquery.js'></script>
+		<!-- Voxelent Code //-->
+		<script type='text/javascript' src='lib/voxelent_v0.88.js'></script>
+
+		<script type='text/javascript' id='code-js'>
+            /**
+             * Writing code in Voxelent is as easy as taking a stroll
+             * on a warm sunny day
+             */
+            var scene1 = new vxlScene();
+            var scene2 = new vxlScene();
+            var view1, view2, view3;
+
+            function runVoxApp() {
+
+                /*var list = ["brain/part1.json",
+                 "brain/part2.json",
+                 "brain/part3.json",
+                 "brain/part4.json",
+                 "brain/part5.json",
+                 "brain/part6.json",
+                 ];*/
+                 
+                view1 = vxl.api.setup('view-1', scene1);
+                view2 = vxl.api.setup('view-2', scene1);
+                view3 = vxl.api.setup('view-3', scene1);
+                //vxl.api.loadAssets(list, null, scene1);
+                vxl.api.load('cone.json',null, scene1);
+                //view1.refresh();
+                //view2.refresh();
+                view1.start();
+                view2.start();
+                view3.start();
+                view1.cameraman.getActiveCamera().setPosition([0,0,7]);
+                view2.cameraman.getActiveCamera().setPosition([0,0,7]);
+                view3.cameraman.getActiveCamera().setPosition([0,0,7]);
+            }
+
+            //bgcolor='#858585'
+		</script>
+	</head>
+	<body onload='runVoxApp()'>
+		<table>
+			<tr>
+				<td>
+				<div class="col-width clearfix header-inner"><img src=
+					"css/img/voxelent.png" />
+					<div class="shadow"></div>
+				</div><div class="header-shadow"></div></td>
+			</tr>
+			<tr>
+				<td>
+				<table cellspacing='5'>
+					<tr>
+						<td >
+						<canvas id='view-1' width='300' height='300'>
+							Your browser does not support the HTML5 canvas element.
+						</canvas></td>
+						<td >
+						<canvas id='view-2' width='300' height='300'>
+							Your browser does not support the HTML5 canvas element.
+						</canvas></td>
+					</tr>
+					<tr>
+						<td>
+						<canvas id='view-3' width='300' height='300'>
+							Your browser does not support the HTML5 canvas element.
+						</canvas></td>
+						<td></td>
+					</tr>
+				</table></td>
+			</tr>
+		</table>
+	</body>
+</html>

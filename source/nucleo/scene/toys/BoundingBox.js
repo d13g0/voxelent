@@ -33,7 +33,7 @@ function vxlBoundingBox() {
     this.mode 		= vxl.def.actor.mode.WIREFRAME;
     this.visible 	= false;
     this.toy    	= true;
-}	
+}	;
 
 /**
 * Sets the bounding box
@@ -54,7 +54,7 @@ vxlBoundingBox.prototype.setBoundingBox = function(b){
 		];
         
     this.model.vertices = this.bb;
-}
+};
 
 
 

@@ -40,8 +40,8 @@ function vxlRenderer(vw){
     this.transforms = new vxlTransforms(vw);
     
     this.currentProgram      = undefined;
-    this.defaultProgram      = undefined;
-    this.setDefaultProgram(vxl.def.glsl.diffusive);
+
+    this.setProgram(vxl.def.glsl.diffusive);
    
 }
 
@@ -87,8 +87,7 @@ vxlRenderer.prototype.getWebGLContext = function(){
  * @param {vxl.def.glsl.program} program to make default
  */
 vxlRenderer.prototype.setDefaultProgram = function(program){
-    this.setProgram(program);
-    this.defaultProgram = program;
+    alert('setDefaultProgram is deprecated');
 };
 
 
@@ -129,7 +128,7 @@ vxlRenderer.prototype.setProgram = function(program){
  */
 vxlRenderer.prototype.clear = function(){
 	this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-	this.gl.viewport(0, 0, this.view.canvas.width, this.view.canvas.height);
+	this.gl.viewport(0, 0, this.view.canvas.width, this.view.canvas.height); //@TODO: Think about dividing view ports for multi-view apps - March 19/2012
 	this.transforms.calculatePerspective();
 };
 
@@ -156,7 +155,7 @@ vxlRenderer.prototype.setMode = function(mode){
     this.stop();
     this.mode = mode;
     this.start();   
-}
+};
 
 /**
  * Stops the renderer
@@ -212,7 +211,7 @@ vxlRenderer.prototype.clearDepth = function(d){
 /**
  * Delegates rendering to the scene
  */
-vxlRenderer.prototype.render = function(){	
-	this.view.resize();
-    this.view.scene.render();
+vxlRenderer.prototype.render = function(){
+    this.clear();	
+    this.view.scene.render(this);
 };

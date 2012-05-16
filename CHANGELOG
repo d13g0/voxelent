@@ -1,4 +1,22 @@
 -------------------------------------------------------------------------------------------
+VERSION 0.87.5 - Mother's Day
+-------------------------------------------------------------------------------------------
+1. The method setAutomaticResize(bool) is added to view. It will only work if the canvas is inside a div?
+
+2. Each renderer calls the scene.render method and passes itself as an argument. In the last tests there are not collisions (nor flickering). 
+We expected some issues here because we are multithreading the access to the GPU (using JavaScript intervals one per renderer)... Hmmm
+let's see what the browsers vendors can do.
+
+3. In the process of updating demos [not done yet] When done we will have the 0.88 version and then they will be available again in the website
+
+4. Multi-view demo was added.
+
+5. Voxelent uses now glMatrix! yay! Thank you Brandon.
+
+6. The python packager generates the unminified and the minified voxelent lib.
+
+
+-------------------------------------------------------------------------------------------
 VERSION 0.87 - Kitware Visit
 -------------------------------------------------------------------------------------------
 1. The folder tutorials was renamed to demos

@@ -425,24 +425,31 @@
 <span class='line'>418</span>   * Loads a program
 <span class='line'>419</span>   * @param definition one of voxelent's programs
 <span class='line'>420</span>   */</span><span class="WHIT">
-<span class='line'>421</span> </span><span class="WHIT"> </span><span class="NAME">setDefaultProgram</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">program</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>422</span> </span><span class="WHIT">    </span><span class="NAME">vxl.c.view.renderer.setDefaultProgram</span><span class="PUNC">(</span><span class="NAME">program</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>421</span> </span><span class="WHIT"> </span><span class="NAME">setProgram</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">view</span><span class="PUNC">,</span><span class="NAME">program</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>422</span> </span><span class="WHIT">    </span><span class="NAME">view.renderer.setProgram</span><span class="PUNC">(</span><span class="NAME">program</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>423</span> </span><span class="WHIT">    </span><span class="WHIT">
 <span class='line'>424</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>425</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>426</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>427</span>   * Sets a uniform
-<span class='line'>428</span>   */</span><span class="WHIT">
-<span class='line'>429</span> </span><span class="WHIT">  </span><span class="NAME">setUniform</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">uniformID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">,</span><span class="NAME">hint</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>430</span> </span><span class="WHIT">      </span><span class="NAME">vxl.c.view.renderer.prg.setUniform</span><span class="PUNC">(</span><span class="NAME">uniformID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">,</span><span class="NAME">hint</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>431</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>432</span> </span><span class="WHIT">  </span><span class="WHIT">
-<span class='line'>433</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'>434</span>    * Return the uniform names of the current program
-<span class='line'>435</span>    */</span><span class="WHIT">
-<span class='line'>436</span> </span><span class="WHIT">  </span><span class="NAME">getUniformNames</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>437</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">vxl.c.view.renderer.prg._uniformList</span><span class="PUNC">[</span><span class="NAME">vxl.c.view.renderer.prg._currentProgramID</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>438</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>439</span> 
-<span class='line'>440</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>441</span> </span><span class="WHIT"> </span></pre></body></html>
+<span class='line'>426</span> </span><span class="WHIT"> </span><span class="COMM">//TODO: Wwork in progress... sorry for the mess.</span><span class="WHIT">
+<span class='line'>427</span> </span><span class="WHIT"> </span><span class="COMM">//buildProgramFromDOM: function(id,VERTEX_SHADER_DOM_ID,FRAGMENT_SHADER_DOM_ID){</span><span class="WHIT">
+<span class='line'>428</span> </span><span class="WHIT"> </span><span class="COMM">//       var vshader= document.getElementById(VERTEX_SHADER_DOM_ID);</span><span class="WHIT">
+<span class='line'>429</span> </span><span class="WHIT">        </span><span class="WHIT">
+<span class='line'>430</span> </span><span class="WHIT">     </span><span class="WHIT">
+<span class='line'>431</span> </span><span class="WHIT"> </span><span class="COMM">//},</span><span class="WHIT">
+<span class='line'>432</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>433</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>434</span>   * Sets a uniform
+<span class='line'>435</span>   */</span><span class="WHIT">
+<span class='line'>436</span> </span><span class="WHIT">  </span><span class="NAME">setUniform</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">uniformID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">,</span><span class="NAME">hint</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>437</span> </span><span class="WHIT">      </span><span class="NAME">vxl.c.view.renderer.prg.setUniform</span><span class="PUNC">(</span><span class="NAME">uniformID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">,</span><span class="NAME">hint</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>438</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>439</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>440</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>441</span>    * Return the uniform names of the current program
+<span class='line'>442</span>    */</span><span class="WHIT">
+<span class='line'>443</span> </span><span class="WHIT">  </span><span class="NAME">getUniformNames</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>444</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">vxl.c.view.renderer.prg._uniformList</span><span class="PUNC">[</span><span class="NAME">vxl.c.view.renderer.prg._currentProgramID</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>445</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>446</span> 
+<span class='line'>447</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>448</span> </span><span class="WHIT"> </span></pre></body></html>

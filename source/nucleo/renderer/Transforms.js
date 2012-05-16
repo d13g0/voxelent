@@ -22,17 +22,17 @@
 function vxlTransforms(vw){
 	this.stack = [];
 	this.view = vw;
-	this.mvMatrix    = new vxlMatrix4x4();    // The Model-View matrix
-	this.pMatrix     = new vxlMatrix4x4();    // The projection matrix
-	this.nMatrix     = new vxlMatrix4x4();    // The normal matrix
-	this.cMatrix     = new vxlMatrix4x4();    // The camera matrix	
+	this.mvMatrix    = mat4.identity();    // The Model-View matrix
+	this.pMatrix     = mat4.identity();    // The projection matrix
+	this.nMatrix     = mat4.identity();    // The normal matrix
+	this.cMatrix     = mat4.identity();    // The camera matrix	
 };
 
 /**
  * Calculates the Model-View matrix for the current camera.
  */
 vxlTransforms.prototype.calculateModelView = function(){
-	vxl.mat4.set(this.view.cameraman.active.getViewTransform(), this.mvMatrix);
+	mat4.set(this.view.cameraman.active.getViewTransform(), this.mvMatrix);
     
 };
 
@@ -40,10 +40,10 @@ vxlTransforms.prototype.calculateModelView = function(){
  * Calculates the normal matrix corresponding to the current Model-View matrix
  */
 vxlTransforms.prototype.calculateNormal = function(){
-	vxl.mat4.identity(this.nMatrix);
-    vxl.mat4.set(this.mvMatrix, this.nMatrix);
-    vxl.mat4.inverse(this.nMatrix);
-    vxl.mat4.transpose(this.nMatrix);
+	mat4.identity(this.nMatrix);
+    mat4.set(this.mvMatrix, this.nMatrix);
+    mat4.inverse(this.nMatrix);
+    mat4.transpose(this.nMatrix);
 };
 
 /**
@@ -52,8 +52,8 @@ vxlTransforms.prototype.calculateNormal = function(){
 vxlTransforms.prototype.calculatePerspective = function(){
     var c = this.view.cameraman.active;
     var vw = this.view;
-	vxl.mat4.identity(this.pMatrix);
-	vxl.mat4.perspective(this.pMatrix, c.FOV, vw.width/vw.height, c.Z_NEAR, c.Z_FAR);
+	mat4.identity(this.pMatrix);
+	mat4.perspective(c.FOV, vw.width/vw.height, c.Z_NEAR, c.Z_FAR, this.pMatrix);
 };
 
 /**
@@ -73,8 +73,8 @@ vxlTransforms.prototype.update = function(){
  */
 
 vxlTransforms.prototype.push = function(){
-	var memento =  new vxlMatrix4x4();
-	vxl.mat4.set(this.mvMatrix, memento);
+	var memento =  mat4.create();
+	mat4.set(this.mvMatrix, memento);
 	this.stack.push(memento);
 };
 

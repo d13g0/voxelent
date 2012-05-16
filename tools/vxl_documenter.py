@@ -1,13 +1,21 @@
-import sys,string,traceback, os.path, subprocess, shutil
+import platform, sys,string,traceback, os.path, subprocess, shutil
 
 def document(VOX_VERSION_NUMBER):
     if len(str(VOX_VERSION_NUMBER)) == 0:
         print "No version indicated"
         return
-    print '-- START --'
+    print '-- START DOCUMENTER --'
     VERSION_TAG = ""+str(VOX_VERSION_NUMBER)+"";
-    subprocess.call("java -jar jsdoc-toolkit\\jsrun.jar jsdoc-toolkit\\app\\run.js -D=\"version:"+VERSION_TAG+"\" -t=jsdoc-toolkit\\templates\\jsdoc -a -d=..\\docs -r=10 ..\\source\\nucleo\\")
-    print ' -- END --'
+   
+    OS = platform.system()
+    
+    if OS == 'Darwin':
+        SEP = '/'
+    else:
+        SEP = '\\'
+        
+    subprocess.call(['java','-jar','jsdoc-toolkit'+SEP+'jsrun.jar', 'jsdoc-toolkit'+SEP+'app'+SEP+'run.js', '-D=\"version:'+VERSION_TAG+'\"', '-t=jsdoc-toolkit'+SEP+'templates'+SEP+'jsdoc', '-a', '-d=..'+SEP+'docs', '-r=10', '..'+SEP+'source'+SEP+'nucleo'])
+    print ' -- END DOCUMENTER --'
     
 if __name__ == '__main__':
     document(sys.argv[1])
