@@ -45,7 +45,7 @@ vxlModelManager.prototype.load = function(filename, scene) {
 	
 	vxl.go.console('ModelManager.load: Requesting '+filename+'...');
     var request = new XMLHttpRequest();
-    request.open("GET", vxl.def.model.folder+'/'+filename);
+    request.open("GET", vxl.def.model.folder+filename);
     request.onreadystatechange = function() {
       if (request.readyState == 4) {
 	    if(request.status == 404) {

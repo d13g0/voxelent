@@ -101,8 +101,8 @@ def pack(VOX_VERSION_NUMBER):
     
     demos_dir = open('..'+SEP+'demos'+SEP+'lib'+SEP+'voxelent'+VERSION_TAG+'.js','w');
     demos_dir_min = open('..'+SEP+'demos'+SEP+'lib'+SEP+'voxelent'+VERSION_TAG+'-min.js','w');
-    lib_dir = open('..'+SEP+'library'+SEP+'voxelent'+VERSION_TAG+'.js','w');
-    lib_dir_min = open('..'+SEP+'library'+SEP+'voxelent'+VERSION_TAG+'-min.js','w');
+    lib_dir = open('..'+SEP+'downloads'+SEP+'voxelent'+VERSION_TAG+'.js','w');
+    lib_dir_min = open('..'+SEP+'downloads'+SEP+'voxelent'+VERSION_TAG+'-min.js','w');
     
     demos_dir.write(buffer);
     demos_dir_min.write(buffer_min);

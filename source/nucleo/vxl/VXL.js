@@ -77,7 +77,7 @@ def : {
       
 						main:"default",
 
-						folder:"voxdata/luts"
+						folder:""
 				    },
 	/**
     * @namespace Default values for models
@@ -85,7 +85,7 @@ def : {
     * @property {Array}  diffuse    A 4-valued array that contains the color for actor's default diffuse property. This array has the format [r,g,b,a]
     */
 	model			: { 
-						folder:"voxdata/models",
+						folder:"",
 						diffuse: [0.9,0.0,0.0,1.0],
 						/** @namespace Enumeration with the different loading modes provided by Voxelent
                           * @property {String} LIVE     Each asset is added to the scene as soon as it is downloaded

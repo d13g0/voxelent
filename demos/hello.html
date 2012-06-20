@@ -13,7 +13,7 @@
 		<link href='css/jquery-ui/theme-1.css' type='text/css' rel='stylesheet' />
 		
 		<script type='text/javascript' src='lib/jquery.js'></script>
-		<script type='text/javascript' src='lib/voxelent_v0.88.js'></script>
+		<script type='text/javascript' src='lib/voxelent_v0.87.6.js'></script>
 		<script type='text/javascript' src='lib/prettify.js'></script>
 		<script type='text/javascript' src='lib/jquery-ui.js'></script> 
 		<script type='text/javascript' src='lib/codeview.js'></script>
@@ -25,9 +25,9 @@
 
         function Hello_3D_World(){
             var view = vxl.api.setup('view-1');
-            vxl.api.load('cone2.json');
+            vxl.api.load('assets/models/simple/cone.json');
             vxl.c.view.start();
-            view.cameraman.getActiveCamera().setPosition([0,3,15]);
+            view.cameraman.getActiveCamera().setPosition([0,0,8]);
         }
         </script>
         
