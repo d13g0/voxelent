@@ -13,9 +13,12 @@
     You should have received a copy of the GNU General Public License
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/   
-
-if (!jQuery){
-	alert('Voxelent: jQuery is not loaded. Please include JQuery in your page');	
+try{
+    if (!jQuery){
+    	alert('Voxelent: jQuery is not loaded. Please include JQuery in your page');	
+    }
+}catch(e){
+    alert('Voxelent: jQuery is not loaded. Please include JQuery in your page');
 }
 
 
