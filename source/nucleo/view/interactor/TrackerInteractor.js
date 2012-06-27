@@ -60,7 +60,8 @@ vxlTrackerInteractor.prototype.onMouseDown = function(ev){
 	this.y = ev.clientY;
 	this.dragging = true;
 	this.button = ev.button;
-	this.dstep = Math.max(this.camera.position.x,this.camera.position.y,this.camera.position.z)/100;
+	//@TODO: This is a hack. Find a nice way to calculate this step parameter for dollying
+	this.dstep = Math.max(this.camera.position[0],this.camera.position[1],this.camera.position[2])/100;
 };
 
 vxlTrackerInteractor.prototype.onMouseMove = function(ev){

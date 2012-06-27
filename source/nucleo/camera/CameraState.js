@@ -99,5 +99,5 @@ vxlCameraState.prototype.retrieve = function() {
 	vec3.set(this.up, c.up);
 	vec3.set(this.right, c.right);
 
-	c.setPosition(this.position.x, this.position.y, this.position.z);
+	c.setPosition(this.position);
 };

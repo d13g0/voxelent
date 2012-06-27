@@ -146,11 +146,23 @@ vxlCamera.prototype.setDistance = function(d) {
 
 /**
  * Sets the camera position in the scene
- * @param {Array} p the position
+ * This method has three parameters x,y,z which represent the coordinates for 
+ * the camera's position.
+ * 
+ * x could be an Array[3] or a glMatrix vec3 too. In this case the y, and z parameters
+ * are discarded.
  */
-vxlCamera.prototype.setPosition = function(p) {
+vxlCamera.prototype.setPosition = function(x,y,z) {
 	
-    vec3.set(vec3.create(p), this.position);
+	if (x instanceof Array){
+		vec3.set(vec3.create(x), this.position)
+	}
+	else if (x instanceof determineMatrixArrayType()){
+		vec3.set(x, this.position)
+	}
+	else{
+    	vec3.set(vec3.createFrom(x,y,z), this.position);
+   	}
     this.update();
 	this.debugMessage('Camera: Updated position: ' + this.position.toString(1));
 };
@@ -192,17 +204,17 @@ vxlCamera.prototype.dolly = function(value) {
     var newPosition = vec3.create();
     
     if(c.type == vxl.def.camera.type.TRACKING){
-        newPosition.x = p.x - step*n.x;
-        newPosition.y = p.y - step*n.y;
-        newPosition.z = p.z - step*n.z;
+        newPosition[0] = p[0] - step*n[0];
+        newPosition[1] = p[1] - step*n[1];
+        newPosition[2] = p[2] - step*n[2];
     }
     else{
-        newPosition.x = p.x;
-        newPosition.y = p.y;
-        newPosition.z = p.z - step; 
+        newPosition[1] = p[0];
+        newPosition[1] = p[1];
+        newPosition[2] = p[2] - step; 
     }
     
-    c.setPosition([newPosition.x, newPosition.y, newPosition.z]); //@TODO: fix this syntax ambivalence
+    c.setPosition(newPosition); 
     c.steps = value;
 };
 

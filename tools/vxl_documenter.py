@@ -9,7 +9,7 @@ def document(VOX_VERSION_NUMBER):
    
     OS = platform.system()
     
-    if OS == 'Darwin':
+    if OS == 'Darwin' or OS == 'Linux':
         SEP = '/'
     else:
         SEP = '\\'

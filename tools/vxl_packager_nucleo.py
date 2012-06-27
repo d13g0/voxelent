@@ -11,7 +11,7 @@ def pack(VOX_VERSION_NUMBER):
     SLUG = "c4n3l4"
     OS = platform.system()
 
-    if OS == 'Darwin':
+    if OS == 'Darwin' or OS == 'Linux':
         SEP = '/'
     else:
         SEP = '\\'
