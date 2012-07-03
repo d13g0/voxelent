@@ -76,18 +76,23 @@ vxlTrackerInteractor.prototype.onMouseMove = function(ev){
 	if (!this.dragging) return;
 	
 	
-	this.ctrlPressed = ev.ctrlKey;
-	this.altPressed = ev.altKey;
+	this.ctrlPressed 	= ev.ctrlKey;
+	this.altPressed 	= ev.altKey;
+	this.shiftPressed 	= ev.shiftKey;
+	
 	
 	var dx = this.x - this.lastX;
 	var dy = this.y - this.lastY;
 	
 	if (this.button == 0) { 
-		if(this.altPressed){
+		if(!this.altPressed && !this.shiftPressed){
+			this.rotate(dx,dy);
+		}
+		else if (this.altPressed){ 
 			this.dolly(dy);
 		}
-		else{ 
-			this.rotate(dx,dy);
+		else if (this.shiftPressed){
+			this.pan(dx,dy);
 		}
 	}
 
@@ -101,8 +106,9 @@ vxlTrackerInteractor.prototype.onKeyDown = function(ev){
 	
 	this.keyPressed = ev.keyCode;
 	this.altPressed = ev.altKey;
+	this.shiftPressed = ev.shiftKey;
 	
-	if (!this.altPressed){
+	if (!this.altPressed && !this.shiftPressed){
 		if (this.keyPressed == 38){
 			camera.changeElevation(10);
 			camera.status('elevation up');
@@ -126,7 +132,7 @@ vxlTrackerInteractor.prototype.onKeyDown = function(ev){
 			
 		//}
 	}
-	else if(this.altPressed && this.keyPressed !=17) {
+	else if(this.shiftPressed && this.keyPressed !=17) {
 		var px = 0;
 		var py = 0;
 		vxl.go.console(ev);
@@ -146,6 +152,7 @@ vxlTrackerInteractor.prototype.onKeyDown = function(ev){
 			this.pan(px,py);
 		}
 	}
+	camera.refresh();
 };
 
 vxlTrackerInteractor.prototype.onKeyUp = function(ev){

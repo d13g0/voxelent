@@ -25,12 +25,9 @@
  */
 function vxlActor(model){
   
-  if (model){
-  	this.model 	 = model;
-  	this.name 	 = model.name;
-  	this.diffuse = model.diffuse;
-  }
   
+  
+  this.bb = []
   this.allocated = false;
   this.visible   = true;
   this.mode = vxl.def.actor.mode.SOLID;
@@ -47,6 +44,14 @@ function vxlActor(model){
   this.renderers = [];
   this.buffers = [];
   this.clones  = 0;
+  
+  if (model){
+  	this.model 	 = model;
+  	this.name 	 = model.name;
+  	this.diffuse = model.diffuse;
+  	this.bb 	 = model.outline;
+  }
+  
 };
 
 
@@ -71,14 +76,30 @@ vxlActor.prototype.setProperty = function(property, value){
 
 vxlActor.prototype.setPosition = function (position){
     this.position = vec3.create(position);
+    throw('todo: recalculate bounding box');
     //TODO: Recalculate bounding box
 };
 
 vxlActor.prototype.setScale = function(scale){
     this.scale = vec3.create(scale);
+    throw('todo: recalculate bounding box');
     //TODO: Recalculate bounding box
 };
 
+vxlActor.prototype.getPosition = function(){
+	cc = this.centre;
+	bb = this.bb;
+	
+	cc[0] = (bb[3] + bb[0]) /2;
+	cc[1] = (bb[4] + bb[1]) /2;
+	cc[2] = (bb[5] + bb[2]) /2;
+		
+	cc[0] = Math.round(cc[0]*1000)/1000;
+	cc[1] = Math.round(cc[1]*1000)/1000;
+	cc[2] = Math.round(cc[2]*1000)/1000;
+	
+	return cc;
+};
 /**
 * Creates the internal WebGL buffers that will store geometry, normals, colors, etc for this Actor.
 * It uses the renderer passed as a parameter to retrieve the gl context to use.

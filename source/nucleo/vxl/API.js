@@ -123,7 +123,14 @@ vxl.api = {
 	vxl.c.view.scene.setLookupTable(name);
  },
  
- loadLUTS :  function(){
+ /**
+  *@param {String} folder. This parameter is required. It specifies the location from where
+  * the lookup tables will be loaded. If this parameter is not passed the current folder will
+  * be used. The current folder is determined on running time and it is the folder where voxelent is 
+  * located.
+  */
+ loadLUTS :  function(folder){
+ 	vxl.go.lookupTableManager.setLocation(folder);
 	vxl.go.lookupTableManager.loadAll();
  },
 
@@ -442,7 +449,11 @@ wireframeON :  function(){
    */
   getUniformNames: function(){
       return vxl.c.view.renderer.prg._uniformList[vxl.c.view.renderer.prg._currentProgramID].slice(0);
+  },
+  
+  subscribe: function(event, context){
+  	vxl.go.notifier.addTarget(event, context);
   }
-
+  
  }; 
  

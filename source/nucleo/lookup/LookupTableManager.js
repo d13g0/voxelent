@@ -8,8 +8,13 @@
 function vxlLookupTableManager(){
 	this.lutTimerID = 0;
 	this.tables = [];
+	this.location = "";
 	vxl.go.notifier.addSource(vxl.events.DEFAULT_LUT_LOADED,this);
 };
+
+vxlLookupTableManager.prototype.setLocation = function(loc){
+	this.location = loc;
+}
 
 /**
  * Load a lookup table file
@@ -20,7 +25,7 @@ vxlLookupTableManager.prototype.load = function(name){
 		if (this.isLoaded(name)) return;
 
 	    var request = new XMLHttpRequest();
-	    request.open("GET", vxl.def.lut.folder+'/'+name+'.lut');
+	    request.open("GET", this.location+'/'+name+'.lut');
 	    request.onreadystatechange = function() {
 	      if (request.readyState == 4) {
 		    if(request.status == 404) {

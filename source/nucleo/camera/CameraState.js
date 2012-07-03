@@ -35,7 +35,7 @@ function vxlCameraState(camera) {
 
 	this.c             = camera;
 	this.position      = vec3.createFrom(0, 0, 1);
-	this.focalPoint    = vec3.createFrom(0, 0, 0);
+	this.focus    	   = vec3.createFrom(0, 0, 0);
 	
     this.up            = vec3.createFrom(0, 1, 0);
 	this.right         = vec3.createFrom(1, 0, 0);
@@ -56,16 +56,13 @@ function vxlCameraState(camera) {
  */
 vxlCameraState.prototype.reset = function() {
 	var c = this.c;
-	c.focalPoint       = vec3.createFrom(0, 0, 0);
+	c.focus            = vec3.createFrom(0, 0, 0);
 	c.up               = vec3.createFrom(0, 1, 0);
 	c.right            = vec3.createFrom(1, 0, 0);
 	c.distance         = 0;
 	c.elevation        = 0;
 	c.azimuth          = 0;
-	c.xTr              = 0;
-	c.yTr              = 0;
 	c.setPosition(0, 0, 1);
-	c.setOptimalDistance();
 };
 
 /**
@@ -77,10 +74,8 @@ vxlCameraState.prototype.save = function() {
 	this.distance = c.distance;
 	this.azimuth = c.azimuth;
 	this.elevation = c.elevation;
-	this.xTr = c.xTr;
-	this.yTr = c.yTr;
 	vec3.set(c.position, this.position);
-	vec3.set(c.focalPoint, this.focalPoint);
+	vec3.set(c.focus, this.focus);
 	vec3.set(c.up, this.up);
 	vec3.set(c.right, this.right);
 };
@@ -92,10 +87,8 @@ vxlCameraState.prototype.retrieve = function() {
 	var c = this.c;
 	c.azimuth = this.azimuth;
 	c.elevation = this.elevation;
-	c.xTr = this.xTr;
-	c.yTr = this.yTr;
 
-	vec3.set(this.focalPoint, c.focalPoint);
+	vec3.set(this.focus, c.focus);
 	vec3.set(this.up, c.up);
 	vec3.set(this.right, c.right);
 

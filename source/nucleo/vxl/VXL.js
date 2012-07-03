@@ -41,7 +41,7 @@ var vxl = {
 */
 version : 
 {
-   	number : '0.88',
+   	number : '0.87.6',
    	codename : 'c4n314',
    	plugins  : []
 },
@@ -69,7 +69,6 @@ def : {
      * @namespace Lookup Table Definitions 
      * @property {Array}       list         List of lookup tables available
      * @property {String}      main         Lookup table loaded by default
-     * @property {String}      folder       Folder relative to the web page where lookup tables can be found
      */                
 	lut             : {
              
@@ -78,17 +77,14 @@ def : {
 								"hot","hotiron","hsv","jet","nih","nih_fire","nih_ice","pink",
 								"rainramp","spectrum","surface","x_hot","x_rain"],
       
-						main:"default",
+						main:"default"
 
-						folder:""
 				    },
 	/**
     * @namespace Default values for models
-    * @property {String} folder     Default folder where voxelent will look up for models. This folder is relative to the web page
     * @property {Array}  diffuse    A 4-valued array that contains the color for actor's default diffuse property. This array has the format [r,g,b,a]
     */
 	model			: { 
-						folder:"",
 						diffuse: [0.9,0.0,0.0,1.0],
 						/** @namespace Enumeration with the different loading modes provided by Voxelent
                           * @property {String} LIVE     Each asset is added to the scene as soon as it is downloaded
@@ -229,18 +225,34 @@ c : {
 	camera 		: undefined,
 	actor		: undefined,  
 	animation 	: undefined
+},
+
+util : {
+	format: function(arr, digits){
+		var p = Math.pow(10,digits);
+		if (typeof(arr) == 'object'){
+			
+			var result = '['; 
+			for (var i=0; i < arr.length-1; i+=1){
+				result  += Math.round(arr[i] * p) / p + ', '; 
+			}
+			result += Math.round(arr[arr.length-1] * p) / p  + ']'
+		}
+		else if (typeof(arr) == 'number'){
+			result = '[' + Math.round(arr * p) / p  + ']';
+		}
+		return result;
+	}
 }
 
 };
 
-
-
 Array.prototype.max = function(){
-	return Math.max.apply(Math, this);
+	return Math.max.apply(null, this);
 };
 
 Array.prototype.min = function(){
-	return Math.min.apply(Math, this);
+	return Math.min.apply(null, this);
 };
 
 Array.prototype.hasObject = (
@@ -260,9 +272,6 @@ Array.prototype.hasObject = (
     return (this.indexOf(o) !== -1);
   }
 );
-
-
-
 
 window.requestAnimFrame = (function(){
     return  window.requestAnimationFrame       || 

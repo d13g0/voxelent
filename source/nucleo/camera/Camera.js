@@ -40,22 +40,19 @@ function vxlCamera(vw,t) {
 
 	this.view 		= vw;
     this.matrix 	= mat4.identity();
-    this.up 		= vec3.create([0, 1, 0]);
-	this.right 		= vec3.create([1, 0, 0]);
-	this.normal 	= vec3.create([0, 0, 0]);
-    this.position 	= vec3.create([0, 0, 1]);
-    this.focus		= vec3.create([0, 0, 0]);
+    this.up 		= vec3.createFrom(0, 1, 0);
+	this.right 		= vec3.createFrom(1, 0, 0);
+	this.normal 	= vec3.createFrom(0, 0, 0);
+    this.position 	= vec3.createFrom(0, 0, 1);
+    this.focus		= vec3.createFrom(0, 0, 0);
     this.azimuth 	= 0;
     this.elevation 	= 0;
 	this.steps		= 0;
-    this.home 		= vec3.create([0,0,0]);
+    this.home 		= vec3.createFrom(0,0,0);
     this.id         = 0;
     this.FOV        = 30;
     this.Z_NEAR     = 0.1;    
     this.Z_FAR      = 10000;     
-    
-	
-   
 	
 	if (t != undefined && t !=null){
         this.type = t;
@@ -64,10 +61,9 @@ function vxlCamera(vw,t) {
         this.type = vxl.def.camera.type.ORBITING;
     }
     
-
-	this.distance = 0;
-	this.debug = false;
-
+	this.distance 	= 0;
+	this.debug 		= false;
+	this.state 	    = new vxlCameraState(this);
 };
 
 
@@ -85,28 +81,41 @@ vxlCamera.prototype.setType = function(t){
     }
 };
 
+
+
+/**
+ * Sends the camera home. Wherever that home is.
+ * @param {Number, Array} x it can be a number or an array containing three numbers
+ * @param {Number} y if x is a number, this parameter contains the y coordinate
+ * @param {Number} z if x is a number, this parameter contains the z coordinate
+ */
+vxlCamera.prototype.goHome = function(x,y,z){
+    if (x != null){
+        if (x instanceof Array){
+			vec3.set(vec3.create(x), this.home)
+		}
+		else if (x instanceof determineMatrixArrayType()){
+			vec3.set(x, this.home)
+		}
+		else{
+    		vec3.set(vec3.createFrom(x,y,z), this.home);
+   		}
+    }
+    
+    this.setPosition(this.home);
+	this.setAzimuth(0);
+    this.setElevation(0);
+    this.steps = 0;
+};
+
 /**
  *	Initializes the camera 
  */
 vxlCamera.prototype.init = function() {
 	var c = this;
-	this.goHome([0,0,1]);
-	this.setFocus([0,0,0]);
+	c.goHome(0,0,1);
+	c.setFocus(0,0,0);
 	mat4.identity(this.matrix);
-};
-
-/**
- * Sends the camera home. Wherever that home is.
- * @param {Array} h home
- */
-vxlCamera.prototype.goHome = function(h){
-    if (h != null){
-        this.home = vec3.create(h);
-    }
-    this.setPosition(h);
-    this.setAzimuth(0);
-    this.setElevation(0);
-    this.steps = 0;
 };
 
 
@@ -169,26 +178,46 @@ vxlCamera.prototype.setPosition = function(x,y,z) {
 
 /**
  * Sets the focus point of the camera
- * @param {Array} f the focus point
+ * 
+ * This method has three parameters x,y,z which represent the coordinates for 
+ * the camera's focus.
+ * 
+ * x could be an Array[3] or a glMatrix vec3 too. In this case the y, and z parameters
+ * are discarded.
  */
-vxlCamera.prototype.setFocus = function(f){
-	vec3.set(vec3.create(f), this.focus);
+vxlCamera.prototype.setFocus = function(x,y,z){
+	if (x instanceof Array){
+		vec3.set(vec3.create(x), this.focus)
+	}
+	else if (x instanceof determineMatrixArrayType()){
+		vec3.set(x, this.focus)
+	}
+	else{
+    	vec3.set(vec3.createFrom(x,y,z), this.focus);
+   	}
 	this.update();
 	this.debugMessage('Camera: Updated focus: ' + this.focus.toString(1));
 };
 
 
 vxlCamera.prototype.pan = function(dx, dy) {
-	vxl.go.console('Camera: pan called');
+	
 	/*@TODO: Review buggy*/
-	/*message('dx = ' + dx);
-	message('dy = ' + dy);
 	var c = this;
-	c.setPosition(c.position.x + dx * c.right.x, c.position.y + dy * c.up.y, c.position.z);
-	c.setFocalPoint(c.focalPoint.x + dx * c.right.x, c.focalPoint.y + dy * c.up.y, c.focalPoint.z);*/
-
+	c.setPosition(c.position[0] + dx * c.right[0], 
+		          c.position[1] + dy * c.up[1], 
+		          c.position[2]);
+	c.setFocus(c.focus[0] + dx * c.right[0], 
+		       c.focus[1] + dy * c.up[1], 
+		       c.focus[2]);
 };
 
+/**
+ * Performs the dollying operation in the direction indicated by the camera normal axis.
+ * This operation is also known as zoom in/zoom out
+ * 
+ * @param {Number} value the dollying value 
+ */
 vxlCamera.prototype.dolly = function(value) {
     var c = this;
     
@@ -209,7 +238,7 @@ vxlCamera.prototype.dolly = function(value) {
         newPosition[2] = p[2] - step*n[2];
     }
     else{
-        newPosition[1] = p[0];
+        newPosition[0] = p[0];
         newPosition[1] = p[1];
         newPosition[2] = p[2] - step; 
     }
@@ -272,9 +301,13 @@ vxlCamera.prototype.changeElevation = function(el){
  */
 vxlCamera.prototype.computeAxis = function(){
 	var m       = this.matrix;
-    this.right  = mat4.multiplyVec3(m, [1, 0, 0]);
-    this.up     = mat4.multiplyVec3(m, [0, 1, 0]);
-    this.normal = mat4.multiplyVec3(m, [0, 0, 1]);
+    this.right  = mat4.multiplyVec4(m, [1, 0, 0, 0]);
+    this.up     = mat4.multiplyVec4(m, [0, 1, 0, 0]);
+    this.normal = mat4.multiplyVec4(m, [0, 0, 1, 0]);
+    
+    vec3.normalize(this.right);
+    vec3.normalize(this.up);
+    vec3.normalize(this.normal);
 };
 
 /**
@@ -320,9 +353,13 @@ vxlCamera.prototype.update = function(){
     
     
     this.debugMessage('------------- update -------------');
-    this.debugMessage(' right: ' + this.right.toString(2)+', up: ' + this.up.toString(2)+', normal: ' + this.normal.toString(2));
-    this.debugMessage('   pos: ' + this.position.toString(2));
-    this.debugMessage('   azimuth: ' + this.azimuth +', elevation: '+ this.elevation);
+    this.debugMessage('  right: ' + vxl.util.format(this.right, 2)); 
+    this.debugMessage('     up: ' + vxl.util.format(this.up, 2));   
+    this.debugMessage(' normal: ' + vxl.util.format(this.normal,2));
+                      
+    this.debugMessage('  position: ' + vxl.util.format(this.position,2));
+    this.debugMessage('   azimuth: ' + vxl.util.format(this.azimuth,3));
+    this.debugMessage(' elevation: ' + vxl.util.format(this.elevation,3));
 };
 
 /**
@@ -346,20 +383,41 @@ vxlCamera.prototype.refresh = function() {
 };
 
 /**
+ *@param {String} actorName. The name of the actor that the camera will focus on 
+ */
+vxlCamera.prototype.focusOn = function(actorName){
+	var actor = this.view.scene.getActorByName(actorName);
+	if (actor == undefined){
+		throw 'The actor '+actorName+' does not exist'
+	}
+	this.shot(actor.bb);	
+	
+}
+
+/**
  * This method sets the camera to a distance such that the area covered by the bounding box (parameter)
  * is viewed.
  * @param {vxlBoundingBox} bb the bounding box
  */
 vxlCamera.prototype.shot = function(bb){
 	var maxDim = Math.max(bb[3] - bb[0], bb[4] - bb[1]);
-	var centre = this.view.scene.centre;
+	
+	cc = [0,0,0];
+
+	cc[0] = (bb[3] + bb[0]) /2;
+	cc[1] = (bb[4] + bb[1]) /2;
+	cc[2] = (bb[5] + bb[2]) /2;
+		
+	cc[0] = Math.round(cc[0]*1000)/1000;
+	cc[1] = Math.round(cc[1]*1000)/1000;
+	cc[2] = Math.round(cc[2]*1000)/1000;
 	
 	if(maxDim != 0) {
 		var distance = 1.5 * maxDim / (Math.tan(this.FOV * Math.PI / 180));
-		this.setPosition([centre[0], centre[1], centre[2]+ distance]);
+		this.setPosition([cc[0], cc[1], cc[2]+ distance]);
 	}
 	
-	this.setFocus(centre);
+	this.setFocus(cc);
 };
 
 /**
@@ -452,7 +510,7 @@ vxlCamera.prototype.left = function() {
 
 vxlCamera.prototype.debugMessage = function(v) {
 	if(this.debug) {
-		vxl.go.console(v);
+		console.info(v);
 	}
 };
 

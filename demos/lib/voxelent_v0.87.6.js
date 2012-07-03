@@ -41,7 +41,7 @@ var vxl = {
 */
 version : 
 {
-   	number : '0.88',
+   	number : '0.87.6',
    	codename : 'c4n314',
    	plugins  : []
 },
@@ -69,7 +69,6 @@ def : {
      * @namespace Lookup Table Definitions 
      * @property {Array}       list         List of lookup tables available
      * @property {String}      main         Lookup table loaded by default
-     * @property {String}      folder       Folder relative to the web page where lookup tables can be found
      */                
 	lut             : {
              
@@ -78,17 +77,14 @@ def : {
 								"hot","hotiron","hsv","jet","nih","nih_fire","nih_ice","pink",
 								"rainramp","spectrum","surface","x_hot","x_rain"],
       
-						main:"default",
+						main:"default"
 
-						folder:""
 				    },
 	/**
     * @namespace Default values for models
-    * @property {String} folder     Default folder where voxelent will look up for models. This folder is relative to the web page
     * @property {Array}  diffuse    A 4-valued array that contains the color for actor's default diffuse property. This array has the format [r,g,b,a]
     */
 	model			: { 
-						folder:"",
 						diffuse: [0.9,0.0,0.0,1.0],
 						/** @namespace Enumeration with the different loading modes provided by Voxelent
                           * @property {String} LIVE     Each asset is added to the scene as soon as it is downloaded
@@ -229,18 +225,34 @@ c : {
 	camera 		: undefined,
 	actor		: undefined,  
 	animation 	: undefined
+},
+
+util : {
+	format: function(arr, digits){
+		var p = Math.pow(10,digits);
+		if (typeof(arr) == 'object'){
+			
+			var result = '['; 
+			for (var i=0; i < arr.length-1; i+=1){
+				result  += Math.round(arr[i] * p) / p + ', '; 
+			}
+			result += Math.round(arr[arr.length-1] * p) / p  + ']'
+		}
+		else if (typeof(arr) == 'number'){
+			result = '[' + Math.round(arr * p) / p  + ']';
+		}
+		return result;
+	}
 }
 
 };
 
-
-
 Array.prototype.max = function(){
-	return Math.max.apply(Math, this);
+	return Math.max.apply(null, this);
 };
 
 Array.prototype.min = function(){
-	return Math.min.apply(Math, this);
+	return Math.min.apply(null, this);
 };
 
 Array.prototype.hasObject = (
@@ -260,9 +272,6 @@ Array.prototype.hasObject = (
     return (this.indexOf(o) !== -1);
   }
 );
-
-
-
 
 window.requestAnimFrame = (function(){
     return  window.requestAnimationFrame       || 
@@ -3674,7 +3683,7 @@ function vxlCameraState(camera) {
 
 	this.c             = camera;
 	this.position      = vec3.createFrom(0, 0, 1);
-	this.focalPoint    = vec3.createFrom(0, 0, 0);
+	this.focus    	   = vec3.createFrom(0, 0, 0);
 	
     this.up            = vec3.createFrom(0, 1, 0);
 	this.right         = vec3.createFrom(1, 0, 0);
@@ -3695,16 +3704,13 @@ function vxlCameraState(camera) {
  */
 vxlCameraState.prototype.reset = function() {
 	var c = this.c;
-	c.focalPoint       = vec3.createFrom(0, 0, 0);
+	c.focus            = vec3.createFrom(0, 0, 0);
 	c.up               = vec3.createFrom(0, 1, 0);
 	c.right            = vec3.createFrom(1, 0, 0);
 	c.distance         = 0;
 	c.elevation        = 0;
 	c.azimuth          = 0;
-	c.xTr              = 0;
-	c.yTr              = 0;
 	c.setPosition(0, 0, 1);
-	c.setOptimalDistance();
 };
 
 /**
@@ -3716,10 +3722,8 @@ vxlCameraState.prototype.save = function() {
 	this.distance = c.distance;
 	this.azimuth = c.azimuth;
 	this.elevation = c.elevation;
-	this.xTr = c.xTr;
-	this.yTr = c.yTr;
 	vec3.set(c.position, this.position);
-	vec3.set(c.focalPoint, this.focalPoint);
+	vec3.set(c.focus, this.focus);
 	vec3.set(c.up, this.up);
 	vec3.set(c.right, this.right);
 };
@@ -3731,10 +3735,8 @@ vxlCameraState.prototype.retrieve = function() {
 	var c = this.c;
 	c.azimuth = this.azimuth;
 	c.elevation = this.elevation;
-	c.xTr = this.xTr;
-	c.yTr = this.yTr;
 
-	vec3.set(this.focalPoint, c.focalPoint);
+	vec3.set(this.focus, c.focus);
 	vec3.set(this.up, c.up);
 	vec3.set(this.right, c.right);
 
@@ -3782,22 +3784,19 @@ function vxlCamera(vw,t) {
 
 	this.view 		= vw;
     this.matrix 	= mat4.identity();
-    this.up 		= vec3.create([0, 1, 0]);
-	this.right 		= vec3.create([1, 0, 0]);
-	this.normal 	= vec3.create([0, 0, 0]);
-    this.position 	= vec3.create([0, 0, 1]);
-    this.focus		= vec3.create([0, 0, 0]);
+    this.up 		= vec3.createFrom(0, 1, 0);
+	this.right 		= vec3.createFrom(1, 0, 0);
+	this.normal 	= vec3.createFrom(0, 0, 0);
+    this.position 	= vec3.createFrom(0, 0, 1);
+    this.focus		= vec3.createFrom(0, 0, 0);
     this.azimuth 	= 0;
     this.elevation 	= 0;
 	this.steps		= 0;
-    this.home 		= vec3.create([0,0,0]);
+    this.home 		= vec3.createFrom(0,0,0);
     this.id         = 0;
     this.FOV        = 30;
     this.Z_NEAR     = 0.1;    
     this.Z_FAR      = 10000;     
-    
-	
-   
 	
 	if (t != undefined && t !=null){
         this.type = t;
@@ -3806,10 +3805,9 @@ function vxlCamera(vw,t) {
         this.type = vxl.def.camera.type.ORBITING;
     }
     
-
-	this.distance = 0;
-	this.debug = false;
-
+	this.distance 	= 0;
+	this.debug 		= false;
+	this.state 	    = new vxlCameraState(this);
 };
 
 
@@ -3827,28 +3825,41 @@ vxlCamera.prototype.setType = function(t){
     }
 };
 
+
+
+/**
+ * Sends the camera home. Wherever that home is.
+ * @param {Number, Array} x it can be a number or an array containing three numbers
+ * @param {Number} y if x is a number, this parameter contains the y coordinate
+ * @param {Number} z if x is a number, this parameter contains the z coordinate
+ */
+vxlCamera.prototype.goHome = function(x,y,z){
+    if (x != null){
+        if (x instanceof Array){
+			vec3.set(vec3.create(x), this.home)
+		}
+		else if (x instanceof determineMatrixArrayType()){
+			vec3.set(x, this.home)
+		}
+		else{
+    		vec3.set(vec3.createFrom(x,y,z), this.home);
+   		}
+    }
+    
+    this.setPosition(this.home);
+	this.setAzimuth(0);
+    this.setElevation(0);
+    this.steps = 0;
+};
+
 /**
  *	Initializes the camera 
  */
 vxlCamera.prototype.init = function() {
 	var c = this;
-	this.goHome([0,0,1]);
-	this.setFocus([0,0,0]);
+	c.goHome(0,0,1);
+	c.setFocus(0,0,0);
 	mat4.identity(this.matrix);
-};
-
-/**
- * Sends the camera home. Wherever that home is.
- * @param {Array} h home
- */
-vxlCamera.prototype.goHome = function(h){
-    if (h != null){
-        this.home = vec3.create(h);
-    }
-    this.setPosition(h);
-    this.setAzimuth(0);
-    this.setElevation(0);
-    this.steps = 0;
 };
 
 
@@ -3911,26 +3922,46 @@ vxlCamera.prototype.setPosition = function(x,y,z) {
 
 /**
  * Sets the focus point of the camera
- * @param {Array} f the focus point
+ * 
+ * This method has three parameters x,y,z which represent the coordinates for 
+ * the camera's focus.
+ * 
+ * x could be an Array[3] or a glMatrix vec3 too. In this case the y, and z parameters
+ * are discarded.
  */
-vxlCamera.prototype.setFocus = function(f){
-	vec3.set(vec3.create(f), this.focus);
+vxlCamera.prototype.setFocus = function(x,y,z){
+	if (x instanceof Array){
+		vec3.set(vec3.create(x), this.focus)
+	}
+	else if (x instanceof determineMatrixArrayType()){
+		vec3.set(x, this.focus)
+	}
+	else{
+    	vec3.set(vec3.createFrom(x,y,z), this.focus);
+   	}
 	this.update();
 	this.debugMessage('Camera: Updated focus: ' + this.focus.toString(1));
 };
 
 
 vxlCamera.prototype.pan = function(dx, dy) {
-	vxl.go.console('Camera: pan called');
+	
 	/*@TODO: Review buggy*/
-	/*message('dx = ' + dx);
-	message('dy = ' + dy);
 	var c = this;
-	c.setPosition(c.position.x + dx * c.right.x, c.position.y + dy * c.up.y, c.position.z);
-	c.setFocalPoint(c.focalPoint.x + dx * c.right.x, c.focalPoint.y + dy * c.up.y, c.focalPoint.z);*/
-
+	c.setPosition(c.position[0] + dx * c.right[0], 
+		          c.position[1] + dy * c.up[1], 
+		          c.position[2]);
+	c.setFocus(c.focus[0] + dx * c.right[0], 
+		       c.focus[1] + dy * c.up[1], 
+		       c.focus[2]);
 };
 
+/**
+ * Performs the dollying operation in the direction indicated by the camera normal axis.
+ * This operation is also known as zoom in/zoom out
+ * 
+ * @param {Number} value the dollying value 
+ */
 vxlCamera.prototype.dolly = function(value) {
     var c = this;
     
@@ -3951,7 +3982,7 @@ vxlCamera.prototype.dolly = function(value) {
         newPosition[2] = p[2] - step*n[2];
     }
     else{
-        newPosition[1] = p[0];
+        newPosition[0] = p[0];
         newPosition[1] = p[1];
         newPosition[2] = p[2] - step; 
     }
@@ -4014,9 +4045,13 @@ vxlCamera.prototype.changeElevation = function(el){
  */
 vxlCamera.prototype.computeAxis = function(){
 	var m       = this.matrix;
-    this.right  = mat4.multiplyVec3(m, [1, 0, 0]);
-    this.up     = mat4.multiplyVec3(m, [0, 1, 0]);
-    this.normal = mat4.multiplyVec3(m, [0, 0, 1]);
+    this.right  = mat4.multiplyVec4(m, [1, 0, 0, 0]);
+    this.up     = mat4.multiplyVec4(m, [0, 1, 0, 0]);
+    this.normal = mat4.multiplyVec4(m, [0, 0, 1, 0]);
+    
+    vec3.normalize(this.right);
+    vec3.normalize(this.up);
+    vec3.normalize(this.normal);
 };
 
 /**
@@ -4062,9 +4097,13 @@ vxlCamera.prototype.update = function(){
     
     
     this.debugMessage('------------- update -------------');
-    this.debugMessage(' right: ' + this.right.toString(2)+', up: ' + this.up.toString(2)+', normal: ' + this.normal.toString(2));
-    this.debugMessage('   pos: ' + this.position.toString(2));
-    this.debugMessage('   azimuth: ' + this.azimuth +', elevation: '+ this.elevation);
+    this.debugMessage('  right: ' + vxl.util.format(this.right, 2)); 
+    this.debugMessage('     up: ' + vxl.util.format(this.up, 2));   
+    this.debugMessage(' normal: ' + vxl.util.format(this.normal,2));
+                      
+    this.debugMessage('  position: ' + vxl.util.format(this.position,2));
+    this.debugMessage('   azimuth: ' + vxl.util.format(this.azimuth,3));
+    this.debugMessage(' elevation: ' + vxl.util.format(this.elevation,3));
 };
 
 /**
@@ -4088,20 +4127,41 @@ vxlCamera.prototype.refresh = function() {
 };
 
 /**
+ *@param {String} actorName. The name of the actor that the camera will focus on 
+ */
+vxlCamera.prototype.focusOn = function(actorName){
+	var actor = this.view.scene.getActorByName(actorName);
+	if (actor == undefined){
+		throw 'The actor '+actorName+' does not exist'
+	}
+	this.shot(actor.bb);	
+	
+}
+
+/**
  * This method sets the camera to a distance such that the area covered by the bounding box (parameter)
  * is viewed.
  * @param {vxlBoundingBox} bb the bounding box
  */
 vxlCamera.prototype.shot = function(bb){
 	var maxDim = Math.max(bb[3] - bb[0], bb[4] - bb[1]);
-	var centre = this.view.scene.centre;
+	
+	cc = [0,0,0];
+
+	cc[0] = (bb[3] + bb[0]) /2;
+	cc[1] = (bb[4] + bb[1]) /2;
+	cc[2] = (bb[5] + bb[2]) /2;
+		
+	cc[0] = Math.round(cc[0]*1000)/1000;
+	cc[1] = Math.round(cc[1]*1000)/1000;
+	cc[2] = Math.round(cc[2]*1000)/1000;
 	
 	if(maxDim != 0) {
 		var distance = 1.5 * maxDim / (Math.tan(this.FOV * Math.PI / 180));
-		this.setPosition([centre[0], centre[1], centre[2]+ distance]);
+		this.setPosition([cc[0], cc[1], cc[2]+ distance]);
 	}
 	
-	this.setFocus(centre);
+	this.setFocus(cc);
 };
 
 /**
@@ -4194,7 +4254,7 @@ vxlCamera.prototype.left = function() {
 
 vxlCamera.prototype.debugMessage = function(v) {
 	if(this.debug) {
-		vxl.go.console(v);
+		console.info(v);
 	}
 };
 
@@ -4471,18 +4531,23 @@ vxlTrackerInteractor.prototype.onMouseMove = function(ev){
 	if (!this.dragging) return;
 	
 	
-	this.ctrlPressed = ev.ctrlKey;
-	this.altPressed = ev.altKey;
+	this.ctrlPressed 	= ev.ctrlKey;
+	this.altPressed 	= ev.altKey;
+	this.shiftPressed 	= ev.shiftKey;
+	
 	
 	var dx = this.x - this.lastX;
 	var dy = this.y - this.lastY;
 	
 	if (this.button == 0) { 
-		if(this.altPressed){
+		if(!this.altPressed && !this.shiftPressed){
+			this.rotate(dx,dy);
+		}
+		else if (this.altPressed){ 
 			this.dolly(dy);
 		}
-		else{ 
-			this.rotate(dx,dy);
+		else if (this.shiftPressed){
+			this.pan(dx,dy);
 		}
 	}
 
@@ -4496,8 +4561,9 @@ vxlTrackerInteractor.prototype.onKeyDown = function(ev){
 	
 	this.keyPressed = ev.keyCode;
 	this.altPressed = ev.altKey;
+	this.shiftPressed = ev.shiftKey;
 	
-	if (!this.altPressed){
+	if (!this.altPressed && !this.shiftPressed){
 		if (this.keyPressed == 38){
 			camera.changeElevation(10);
 			camera.status('elevation up');
@@ -4521,7 +4587,7 @@ vxlTrackerInteractor.prototype.onKeyDown = function(ev){
 			
 		//}
 	}
-	else if(this.altPressed && this.keyPressed !=17) {
+	else if(this.shiftPressed && this.keyPressed !=17) {
 		var px = 0;
 		var py = 0;
 		vxl.go.console(ev);
@@ -4541,6 +4607,7 @@ vxlTrackerInteractor.prototype.onKeyDown = function(ev){
 			this.pan(px,py);
 		}
 	}
+	camera.refresh();
 };
 
 vxlTrackerInteractor.prototype.onKeyUp = function(ev){
@@ -5934,12 +6001,9 @@ vxlModel.prototype.getOutline = function(){
  */
 function vxlActor(model){
   
-  if (model){
-  	this.model 	 = model;
-  	this.name 	 = model.name;
-  	this.diffuse = model.diffuse;
-  }
   
+  
+  this.bb = []
   this.allocated = false;
   this.visible   = true;
   this.mode = vxl.def.actor.mode.SOLID;
@@ -5956,6 +6020,14 @@ function vxlActor(model){
   this.renderers = [];
   this.buffers = [];
   this.clones  = 0;
+  
+  if (model){
+  	this.model 	 = model;
+  	this.name 	 = model.name;
+  	this.diffuse = model.diffuse;
+  	this.bb 	 = model.outline;
+  }
+  
 };
 
 
@@ -5980,14 +6052,30 @@ vxlActor.prototype.setProperty = function(property, value){
 
 vxlActor.prototype.setPosition = function (position){
     this.position = vec3.create(position);
+    throw('todo: recalculate bounding box');
     //TODO: Recalculate bounding box
 };
 
 vxlActor.prototype.setScale = function(scale){
     this.scale = vec3.create(scale);
+    throw('todo: recalculate bounding box');
     //TODO: Recalculate bounding box
 };
 
+vxlActor.prototype.getPosition = function(){
+	cc = this.centre;
+	bb = this.bb;
+	
+	cc[0] = (bb[3] + bb[0]) /2;
+	cc[1] = (bb[4] + bb[1]) /2;
+	cc[2] = (bb[5] + bb[2]) /2;
+		
+	cc[0] = Math.round(cc[0]*1000)/1000;
+	cc[1] = Math.round(cc[1]*1000)/1000;
+	cc[2] = Math.round(cc[2]*1000)/1000;
+	
+	return cc;
+};
 /**
 * Creates the internal WebGL buffers that will store geometry, normals, colors, etc for this Actor.
 * It uses the renderer passed as a parameter to retrieve the gl context to use.
@@ -6768,8 +6856,13 @@ vxlLookupTable.prototype.getColors = function(s,min,max){
 function vxlLookupTableManager(){
 	this.lutTimerID = 0;
 	this.tables = [];
+	this.location = "";
 	vxl.go.notifier.addSource(vxl.events.DEFAULT_LUT_LOADED,this);
 };
+
+vxlLookupTableManager.prototype.setLocation = function(loc){
+	this.location = loc;
+}
 
 /**
  * Load a lookup table file
@@ -6780,7 +6873,7 @@ vxlLookupTableManager.prototype.load = function(name){
 		if (this.isLoaded(name)) return;
 
 	    var request = new XMLHttpRequest();
-	    request.open("GET", vxl.def.lut.folder+'/'+name+'.lut');
+	    request.open("GET", this.location+'/'+name+'.lut');
 	    request.onreadystatechange = function() {
 	      if (request.readyState == 4) {
 		    if(request.status == 404) {
@@ -7319,7 +7412,7 @@ vxlModelManager.prototype.load = function(filename, scene) {
 	
 	vxl.go.console('ModelManager.load: Requesting '+filename+'...');
     var request = new XMLHttpRequest();
-    request.open("GET", vxl.def.model.folder+filename);
+    request.open("GET", filename);
     request.onreadystatechange = function() {
       if (request.readyState == 4) {
 	    if(request.status == 404) {
@@ -7558,7 +7651,14 @@ vxl.api = {
 	vxl.c.view.scene.setLookupTable(name);
  },
  
- loadLUTS :  function(){
+ /**
+  *@param {String} folder. This parameter is required. It specifies the location from where
+  * the lookup tables will be loaded. If this parameter is not passed the current folder will
+  * be used. The current folder is determined on running time and it is the folder where voxelent is 
+  * located.
+  */
+ loadLUTS :  function(folder){
+ 	vxl.go.lookupTableManager.setLocation(folder);
 	vxl.go.lookupTableManager.loadAll();
  },
 
@@ -7877,8 +7977,12 @@ wireframeON :  function(){
    */
   getUniformNames: function(){
       return vxl.c.view.renderer.prg._uniformList[vxl.c.view.renderer.prg._currentProgramID].slice(0);
+  },
+  
+  subscribe: function(event, context){
+  	vxl.go.notifier.addTarget(event, context);
   }
-
+  
  }; 
  /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
