@@ -7774,9 +7774,11 @@ vxl.api = {
 
 
 /**
- * If an actor has been selected (If there is an current actor in vxl.c.actor), changes its visualization mode to WIREFRAME. Otherwise,
- * shows all the scene in WIREFRAME mode.
+ * If an actor has been selected (If there is an current actor in vxl.c.actor), 
+ * changes its visualization mode to WIREFRAME. 
+ * Otherwise,shows all the scene in WIREFRAME mode.
  * 
+ * @see vxl.def.actor.mode
  */ 
 wireframeON :  function(){
 	if (vxl.c.actor){
@@ -7789,7 +7791,9 @@ wireframeON :  function(){
  },
  
  /**
-  * If there is an act
+  * Changes the visualization mode of the current actor (or all the actors if there's no current actor')
+  * to a solid representation
+  * @see vxl.def.actor.mode
   */
  surfaceON :  function(){
 	if (vxl.c.actor){
@@ -7801,6 +7805,11 @@ wireframeON :  function(){
 	vxl.go.console('API:Wireframe is hidden.');
  },
  
+ /**
+  * Changes the visualization mode of the current actor (or all the actors if there's no current actor')
+  * to a point representation
+  * @see vxl.def.actor.mode
+  */
  pointsON :  function(){
 	if (vxl.c.actor){
 		vxl.c.actor.setVisualizationMode(vxl.def.actor.mode.POINTS);
@@ -7810,7 +7819,13 @@ wireframeON :  function(){
 	}
  },
  
- 
+ /**
+  * Retrieves an actor object by name
+  * @param {String} actorName the name of the actor
+  * @param {vxlScene} scene looks in the specified scene. This parameter is optional. 
+  * If not specified, the current scene (vxl.c.scene) will be queried
+  *  
+  */
  getActorByName :  function(actorName,scene){
  	var _scene = scene;
  	if (_scene == undefined){ //look in the current scene
@@ -7844,8 +7859,8 @@ wireframeON :  function(){
  
  /**
   * @param actor it can be a vxlActor or a String with the actor name
-  * @param {String} the property to change 
-  * @param {Object} the new value
+  * @param {String} property the property to change 
+  * @param {Object} value the new value
   */
  setActorProperty :  function (actor, property, value){
 	
@@ -7876,15 +7891,27 @@ wireframeON :  function(){
 	vxl.c.view.refresh();
  },
  
- 
+ /**
+  *If there is an animation object (vxl.c.animation) then
+  * it stops the animation 
+  */
  stopAnimation :  function(){
 	if(vxl.c.animation != null) vxl.c.animation.stop();
  },
  
+ /**
+  *If there is an animation object (vxl.c.animation) then 
+  * it starts the animation 
+  */
  startAnimation :  function(){
 	if(vxl.c.animation != null) vxl.c.animation.start();
  },
  
+ /**
+  * If there is a vxlFrameAnimation object attached to the scene then it 
+  * sets the current animation frame
+  * @param {Number} f the animation frame index
+  */
  setFrame :  function(f){
 	if (vxl.c.animation == null) return;
 	var a = vxl.c.animation;
@@ -7898,6 +7925,9 @@ wireframeON :  function(){
 	}
  },
 
+ /**
+  *Removes the current animation from the scene 
+  */
  clearAnimation :  function(){
 	if(vxl.c.animation){
 		vxl.c.animation.stop();

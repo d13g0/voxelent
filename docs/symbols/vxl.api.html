@@ -501,7 +501,7 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.clearAnimation">clearAnimation</a></b>()
 								</div>
-								<div class="description"></div>
+								<div class="description">Removes the current animation from the scene</div>
 							</td>
 						</tr>
 					
@@ -519,7 +519,7 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.getActorByName">getActorByName</a></b>(actorName, scene)
 								</div>
-								<div class="description"></div>
+								<div class="description">Retrieves an actor object by name</div>
 							</td>
 						</tr>
 					
@@ -627,7 +627,7 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.pointsON">pointsON</a></b>()
 								</div>
-								<div class="description"></div>
+								<div class="description">Changes the visualization mode of the current actor (or all the actors if there's no current actor')to a point representation</div>
 							</td>
 						</tr>
 					
@@ -679,7 +679,7 @@ height:135px;
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.setActorProperty">setActorProperty</a></b>(actor, the, the)
+								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.setActorProperty">setActorProperty</a></b>(actor, property, value)
 								</div>
 								<div class="description"></div>
 							</td>
@@ -753,7 +753,7 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.setFrame">setFrame</a></b>(f)
 								</div>
-								<div class="description"></div>
+								<div class="description">If there is a vxlFrameAnimation object attached to the scene then it sets the current animation frame</div>
 							</td>
 						</tr>
 					
@@ -807,7 +807,7 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.startAnimation">startAnimation</a></b>()
 								</div>
-								<div class="description"></div>
+								<div class="description">If there is an animation object (vxl.c.animation) then it starts the animation</div>
 							</td>
 						</tr>
 					
@@ -816,7 +816,7 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.stopAnimation">stopAnimation</a></b>()
 								</div>
-								<div class="description"></div>
+								<div class="description">If there is an animation object (vxl.c.animation) thenit stops the animation</div>
 							</td>
 						</tr>
 					
@@ -834,7 +834,7 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.surfaceON">surfaceON</a></b>()
 								</div>
-								<div class="description">If there is an act</div>
+								<div class="description">Changes the visualization mode of the current actor (or all the actors if there's no current actor')to a solid representation</div>
 							</td>
 						</tr>
 					
@@ -852,7 +852,7 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.wireframeON">wireframeON</a></b>()
 								</div>
-								<div class="description">If an actor has been selected (If there is an current actor in vxl.c.actor), changes its visualization mode to WIREFRAME.</div>
+								<div class="description">If an actor has been selected (If there is an current actor in vxl.c.actor), changes its visualization mode to WIREFRAME.</div>
 							</td>
 						</tr>
 					
@@ -1012,7 +1012,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						
+						Removes the current animation from the scene
 						
 						
 					</div>
@@ -1073,7 +1073,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						
+						Retrieves an actor object by name
 						
 						
 					</div>
@@ -1085,16 +1085,16 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>actorName</b>
+									<span class="light fixedFont">{String}</span> <b>actorName</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the name of the actor</dd>
 							
 								<dt>
-									<b>scene</b>
+									<span class="light fixedFont">{<a href="../symbols/vxlScene.html">vxlScene</a>}</span> <b>scene</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>looks in the specified scene. This parameter is optional. If not specified, the current scene (vxl.c.scene) will be queried</dd>
 							
 							</dl>
 						
@@ -1442,7 +1442,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						
+						Changes the visualization mode of the current actor (or all the actors if there's no current actor')to a point representation
 						
 						
 					</div>
@@ -1455,6 +1455,13 @@ height:135px;
 						
 						
 						
+						
+							<dl class="detailList">
+							<dt class="heading">See:</dt>
+							
+								<dd><a href="../symbols/vxl.def.actor.mode.html">vxl.def.actor.mode</a></dd>
+							
+							</dl>
 						
 
 					<hr />
@@ -1599,7 +1606,7 @@ height:135px;
 					<div class="fixedFont">&lt;static&gt; 
 
 					
-					<span class="light">vxl.api.</span><b>setActorProperty</b>(actor, the, the)
+					<span class="light">vxl.api.</span><b>setActorProperty</b>(actor, property, value)
 
 					</div>
 					<div class="description">
@@ -1621,16 +1628,16 @@ height:135px;
 								<dd>it can be a vxlActor or a String with the actor name</dd>
 							
 								<dt>
-									<span class="light fixedFont">{String}</span> <b>the</b>
+									<span class="light fixedFont">{String}</span> <b>property</b>
 									
 								</dt>
-								<dd>property to change</dd>
+								<dd>the property to change</dd>
 							
 								<dt>
-									<span class="light fixedFont">{Object}</span> <b>the</b>
+									<span class="light fixedFont">{Object}</span> <b>value</b>
 									
 								</dt>
-								<dd>new value</dd>
+								<dd>the new value</dd>
 							
 							</dl>
 						
@@ -1903,7 +1910,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						
+						If there is a vxlFrameAnimation object attached to the scene then it sets the current animation frame
 						
 						
 					</div>
@@ -1915,10 +1922,10 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>f</b>
+									<span class="light fixedFont">{Number}</span> <b>f</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the animation frame index</dd>
 							
 							</dl>
 						
@@ -2157,7 +2164,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						
+						If there is an animation object (vxl.c.animation) then it starts the animation
 						
 						
 					</div>
@@ -2182,7 +2189,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						
+						If there is an animation object (vxl.c.animation) thenit stops the animation
 						
 						
 					</div>
@@ -2249,7 +2256,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						If there is an act
+						Changes the visualization mode of the current actor (or all the actors if there's no current actor')to a solid representation
 						
 						
 					</div>
@@ -2262,6 +2269,13 @@ height:135px;
 						
 						
 						
+						
+							<dl class="detailList">
+							<dt class="heading">See:</dt>
+							
+								<dd><a href="../symbols/vxl.def.actor.mode.html">vxl.def.actor.mode</a></dd>
+							
+							</dl>
 						
 
 					<hr />
@@ -2299,7 +2313,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						If an actor has been selected (If there is an current actor in vxl.c.actor), changes its visualization mode to WIREFRAME. Otherwise,shows all the scene in WIREFRAME mode.
+						If an actor has been selected (If there is an current actor in vxl.c.actor), changes its visualization mode to WIREFRAME. Otherwise,shows all the scene in WIREFRAME mode.
 						
 						
 					</div>
@@ -2312,6 +2326,13 @@ height:135px;
 						
 						
 						
+						
+							<dl class="detailList">
+							<dt class="heading">See:</dt>
+							
+								<dd><a href="../symbols/vxl.def.actor.mode.html">vxl.def.actor.mode</a></dd>
+							
+							</dl>
 						
 
 					
@@ -2328,7 +2349,7 @@ height:135px;
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jul 03 2012 18:53:29 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Jul 04 2012 19:19:15 GMT-0400 (EDT)
 		</div>
         </div>
         </div>

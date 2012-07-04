@@ -1,23 +1,24 @@
-mpl-------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------
 VERSION 0.87.6 - Spilberg's JAWS
 -------------------------------------------------------------------------------------------
-1. Lookup tables are loaded BY DEMAND instead of loading them all at the beginning. This controls the case
-where the vxl.def.lut.folder has not been created by the developer. 
-This way simpler demos that do not require LUTs do not have the dependency of
-having to define the LUT folder. 
+1. Lookup tables are loaded BY DEMAND instead of loading them all when Voxelent loads.
+See vxl.api.loadLUTS 
 
 2. Main folder structure has been simplified:
 demos - docs - downloads - tools - source 
 
 3. There is a new folder where I will put all the importers that I am working on: tools - importers
 
-4. Default folders (vxl.def.lut.folder and vxl.def.model.folder) have been set to "". It is simpler to look
-in the current folder first. Now if the developer wants to specify a folder, then he can use these
-variables to set these folders and voxelent will recognize them.
+4. Default folders (vxl.def.lut.folder and vxl.def.model.folder) have been eliminated.
+The developer needs to specify where relatively to voxelent.js location the assets are.
+This applies for lookup tables and models. 
+
+See vxl.api.loadLUTS, vxl.api.load
 
 5. try catch block added to JQuery detection (VXL.js)
 
-
+6. The method vxl.api.subscribe has been added to the public API. 
+Kamyar: please how to use this in your tutorial
 
 -------------------------------------------------------------------------------------------
 VERSION 0.87.5 - Mother's Day
