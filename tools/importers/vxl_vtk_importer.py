@@ -1,7 +1,7 @@
 import sys,string,traceback
 from threading import Thread
 
-#vtk2json.py only has one argument: the name of the vtk file to process (include the extension please)
+#vxl_vtk_importer.py only has one argument: the name of the vtk file to process (include the extension please)
 
 ARRAY_SIZE = 65536*3
 # ver - vertices
@@ -23,7 +23,7 @@ def tesellate(ver,ind, pod, blockID):
 	nidx = -1
 	#item = 1
 	
-	print 'Processing block #' + str(blockID+1) + '['+str(lowerBound)+','+str(upperBound)+']'
+	print('Processing block #' + str(blockID+1) + '['+str(lowerBound)+','+str(upperBound)+']')
 	
 	try:
 	#for each index to be processed
@@ -80,7 +80,7 @@ def processBlock(vertices, indices, scalars, blockID):
 	vv, ii, dd = tesellate(vertices, indices, scalars, blockID)
 	filename =fname+'_'+str(blockID)+'.json'
 	writejson(filename,vv,ii,dd)
-	print 'Block #' + str(blockID) +' processed'
+	print ('Block #' + str(blockID) +' processed')
 
 
 NOWHERE = 0	
@@ -106,34 +106,34 @@ for line in open(sys.argv[1], 'r').readlines():
 	linenumber = linenumber + 1
 	try:
 		if line.startswith('POINTS'):
-			print line
+			print(line)
 			location = POINTS
 			continue
 		elif line.startswith('POLYGONS'):
-			print line
+			print(line)
 			location = POLYGONS
 			continue
 		elif line.startswith('POINT_DATA'):
 			location = POINT_DATA
 			continue
 		elif line.startswith('NORMALS'):
-			print line
+			print(line)
 			location = NORMALS
 			continue
 		elif line.startswith('CELL_DATA'):
-			print line
+			print(line)
 			location = CELL_DATA
 			continue
 		elif line.startswith('TEXTURE_COORDINATES'):
-			print line
+			print(line)
 			location = TEXTURE_COORDINATES
 			continue
 		elif line.startswith('SCALARS'):
-			print line
+			print(line)
 			location = SCALARS
 			continue
 		elif line.startswith('LOOKUP_TABLE'):
-			print line
+			print(line)
 			location = LOOKUP_TABLE
 			continue
 		
@@ -159,8 +159,8 @@ for line in open(sys.argv[1], 'r').readlines():
 			for n in line.split():
 				normals.append(float(n))
 	except:
-		print 'Error while processing line '+str(linenumber)
-		print line
+		print('Error while processing line '+str(linenumber))
+		print(line)
 		raise
 
 v_count = len(vertices)/3
@@ -174,21 +174,22 @@ i_count = ii_count/3
 
 pd_count = len(scalars)
 
-print 'vertices: ' + str(v_count) +'\n normals: ' + str(n_count) + '\n indices: ' + str(ii_count)+'\n triangle count: ' + str(i_count) + '\n scalars: ' + str(pd_count) + '\n' 
+print('vertices: ' + str(v_count) +'\n normals: ' + str(n_count) + '\n indices: ' + str(ii_count)+'\n triangle count: ' + str(i_count) + '\n scalars: ' + str(pd_count) + '\n' )
 
 if (v_err or n_err):
-	print 'vertex error = ' + str(v_err) +', normal error = ' + str(n_err)
+	print ('vertex error = ' + str(v_err) +', normal error = ' + str(n_err))
 	
 
 numBlocks = ii_count // ARRAY_SIZE
 if(ii_count % ARRAY_SIZE != 0):
 	numBlocks = numBlocks + 1
-print 'Number of Blocks: ' + str(numBlocks)
+print( 'Number of Blocks: ' + str(numBlocks))
 
 for i in range(numBlocks):
 	try:
 		#Thread(target=processBlock, args=(vertices, indices, scalars, i)).start()
 		processBlock(vertices, indices, scalars,i);
-	except Exception, errtxt:
-		print errtxt
+	#except Exception, errtxt:
+	except errtxt:
+		print( errtxt)
 	
