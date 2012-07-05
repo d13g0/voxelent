@@ -7413,18 +7413,31 @@ vxlModelManager.prototype.load = function(filename, scene) {
 	vxl.go.console('ModelManager.load: Requesting '+filename+'...');
     var request = new XMLHttpRequest();
     request.open("GET", filename);
+    
     request.onreadystatechange = function() {
-      if (request.readyState == 4) {
-	    if(request.status == 404) {
-			throw 'ModelManager.load: '+ filename + ' does not exist';
-		 }
-		else {
-		    
-			manager.add(JSON.parse(request.responseText),filename,scene);
-		}
-	  }
+    	if (request.readyState == 4) {
+      		if (request.status == 200 || ( request.status == 0 && document.domain.length ==0)){
+      			var name = filename.replace(/^.*[\\\/]/, '');
+       			manager.add(JSON.parse(request.responseText),name,scene);
+      		}
+	    	else {
+				alert ('There was a problem loading the file '+filename+'. HTTP error code:'+request.status);
+	  		}
+    	}
     };
-    request.send();
+    
+    try{
+    	request.send();
+    } 
+    catch(e){
+    	if (e.code = 1012){
+    		alert('The file '+filename+' could not be accessed. \n\n'+
+    		'Please make sure that the path is correct and that you have the right pemissions');
+    	}
+    	else{
+    		alert(e);
+    	}
+    }	
 };
 
 /**
@@ -7694,21 +7707,34 @@ vxl.api = {
   * @param {String|Array} arguments the name of the asset or the list of models (each element being the file name).
   * @param {vxl.def.model.loadingMode} mode the loading mode
   * @param {vxlScene} scene the scene in case we do not want to load these models in the current one
+  * @param {String} path the path that will be concatenated to the list of files (optional).
   * 
   * @see {vxl#def#asset#loadingMode}
   * @see {vxlAssetManager}
   * @see {vxlScene#setLoadingMode}
+  * 
   */
- load :  function(arguments,mode,scene){
+ load :  function(arguments,mode,scene,path){
+ 	
+ 	function getPath(path){
+ 		if (path ==undefined || path == null) {
+ 			return "";
+ 		}
+ 		else if (path.length - 1 == path.lastIndexOf('/')){
+ 			return path;
+ 		}
+ 		else return path + '/';
+ 	}
  	
  	var scene = scene==null?vxl.c.scene:scene;
  	var models = [];
  	if (typeof(arguments) == 'string' || arguments instanceof String){
- 		models.push(arguments);
+ 		models.push(getPath(path)  + arguments);
  	}
  	else if (arguments instanceof Array){
+ 		p = getPath(path);
  		for(var i=0; i<arguments.length;i++){
-			models.push(arguments[i]);
+			models.push(p + arguments[i]);
 		}
  	}
  	if (mode != undefined && mode != null){

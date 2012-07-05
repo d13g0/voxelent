@@ -13,12 +13,16 @@ demos - docs - downloads - tools - source
 The developer needs to specify where relatively to voxelent.js location the assets are.
 This applies for lookup tables and models. 
 
-See vxl.api.loadLUTS, vxl.api.load
+There is a new parameter to set the path for a list of models to load. Check the documentation for
+vxl.api.load
+
 
 5. try catch block added to JQuery detection (VXL.js)
 
 6. The method vxl.api.subscribe has been added to the public API. 
 Kamyar: please how to use this in your tutorial
+
+
 
 -------------------------------------------------------------------------------------------
 VERSION 0.87.5 - Mother's Day
