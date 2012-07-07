@@ -109,8 +109,9 @@ def : {
                         * @property {String} SOLID 
                         * @property {String} WIREFRAME
                         * @property {String} POINTS
+                        * @property {String} LINES
                         */
-						mode: {	SOLID:'SOLID', WIREFRAME:'WIREFRAME', POINTS:'POINTS'}
+						mode: {	SOLID:'SOLID', WIREFRAME:'WIREFRAME', POINTS:'POINTS', LINES:'LINES'}
 					},
 	/**
     * @namespace Default values for cameras

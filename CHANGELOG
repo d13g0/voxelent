@@ -22,6 +22,7 @@ vxl.api.load
 6. The method vxl.api.subscribe has been added to the public API. 
 Kamyar: please how to use this in your tutorial
 
+7. Added support to render LINES! Check the cool DTI model in the VTK tutorial.
 
 
 -------------------------------------------------------------------------------------------

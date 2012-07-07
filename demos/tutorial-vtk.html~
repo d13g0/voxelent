@@ -1,0 +1,38 @@
+<html>
+<head>
+<title>Tutorial: rendering a VTK model</title>
+<script src="http://code.jquery.com/jquery-1.7.2.min.js" type="text/javascript"></script>
+<script type='text/javascript' src='lib/voxelent_v0.87.6.js'></script>
+
+<script type='text/javascript'>
+var view;
+
+function runVoxApp(){
+     vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
+     vxl.api.loadLUTS('assets/tables');
+     vxl.api.setLookupTable('default');
+     view = vxl.api.setup('view-1');
+     vxl.api.load('assets/models/kamyar/myVTKModel.json');
+     view.start();
+}
+
+function handleEvent(event){
+    vxl.c.camera.focusOn('myVTKModel.json');
+    vxl.api.boundingBoxON();
+}
+</script>
+</head>
+<body onload='runVoxApp()'>
+    <canvas id ='view-1' width=800 height=650></canvas>
+    <select id='lutPicker'>
+        <option value='default'>default</option>
+        <option value='cte'>cte</option>
+    </select>
+
+<script type='text/javascript'>
+        $('#lutPicker').change(function(){
+        vxl.api.setLookupTable($('#lutPicker').val());
+        });
+    </script>
+</body>
+</html>

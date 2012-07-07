@@ -33,6 +33,7 @@ function vxlModel(name, JSON_OBJECT){
 	this.wireframe 	= null;
 	this.centre 	= null;
 	this.outline 	= null;
+	this.mode       = null;
 	//texture
     
     if (JSON_OBJECT != undefined){
@@ -56,7 +57,8 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
 	this.diffuse 	= JSON_OBJECT.diffuse;
 	this.scalars 	= JSON_OBJECT.scalars;
 	this.wireframe  = JSON_OBJECT.wireframe;
-	this.colors     = JSON_OBJECT.colors;	
+	this.colors     = JSON_OBJECT.colors;
+	this.mode       = JSON_OBJECT.mode;	
 
 	if(this.normals == undefined && this.indices != undefined){
 		this.getNormals();
@@ -71,6 +73,9 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
 		this.getWireframeIndices();
 	}
 	
+	if (this.mode == undefined){
+		this.mode == vxl.def.actor.mode.SOLID;
+	}
 	this.getOutline();
 	this.getCentre();
 };

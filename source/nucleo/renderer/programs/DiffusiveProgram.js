@@ -76,10 +76,7 @@ vxl.def.glsl.diffusive = {
 	"		vec4 Id = vFinalColor * uLightDiffuse * lambertTerm;",
     "		vFinalColor = Ia + Id;",
 	"		vFinalColor.a = uMaterialDiffuse.a;",
-	"	}", 
-	"	else {",
-	"		vFinalColor = uMaterialDiffuse;",
-	"	}",
+	"	}" ,
 	"}"].join('\n'),
     
     FRAGMENT_SHADER : [

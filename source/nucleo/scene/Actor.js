@@ -50,6 +50,7 @@ function vxlActor(model){
   	this.name 	 = model.name;
   	this.diffuse = model.diffuse;
   	this.bb 	 = model.outline;
+  	this.mode    = model.mode;
   }
   
 };
@@ -257,14 +258,13 @@ vxlActor.prototype.render = function(renderer){
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.colors.slice(0)), gl.STATIC_DRAW);
 			
 			prg.enableAttribute("aVertexColor");
-			prg.setAttributePointer("aVertexColor", 4, gl.FLOAT, false, 0, 0);
+			prg.setAttributePointer("aVertexColor", 3, gl.FLOAT, false, 0, 0);
 		}
 		catch(err){
         	alert('There was a problem while rendering the actor ['+this.name+']. The problem happened while handling the color buffer. Error =' +err.description);
 			throw('There was a problem while rendering the actor ['+this.name+']. The problem happened while handling the color buffer. Error =' +err.description);
    		}
     }
-	
     
     if(model.normals){
 	    try{
@@ -288,7 +288,7 @@ vxlActor.prototype.render = function(renderer){
 			gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
 		}
 		else if (this.mode == vxl.def.actor.mode.WIREFRAME){
-			prg.setUniform("uUseShading", true);
+			prg.setUniform("uUseShading", false);
 			if (this.name == 'floor'){
 			     prg.disableAttribute("aVertexNormal");
 			}
@@ -300,6 +300,13 @@ vxlActor.prototype.render = function(renderer){
 			prg.setUniform("uUseShading", true);
 			prg.enableAttribute("aVertexNormal");
 			gl.drawArrays(gl.POINTS,0, this.model.vertices.length/3);
+		}
+		else if (this.mode == vxl.def.actor.mode.LINES){
+			prg.setUniform("uUseShading", false);
+			prg.disableAttribute("aVertexNormal");
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.index);
+			gl.drawElements(gl.LINES, this.model.indices.length, gl.UNSIGNED_SHORT,0);
+		
 		}
 		else{
             alert('There was a problem while rendering the actor ['+this.name+']. The visualization mode: '+this.mode+' is not valid.');
