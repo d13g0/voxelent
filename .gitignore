@@ -35,3 +35,4 @@ c4n3l4/
 .project
 .pydevproject
 *.pyc
+.settings
