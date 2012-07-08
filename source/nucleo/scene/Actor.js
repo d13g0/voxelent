@@ -50,7 +50,7 @@ function vxlActor(model){
   	this.name 	 = model.name;
   	this.diffuse = model.diffuse;
   	this.bb 	 = model.outline;
-  	this.mode    = model.mode;
+  	this.mode    = model.mode==undefined?vxl.def.actor.mode.SOLID:model.mode;
   }
   
 };
