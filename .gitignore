@@ -34,3 +34,4 @@ c4n3l4/
 ._.DS_Store
 .project
 .pydevproject
+*.pyc
