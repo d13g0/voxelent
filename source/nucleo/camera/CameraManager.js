@@ -54,7 +54,6 @@ vxlCameraManager.prototype.checkBoundary = function(idx){
  */
 vxlCameraManager.prototype.createCamera = function(type){
 	var camera = new vxlCamera(this.view, type);
-	camera.init();
 	
 	this.cameras.push(camera);
 	camera.idx = this.cameras.length - 1;

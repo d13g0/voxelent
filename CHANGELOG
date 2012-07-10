@@ -24,6 +24,11 @@ Kamyar: please how to use this in your tutorial
 
 7. Added support to render LINES! Check the cool DTI model in the VTK tutorial.
 
+8. Camera API simplified
+
+9. Dollying / Panning working nicely
+
+10. Gimbal lock fixed using quaternions. Thanks tojiro!!
 
 -------------------------------------------------------------------------------------------
 VERSION 0.87.5 - Mother's Day

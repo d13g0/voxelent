@@ -419,42 +419,43 @@ wireframeON :  function(){
 		vxl.c.animation = null;
 	}
  },
- 
+ /**
+  * Resets the current camera
+  */
  resetCamera :  function(){
 	vxl.c.camera.reset();
  },
  
+ /**
+  * Saves the current camera state
+  */
  saveCamera :  function(){
 	vxl.c.camera.save();
  },
  
+ /**
+  * Retrieves the last saved camera state
+  */
  retrieveCamera :  function(){
 	vxl.c.camera.retrieve();
  },
  
+ /**
+  * Sets the azimuth of the camera
+  * @param {Number} a azimuth
+  */
  setAzimuth :  function(a){
-	vxl.c.camera.changeAzimuth(a);
+	vxl.c.camera.setAzimuth(a);
  },
  
+ /**
+  * Sets the elevation of the camera
+  * @param {Number} e elevation
+  */
  setElevation :  function(e){
-	vxl.c.camera.changeElevation(e);
+	vxl.c.camera.setElevation(e);
  },
  
- go_above :  function(){
-	vxl.c.camera.above();
- },
- 
- go_below :  function(){
-	vxl.c.camera.below();
- },
- 
- go_left :  function(){
-	vxl.c.camera.left();
- },
- 
- go_right :  function(){
-	vxl.c.camera.right();
- },
  
  getLookupTables :  function(){
     return vxl.go.lookupTableManager.getAllLoaded();

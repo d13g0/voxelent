@@ -80,10 +80,19 @@ vxlActor.prototype.setPosition = function (position){
     throw('todo: recalculate bounding box');
     //TODO: Recalculate bounding box
 };
-
+/**
+ * Scales this actor. 
+ * @param {Number} scale the scaling factor. The scaling factor is applied in all axes.
+ * @param {Array} scale the array that contains the scaling factors for each axis ordered like this [x,y,z]
+ */
 vxlActor.prototype.setScale = function(scale){
-    this.scale = vec3.create(scale);
-    throw('todo: recalculate bounding box');
+    if (scale instanceof Array){
+        this.scale = vec3.create(scale);
+    }
+    else {
+        this.scale = vec3.create([scale,scale,scale]);
+    }
+    //throw('todo: recalculate bounding box');
     //TODO: Recalculate bounding box
 };
 
@@ -169,8 +178,8 @@ vxlActor.prototype.deallocate = function(){
 
 /**
  * Passes the matrices to the shading program
- * @param renderer determines the context for the transformations, 
- * different rendereres can have different matrices transformations 
+ * @param {vxlRenderer} renderer determines the context for the transformations, 
+ * different renderers can have different matrices transformations 
  * we will update each Model-View matrix of each renderer according to
  * the actor position,scale and rotation.
  */

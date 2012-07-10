@@ -463,7 +463,25 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#above">above</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#clear">clear</a></b>()
+								</div>
+								<div class="description">Calculates the new axis based on the current camera matrix,sets the rotations (azimuth and elevation) back to zero.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#clearRotation">clearRotation</a></b>()
+								</div>
+								<div class="description">Used by the tracker when done rotation.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#clearTranslation">clearTranslation</a></b>()
 								</div>
 								<div class="description"></div>
 							</td>
@@ -472,34 +490,7 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#below">below</a></b>()
-								</div>
-								<div class="description"></div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#changeAzimuth">changeAzimuth</a></b>(az)
-								</div>
-								<div class="description">Changes the azimuth of the camera</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#changeElevation">changeElevation</a></b>(el)
-								</div>
-								<div class="description">Changes the elevation of the camera</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#computeAxis">computeAxis</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#computeAxes">computeAxes</a></b>()
 								</div>
 								<div class="description">Updates the x,y and z axis of the camera according to the current camera matrix.</div>
 							</td>
@@ -508,9 +499,27 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#debugMessage">debugMessage</a></b>(v)
+								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#computeDistance">computeDistance</a></b>()
 								</div>
 								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#computePosition">computePosition</a></b>()
+								</div>
+								<div class="description">Calculates the position based on the current distance</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#debugMessage">debugMessage</a></b>(v)
+								</div>
+								<div class="description">If the debug field is set to true, this method will print the message passed as a parameter in the browser's console</div>
 							</td>
 						</tr>
 					
@@ -544,33 +553,6 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#goHome">goHome</a></b>(x, y, z)
-								</div>
-								<div class="description">Sends the camera home.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#init">init</a></b>()
-								</div>
-								<div class="description">Initializes the camera</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#left">left</a></b>()
-								</div>
-								<div class="description"></div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#longShot">longShot</a></b>()
 								</div>
 								<div class="description">The camera moves to a position where all the actors in the scene are viewed.</div>
@@ -582,7 +564,7 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#pan">pan</a></b>(dx, dy)
 								</div>
-								<div class="description"></div>
+								<div class="description">Translates the camera side-to-side and up-and-down</div>
 							</td>
 						</tr>
 					
@@ -616,15 +598,6 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#right">right</a></b>()
-								</div>
-								<div class="description"></div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#save">save</a></b>()
 								</div>
 								<div class="description">Saves the current camera state in a memento (vxlCameraState)</div>
@@ -634,7 +607,7 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#setAzimuth">setAzimuth</a></b>(az)
+								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#setAzimuth">setAzimuth</a></b>(el)
 								</div>
 								<div class="description">Sets the azimuth of the camera</div>
 							</td>
@@ -697,16 +670,16 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#status">status</a></b>(v)
+								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#status">status</a></b>()
 								</div>
-								<div class="description"></div>
+								<div class="description">Prints a summary of the camera variables on the browser's console</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#update">update</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#updateMatrix">updateMatrix</a></b>()
 								</div>
 								<div class="description">This method updates the current camera matrix upon changes in location, and rotation (azimuth, elevation)</div>
 							</td>
@@ -777,11 +750,61 @@ height:135px;
 					Method Detail
 				</div>
 				
-					<a name="above"> </a>
+					<a name="clear"> </a>
 					<div class="fixedFont">
 
 					
-					<b>above</b>()
+					<b>clear</b>()
+
+					</div>
+					<div class="description">
+						Calculates the new axis based on the current camera matrix,sets the rotations (azimuth and elevation) back to zero.it also calculates the current distance to the focal pointIn short, it clears the camera to proceed with another transformation
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="clearRotation"> </a>
+					<div class="fixedFont">
+
+					
+					<b>clearRotation</b>()
+
+					</div>
+					<div class="description">
+						Used by the tracker when done rotation. Clear the temporary variables to store rotation.
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="clearTranslation"> </a>
+					<div class="fixedFont">
+
+					
+					<b>clearTranslation</b>()
 
 					</div>
 					<div class="description">
@@ -802,112 +825,65 @@ height:135px;
 
 					<hr />
 				
-					<a name="below"> </a>
+					<a name="computeAxes"> </a>
 					<div class="fixedFont">
 
 					
-					<b>below</b>()
-
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="changeAzimuth"> </a>
-					<div class="fixedFont">
-
-					
-					<b>changeAzimuth</b>(az)
-
-					</div>
-					<div class="description">
-						Changes the azimuth of the camera
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Number}</span> <b>az</b>
-									
-								</dt>
-								<dd>the relative increment in degrees</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="changeElevation"> </a>
-					<div class="fixedFont">
-
-					
-					<b>changeElevation</b>(el)
-
-					</div>
-					<div class="description">
-						Changes the elevation of the camera
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Number}</span> <b>el</b>
-									
-								</dt>
-								<dd>the relative elevation increment in degrees</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="computeAxis"> </a>
-					<div class="fixedFont">
-
-					
-					<b>computeAxis</b>()
+					<b>computeAxes</b>()
 
 					</div>
 					<div class="description">
 						Updates the x,y and z axis of the camera according to the current camera matrix.This is useful when one needs to know the values of the axis and operate with them directly.Such is the case for zooming, where you need to know what is the normal axis to movealong it for dollying or zooming.
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="computeDistance"> </a>
+					<div class="fixedFont">
+
+					
+					<b>computeDistance</b>()
+
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="computePosition"> </a>
+					<div class="fixedFont">
+
+					
+					<b>computePosition</b>()
+
+					</div>
+					<div class="description">
+						Calculates the position based on the current distance
 						
 						
 					</div>
@@ -932,7 +908,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						
+						If the debug field is set to true, this method will print the message passed as a parameter in the browser's console
 						
 						
 					</div>
@@ -944,10 +920,10 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>v</b>
+									<span class="light fixedFont">{String}</span> <b>v</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the message to print</dd>
 							
 							</dl>
 						
@@ -968,7 +944,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						Performs the dollying operation in the direction indicated by the camera normal axis.This operation is also known as zoom in/zoom out
+						Performs the dollying operation in the direction indicated by the camera normal axis.The dollying mechanism offered by a camera makes sure that the camera moves fasttowards the object when the distance is large and slow when it is very close to the object.For that effect, every time that the new position  (after dollying) is calculated, the field dstep is computed.
 						
 						
 					</div>
@@ -992,6 +968,13 @@ height:135px;
 						
 						
 						
+						
+							<dl class="detailList">
+							<dt class="heading">See:</dt>
+							
+								<dd></dd>
+							
+							</dl>
 						
 
 					<hr />
@@ -1064,104 +1047,6 @@ height:135px;
 
 					<hr />
 				
-					<a name="goHome"> </a>
-					<div class="fixedFont">
-
-					
-					<b>goHome</b>(x, y, z)
-
-					</div>
-					<div class="description">
-						Sends the camera home. Wherever that home is.
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Number|<a href="../symbols/Array.html">Array</a>}</span> <b>x</b>
-									
-								</dt>
-								<dd>it can be a number or an array containing three numbers</dd>
-							
-								<dt>
-									<span class="light fixedFont">{Number}</span> <b>y</b>
-									
-								</dt>
-								<dd>if x is a number, this parameter contains the y coordinate</dd>
-							
-								<dt>
-									<span class="light fixedFont">{Number}</span> <b>z</b>
-									
-								</dt>
-								<dd>if x is a number, this parameter contains the z coordinate</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="init"> </a>
-					<div class="fixedFont">
-
-					
-					<b>init</b>()
-
-					</div>
-					<div class="description">
-						Initializes the camera
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="left"> </a>
-					<div class="fixedFont">
-
-					
-					<b>left</b>()
-
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
 					<a name="longShot"> </a>
 					<div class="fixedFont">
 
@@ -1195,7 +1080,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						
+						Translates the camera side-to-side and up-and-down
 						
 						
 					</div>
@@ -1207,16 +1092,16 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>dx</b>
+									<span class="light fixedFont">{Number}</span> <b>dx</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the horizontal displacement</dd>
 							
 								<dt>
-									<b>dy</b>
+									<span class="light fixedFont">{Number}</span> <b>dy</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the vertical displacement</dd>
 							
 							</dl>
 						
@@ -1311,31 +1196,6 @@ height:135px;
 
 					<hr />
 				
-					<a name="right"> </a>
-					<div class="fixedFont">
-
-					
-					<b>right</b>()
-
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
 					<a name="save"> </a>
 					<div class="fixedFont">
 
@@ -1372,7 +1232,7 @@ height:135px;
 					<div class="fixedFont">
 
 					
-					<b>setAzimuth</b>(az)
+					<b>setAzimuth</b>(el)
 
 					</div>
 					<div class="description">
@@ -1388,7 +1248,7 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Number}</span> <b>az</b>
+									<span class="light fixedFont">{Number}</span> <b>el</b>
 									
 								</dt>
 								<dd>the azimuth in degrees</dd>
@@ -1463,7 +1323,7 @@ height:135px;
 									<span class="light fixedFont">{Number}</span> <b>el</b>
 									
 								</dt>
-								<dd>the elevation value in degrees</dd>
+								<dd>the elevation in degrees</dd>
 							
 							</dl>
 						
@@ -1484,7 +1344,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						Sets the focus point of the cameraThis method has three parameters x,y,z which represent the coordinates for the camera's focus.x could be an Array[3] or a glMatrix vec3 too. In this case the y, and z parametersare discarded.
+						Sets the focus point of the cameraThis method has three parameters x,y,z which represent the coordinates for the camera's focus.
 						
 						
 					</div>
@@ -1496,22 +1356,22 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>x</b>
+									<span class="light fixedFont">{Number|<a href="../symbols/Array.html">Array</a>}</span> <b>x</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the x-coordinate. x can also be an Array [a,b,c] in this case the y and z parameters are discarded.</dd>
 							
 								<dt>
-									<b>y</b>
+									<span class="light fixedFont">{Number}</span> <b>y</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the y-coordinate</dd>
 							
 								<dt>
-									<b>z</b>
+									<span class="light fixedFont">{Number}</span> <b>z</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the z-coordinate</dd>
 							
 							</dl>
 						
@@ -1532,7 +1392,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						Sets the camera position in the sceneThis method has three parameters x,y,z which represent the coordinates for the camera's position.x could be an Array[3] or a glMatrix vec3 too. In this case the y, and z parametersare discarded.
+						Sets the camera position in the sceneThis method has three parameters x,y,z which represent the coordinates for the camera's position.
 						
 						
 					</div>
@@ -1544,22 +1404,22 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>x</b>
+									<span class="light fixedFont">{Number|<a href="../symbols/Array.html">Array</a>}</span> <b>x</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the x-coordinate. x can also be an Array [a,b,c] in this case the y and z parameters are discarded.</dd>
 							
 								<dt>
-									<b>y</b>
+									<span class="light fixedFont">{Number}</span> <b>y</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the y-coordinate</dd>
 							
 								<dt>
-									<b>z</b>
+									<span class="light fixedFont">{Number}</span> <b>z</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the z-coordinate</dd>
 							
 							</dl>
 						
@@ -1595,7 +1455,7 @@ height:135px;
 									<span class="light fixedFont">{<a href="../symbols/vxl.def.camera.type.html">vxl.def.camera.type</a>}</span> <b>t</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the type of camera</dd>
 							
 							</dl>
 						
@@ -1604,6 +1464,13 @@ height:135px;
 						
 						
 						
+						
+							<dl class="detailList">
+							<dt class="heading">See:</dt>
+							
+								<dd></dd>
+							
+							</dl>
 						
 
 					<hr />
@@ -1648,28 +1515,17 @@ height:135px;
 					<div class="fixedFont">
 
 					
-					<b>status</b>(v)
+					<b>status</b>()
 
 					</div>
 					<div class="description">
-						
+						Prints a summary of the camera variables on the browser's console
 						
 						
 					</div>
 
 					
 
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<b>v</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
 						
 						
 						
@@ -1680,11 +1536,11 @@ height:135px;
 
 					<hr />
 				
-					<a name="update"> </a>
+					<a name="updateMatrix"> </a>
 					<div class="fixedFont">
 
 					
-					<b>update</b>()
+					<b>updateMatrix</b>()
 
 					</div>
 					<div class="description">
@@ -1717,7 +1573,7 @@ height:135px;
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sat Jul 07 2012 23:07:32 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jul 10 2012 17:10:10 GMT-0400 (EDT)
 		</div>
         </div>
         </div>

@@ -30,6 +30,8 @@ function vxlTrackerInteractor(view,camera){
 	this.y = 0;
 	this.lastX = 0;
 	this.lastY = 0;
+	this.lastClickedX = 0;
+	this.lastClickedY = 0;
 	this.ctrlPressed = false;
 	this.altPressed = false;
 	this.keyPressed = 0;
@@ -43,34 +45,27 @@ vxlTrackerInteractor.prototype.getType = function(){
 };
 
 vxlTrackerInteractor.prototype.onMouseUp = function(ev){
-	//Only for debug purposes
-	/*var task = this.task;
-	var c = this.camera;
-	if (task == vxl.def.camera.task.PAN){
-			vxl.go.console('Trackball Camera INteractor: New Focal Point : ' + c.focalPoint.toString(1,'focalPoint'));
-	}*/
-	
 	task = vxl.def.camera.task.NONE;
-	
+	this.camera.clear();
 	this.dragging = false;
 };
 
 vxlTrackerInteractor.prototype.onMouseDown = function(ev){
-	this.x = ev.clientX;
-	this.y = ev.clientY;
-	this.dragging = true;
-	this.button = ev.button;
-	//@TODO: This is a hack. Find a nice way to calculate this step parameter for dollying
-	this.dstep = Math.max(this.camera.position[0],this.camera.position[1],this.camera.position[2])/100;
+	this.x             = ev.clientX;
+	this.y             = ev.clientY;
+	this.lastClikedX   = this.x;
+	this.lastclickedY  = this.y;
+	this.button        = ev.button;
+	this.dragging      = true;
 };
 
 vxlTrackerInteractor.prototype.onMouseMove = function(ev){
 
-	this.lastX = this.x;
-	this.lastY = this.y;
+	this.lastX         = this.x;
+	this.lastY         = this.y;
 	
-	this.x = ev.clientX;
-    this.y = ev.clientY;
+	this.x             = ev.clientX;
+    this.y             = ev.clientY;
 	
 
 	if (!this.dragging) return;
@@ -85,20 +80,26 @@ vxlTrackerInteractor.prototype.onMouseMove = function(ev){
 	var dy = this.y - this.lastY;
 	
 	if (this.button == 0) { 
-		if(!this.altPressed && !this.shiftPressed){
-			this.rotate(dx,dy);
-		}
-		else if (this.altPressed){ 
+	    if (this.altPressed){ 
 			this.dolly(dy);
 		}
 		else if (this.shiftPressed){
 			this.pan(dx,dy);
 		}
+		else{
+		    this.rotate(dx,dy);
+		}
 	}
 
-	this.lastX = this.x;
-    this.lastY = this.y; 
+};
 
+
+vxlTrackerInteractor.prototype.onKeyUp = function(ev){
+    if (ev.keyCode == 17){
+        this.ctrlPressed = false;
+    }
+    
+    this.camera.clear();
 };
 
 vxlTrackerInteractor.prototype.onKeyDown = function(ev){
@@ -110,20 +111,20 @@ vxlTrackerInteractor.prototype.onKeyDown = function(ev){
 	
 	if (!this.altPressed && !this.shiftPressed){
 		if (this.keyPressed == 38){
-			camera.changeElevation(10);
-			camera.status('elevation up');
+			camera.setElevation(10);
+			
 		}
 		else if (this.keyPressed == 40){
-			camera.changeElevation(-10);
-			camera.status('elevation down');
+			camera.setElevation(-10);
+			
 		}
 		else if (this.keyPressed == 37){
-			camera.changeAzimuth(-10);
-			camera.status('azimuth left');
+			camera.setAzimuth(-10);
+			
 		}
 		else if (this.keyPressed == 39){
-			camera.changeAzimuth(10);
-			camera.status('azimuth right');
+			camera.setAzimuth(10);
+			
 		}
 		//just to try picking. later on do it better
 		//else if (this.keyPressed = 80) {
@@ -155,25 +156,29 @@ vxlTrackerInteractor.prototype.onKeyDown = function(ev){
 	camera.refresh();
 };
 
-vxlTrackerInteractor.prototype.onKeyUp = function(ev){
-	if (ev.keyCode == 17){
-		this.ctrlPressed = false;
-	}
-};
 
+
+/**
+ * Internal method used by this tracker to perform dollying
+ * @param {Number} value the number of dollying steps
+ */
 vxlTrackerInteractor.prototype.dolly = function(value){
 	this.task = vxl.def.camera.task.DOLLY;
-if (value>0){
-        this.dloc += this.dstep;
+    if (value>0){
+        this.dloc += Math.abs(value);
     }
     else{
-        this.dloc -= this.dstep;
+        this.dloc -= Math.abs(value);
     }
-    this.camera.dolly(this.dloc);
+    this.camera.dolly(value);
 	this.camera.refresh();
-
 };
 
+/**
+ * Internal method used by this tracker to rotate the camera.
+ * @param {Number} dx the rotation on the X axis (elevation)
+ * @param {Number} dy the rotation on the Y axis (azimuth)
+ */
 vxlTrackerInteractor.prototype.rotate = function(dx, dy){
 	this.task = vxl.def.camera.task.ROTATE;
 	
@@ -186,8 +191,8 @@ vxlTrackerInteractor.prototype.rotate = function(dx, dy){
 	var nAzimuth = dx * delta_azimuth * this.MOTION_FACTOR;
 	var nElevation = dy * delta_elevation * this.MOTION_FACTOR;
 	
-	camera.changeAzimuth(nAzimuth);
-	camera.changeElevation(nElevation);
+	camera.setAzimuth(nAzimuth);
+	camera.setElevation(nElevation);
 	camera.refresh();
 	
 };
