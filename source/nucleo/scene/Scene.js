@@ -87,6 +87,7 @@ vxlScene.prototype.updateMetrics = function(b){
     if (this.actors.length == 1){
         //Quicky!  
         this.bb = this.actors[0].bb.slice(0);
+        this.toys.update();
         return;
     }
     
