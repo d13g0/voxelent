@@ -227,8 +227,18 @@ c : {
 	actor		: undefined,  
 	animation 	: undefined
 },
-
+/**
+ * Utility functions
+ * @namespace Voxelent Util methods
+ * 
+ */
 util : {
+    /**
+     * Formats Arrays, vec3 and vec4 for display
+     * 
+     * @param {Array, vec3, vec4} arr the object to format
+     * @param {Number} digits the number of decimal figures
+     */
 	format: function(arr, digits){
 		var p = Math.pow(10,digits);
 		if (typeof(arr) == 'object'){
@@ -243,6 +253,26 @@ util : {
 			result = '[' + Math.round(arr * p) / p  + ']';
 		}
 		return result;
+	},
+	
+	/**
+	 * Creates a vector from a set of parameters
+	 * @param {Array, vec3, Number} x it can be an Array, a vec3 or a number
+	 * @param {Number} y if x is a number, this parameter corresponds to the y-component
+	 * @param {Number} z if x is a number, this parameter corresponds to the z-component
+	 */
+	createVec3: function(x,y,z){
+	    var vvv = vec3.create();
+	    if (x instanceof Array){
+            vec3.set(vec3.create(x), vvv)
+        }
+        else if (x instanceof determineMatrixArrayType()){
+            vec3.set(x, vvv)
+        }
+        else{
+            vec3.set(vec3.createFrom(x,y,z), vvv);
+        }
+        return vvv;
 	}
 }
 
@@ -3892,18 +3922,14 @@ vxlCamera.prototype.computeDistance = function(){
  * @param {Number} z the z-coordinate
  */
 vxlCamera.prototype.setPosition = function(x,y,z) {
-	
-	if (x instanceof Array){
-		vec3.set(vec3.create(x), this.position)
-	}
-	else if (x instanceof determineMatrixArrayType()){
-		vec3.set(x, this.position)
-	}
-	else{
-    	vec3.set(vec3.createFrom(x,y,z), this.position);
-   	}
-   	this.computeDistance();    
-    this.updateMatrix();
+	this.position = vxl.util.createVec3(x,y,z);
+   	this.computeDistance();
+   	
+   	var m = this.matrix;
+   	m[12] = this.position[0];
+   	m[13] = this.position[1];
+   	m[14] = this.position[2];
+    m[15] = 1;
 };
 
 /**
@@ -3920,7 +3946,12 @@ vxlCamera.prototype.computePosition = function(){
     pos[2] = d*n[2];
     
     vec3.set(pos, this.position);
-    this.updateMatrix();
+    
+    var m = this.matrix;
+    m[12] = this.position[0];
+    m[13] = this.position[1];
+    m[14] = this.position[2];
+    m[15] = 1;
 };
 
 /**
@@ -3934,15 +3965,7 @@ vxlCamera.prototype.computePosition = function(){
  * @param {Number} z the z-coordinate
  */
 vxlCamera.prototype.setFocus = function(x,y,z){
-	if (x instanceof Array){
-		vec3.set(vec3.create(x), this.focus)
-	}
-	else if (x instanceof determineMatrixArrayType()){
-		vec3.set(x, this.focus)
-	}
-	else{
-    	vec3.set(vec3.createFrom(x,y,z), this.focus);
-   	}
+	this.focus = vxl.util.createVec3(x,y,z);
 	this.updateMatrix();
 };
 
@@ -4006,8 +4029,15 @@ vxlCamera.prototype.dolly = function(value) {
  * @param {Number} dy the vertical displacement
  */
 vxlCamera.prototype.pan = function(tx, ty) {
-   vec3.add(this.tr,[tx,-ty,0]);  
-   this.updateMatrix();
+   vec3.add(this.tr,[tx,-ty,0]);
+   
+   //mat4.translate(this.matrix, this.tr); 
+    
+   var m = this.matrix;
+    m[12] = this.position[0] + this.tr[0];
+    m[13] = this.position[1] + this.tr[1];
+    m[14] = this.position[2] + this.tr[2];
+    m[15] = 1;
 };
 
 
@@ -4022,7 +4052,9 @@ vxlCamera.prototype.computeAxes = function(){
     vec3.set(mat4.multiplyVec4(m, [1, 0, 0, 0]), this.right);
     vec3.set(mat4.multiplyVec4(m, [0, 1, 0, 0]), this.up);
     vec3.set(mat4.multiplyVec4(m, [0, 0, 1, 0]), this.normal);
-    vec3.set(mat4.multiplyVec4(m, [0, 0, 0, 1]), this.position);
+    if (this.type == vxl.def.camera.type.TRACKING){
+        vec3.set(mat4.multiplyVec4(m, [0, 0, 0, 1]), this.position);
+    }
     vec3.normalize(this.right);
     vec3.normalize(this.up);
     vec3.normalize(this.normal);
@@ -4038,9 +4070,9 @@ vxlCamera.prototype.clearRotation = function(){
     this.elevation = 0;
 };
 
-vxlCamera.prototype.clearTranslation = function(){
-    this.tr = vec3.create();
-}
+//vxlCamera.prototype.clearTranslation = function(){
+//    this.tr = vec3.create();
+//}
 
 
 /**
@@ -4062,7 +4094,9 @@ vxlCamera.prototype.clear = function(){
  * and rotation (azimuth, elevation)
  */
 vxlCamera.prototype.updateMatrix = function(){
-	this.matrix = mat4.toRotationMat(this.matrix);
+	
+	//this.matrix = mat4.toRotationMat(this.matrix);
+
 	
 	if (this.type ==  vxl.def.camera.type.TRACKING){
     	        //mat4.translate(this.matrix, this.position);
@@ -4071,16 +4105,22 @@ vxlCamera.prototype.updateMatrix = function(){
               
      }
      else if (this.type ==  vxl.def.camera.type.ORBITING){
-                mat4.translate(this.matrix, this.focus);
-                //According to tojiro the following should work...
+                
+                //Rotations according to Tojiro
                 var rotY  = quat4.fromAngleAxis(this.azimuth * Math.PI/180, [0,1,0]);
                 var rotX  = quat4.fromAngleAxis(this.elevation * Math.PI/180, [1,0,0]);
                 var rot = quat4.multiply(rotY, rotX, quat4.create());
                 var rotMatrix = quat4.toMat4(rot);
-                mat4.translate(rotMatrix, [this.tr[0], this.tr[1], this.distance]);
+                
+                
+                //Transformation stack:
+                mat4.translate(this.matrix, vec3.negate(this.position, vec3.create()));
+                mat4.translate(this.matrix, this.focus);
                 mat4.multiply(this.matrix, rotMatrix);
-                var negfocus = vec3.negate(this.focus, vec3.create());
-                mat4.translate(this.matrix, negfocus); 
+                mat4.translate(this.matrix, vec3.negate(this.focus, vec3.create()));
+                mat4.translate(this.matrix, this.position);
+
+                
     } 
 };
 
@@ -4089,10 +4129,7 @@ vxlCamera.prototype.updateMatrix = function(){
  * @returns {mat4} m the Model-View Transform
  */
 vxlCamera.prototype.getViewTransform = function(){
-    var m = mat4.identity();
-    mat4.set(this.matrix, m);
-    mat4.inverse(m);
-    return m;
+    return mat4.inverse(this.matrix, mat4.create());
 };
 
 /**
@@ -5744,9 +5781,9 @@ function vxlModel(name, JSON_OBJECT){
 	this.normals 	= null;
 	this.wireframe 	= null;
 	this.centre 	= null;
-	this.outline 	= null;
+	this.bb     	= null;
 	this.mode       = null;
-	//texture
+	//@TODO implement textures
     
     if (JSON_OBJECT != undefined){
         this.load(this.name, JSON_OBJECT);
@@ -5773,7 +5810,7 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
 	this.mode       = JSON_OBJECT.mode;	
 
 	if(this.normals == undefined && this.indices != undefined){
-		this.getNormals();
+		this.computeNormals();
 	}
 	
 	if(this.diffuse == undefined){
@@ -5782,14 +5819,13 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
 	}
 	
 	if (this.wireframe == undefined){
-		this.getWireframeIndices();
+		this.computeWireframeIndices();
 	}
 	
 	if (this.mode == undefined){
 		this.mode == vxl.def.actor.mode.SOLID;
 	}
-	this.getOutline();
-	this.getCentre();
+	this.computeBoundingBox();
 };
 
 
@@ -5799,7 +5835,7 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
  * @param {bool} reverse if true will calculate the reversed normals
  * 
  */
-vxlModel.prototype.getNormals = function(reverse){
+vxlModel.prototype.computeNormals = function(reverse){
 	if (reverse == undefined){
 		reverse = false;
 	}
@@ -5872,7 +5908,7 @@ vxlModel.prototype.getNormals = function(reverse){
 /**
  * Generate the wireframe indices using the model indices
  */  
-vxlModel.prototype.getWireframeIndices = function(){
+vxlModel.prototype.computeWireframeIndices = function(){
 	var ind = this.indices;
     var wfi = [];
 	var j = 0;
@@ -5887,36 +5923,35 @@ vxlModel.prototype.getWireframeIndices = function(){
 	}
 	this.wireframe = wfi;
 };
-/**
- * Calculate the centre of this model
- */  
-vxlModel.prototype.getCentre = function(){
-	  var bb = this.outline;
-      var c = [0, 0, 0];
-	  
-  	  c[0] = (bb[3] + bb[0]) /2;
-	  c[1] = (bb[4] + bb[1]) /2;
-	  c[2] = (bb[5] + bb[2]) /2;
-	  
-	  this.centre = c;
-};
+
 
 /**
- * Calculate the outline of this model (bounding box)
+ * Calculate the bounding box of this model and its centre
+ * 
  */
-vxlModel.prototype.getOutline = function(){	
+vxlModel.prototype.computeBoundingBox = function(){	
 	var vs = this.vertices;
-	var bb  = [vs[0],vs[1],vs[2],vs[0],vs[1],vs[2]];
+	var bbm  = [vs[0],vs[1],vs[2],vs[0],vs[1],vs[2]];
 	  
 	for(var i=0;i<vs.length;i=i+3){
-		bb[0] = Math.min(bb[0],vs[i]);
-		bb[1] = Math.min(bb[1],vs[i+1]);
-		bb[2] = Math.min(bb[2],vs[i+2]);
-		bb[3] = Math.max(bb[3],vs[i]);
-		bb[4] = Math.max(bb[4],vs[i+1]);
-		bb[5] = Math.max(bb[5],vs[i+2]);
+		bbm[0] = Math.min(bbm[0],vs[i]);
+		bbm[1] = Math.min(bbm[1],vs[i+1]);
+		bbm[2] = Math.min(bbm[2],vs[i+2]);
+		bbm[3] = Math.max(bbm[3],vs[i]);
+		bbm[4] = Math.max(bbm[4],vs[i+1]);
+		bbm[5] = Math.max(bbm[5],vs[i+2]);
 	}
-	this.outline = bb;
+	
+	
+	var c = [0, 0, 0];
+      
+    c[0] = (bbm[3] + bbm[0]) /2;
+    c[1] = (bbm[4] + bbm[1]) /2;
+    c[2] = (bbm[5] + bbm[2]) /2;
+    
+    
+    this.bb = bbm;  
+    this.centre = c;
 };
 
 
@@ -5949,7 +5984,7 @@ function vxlActor(model){
   
   
   
-  this.bb = []
+  this.bb = [0, 0, 0, 0, 0, 0];
   this.allocated = false;
   this.visible   = true;
   this.mode = vxl.def.actor.mode.SOLID;
@@ -5971,7 +6006,7 @@ function vxlActor(model){
   	this.model 	 = model;
   	this.name 	 = model.name;
   	this.diffuse = model.diffuse;
-  	this.bb 	 = model.outline;
+  	this.bb 	 = model.bb.slice(0);
   	this.mode    = model.mode==undefined?vxl.def.actor.mode.SOLID:model.mode;
   }
   
@@ -5997,30 +6032,58 @@ vxlActor.prototype.setProperty = function(property, value){
 	}
 };
 
-vxlActor.prototype.setPosition = function (position){
-    this.position = vec3.create(position);
-    throw('todo: recalculate bounding box');
-    //TODO: Recalculate bounding box
+/**
+ * Sets the position of this actor. 
+ * 
+ * It updates the bounding box according to the position of the actor. The position of the actor
+ * is initially [0,0,0] and it is relative to the model centre. If the model is not centered in 
+ * the origin, then the actor's position will be relative to the model centre.
+ * 
+ * @param {Number, Array, vec3} x it can be the x coordinate, a 3-dimensional Array or a glMatrix vec3
+ * @param {Number} y if x is a number, then this parameter corresponds to the y-coordinate
+ * @param {Number} z if x is a number, then this parameter corresponds to the z-coordinate
+ */
+vxlActor.prototype.setPosition = function (x,y,z){
+    
+    var bb = this.bb;
+    
+    this.position = vxl.util.createVec3(x,y,z); 
+    
+    var currentPos = vec3.set(this.position, vec3.create()); 
+    
+    //Now recalculate the bounding box 
+    var shift = vec3.subtract(this.position, currentPos, vec3.create());
+    bb[0] += shift[0];
+    bb[1] += shift[1];
+    bb[2] += shift[2];
+    bb[3] += shift[0];
+    bb[4] += shift[1];
+    bb[5] += shift[2];
+    
 };
 /**
  * Scales this actor. 
- * @param {Number} scale the scaling factor. The scaling factor is applied in all axes.
- * @param {Array} scale the array that contains the scaling factors for each axis ordered like this [x,y,z]
+ * @param {Number, Array, vec3} s the scaling factor. The scaling factor is applied in all axes.
+ *
  */
-vxlActor.prototype.setScale = function(scale){
-    if (scale instanceof Array){
-        this.scale = vec3.create(scale);
+vxlActor.prototype.setScale = function(s){
+    
+    if (typeof(s)=="number"){
+        this.scale = vxl.util.createVec3(s,s,s);
     }
-    else {
-        this.scale = vec3.create([scale,scale,scale]);
+    else{
+        this.scale = vxl.util.createVec3(s);
     }
-    //throw('todo: recalculate bounding box');
     //TODO: Recalculate bounding box
 };
 
-vxlActor.prototype.getPosition = function(){
-	cc = this.centre;
+/**
+ * Calculates the current position as
+ * the center of the current bounding box
+ */
+/*vxlActor.prototype.computePosition = function(){
 	bb = this.bb;
+	var cc = this.position;
 	
 	cc[0] = (bb[3] + bb[0]) /2;
 	cc[1] = (bb[4] + bb[1]) /2;
@@ -6030,8 +6093,9 @@ vxlActor.prototype.getPosition = function(){
 	cc[1] = Math.round(cc[1]*1000)/1000;
 	cc[2] = Math.round(cc[2]*1000)/1000;
 	
-	return cc;
-};
+	return vec3.create(cc); //so it does not mess with the internal variable
+};*/
+
 /**
 * Creates the internal WebGL buffers that will store geometry, normals, colors, etc for this Actor.
 * It uses the renderer passed as a parameter to retrieve the gl context to use.
@@ -6112,7 +6176,9 @@ vxlActor.prototype.updateMatrixStack = function(renderer){
     trx.push();
         mat4.scale      (trx.mvMatrix, this.scale);
 		mat4.translate	(trx.mvMatrix, this.position);
-		//TODO: Implement actor rotations
+		//@TODO: IMPLEMENT ACTOR ROTATIONS
+		var negposition = vec3.negate(this.position, vec3.create());
+		//mat4.translate (trx.mvMatrix, negposition);
 	    prg.setUniform("uMVMatrix",r.transforms.mvMatrix);
     trx.pop();
     trx.calculateNormal(); 
@@ -6395,8 +6461,8 @@ function vxlScene()
 	this.dispatchRate 			= 500;
 	this.scalarMIN 				= Number.MAX_VALUE;
 	this.scalarMAX 				= Number.MIN_VALUE;
-	this.bb 					= [];
-	this.centre 				= [];
+	this.bb 					= [0, 0, 0, 0, 0, 0];
+	this.centre 				= [0, 0, 0];
 	this.frameAnimation			= null;
 
 	if (vxl.c.scene  == null) vxl.c.scene 	= this;
@@ -6441,26 +6507,34 @@ vxlScene.prototype.setLoadingMode = function(mode){
  * Calculates the global bounding box and the centre for the scene. 
  */
 vxlScene.prototype.updateMetrics = function(b){
-        vxl.go.console('Scene: updating metrics with ('+ b[0]+','+b[1]+','+b[2]+') - ('+b[3]+','+b[4]+','+b[5]+')');
-        var bb = this.bb;
-        var cc = this.centre;
-        
-		bb[0] = Math.min(bb[0],b[0]);
-		bb[1] = Math.min(bb[1],b[1]);
-		bb[2] = Math.min(bb[2],b[2]);
-		bb[3] = Math.max(bb[3],b[3]);
-		bb[4] = Math.max(bb[4],b[4]);
-		bb[5] = Math.max(bb[5],b[5]);
+    
+    vxl.go.console('Scene: updating metrics with ('+ b[0]+','+b[1]+','+b[2]+') - ('+b[3]+','+b[4]+','+b[5]+')');
+    if (this.actors.length == 1){
+        //Quicky!  
+        this.bb = this.actors[0].bb.slice(0);
+        return;
+    }
+    
+    
+    var bb = this.bb;
+    var cc = this.centre;
+    
+	bb[0] = Math.min(bb[0],b[0]);
+	bb[1] = Math.min(bb[1],b[1]);
+	bb[2] = Math.min(bb[2],b[2]);
+	bb[3] = Math.max(bb[3],b[3]);
+	bb[4] = Math.max(bb[4],b[4]);
+	bb[5] = Math.max(bb[5],b[5]);
 
-		cc[0] = (bb[3] + bb[0]) /2;
-		cc[1] = (bb[4] + bb[1]) /2;
-		cc[2] = (bb[5] + bb[2]) /2;
-		
-		cc[0] = Math.round(cc[0]*1000)/1000;
-		cc[1] = Math.round(cc[1]*1000)/1000;
-		cc[2] = Math.round(cc[2]*1000)/1000;
-		
-		this.toys.update();
+	cc[0] = (bb[3] + bb[0]) /2;
+	cc[1] = (bb[4] + bb[1]) /2;
+	cc[2] = (bb[5] + bb[2]) /2;
+	
+	cc[0] = Math.round(cc[0]*1000)/1000;
+	cc[1] = Math.round(cc[1]*1000)/1000;
+	cc[2] = Math.round(cc[2]*1000)/1000;
+	
+	this.toys.update();
 
 };
 
@@ -6472,7 +6546,7 @@ vxlScene.prototype.computeMetrics = function() {
 	this.bb = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
 	this.centre = [0.0, 0.0, 0.0];
 	for(var i=0; i<this.actors.length; i++){
-		this.updateMetrics(this.actors[i].model.outline);
+		this.updateMetrics(this.actors[i].bb);
 	}
 };
 
@@ -6515,7 +6589,7 @@ vxlScene.prototype.addActor = function(actor){
     }
     
     this.actors.push(actor);
-    this.updateMetrics(actor.model.outline); //TODO: What if the actor moves? use actor bounding box instead
+    this.updateMetrics(actor.bb); 
     
     vxl.go.console('Scene: Actor for model '+actor.model.name+' added');
     vxl.c.actor = actor;
@@ -7353,7 +7427,6 @@ vxlView.prototype.refresh = function(){
  * @author Diego Cantor
  */
 function vxlModelManager(){
-	this.firstLoadedModel = false; //analyze
 	this.toLoad = new Array(); //analyze
 	this.models = [];
 	vxl.go.notifier.addSource(vxl.events.MODELS_LOADED,this);
@@ -7425,12 +7498,6 @@ vxlModelManager.prototype.add = function(JSON_OBJECT,name,scene){
 	
 	var model = new vxlModel(name, JSON_OBJECT);
 	
-	
-	if (!this.firstLoadedModel){
-		scene.bb = model.outline;
-		this.firstLoadedModel = true;
-	}
-		
 	model.loaded = true;
 	this.models.push(model);
 	vxl.go.console('ModelManager: model '+model.name+' created.'); 

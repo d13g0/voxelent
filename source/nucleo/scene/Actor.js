@@ -27,7 +27,7 @@ function vxlActor(model){
   
   
   
-  this.bb = []
+  this.bb = [0, 0, 0, 0, 0, 0];
   this.allocated = false;
   this.visible   = true;
   this.mode = vxl.def.actor.mode.SOLID;
@@ -49,7 +49,7 @@ function vxlActor(model){
   	this.model 	 = model;
   	this.name 	 = model.name;
   	this.diffuse = model.diffuse;
-  	this.bb 	 = model.outline;
+  	this.bb 	 = model.bb.slice(0);
   	this.mode    = model.mode==undefined?vxl.def.actor.mode.SOLID:model.mode;
   }
   
@@ -75,30 +75,58 @@ vxlActor.prototype.setProperty = function(property, value){
 	}
 };
 
-vxlActor.prototype.setPosition = function (position){
-    this.position = vec3.create(position);
-    throw('todo: recalculate bounding box');
-    //TODO: Recalculate bounding box
+/**
+ * Sets the position of this actor. 
+ * 
+ * It updates the bounding box according to the position of the actor. The position of the actor
+ * is initially [0,0,0] and it is relative to the model centre. If the model is not centered in 
+ * the origin, then the actor's position will be relative to the model centre.
+ * 
+ * @param {Number, Array, vec3} x it can be the x coordinate, a 3-dimensional Array or a glMatrix vec3
+ * @param {Number} y if x is a number, then this parameter corresponds to the y-coordinate
+ * @param {Number} z if x is a number, then this parameter corresponds to the z-coordinate
+ */
+vxlActor.prototype.setPosition = function (x,y,z){
+    
+    var bb = this.bb;
+    
+    this.position = vxl.util.createVec3(x,y,z); 
+    
+    var currentPos = vec3.set(this.position, vec3.create()); 
+    
+    //Now recalculate the bounding box 
+    var shift = vec3.subtract(this.position, currentPos, vec3.create());
+    bb[0] += shift[0];
+    bb[1] += shift[1];
+    bb[2] += shift[2];
+    bb[3] += shift[0];
+    bb[4] += shift[1];
+    bb[5] += shift[2];
+    
 };
 /**
  * Scales this actor. 
- * @param {Number} scale the scaling factor. The scaling factor is applied in all axes.
- * @param {Array} scale the array that contains the scaling factors for each axis ordered like this [x,y,z]
+ * @param {Number, Array, vec3} s the scaling factor. The scaling factor is applied in all axes.
+ *
  */
-vxlActor.prototype.setScale = function(scale){
-    if (scale instanceof Array){
-        this.scale = vec3.create(scale);
+vxlActor.prototype.setScale = function(s){
+    
+    if (typeof(s)=="number"){
+        this.scale = vxl.util.createVec3(s,s,s);
     }
-    else {
-        this.scale = vec3.create([scale,scale,scale]);
+    else{
+        this.scale = vxl.util.createVec3(s);
     }
-    //throw('todo: recalculate bounding box');
     //TODO: Recalculate bounding box
 };
 
-vxlActor.prototype.getPosition = function(){
-	cc = this.centre;
+/**
+ * Calculates the current position as
+ * the center of the current bounding box
+ */
+/*vxlActor.prototype.computePosition = function(){
 	bb = this.bb;
+	var cc = this.position;
 	
 	cc[0] = (bb[3] + bb[0]) /2;
 	cc[1] = (bb[4] + bb[1]) /2;
@@ -108,8 +136,9 @@ vxlActor.prototype.getPosition = function(){
 	cc[1] = Math.round(cc[1]*1000)/1000;
 	cc[2] = Math.round(cc[2]*1000)/1000;
 	
-	return cc;
-};
+	return vec3.create(cc); //so it does not mess with the internal variable
+};*/
+
 /**
 * Creates the internal WebGL buffers that will store geometry, normals, colors, etc for this Actor.
 * It uses the renderer passed as a parameter to retrieve the gl context to use.
@@ -190,7 +219,9 @@ vxlActor.prototype.updateMatrixStack = function(renderer){
     trx.push();
         mat4.scale      (trx.mvMatrix, this.scale);
 		mat4.translate	(trx.mvMatrix, this.position);
-		//TODO: Implement actor rotations
+		//@TODO: IMPLEMENT ACTOR ROTATIONS
+		var negposition = vec3.negate(this.position, vec3.create());
+		//mat4.translate (trx.mvMatrix, negposition);
 	    prg.setUniform("uMVMatrix",r.transforms.mvMatrix);
     trx.pop();
     trx.calculateNormal(); 

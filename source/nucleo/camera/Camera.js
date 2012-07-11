@@ -147,18 +147,14 @@ vxlCamera.prototype.computeDistance = function(){
  * @param {Number} z the z-coordinate
  */
 vxlCamera.prototype.setPosition = function(x,y,z) {
-	
-	if (x instanceof Array){
-		vec3.set(vec3.create(x), this.position)
-	}
-	else if (x instanceof determineMatrixArrayType()){
-		vec3.set(x, this.position)
-	}
-	else{
-    	vec3.set(vec3.createFrom(x,y,z), this.position);
-   	}
-   	this.computeDistance();    
-    this.updateMatrix();
+	this.position = vxl.util.createVec3(x,y,z);
+   	this.computeDistance();
+   	
+   	var m = this.matrix;
+   	m[12] = this.position[0];
+   	m[13] = this.position[1];
+   	m[14] = this.position[2];
+    m[15] = 1;
 };
 
 /**
@@ -175,7 +171,12 @@ vxlCamera.prototype.computePosition = function(){
     pos[2] = d*n[2];
     
     vec3.set(pos, this.position);
-    this.updateMatrix();
+    
+    var m = this.matrix;
+    m[12] = this.position[0];
+    m[13] = this.position[1];
+    m[14] = this.position[2];
+    m[15] = 1;
 };
 
 /**
@@ -189,15 +190,7 @@ vxlCamera.prototype.computePosition = function(){
  * @param {Number} z the z-coordinate
  */
 vxlCamera.prototype.setFocus = function(x,y,z){
-	if (x instanceof Array){
-		vec3.set(vec3.create(x), this.focus)
-	}
-	else if (x instanceof determineMatrixArrayType()){
-		vec3.set(x, this.focus)
-	}
-	else{
-    	vec3.set(vec3.createFrom(x,y,z), this.focus);
-   	}
+	this.focus = vxl.util.createVec3(x,y,z);
 	this.updateMatrix();
 };
 
@@ -261,8 +254,15 @@ vxlCamera.prototype.dolly = function(value) {
  * @param {Number} dy the vertical displacement
  */
 vxlCamera.prototype.pan = function(tx, ty) {
-   vec3.add(this.tr,[tx,-ty,0]);  
-   this.updateMatrix();
+   vec3.add(this.tr,[tx,-ty,0]);
+   
+   //mat4.translate(this.matrix, this.tr); 
+    
+   var m = this.matrix;
+    m[12] = this.position[0] + this.tr[0];
+    m[13] = this.position[1] + this.tr[1];
+    m[14] = this.position[2] + this.tr[2];
+    m[15] = 1;
 };
 
 
@@ -277,7 +277,9 @@ vxlCamera.prototype.computeAxes = function(){
     vec3.set(mat4.multiplyVec4(m, [1, 0, 0, 0]), this.right);
     vec3.set(mat4.multiplyVec4(m, [0, 1, 0, 0]), this.up);
     vec3.set(mat4.multiplyVec4(m, [0, 0, 1, 0]), this.normal);
-    vec3.set(mat4.multiplyVec4(m, [0, 0, 0, 1]), this.position);
+    if (this.type == vxl.def.camera.type.TRACKING){
+        vec3.set(mat4.multiplyVec4(m, [0, 0, 0, 1]), this.position);
+    }
     vec3.normalize(this.right);
     vec3.normalize(this.up);
     vec3.normalize(this.normal);
@@ -293,9 +295,9 @@ vxlCamera.prototype.clearRotation = function(){
     this.elevation = 0;
 };
 
-vxlCamera.prototype.clearTranslation = function(){
-    this.tr = vec3.create();
-}
+//vxlCamera.prototype.clearTranslation = function(){
+//    this.tr = vec3.create();
+//}
 
 
 /**
@@ -317,7 +319,9 @@ vxlCamera.prototype.clear = function(){
  * and rotation (azimuth, elevation)
  */
 vxlCamera.prototype.updateMatrix = function(){
-	this.matrix = mat4.toRotationMat(this.matrix);
+	
+	//this.matrix = mat4.toRotationMat(this.matrix);
+
 	
 	if (this.type ==  vxl.def.camera.type.TRACKING){
     	        //mat4.translate(this.matrix, this.position);
@@ -326,16 +330,22 @@ vxlCamera.prototype.updateMatrix = function(){
               
      }
      else if (this.type ==  vxl.def.camera.type.ORBITING){
-                mat4.translate(this.matrix, this.focus);
-                //According to tojiro the following should work...
+                
+                //Rotations according to Tojiro
                 var rotY  = quat4.fromAngleAxis(this.azimuth * Math.PI/180, [0,1,0]);
                 var rotX  = quat4.fromAngleAxis(this.elevation * Math.PI/180, [1,0,0]);
                 var rot = quat4.multiply(rotY, rotX, quat4.create());
                 var rotMatrix = quat4.toMat4(rot);
-                mat4.translate(rotMatrix, [this.tr[0], this.tr[1], this.distance]);
+                
+                
+                //Transformation stack:
+                mat4.translate(this.matrix, vec3.negate(this.position, vec3.create()));
+                mat4.translate(this.matrix, this.focus);
                 mat4.multiply(this.matrix, rotMatrix);
-                var negfocus = vec3.negate(this.focus, vec3.create());
-                mat4.translate(this.matrix, negfocus); 
+                mat4.translate(this.matrix, vec3.negate(this.focus, vec3.create()));
+                mat4.translate(this.matrix, this.position);
+
+                
     } 
 };
 
@@ -344,10 +354,7 @@ vxlCamera.prototype.updateMatrix = function(){
  * @returns {mat4} m the Model-View Transform
  */
 vxlCamera.prototype.getViewTransform = function(){
-    var m = mat4.identity();
-    mat4.set(this.matrix, m);
-    mat4.inverse(m);
-    return m;
+    return mat4.inverse(this.matrix, mat4.create());
 };
 
 /**

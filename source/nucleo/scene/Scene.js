@@ -36,8 +36,8 @@ function vxlScene()
 	this.dispatchRate 			= 500;
 	this.scalarMIN 				= Number.MAX_VALUE;
 	this.scalarMAX 				= Number.MIN_VALUE;
-	this.bb 					= [];
-	this.centre 				= [];
+	this.bb 					= [0, 0, 0, 0, 0, 0];
+	this.centre 				= [0, 0, 0];
 	this.frameAnimation			= null;
 
 	if (vxl.c.scene  == null) vxl.c.scene 	= this;
@@ -82,26 +82,34 @@ vxlScene.prototype.setLoadingMode = function(mode){
  * Calculates the global bounding box and the centre for the scene. 
  */
 vxlScene.prototype.updateMetrics = function(b){
-        vxl.go.console('Scene: updating metrics with ('+ b[0]+','+b[1]+','+b[2]+') - ('+b[3]+','+b[4]+','+b[5]+')');
-        var bb = this.bb;
-        var cc = this.centre;
-        
-		bb[0] = Math.min(bb[0],b[0]);
-		bb[1] = Math.min(bb[1],b[1]);
-		bb[2] = Math.min(bb[2],b[2]);
-		bb[3] = Math.max(bb[3],b[3]);
-		bb[4] = Math.max(bb[4],b[4]);
-		bb[5] = Math.max(bb[5],b[5]);
+    
+    vxl.go.console('Scene: updating metrics with ('+ b[0]+','+b[1]+','+b[2]+') - ('+b[3]+','+b[4]+','+b[5]+')');
+    if (this.actors.length == 1){
+        //Quicky!  
+        this.bb = this.actors[0].bb.slice(0);
+        return;
+    }
+    
+    
+    var bb = this.bb;
+    var cc = this.centre;
+    
+	bb[0] = Math.min(bb[0],b[0]);
+	bb[1] = Math.min(bb[1],b[1]);
+	bb[2] = Math.min(bb[2],b[2]);
+	bb[3] = Math.max(bb[3],b[3]);
+	bb[4] = Math.max(bb[4],b[4]);
+	bb[5] = Math.max(bb[5],b[5]);
 
-		cc[0] = (bb[3] + bb[0]) /2;
-		cc[1] = (bb[4] + bb[1]) /2;
-		cc[2] = (bb[5] + bb[2]) /2;
-		
-		cc[0] = Math.round(cc[0]*1000)/1000;
-		cc[1] = Math.round(cc[1]*1000)/1000;
-		cc[2] = Math.round(cc[2]*1000)/1000;
-		
-		this.toys.update();
+	cc[0] = (bb[3] + bb[0]) /2;
+	cc[1] = (bb[4] + bb[1]) /2;
+	cc[2] = (bb[5] + bb[2]) /2;
+	
+	cc[0] = Math.round(cc[0]*1000)/1000;
+	cc[1] = Math.round(cc[1]*1000)/1000;
+	cc[2] = Math.round(cc[2]*1000)/1000;
+	
+	this.toys.update();
 
 };
 
@@ -113,7 +121,7 @@ vxlScene.prototype.computeMetrics = function() {
 	this.bb = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
 	this.centre = [0.0, 0.0, 0.0];
 	for(var i=0; i<this.actors.length; i++){
-		this.updateMetrics(this.actors[i].model.outline);
+		this.updateMetrics(this.actors[i].bb);
 	}
 };
 
@@ -156,7 +164,7 @@ vxlScene.prototype.addActor = function(actor){
     }
     
     this.actors.push(actor);
-    this.updateMetrics(actor.model.outline); //TODO: What if the actor moves? use actor bounding box instead
+    this.updateMetrics(actor.bb); 
     
     vxl.go.console('Scene: Actor for model '+actor.model.name+' added');
     vxl.c.actor = actor;

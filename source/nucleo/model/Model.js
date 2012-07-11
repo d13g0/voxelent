@@ -32,9 +32,9 @@ function vxlModel(name, JSON_OBJECT){
 	this.normals 	= null;
 	this.wireframe 	= null;
 	this.centre 	= null;
-	this.outline 	= null;
+	this.bb     	= null;
 	this.mode       = null;
-	//texture
+	//@TODO implement textures
     
     if (JSON_OBJECT != undefined){
         this.load(this.name, JSON_OBJECT);
@@ -61,7 +61,7 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
 	this.mode       = JSON_OBJECT.mode;	
 
 	if(this.normals == undefined && this.indices != undefined){
-		this.getNormals();
+		this.computeNormals();
 	}
 	
 	if(this.diffuse == undefined){
@@ -70,14 +70,13 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
 	}
 	
 	if (this.wireframe == undefined){
-		this.getWireframeIndices();
+		this.computeWireframeIndices();
 	}
 	
 	if (this.mode == undefined){
 		this.mode == vxl.def.actor.mode.SOLID;
 	}
-	this.getOutline();
-	this.getCentre();
+	this.computeBoundingBox();
 };
 
 
@@ -87,7 +86,7 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
  * @param {bool} reverse if true will calculate the reversed normals
  * 
  */
-vxlModel.prototype.getNormals = function(reverse){
+vxlModel.prototype.computeNormals = function(reverse){
 	if (reverse == undefined){
 		reverse = false;
 	}
@@ -160,7 +159,7 @@ vxlModel.prototype.getNormals = function(reverse){
 /**
  * Generate the wireframe indices using the model indices
  */  
-vxlModel.prototype.getWireframeIndices = function(){
+vxlModel.prototype.computeWireframeIndices = function(){
 	var ind = this.indices;
     var wfi = [];
 	var j = 0;
@@ -175,36 +174,35 @@ vxlModel.prototype.getWireframeIndices = function(){
 	}
 	this.wireframe = wfi;
 };
-/**
- * Calculate the centre of this model
- */  
-vxlModel.prototype.getCentre = function(){
-	  var bb = this.outline;
-      var c = [0, 0, 0];
-	  
-  	  c[0] = (bb[3] + bb[0]) /2;
-	  c[1] = (bb[4] + bb[1]) /2;
-	  c[2] = (bb[5] + bb[2]) /2;
-	  
-	  this.centre = c;
-};
+
 
 /**
- * Calculate the outline of this model (bounding box)
+ * Calculate the bounding box of this model and its centre
+ * 
  */
-vxlModel.prototype.getOutline = function(){	
+vxlModel.prototype.computeBoundingBox = function(){	
 	var vs = this.vertices;
-	var bb  = [vs[0],vs[1],vs[2],vs[0],vs[1],vs[2]];
+	var bbm  = [vs[0],vs[1],vs[2],vs[0],vs[1],vs[2]];
 	  
 	for(var i=0;i<vs.length;i=i+3){
-		bb[0] = Math.min(bb[0],vs[i]);
-		bb[1] = Math.min(bb[1],vs[i+1]);
-		bb[2] = Math.min(bb[2],vs[i+2]);
-		bb[3] = Math.max(bb[3],vs[i]);
-		bb[4] = Math.max(bb[4],vs[i+1]);
-		bb[5] = Math.max(bb[5],vs[i+2]);
+		bbm[0] = Math.min(bbm[0],vs[i]);
+		bbm[1] = Math.min(bbm[1],vs[i+1]);
+		bbm[2] = Math.min(bbm[2],vs[i+2]);
+		bbm[3] = Math.max(bbm[3],vs[i]);
+		bbm[4] = Math.max(bbm[4],vs[i+1]);
+		bbm[5] = Math.max(bbm[5],vs[i+2]);
 	}
-	this.outline = bb;
+	
+	
+	var c = [0, 0, 0];
+      
+    c[0] = (bbm[3] + bbm[0]) /2;
+    c[1] = (bbm[4] + bbm[1]) /2;
+    c[2] = (bbm[5] + bbm[2]) /2;
+    
+    
+    this.bb = bbm;  
+    this.centre = c;
 };
 
 

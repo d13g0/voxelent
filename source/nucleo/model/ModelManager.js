@@ -24,7 +24,6 @@
  * @author Diego Cantor
  */
 function vxlModelManager(){
-	this.firstLoadedModel = false; //analyze
 	this.toLoad = new Array(); //analyze
 	this.models = [];
 	vxl.go.notifier.addSource(vxl.events.MODELS_LOADED,this);
@@ -96,12 +95,6 @@ vxlModelManager.prototype.add = function(JSON_OBJECT,name,scene){
 	
 	var model = new vxlModel(name, JSON_OBJECT);
 	
-	
-	if (!this.firstLoadedModel){
-		scene.bb = model.outline;
-		this.firstLoadedModel = true;
-	}
-		
 	model.loaded = true;
 	this.models.push(model);
 	vxl.go.console('ModelManager: model '+model.name+' created.'); 

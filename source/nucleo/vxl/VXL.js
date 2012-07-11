@@ -227,8 +227,18 @@ c : {
 	actor		: undefined,  
 	animation 	: undefined
 },
-
+/**
+ * Utility functions
+ * @namespace Voxelent Util methods
+ * 
+ */
 util : {
+    /**
+     * Formats Arrays, vec3 and vec4 for display
+     * 
+     * @param {Array, vec3, vec4} arr the object to format
+     * @param {Number} digits the number of decimal figures
+     */
 	format: function(arr, digits){
 		var p = Math.pow(10,digits);
 		if (typeof(arr) == 'object'){
@@ -243,6 +253,26 @@ util : {
 			result = '[' + Math.round(arr * p) / p  + ']';
 		}
 		return result;
+	},
+	
+	/**
+	 * Creates a vector from a set of parameters
+	 * @param {Array, vec3, Number} x it can be an Array, a vec3 or a number
+	 * @param {Number} y if x is a number, this parameter corresponds to the y-component
+	 * @param {Number} z if x is a number, this parameter corresponds to the z-component
+	 */
+	createVec3: function(x,y,z){
+	    var vvv = vec3.create();
+	    if (x instanceof Array){
+            vec3.set(vec3.create(x), vvv)
+        }
+        else if (x instanceof determineMatrixArrayType()){
+            vec3.set(x, vvv)
+        }
+        else{
+            vec3.set(vec3.createFrom(x,y,z), vvv);
+        }
+        return vvv;
 	}
 }
 
