@@ -4029,15 +4029,14 @@ vxlCamera.prototype.dolly = function(value) {
  * @param {Number} dy the vertical displacement
  */
 vxlCamera.prototype.pan = function(tx, ty) {
-   vec3.add(this.tr,[tx,-ty,0]);
+   //vec3.add(this.tr,[tx,-ty,0]);
    
-   //mat4.translate(this.matrix, this.tr); 
+  
+   mat4.translate(this.matrix,  vec3.negate(this.position, vec3.create()));
+   vec3.add(this.position, [tx,-ty,0]);
+   mat4.translate(this.matrix, this.position); 
     
-   var m = this.matrix;
-    m[12] = this.position[0] + this.tr[0];
-    m[13] = this.position[1] + this.tr[1];
-    m[14] = this.position[2] + this.tr[2];
-    m[15] = 1;
+   
 };
 
 
