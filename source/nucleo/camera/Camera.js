@@ -253,15 +253,10 @@ vxlCamera.prototype.dolly = function(value) {
  * @param {Number} dx the horizontal displacement
  * @param {Number} dy the vertical displacement
  */
-vxlCamera.prototype.pan = function(tx, ty) {
-   //vec3.add(this.tr,[tx,-ty,0]);
-   
-  
+vxlCamera.prototype.pan = function(tx, ty) { 
    mat4.translate(this.matrix,  vec3.negate(this.position, vec3.create()));
    vec3.add(this.position, [tx,-ty,0]);
-   mat4.translate(this.matrix, this.position); 
-    
-   
+   mat4.translate(this.matrix, this.position);   
 };
 
 
