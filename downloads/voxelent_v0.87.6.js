@@ -4010,17 +4010,24 @@ vxlCamera.prototype.setElevation = function(el){
  */
 vxlCamera.prototype.dolly = function(value) {
     
-    var pos = vec3.create();
-    var p =  this.position;
-    var n =  this.normal; // the normal vector is always normalized. See calculateAxes
-    
+    var pos = vec3.create(this.position);
     var step = value*this.dstep;
    
-    var pos = vec3.create();
-    pos[0] = p[0] + step*n[0];
-    pos[1] = p[1] + step*n[1];
-    pos[2] = p[2] + step*n[2];
-    this.setPosition(pos); 
+    /* We dolly the camera along the camera normal (line of view) */
+    if (this.type == vxl.def.camera.type.TRACKING){
+	    var n =  this.normal; // the normal vector is always normalized. See calculateAxes
+	    pos[0] += step*n[0];
+	    pos[1] += step*n[1];
+	    pos[2] += step*n[2];
+	    
+    }
+    /* We dolly the camera along the z axis */
+    else if (this.type == vxl.def.camera.type.ORBITING){
+    	pos[2] = pos[2] + step; 
+    	
+    }
+    
+    this.setPosition(pos);
 };
 
 /**
@@ -4029,13 +4036,14 @@ vxlCamera.prototype.dolly = function(value) {
  * @param {Number} dy the vertical displacement
  */
 vxlCamera.prototype.pan = function(tx, ty) {
-   //vec3.add(this.tr,[tx,-ty,0]);
-   
   
-   mat4.translate(this.matrix,  vec3.negate(this.position, vec3.create()));
-   vec3.add(this.position, [tx,-ty,0]);
-   mat4.translate(this.matrix, this.position); 
-    
+   
+  if (this.type == vxl.def.camera.type.ORBITING){
+	   mat4.translate(this.matrix,  vec3.negate(this.position, vec3.create()));
+	   vec3.add(this.position, [tx,-ty,0]);
+	   mat4.translate(this.matrix, this.position); 
+  }
+  //@TODO: Implement for tracking camera  
    
 };
 
@@ -4069,9 +4077,6 @@ vxlCamera.prototype.clearRotation = function(){
     this.elevation = 0;
 };
 
-//vxlCamera.prototype.clearTranslation = function(){
-//    this.tr = vec3.create();
-//}
 
 
 /**
@@ -4084,7 +4089,6 @@ vxlCamera.prototype.clearRotation = function(){
 vxlCamera.prototype.clear = function(){
     this.computeAxes();
     this.clearRotation();
-    //this.clearTranslation();
     this.computeDistance();
 };
 
