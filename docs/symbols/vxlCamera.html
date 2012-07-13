@@ -353,6 +353,8 @@ height:135px;
 	
 	<li><a href="../symbols/vxl.go.html">vxl.go</a></li>
 	
+	<li><a href="../symbols/vxl.util.html">vxl.util</a></li>
+	
 	<li><a href="../symbols/vxl.version.html">vxl.version</a></li>
 	
 	<li><a href="../symbols/vxlActor.html">vxlActor</a></li>
@@ -436,7 +438,8 @@ height:135px;
 							<div class="fixedFont">
 								<b><a href="../symbols/vxlCamera.html#constructor">vxlCamera</a></b>(vw, t)
 							</div>
-							<div class="description">A vxlCamera object simplifies WebGL programming by providing a simple object interface to the lower levelmatrix manipulations that are required to view a 3D scene.</div>
+							<div class="description">A vxlCamera object simplifies WebGL programming by providing a simple object interface to the lower level
+matrix manipulations that are required to view a 3D scene.</div>
 						</td>
 					</tr>
 				</tbody>
@@ -465,52 +468,8 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#clear">clear</a></b>()
 								</div>
-								<div class="description">Calculates the new axis based on the current camera matrix,sets the rotations (azimuth and elevation) back to zero.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#clearRotation">clearRotation</a></b>()
-								</div>
-								<div class="description">Used by the tracker when done rotation.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#clearTranslation">clearTranslation</a></b>()
-								</div>
-								<div class="description"></div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#computeAxes">computeAxes</a></b>()
-								</div>
-								<div class="description">Updates the x,y and z axis of the camera according to the current camera matrix.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#computeDistance">computeDistance</a></b>()
-								</div>
-								<div class="description"></div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#computePosition">computePosition</a></b>()
-								</div>
-								<div class="description">Calculates the position based on the current distance</div>
+								<div class="description">Calculates the new axis based on the current camera matrix,
+sets the rotations (azimuth and elevation) back to zero.</div>
 							</td>
 						</tr>
 					
@@ -573,7 +532,9 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#refresh">refresh</a></b>()
 								</div>
-								<div class="description">This method updates the 3D sceneThis is the call stack:vxlCamera.refresh -> vxlView.refresh -> vxlRenderer.render</div>
+								<div class="description">This method updates the 3D scene
+This is the call stack:
+vxlCamera.refresh -> vxlView.refresh -> vxlRenderer.render</div>
 							</td>
 						</tr>
 					
@@ -634,9 +595,12 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#setFocus">setFocus</a></b>(x, y, z)
+								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#setFocalPoint">setFocalPoint</a></b>(x, y, z)
 								</div>
-								<div class="description">Sets the focus point of the cameraThis method has three parameters x,y,z which represent the coordinates for the camera's focus.</div>
+								<div class="description">Sets the focal point of the camera
+
+This method has three parameters x,y,z which represent the coordinates for 
+the camera's focus.</div>
 							</td>
 						</tr>
 					
@@ -645,7 +609,9 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#setPosition">setPosition</a></b>(x, y, z)
 								</div>
-								<div class="description">Sets the camera position in the sceneThis method has three parameters x,y,z which represent the coordinates for the camera's position.</div>
+								<div class="description">Sets the camera position in the scene
+This method has three parameters x,y,z which represent the coordinates for 
+the camera's position.</div>
 							</td>
 						</tr>
 					
@@ -663,7 +629,8 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#shot">shot</a></b>(bb)
 								</div>
-								<div class="description">This method sets the camera to a distance such that the area covered by the bounding box (parameter)is viewed.</div>
+								<div class="description">This method sets the camera to a distance such that the area covered by the bounding box (parameter)
+is viewed.</div>
 							</td>
 						</tr>
 					
@@ -673,15 +640,6 @@ height:135px;
 								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#status">status</a></b>()
 								</div>
 								<div class="description">Prints a summary of the camera variables on the browser's console</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlCamera.html#updateMatrix">updateMatrix</a></b>()
-								</div>
-								<div class="description">This method updates the current camera matrix upon changes in location, and rotation (azimuth, elevation)</div>
 							</td>
 						</tr>
 					
@@ -706,7 +664,14 @@ height:135px;
 				</div>
 
 				<div class="description">
-					A vxlCamera object simplifies WebGL programming by providing a simple object interface to the lower levelmatrix manipulations that are required to view a 3D scene.When moving and rotating the camera, such matrices are updated and Voxelent's Nucleo will use this informationin order to draw the scene accordingly to the camera position an orientation.A vxlCamera object requires a vxlView to be created. Having said that, a vxlView can be associated with multiple cameras.
+					A vxlCamera object simplifies WebGL programming by providing a simple object interface to the lower level
+matrix manipulations that are required to view a 3D scene.
+
+When moving and rotating the camera, such matrices are updated and Voxelent's Nucleo will use this information
+in order to draw the scene accordingly to the camera position an orientation.
+
+A vxlCamera object requires a vxlView to be created. Having said that, a vxlView can be associated with 
+multiple cameras.
 					<br /><i>Author: </i>Diego Cantor.
 				</div>
 
@@ -758,132 +723,11 @@ height:135px;
 
 					</div>
 					<div class="description">
-						Calculates the new axis based on the current camera matrix,sets the rotations (azimuth and elevation) back to zero.it also calculates the current distance to the focal pointIn short, it clears the camera to proceed with another transformation
-						
-						
-					</div>
+						Calculates the new axis based on the current camera matrix,
+sets the rotations (azimuth and elevation) back to zero.
+it also calculates the current distance to the focal point
 
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="clearRotation"> </a>
-					<div class="fixedFont">
-
-					
-					<b>clearRotation</b>()
-
-					</div>
-					<div class="description">
-						Used by the tracker when done rotation. Clear the temporary variables to store rotation.
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="clearTranslation"> </a>
-					<div class="fixedFont">
-
-					
-					<b>clearTranslation</b>()
-
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="computeAxes"> </a>
-					<div class="fixedFont">
-
-					
-					<b>computeAxes</b>()
-
-					</div>
-					<div class="description">
-						Updates the x,y and z axis of the camera according to the current camera matrix.This is useful when one needs to know the values of the axis and operate with them directly.Such is the case for zooming, where you need to know what is the normal axis to movealong it for dollying or zooming.
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="computeDistance"> </a>
-					<div class="fixedFont">
-
-					
-					<b>computeDistance</b>()
-
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="computePosition"> </a>
-					<div class="fixedFont">
-
-					
-					<b>computePosition</b>()
-
-					</div>
-					<div class="description">
-						Calculates the position based on the current distance
+In short, it clears the camera to proceed with another transformation
 						
 						
 					</div>
@@ -944,7 +788,10 @@ height:135px;
 
 					</div>
 					<div class="description">
-						Performs the dollying operation in the direction indicated by the camera normal axis.The dollying mechanism offered by a camera makes sure that the camera moves fasttowards the object when the distance is large and slow when it is very close to the object.For that effect, every time that the new position  (after dollying) is calculated, the field dstep is computed.
+						Performs the dollying operation in the direction indicated by the camera normal axis.
+The dollying mechanism offered by a camera makes sure that the camera moves fast
+towards the object when the distance is large and slow when it is very close to the object.
+For that effect, every time that the new position  (after dollying) is calculated, the field dstep is computed.
 						
 						
 					</div>
@@ -1055,7 +902,10 @@ height:135px;
 
 					</div>
 					<div class="description">
-						The camera moves to a position where all the actors in the scene are viewed. The actorsare seen in full within their surrounding environment.A long shot uses the global bounding box of the view's scene
+						The camera moves to a position where all the actors in the scene are viewed. The actors
+are seen in full within their surrounding environment.
+
+A long shot uses the global bounding box of the view's scene
 						
 						
 					</div>
@@ -1122,7 +972,9 @@ height:135px;
 
 					</div>
 					<div class="description">
-						This method updates the 3D sceneThis is the call stack:vxlCamera.refresh -> vxlView.refresh -> vxlRenderer.render
+						This method updates the 3D scene
+This is the call stack:
+vxlCamera.refresh -> vxlView.refresh -> vxlRenderer.render
 						
 						
 					</div>
@@ -1336,15 +1188,18 @@ height:135px;
 
 					<hr />
 				
-					<a name="setFocus"> </a>
+					<a name="setFocalPoint"> </a>
 					<div class="fixedFont">
 
 					
-					<b>setFocus</b>(x, y, z)
+					<b>setFocalPoint</b>(x, y, z)
 
 					</div>
 					<div class="description">
-						Sets the focus point of the cameraThis method has three parameters x,y,z which represent the coordinates for the camera's focus.
+						Sets the focal point of the camera
+
+This method has three parameters x,y,z which represent the coordinates for 
+the camera's focus.
 						
 						
 					</div>
@@ -1392,7 +1247,9 @@ height:135px;
 
 					</div>
 					<div class="description">
-						Sets the camera position in the sceneThis method has three parameters x,y,z which represent the coordinates for the camera's position.
+						Sets the camera position in the scene
+This method has three parameters x,y,z which represent the coordinates for 
+the camera's position.
 						
 						
 					</div>
@@ -1483,7 +1340,8 @@ height:135px;
 
 					</div>
 					<div class="description">
-						This method sets the camera to a distance such that the area covered by the bounding box (parameter)is viewed.
+						This method sets the camera to a distance such that the area covered by the bounding box (parameter)
+is viewed.
 						
 						
 					</div>
@@ -1534,31 +1392,6 @@ height:135px;
 						
 						
 
-					<hr />
-				
-					<a name="updateMatrix"> </a>
-					<div class="fixedFont">
-
-					
-					<b>updateMatrix</b>()
-
-					</div>
-					<div class="description">
-						This method updates the current camera matrix upon changes in location, and rotation (azimuth, elevation)
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
 					
 				
 			
@@ -1573,7 +1406,7 @@ height:135px;
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jul 10 2012 17:10:10 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Jul 13 2012 12:19:42 GMT-0400 (EDT)
 		</div>
         </div>
         </div>
