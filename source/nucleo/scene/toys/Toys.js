@@ -46,7 +46,7 @@ vxlSceneToys.prototype.update = function(){
  */
 vxlSceneToys.prototype.render = function(r){
     for(var t = 0, max = this.list.length; t < max; t +=1){
-        this.list[t].allocate(r);
-        this.list[t].render(r);
+        this.list[t]._allocate(r);
+        this.list[t]._render(r);
     }
 };

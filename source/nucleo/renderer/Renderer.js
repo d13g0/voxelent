@@ -27,22 +27,15 @@
  */
 function vxlRenderer(vw){
     
+	this.view       = vw;
 	this.renderRate = vxl.def.renderer.rate.NORMAL;
 	this.mode       = vxl.def.renderer.mode.TIMER;
     this.timerID    = 0;
-    
-    this.view       = vw;
-    
     this.gl         = this.getWebGLContext();
     this.prg        =   new vxlProgram(this.gl);
-
-      
     this.transforms = new vxlTransforms(vw);
-    
     this.currentProgram      = undefined;
-
-    this.setProgram(vxl.def.glsl.diffusive);
-   
+    this.setProgram(vxl.def.glsl.lambert);
 }
 
 /**
@@ -69,6 +62,7 @@ vxlRenderer.prototype.getWebGLContext = function(){
 		}
 	}
 	if (WEB_GL_CONTEXT == null) {
+		//@TODO: print a nicer jquery  alert
 		alert("Sorry: WebGL is not available on this browser. Have you tried the newest version of Firefox, Chrome or Safari?"); 
 		return;
 	}
@@ -83,21 +77,10 @@ vxlRenderer.prototype.getWebGLContext = function(){
 };
 
 /**
- * Sets the program 'diffusive' as the program by default to be used by this renderer
- * @param {vxl.def.glsl.program} program to make default
- */
-vxlRenderer.prototype.setDefaultProgram = function(program){
-    alert('setDefaultProgram is deprecated');
-};
-
-
-
-
-/**
  * Tries to add a new program definition to this renderer
- * @param {Object} program definition. See the diffuse and phong examples below.
+ * @param {Object} program definition. See the lambert and phong examples below.
  * @see {vxl.def.glsl.phong}
- * @see {vxl.def.glsl.diffuse}
+ * @see {vxl.def.glsl.lambert}
  */
 vxlRenderer.prototype.setProgram = function(program){
     
@@ -133,6 +116,17 @@ vxlRenderer.prototype.clear = function(){
 };
 
 /**
+ * Sets the rendering mode. Options are in vxl.def.renderer.mode
+ * This method updates the rendering mode and tries to restart the rendering process
+ * @param {String} mode the mode to set
+ */
+vxlRenderer.prototype.setMode = function(mode){
+    this.stop();
+    this.mode = mode;
+    this.start();   
+};
+
+/**
  * Starts the renderer
  */
 vxlRenderer.prototype.start = function(){
@@ -144,17 +138,6 @@ vxlRenderer.prototype.start = function(){
 	    vxl.go.console('Renderer: starting rendering at the fastest speed',true);
 		vxl.go.render();
 	}
-};
-
-/**
- * Sets the rendering mode. Options are in vxl.def.renderer.mode
- * This method updates the rendering mode and tries to restart the rendering process
- * @param {String} mode the mode to set
- */
-vxlRenderer.prototype.setMode = function(mode){
-    this.stop();
-    this.mode = mode;
-    this.start();   
 };
 
 /**

@@ -112,8 +112,17 @@ vxlView.prototype.clear = function(){
  */
 vxlView.prototype.resize = function(){
     var parent = this.canvas.parentNode;
-    this.width = $(parent).width()-5;       //@TODO: Review this -5 business here.... March 12/2012
+    this.width = $(parent).width()-5;       
     this.height = $(parent).height()-5;
+    
+    if (this.width > window.innerWidth - 5){
+    	this.width = window.innerWidth -5;
+    }
+    
+    if (this.height > window.innerHeight - 5){
+    	this.height = window.innerHeight - 5;
+    }
+    
     $(this.canvas).attr('width', this.width);
     $(this.canvas).attr('height', this.height);
 }

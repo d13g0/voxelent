@@ -62,8 +62,8 @@ def : {
      */
 	glsl			: { 
 						VERTEX_SHADER   : 'VERTEX_SHADER',
-                       
 						FRAGMENT_SHADER : 'FRAGMENT_SHADER'
+						
 					},
     /** 
      * @namespace Lookup Table Definitions 

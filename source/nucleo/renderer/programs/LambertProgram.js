@@ -17,9 +17,9 @@
 /**
  * @class
  */
-vxl.def.glsl.diffusive = {
+vxl.def.glsl.lambert = {
 	
-	ID : 'diffusive',
+	ID : 'lambert',
 
 	ATTRIBUTES : [
 	"aVertexPosition", 

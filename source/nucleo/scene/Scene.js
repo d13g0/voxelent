@@ -301,8 +301,8 @@ vxlScene.prototype.render = function(renderer){
 		}
 		else{
 			for(var a=0, actorCount = this.actors.length; a < actorCount; a+=1){
-				   this.actors[a].allocate(r);
-			       this.actors[a].render(r);
+				   this.actors[a]._allocate(r);
+			       this.actors[a]._render(r);
 			}
 	    }
 	//}
