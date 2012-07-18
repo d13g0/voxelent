@@ -130,7 +130,16 @@ def : {
                         * @property {String} ORBITING   Orbiting Camera - Around the World
                         * @property {String} TRACKING   Tracking Camera - First Person Camera
                         */
-    					type      : { ORBITING: 'ORBITING', TRACKING : 'TRACKING'}
+    					type      : { ORBITING: 'ORBITING', TRACKING : 'TRACKING'},
+    					
+    					right     : [1,0,0],
+    					up        : [0,1,0],
+    					normal    : [0,0,1],
+    					fov       : 30,
+    					near      : 0.1,
+    					far       : 10000
+    					
+    					
 					},
 				 	
     /**

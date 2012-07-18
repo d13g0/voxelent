@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - vxlProgram</title>
+		<title>JsDoc Reference - vxl.util</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -406,7 +406,7 @@ height:135px;
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class vxlProgram
+				Namespace vxl.util
 			</h1>
 
 <!-- ============================== class summary ========================== -->
@@ -414,17 +414,17 @@ height:135px;
 				
 				
 
-				
+				Voxelent Util methods
 
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_renderer_Program.js.html">Program.js</a>.
+					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_vxl_VXL.js.html">VXL.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class vxlProgram.">
-				<caption>Class Summary</caption>
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class vxl.util.">
+				<caption>Namespace Summary</caption>
 				<thead>
 					<tr>
 						<th scope="col">Constructor Attributes</th>
@@ -436,9 +436,9 @@ height:135px;
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/vxlProgram.html#constructor">vxlProgram</a></b>(gl)
+								<b><a href="../symbols/vxl.util.html#constructor">vxl.util</a></b>
 							</div>
-							<div class="description"></div>
+							<div class="description">Utility functions</div>
 						</td>
 					</tr>
 				</tbody>
@@ -452,7 +452,7 @@ height:135px;
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class vxlProgram.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class vxl.util.">
 					<caption>Method Summary</caption>
 					<thead>
 						<tr>
@@ -463,110 +463,20 @@ height:135px;
 					<tbody>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlProgram.html#disableAttribute">disableAttribute</a></b>(name)
+								<div class="fixedFont">vxl.util.<b><a href="../symbols/vxl.util.html#.createVec3">createVec3</a></b>(x, y, z)
 								</div>
-								<div class="description">Disables a vertex attribute array</div>
+								<div class="description">Creates a vector from a set of parameters</div>
 							</td>
 						</tr>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlProgram.html#enableAttribute">enableAttribute</a></b>(name)
+								<div class="fixedFont">vxl.util.<b><a href="../symbols/vxl.util.html#.format">format</a></b>(arr, digits)
 								</div>
-								<div class="description">Enables a vertex attribute array</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlProgram.html#getUniform">getUniform</a></b>(the)
-								</div>
-								<div class="description">Returns a uniform value from the cache maintained by vxlProgram</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlProgram.html#isLoaded">isLoaded</a></b>(ID)
-								</div>
-								<div class="description">Verifies if a program is loaded</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlProgram.html#isRegistered">isRegistered</a></b>(ID)
-								</div>
-								<div class="description">Verifies whether a program is loaded in the database or not</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlProgram.html#loadDefaults">loadDefaults</a></b>()
-								</div>
-								<div class="description">Loads the uniform defaults for the current program</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlProgram.html#loadProgram">loadProgram</a></b>(ID)
-								</div>
-								<div class="description">Loads a program</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlProgram.html#register">register</a></b>(the)
-								</div>
-								<div class="description">Register a program in the database</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlProgram.html#setAttributePointer">setAttributePointer</a></b>(name, numElements, type, norm, stride, offset)
-								</div>
-								<div class="description">This method tells the WebGL context how to access the information contained in theWebGL buffer associated with the attribute</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlProgram.html#setUniform">setUniform</a></b>(uniform, the, hint)
-								</div>
-								<div class="description">Sets a uniform.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlProgram.html#setUniforms">setUniforms</a></b>(an)
-								</div>
-								<div class="description">Sets all the uniforms defined by the object obj</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlProgram.html#useProgram">useProgram</a></b>(ID)
-								</div>
-								<div class="description">Uses a program from the database.</div>
+								<div class="description">Formats Arrays, vec3 and vec4 for display</div>
 							</td>
 						</tr>
 					
@@ -583,32 +493,21 @@ height:135px;
 			
 			<div class="details"><a name="constructor"> </a>
 				<div class="sectionTitle">
-					Class Detail
+					Namespace Detail
 				</div>
 
 				<div class="fixedFont">
-						<b>vxlProgram</b>(gl)
+						<b>vxl.util</b>
 				</div>
 
 				<div class="description">
-					
+					Utility functions
 					
 				</div>
 
 				
 
 
-					
-						<dl class="detailList">
-						<dt class="heading">Parameters:</dt>
-						
-							<dt>
-								 <b>gl</b>
-								
-							</dt>
-								<dd></dd>
-						
-						</dl>
 					
 					
 					
@@ -629,15 +528,15 @@ height:135px;
 					Method Detail
 				</div>
 				
-					<a name="disableAttribute"> </a>
-					<div class="fixedFont">
+					<a name=".createVec3"> </a>
+					<div class="fixedFont">&lt;static&gt; 
 
 					
-					<b>disableAttribute</b>(name)
+					<span class="light">vxl.util.</span><b>createVec3</b>(x, y, z)
 
 					</div>
 					<div class="description">
-						Disables a vertex attribute array
+						Creates a vector from a set of parameters
 						
 						
 					</div>
@@ -649,10 +548,22 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{String}</span> <b>name</b>
+									<span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>|<a href="../symbols/vec3.html">vec3</a>|Number}</span> <b>x</b>
 									
 								</dt>
-								<dd>the name of the attribute array to disable</dd>
+								<dd>it can be an Array, a vec3 or a number</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>y</b>
+									
+								</dt>
+								<dd>if x is a number, this parameter corresponds to the y-component</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>z</b>
+									
+								</dt>
+								<dd>if x is a number, this parameter corresponds to the z-component</dd>
 							
 							</dl>
 						
@@ -665,15 +576,15 @@ height:135px;
 
 					<hr />
 				
-					<a name="enableAttribute"> </a>
-					<div class="fixedFont">
+					<a name=".format"> </a>
+					<div class="fixedFont">&lt;static&gt; 
 
 					
-					<b>enableAttribute</b>(name)
+					<span class="light">vxl.util.</span><b>format</b>(arr, digits)
 
 					</div>
 					<div class="description">
-						Enables a vertex attribute array
+						Formats Arrays, vec3 and vec4 for display
 						
 						
 					</div>
@@ -685,10 +596,16 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{String}</span> <b>name</b>
+									<span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>|<a href="../symbols/vec3.html">vec3</a>|<a href="../symbols/vec4.html">vec4</a>}</span> <b>arr</b>
 									
 								</dt>
-								<dd>the name of the attribute array to enable</dd>
+								<dd>the object to format</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>digits</b>
+									
+								</dt>
+								<dd>the number of decimal figures</dd>
 							
 							</dl>
 						
@@ -697,418 +614,6 @@ height:135px;
 						
 						
 						
-						
-
-					<hr />
-				
-					<a name="getUniform"> </a>
-					<div class="fixedFont">
-
-					
-					<b>getUniform</b>(the)
-
-					</div>
-					<div class="description">
-						Returns a uniform value from the cache maintained by vxlProgram
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{String}</span> <b>the</b>
-									
-								</dt>
-								<dd>uniform id</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="isLoaded"> </a>
-					<div class="fixedFont">
-
-					
-					<b>isLoaded</b>(ID)
-
-					</div>
-					<div class="description">
-						Verifies if a program is loaded
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{String}</span> <b>ID</b>
-									
-								</dt>
-								<dd>the program id</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd>true if the program is loaded, false otherwise</dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name="isRegistered"> </a>
-					<div class="fixedFont">
-
-					
-					<b>isRegistered</b>(ID)
-
-					</div>
-					<div class="description">
-						Verifies whether a program is loaded in the database or not
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{String}</span> <b>ID</b>
-									
-								</dt>
-								<dd>program id</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd>true if the program is registered, false otherwise</dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name="loadDefaults"> </a>
-					<div class="fixedFont">
-
-					
-					<b>loadDefaults</b>()
-
-					</div>
-					<div class="description">
-						Loads the uniform defaults for the current program
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="loadProgram"> </a>
-					<div class="fixedFont">
-
-					
-					<b>loadProgram</b>(ID)
-
-					</div>
-					<div class="description">
-						Loads a program
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{String}</span> <b>ID</b>
-									
-								</dt>
-								<dd>the id of the program to load</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="register"> </a>
-					<div class="fixedFont">
-
-					
-					<b>register</b>(the)
-
-					</div>
-					<div class="description">
-						Register a program in the database
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Object}</span> <b>the</b>
-									
-								</dt>
-								<dd>program to register</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="setAttributePointer"> </a>
-					<div class="fixedFont">
-
-					
-					<b>setAttributePointer</b>(name, numElements, type, norm, stride, offset)
-
-					</div>
-					<div class="description">
-						This method tells the WebGL context how to access the information contained in theWebGL buffer associated with the attribute
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{String}</span> <b>name</b>
-									
-								</dt>
-								<dd>name of the attribute</dd>
-							
-								<dt>
-									<b>numElements</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<b>type</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<b>norm</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<b>stride</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<b>offset</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="setUniform"> </a>
-					<div class="fixedFont">
-
-					
-					<b>setUniform</b>(uniform, the, hint)
-
-					</div>
-					<div class="description">
-						Sets a uniform.Uses polymorphism to make the programmers life happier
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{String}</span> <b>uniform</b>
-									
-								</dt>
-								<dd>name</dd>
-							
-								<dt>
-									<span class="light fixedFont">{Object}</span> <b>the</b>
-									
-								</dt>
-								<dd>value</dd>
-							
-								<dt>
-									<b>hint</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="setUniforms"> </a>
-					<div class="fixedFont">
-
-					
-					<b>setUniforms</b>(an)
-
-					</div>
-					<div class="description">
-						Sets all the uniforms defined by the object obj
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Object}</span> <b>an</b>
-									
-								</dt>
-								<dd>object containing uniform names and values. Every property of this objectwill be considered a uniform</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="useProgram"> </a>
-					<div class="fixedFont">
-
-					
-					<b>useProgram</b>(ID)
-
-					</div>
-					<div class="description">
-						Uses a program from the database.If you are not sure if the program you want to use is in the database then call vxlRenderer.setProgram instead
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{String}</span> <b>ID</b>
-									
-								</dt>
-								<dd>the program id</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">See:</dt>
-							
-								<dd><a href="../symbols/vxlRenderer.html#setProgram">vxlRenderer#setProgram</a></dd>
-							
-							</dl>
 						
 
 					
