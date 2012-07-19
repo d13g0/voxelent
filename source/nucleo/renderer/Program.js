@@ -15,6 +15,14 @@
 ---------------------------------------------------------------------------*/  
 
 /**
+ * <p>Presents a simple interface to communicate with a ESSL (GLSL) program
+ * This class is responsible for creating, compiling and linking any ESSL program.
+ * It also has methods to query and set uniforms and attributes belonging to the program
+ * that is being currently executed in the GPU</P>
+ * 
+ * <p>a vxlProgram maintains a database of the programs that have been linked to the GPU. 
+ * This way, program switching is easier as it is not necessary to go through the 
+ * compilation and linking process every time</p>
  * @class
  * @constructor
  */
@@ -37,9 +45,13 @@ function vxlProgram (gl) {
 
 /**
  * Register a program in the database
- * @param {Object} the program to register
+ * @param {JSON} the program to register
  */
 vxlProgram.prototype.register = function(glslObject){
+	/*@TODO: this method receives a JSON Object we could instead
+	 * receive a text file and parse it into JSON. This would make
+	 * the writing of shaders much easier.
+	 */
 	vxl.go.console('Registering program '+ glslObject.ID);
     this._codebase[glslObject.ID] = glslObject;
 };
@@ -228,7 +240,8 @@ vxlProgram.prototype.disableAttribute = function(name){
 
 /**
  * Creates a WebGL shader
- * This method is private.
+ * 
+ * @private This method is private.
  */
 vxlProgram.prototype._createShader = function(type,code){
     var gl      = this._gl;
@@ -259,11 +272,15 @@ vxlProgram.prototype._createShader = function(type,code){
 /**
  * Parses uniforms
  * This method is private
+ * @private
+ * 
  */
 vxlProgram.prototype._parseUniforms = function(id){
     
     vs = this._codebase[this._currentProgramID].VERTEX_SHADER;
     fs = this._codebase[this._currentProgramID].FRAGMENT_SHADER;
+    /*@TODO: look for a way to retrieve uNames directly from the parsing of the shaders
+    this should simplify the structure of the JSON file representing the program*/
     uNames = this._codebase[this._currentProgramID].UNIFORMS;
     
     uTypes = {};
@@ -271,7 +288,7 @@ vxlProgram.prototype._parseUniforms = function(id){
     
     for (var i=0;i< uNames.length; i++){
         var uniformID = uNames[i];
-        var rex = new RegExp('uniform.*'+uniformID,'g');
+        var rex = new RegExp('uniform\\s+\\w+\\s'+uniformID,'g');
         
         if (vs.search(rex) != -1){
             uTypes[uniformID] = vs.substring(vs.search(rex),vs.length).substring(0,vs.indexOf(';')).split(' ')[1];
@@ -295,6 +312,7 @@ vxlProgram.prototype._parseUniforms = function(id){
  * Obtains an attribute location
  * This method is private
  * @param {String} name
+ * @private
  */
 vxlProgram.prototype._getAttributeLocation = function(name){
 
@@ -310,6 +328,7 @@ vxlProgram.prototype._getAttributeLocation = function(name){
  * program database, it will do the appropriate gl call to set the uniform
  * This method is private. Use setUniform instead.
  * @see vxlProgram#setUniform
+ * @private 
  */
 vxlProgram.prototype._setPolymorphicUniform = function(uniformID, locationID,value,hint){
 

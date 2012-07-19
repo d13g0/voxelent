@@ -27,15 +27,18 @@
  */
 function vxlRenderer(vw){
     
-	this.view       = vw;
-	this.renderRate = vxl.def.renderer.rate.NORMAL;
-	this.mode       = vxl.def.renderer.mode.TIMER;
-    this.timerID    = 0;
-    this.gl         = this.getWebGLContext();
-    this.prg        =   new vxlProgram(this.gl);
-    this.transforms = new vxlTransforms(vw);
-    this.currentProgram      = undefined;
-    this.setProgram(vxl.def.glsl.lambert);
+	this.view       	= vw;
+	this.renderRate 	= vxl.def.renderer.rate.NORMAL;
+	this.mode       	= vxl.def.renderer.mode.TIMER;
+    this.timerID    	= 0;
+    this.gl         	= this.getWebGLContext();
+    this.prg        	=   new vxlProgram(this.gl);
+    this.transforms 	= new vxlTransforms(vw);
+    this.currentProgram = undefined;
+    this.strategy 		= undefined;
+    
+    this.setProgram(vxl.def.glsl.lambert, vxlBasicStrategy);
+    
 }
 
 /**
@@ -78,11 +81,12 @@ vxlRenderer.prototype.getWebGLContext = function(){
 
 /**
  * Tries to add a new program definition to this renderer
- * @param {Object} program definition. See the lambert and phong examples below.
+ * @param {Object} program JSON program definition.
+ * @param {vxlRenderStrategy} strategy 
  * @see {vxl.def.glsl.phong}
  * @see {vxl.def.glsl.lambert}
  */
-vxlRenderer.prototype.setProgram = function(program){
+vxlRenderer.prototype.setProgram = function(program,strategy){
     
     if(this.currentProgram != undefined && this.currentProgram == program){
         return;
@@ -101,6 +105,14 @@ vxlRenderer.prototype.setProgram = function(program){
 	prg.loadDefaults();
 	
 	this.currentProgram = program;
+	
+	if(strategy != null && strategy != undefined){
+		this.strategy = new strategy(this);
+		//this.strategy.renderer = this;
+	}
+	else{
+		this.strategy = new vxlBasicStrategy(this);
+	}
 };
 
 
@@ -180,7 +192,7 @@ vxlRenderer.prototype.setRenderRate = function(rate){ //rate in ms
  * @see vxlView#setBackgroundColor
  */
 vxlRenderer.prototype.clearColor = function(cc){
-	this.gl.clearColor(cc[0], cc[1], cc[2], cc[3]);
+	this.gl.clearColor(cc[0], cc[1], cc[2], 1.0);
 };
 
 /**
@@ -198,3 +210,26 @@ vxlRenderer.prototype.render = function(){
     this.clear();	
     this.view.scene.render(this);
 };
+
+/**
+ * @private 
+ * 
+ */
+vxlRenderer.prototype._allocateActor = function(actor){
+	return this.strategy.allocate(actor);
+}
+
+/**
+ * @private 
+ */
+vxlRenderer.prototype._deallocateActor = function(actor){
+	this.strategy.deallocate(actor);
+} 
+
+/**
+ * @private 
+ */
+ 
+ vxlRenderer.prototype._renderActor = function(actor){
+ 	this.strategy.render(actor);
+ }

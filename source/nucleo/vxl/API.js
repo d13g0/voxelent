@@ -249,11 +249,13 @@ vxl.api = {
  
 
 /**
- * Sets the background colour of this view.
- * @param color a 4-valued array containing the [r,g,b,a] values to use.
+ * Sets the background color of the current view.
+ * @param {Number, Array, vec3} r it can be the red component, a 3-dimensional Array or a vec3 (glMatrix)
+ * @param {Number} g if r is a number, then this parameter corresponds to the green component
+ * @param {Number} b if r is a number, then this parameter corresponds to the blue component
  */ 
- setBackgroundColor :  function(color){
-	vxl.c.view.setBackgroundColor(color);
+ setBackgroundColor :  function(r,g,b){
+	vxl.c.view.setBackgroundColor(r,g,b);
  },
 
 
@@ -467,10 +469,12 @@ wireframeON :  function(){
  
  /**
   * Loads a program
-  * @param definition one of voxelent's programs
+  * @param{vxlView} view the view to configure
+  * @param{Object} program a JSON object that defines the progrma to execute
+  * @param{vxlRenderStrategy} strategy the strategy that the renderer should follow to communicate with the program
   */
- setProgram :  function(view,program){
-    view.renderer.setProgram(program);
+ setProgram :  function(view,program,strategy){
+    view.renderer.setProgram(program,strategy);
     
  },
  

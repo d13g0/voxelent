@@ -20,25 +20,54 @@
 //@NOTE: A possible optimization is to combine several actors in one buffer. Watch optimzation video on YouTube by Gregg Tavares
 
 /**
+ * <p>
+ * An actor is a representation of a model in voxelent. Actors can cache model properties 
+ * and modified them. This is useful when there are several actors based in the same model
+ * but each one of them needs to have a different version of any given model property (i.e. color)
+ * </p>
+ * <p> 
+ * To propagate one change for all the actors based in the same model, the setProperty method
+ * should be invoked by setting the third parameter (scope) like this:
+ * </p>
+ * 
+ * <pre>
+ * var actor = vxl.c.scene.getActorByName('example.json');
+ * actor.setProperty('color',[1.0,0.0,0.0], vxl.def.model)
+ * </pre>
+ * 
+ * <p>If the change should be local (for just that actor)  then you should write:</p>
+ * 
+ * <pre>
+ * var actor = vxl.c.scene.getActorByName('example.json');
+ * actor.setProperty('color',[1.0,0.0,0.0], vxl.def.actor)
+ * </pre>
+ * 
+ * <p> Or simply </p>
+ *  
+ * <pre>
+ * var actor = vxl.c.scene.getActorByName('example.json');
+ * actor.setProperty('color',[1.0,0.0,0.0])
+ * </pre>
  * @class
  * @constructor
  */
 function vxlActor(model){
   
   this.bb = [0, 0, 0, 0, 0, 0];
-  this.allocated = false;
+  this.position 	= vec3.create([0, 0, 0]);
+  this.scale 		= vec3.create([1, 1, 1]);
+  this.rotation 	= vec3.create([0, 0, 0]);
+
   this.visible   = true;
   this.mode = vxl.def.actor.mode.SOLID;
   this.opacity = 1.0;
   this.colors = model?(model.colors!=null?model.colors:null):null;	//it will create colors for this actor once a lookup table had been set up
-  this.position 	= vec3.create([0, 0, 0]);
-  this.scale 		= vec3.create([1, 1, 1]);
-  this.rotation 	= vec3.create([0, 0, 0]);
-  this.program       = undefined;
-  this.picking_color = undefined;
   this.clones  = 0;
-  this.strategy = new vxlBasicStrategy();
+  
+  this._renderers = [];
+  this._gl_buffers = [];
 
+  
   if (model){
   	this.model 	 = model;
   	this.name 	 = model.name;
@@ -46,6 +75,7 @@ function vxlActor(model){
   	this.bb 	 = model.bb.slice(0);
   	this.mode    = model.mode==undefined?vxl.def.actor.mode.SOLID:model.mode;
   }
+  
 };
 
 
@@ -56,7 +86,7 @@ function vxlActor(model){
  * is initially [0,0,0] and it is relative to the model centre. If the model is not centered in 
  * the origin, then the actor's position will be relative to the model centre.
  * 
- * @param {Number, Array, vec3} x it can be the x coordinate, a 3-dimensional Array or a glMatrix vec3
+ * @param {Number, Array, vec3} x it can be the x coordinate, a 3-dimensional Array or a vec3 (glMatrix)
  * @param {Number} y if x is a number, then this parameter corresponds to the y-coordinate
  * @param {Number} z if x is a number, then this parameter corresponds to the z-coordinate
  */
@@ -121,21 +151,54 @@ vxlActor.prototype.setOpacity = function(o){
  * If the property exists, then it updates it
  * @param {String} property 
  * @param {Object} value 
+ * @param {String} scope indicates if the change is made at the actor level or at the model level
+ * valid values for scope are vxl.def.model and vxl.def.actor
  * @TODO: if the property is position or scale then call the respective methods from here
  */
-vxlActor.prototype.setProperty = function(property, value){
-    if (property == 'position') throw 'Actor.setProperty(position), please use setPosition instead';
-    if (property == 'scale')    throw 'Actor.setProperty(scale), please use setScale instead';
+vxlActor.prototype.setProperty = function(property, value, scope){
     
-	if (this.hasOwnProperty(property)){
+    if (property == 'position') {
+    	this.setPosition(value);
+    	return;
+    }
+    
+    if (property == 'scale')    {
+    	this.setScale(value);
+    	return;
+    }
+    
+    if (scope == vxl.def.actor || scope == undefined || scope == null){
 		this[property] = value;
 		vxl.go.console('Actor: The actor '+this.name+' has been updated. ['+property+' = '+value+']');
 	}
-	else {
-		throw ('Actor: the property '+ property+' does not exist');
+	else if(scope == vxl.def.model){
+		this.model[property] = value;
 	}
+	else{
+		throw('vxlActor.setProperty. Scope:' + scope +' is not valid');
+	}
+	
 };
 
+/**
+ * Returns an actor property if that property exists in the actor. Otherwise it will search 
+ * in the model. This method is used by the renderer. There are some cases where actors have local changes
+ * that are not reflected in the model. In these cases the renderer should pick the actor property
+ * over the model property
+ * @param{String} property the property name
+ * @returns{Object} the property or undefined if the property is not found 
+ */
+vxlActor.prototype.getProperty = function(property){
+	if (this.hasOwnProperty(property)) {
+		return this[property];
+	}
+	else if (this.model.hasOwnProperty(property)){
+		return this.model[property];
+	}
+	else {
+		return undefined;
+	}
+};
 
 /**
  * Estimates the current position as
@@ -254,7 +317,15 @@ vxlActor.prototype.clone = function(){
 * voxelent. Do not invoke directly.
 */
 vxlActor.prototype._allocate = function(renderer){
-	this.strategy.allocate(this,renderer);
+	if (this._renderers.indexOf(renderer)!=-1){ //if this renderer has been allocated then ignore
+   		return;
+   }
+   
+   var buffers = renderer._allocateActor(this);
+   
+   this._renderers.push(renderer);
+   this._gl_buffers.push(buffers);
+
 };
 
 /**
@@ -264,8 +335,8 @@ vxlActor.prototype._allocate = function(renderer){
 * This method is private and it is only supposed to be called by other objects inside
 * voxelent. Do not invoke directly. 
 */
-vxlActor.prototype._deallocate = function(){
-  this.strategy.deallocate(this,renderer);
+vxlActor.prototype._deallocate = function(renderer){
+  renderer._deallocateActor(this);
 };
 
 /**
@@ -280,6 +351,6 @@ vxlActor.prototype._render = function(renderer){
 	if (!this.visible){ 
 		return;
 	}
-	this.strategy.render(this, renderer);
+	renderer._renderActor(this);
 };
 

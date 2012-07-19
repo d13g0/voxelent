@@ -1,163 +1,263 @@
-import sys,string,traceback
+# -----------------------------------------------------------------------------------------------
+# vxl_obj_importer.py 
+# only has has two arguments: the obj file containing the geometry and the mtl file containing the materials (optional)
+# Author: dcantor
+# -----------------------------------------------------------------------------------------------
+
+
+import sys,os,string,traceback,pprint
 from threading import Thread
 
-#vox-obj-importer.py only has one argument: the name of the obj file to process (include the extension please)
+MATERIALS = {}  #dictionary for materials
+OBJECTS = {}
 
-ARRAY_SIZE = 65536*3
-# ver - vertices
-# ind - indices
-# seg - segment
+FILE = ''
 
-def reindexBlock(ver,ind, pod, blockID):
-    lowerBound  = ARRAY_SIZE*blockID
-    upperBound = ARRAY_SIZE*(blockID+1);
-    if upperBound > len(ind):
-        upperBound = len(ind)
-    newindex = dict()
-    mapIndexToVertex = dict()
-    vtxBlock = []
-    idxBlock = []
-    pdxBlock = []
-    hasPointData = len(pod)>0
-    # Set of indices to be processed
-    aux = ind[lowerBound:upperBound]
-    nidx = -1
-    #item = 1
+def createWebGLFile():
+    mf = open('manifest.txt','w')
+    mf.write('original OBJ file: ' + FILE +'\n')
+    print('\n=== WebGL Output ===')
+    partNumber = 1
     
-    print 'Processing block #' + str(blockID+1) + '['+str(lowerBound)+','+str(upperBound)+']'
+    nor = OBJECTS['normals']
     
-    try:
-    #for each index to be processed
-        for oidx in aux:
-            # if index hasn't been mapped
-            if oidx not in newindex.keys():
-                nidx = nidx + 1
-                # create new index for the old index (incrementally)
-                idxBlock.append(nidx)
-                # save in the map for posterior searches
-                newindex[oidx] = nidx
-                # multiply by three to find the right starting point in the vertex array
-                index = oidx * 3
-                # add the correspondant vertex into the new position in the new vertex array
-                vtxBlock.append(ver[index])
-                vtxBlock.append(ver[index+1])
-                vtxBlock.append(ver[index+2])
-                # add the correspondant point data if any
-                if hasPointData :
-                    pdxBlock.append(pod[oidx])
-            else:
-                # if the index was mapped then use it in the new index array
-                idxBlock.append(newindex[oidx])
-    except:
-        #traceback.print_stack()
-        raise
-    return vtxBlock, idxBlock, pdxBlock
-  
-    
-def createFileBlock(vertices, indices, scalars, blockID):
-    fname = sys.argv[1][:-4]
-    vv, ii, dd = reindexBlock(vertices, indices, scalars, blockID)
-    filename =fname+'_'+str(blockID)+'.json'
-    createWebGLFile(filename,vv,ii,dd)
-    print 'Block #' + str(blockID) +' processed'
-
-  
-  
- 
-def createWebGLFile(fname,ver,ind,count):
-    ilen = len(ind)
-    vlen = len(ver)/3
-    rvlen = len(ver)
-    imin = min(ind)
-    print 'Writing file pr'+ str(count)+'.json > '+ fname +' [ vertices:' + str(vlen) + ', indices: ' + str(ilen) +']'
-    f = open('pr'+str(count)+'.json','w')
-    f.write('{\n')
-    f.write('  "obj_name" : "'+fname+'",\n')
-    f.write('  "vertices" : [')
-    for v in ver[0:rvlen-1]:
-        f.write(str(v)+',')
-    f.write(str(ver[rvlen-1])+'],\n')
-    f.write('  "indices" : [')
-    #Given that in an obj file the indexes are continuous from group to group...
-    #the following line makes sure that each file has indexes that are ZERO based
-    
-    indx = [x-imin for x in ind]
-    for i in indx[0:ilen-1]:
-        f.write(str(i)+',')
-    f.write(str(indx[ilen-1])+']')
-    f.write('\n');
-    f.write('}')
-    f.close()
-    
-NOWHERE = 0    
-GROUP = 1
-
-location = NOWHERE
-
-vertices = []
-indices = []
-normals = []
-scalars = []
-
-linenumber = 0
-group_count = 0
-name = 'anonymous'
-
-for line in open(sys.argv[1], 'r').readlines():
-    linenumber = linenumber + 1
-    try:
-        if line.startswith('g '):
-            group_count = group_count + 1
-            #save results from last group
-            lv = len(vertices)
-            lf = len(indices)
-            if (lv >0 and lf >0):
-                createWebGLFile(name, vertices,indices,group_count-1)
-                vertices = []
-                indices = []
-            location = GROUP 
-            name = line[1:line.find('\n')]
+    for obj in OBJECTS:
+        if obj == 'normals':
             continue
-        elif location == GROUP:
-            if line.startswith('v '):
-                for v in line[1:len(line)].split():
-                    vertices.append(float(v))
-            elif line.startswith('f '):
-                f = line[1:len(line)].split()
-                pl = len(f)
-                if (pl == 4):
-                    #as the face is abcd and we need triangles
-                    #change from a-b-c-d to a-b-c a-c-d
-                    fa = int(f[0][0:f[0].find('/')]);
-                    fb = int(f[1][0:f[1].find('/')]);
-                    fc = int(f[2][0:f[2].find('/')]);
-                    fd = int(f[3][0:f[3].find('/')]);              
-                    indices.append(fa)
-                    indices.append(fb)
-                    indices.append(fc)
-                    indices.append(fa)
-                    indices.append(fc)
-                    indices.append(fd)
-                elif (pl == 3):
-                    fa = int(f[0][0:f[0].find('/')]);
-                    fb = int(f[1][0:f[1].find('/')]);
-                    fc = int(f[2][0:f[2].find('/')]);
-                    indices.append(fa)
-                    indices.append(fb)
-                    indices.append(fc)
+        ver = OBJECTS[obj]['vertices']
+        
+        
+        allIndicesForObject = []
+
+        for grp in OBJECTS[obj]['group']:                                   # The idea here is to get the minimum index per object
+            allIndicesForObject += OBJECTS[obj]['group'][grp]['indices']    # so the indices of every group belonging to the same object
+    
+        
+        if len(allIndicesForObject) == 0:
+            print('Warning: the object ' + obj + ' will not generate a JSON file as it has no groups')
+            continue
+        minIndex = min(allIndicesForObject)                                 # can be reindexed (starting on zero per group) for WebGL
+        
+        
+        for grp in OBJECTS[obj]['group']:
+            ind = OBJECTS[obj]['group'][grp]['indices']
+            normals_idx = OBJECTS[obj]['group'][grp]['normals_idx']
+
+            numIndices = len(ind)
+            numVertices = len(ver)
+            numIndNormals = len(normals_idx)
+            
+            print ('Writing file part'+ str(partNumber)+'.json > [ alias: '+grp+' vertices:' + str(numVertices/3) + ', indices: ' + str(numIndices) +']')
+            mf.write('part'+ str(partNumber)+'.json > alias: '+grp+'\n')
+            f = open('part'+str(partNumber)+'.json','w')
+            
+            partNumber +=1
+            f.write('{\n')
+            f.write('  "name" : "'+grp+'",\n')                 # ALIAS
+            
+            f.write('  "vertices" : [')                         # VERTICES
+            for v in ver[0:numVertices-1]:
+                f.write(str(v)+',')
+            f.write(str(ver[numVertices-1])+'],\n')
+            
+            f.write('  "indices" : [')                          # INDICES
+            
+            for i in ind[0:numIndices-1]:
+                f.write(str(i-minIndex)+',')                  
+            f.write(str(ind[numIndices-1]-minIndex)+'],\n')
+            
+            #f.write('  "normals" : [')
+            
+            #for j in normals_idx[0:numIndNormals-1]:
+            #    jk = 3 * (j-1)
+            #    f.write(str(nor[jk])+','+str(nor[jk+1])+','+str(nor[jk+2])+',')
+            #jk = 3 * (normals_idx[numIndNormals-1]-1)
+            #f.write(str(nor[jk])+','+str(nor[jk+1])+','+str(nor[jk+2])+'],\n')
+            
+            useMat = OBJECTS[obj]['group'][grp]['material']     # MATERIALS 
+            #print ' group ' +grp+' uses mat = ' + useMat
+            if useMat == '(null)' or len(useMat) == 0:
+                print ('Warning: the group '+grp+' does not have materials')
+                continue
+            mat = MATERIALS[useMat]
+            numKeys = len(mat)
+            currKey = 1;
+            for key in mat:
+                f.write('  "'+key+'" : ')
+                if type(mat[key]) is float:
+                    f.write("%.5f" % mat[key])
+                elif type(mat[key]) is int:
+                    f.write(str(mat[key]))
                 else:
-                    print 'special face: ' + str(pl) + ' elements in line: ' + str(linenumber) 
-                    fa = int(f[0][0:f[0].find('/')])
-                    for i in range(pl-3):
-                        fb = int(f[i+1][0:f[i+1].find('/')]);
-                        fc = int(f[i+2][0:f[i+2].find('/')]);
+                    numNum = len(mat[key])
+                    currNum = 1;
+                    f.write('[')
+                    for num in mat[key]:
+                        s = "%.5f" % num
+                        f.write(s)
+                        if currNum < numNum:
+                            f.write(',')
+                        currNum +=1
+                    f.write(']')
+                
+                if (currKey < numKeys):
+                    f.write(',\n')
+                else:
+                    f.write('\n')
+                currKey+=1
+            
+            f.write('}')
+            f.close()
+    mf.close();
+    
+def parseGeometry(file, hasMaterials):    
+    print('\n=== Geometry ===')    
+    LOC_NOWHERE = 0    
+    LOC_OBJECT = 1
+    LOC_GROUP = 2
+
+    location = LOC_NOWHERE
+
+    vertices    = []
+    indices     = []
+    normals     = []
+    normals_idx = []
+    scalars     = []
+    material    = {}
+    
+    nLine = 0
+    
+    OBJECT_NAME = ''
+    GROUP_NAME = ''
+    MATERIAL_NAME = ''
+     
+    OBJECTS['normals'] = []
+
+    for line in open(file, 'r').readlines():
+        nLine = nLine + 1
+        try:
+            if line.startswith('usemtl') and hasMaterials:            #there is a material definition file associated .mtl (second argument on cmd line)
+                    words = line.split()
+                    if (len(words) == 2):
+                        MATERIAL_NAME = words[1]
+                    else:
+                        MATERIAL_NAME = 'undefined'
+                    OBJECTS[OBJECT_NAME]['group'][GROUP_NAME]['material'] = MATERIAL_NAME
+                    print ('\tMaterial: '+MATERIAL_NAME)
+            
+            elif line.startswith('o '):                                       #Processing an new object
+                OBJECT_NAME = line.split()[1]
+                location = LOC_OBJECT
+                
+                OBJECTS[OBJECT_NAME] = {}
+                OBJECTS[OBJECT_NAME]['vertices'] = []
+                
+                OBJECTS[OBJECT_NAME]['group']    = {}
+                vertices = OBJECTS[OBJECT_NAME]['vertices']             #aliasing
+                normals = OBJECTS['normals']               #aliasing
+                
+                print ('\nObject: ' + OBJECT_NAME)
+                
+
+            
+            elif line.startswith('g '):                                     #Processing a new group
+                GROUP_NAME = line.split()[1]
+                location = LOC_GROUP
+                
+                OBJECTS[OBJECT_NAME]['group'][GROUP_NAME]                   = {}
+                OBJECTS[OBJECT_NAME]['group'][GROUP_NAME]['indices']        = []
+                OBJECTS[OBJECT_NAME]['group'][GROUP_NAME]['normals_idx']    = []
+                indices     = OBJECTS[OBJECT_NAME]['group'][GROUP_NAME]['indices']          #aliasing so we can store here
+                normals_idx = OBJECTS[OBJECT_NAME]['group'][GROUP_NAME]['normals_idx']    #aliasing so we can store here
+                print '\tGroup: ' + GROUP_NAME
+
+            
+            elif location == LOC_OBJECT:                                    #Add vertices to current object
+                if line.startswith('v '):
+                    for v in line[1:len(line)].split():
+                        vertices.append(float(v))
+            
+                if line.startswith('vn '):
+                    for vn in line[3:len(line)].split():
+                        normals.append(float(vn))
+                        
+            elif location == LOC_GROUP:                                     #Add indices to current group
+                if line.startswith('f '):
+                    f = line[1:len(line)].split()
+                    pl = len(f)
+                    if (pl == 3):                                         #ideal case for WebGL: all faces are triangles
+                        fa = int(f[0][0:f[0].find('/')]);
+                        fb = int(f[1][0:f[1].find('/')]);
+                        fc = int(f[2][0:f[2].find('/')]);
                         indices.append(fa)
                         indices.append(fb)
                         indices.append(fc)
+                        na = int(f[0][f[0].rfind('/')+1:len(f[0])]);
+                        nb = int(f[1][f[1].rfind('/')+1:len(f[1])]);
+                        nc = int(f[2][f[2].rfind('/')+1:len(f[2])]);
+                        normals_idx.append(na)
+                        normals_idx.append(nb)
+                        normals_idx.append(nc)
+                    else:
+                        print ('ERROR: faces need to be triangular')
+                        raise
+            
+
+        except:
+            print ('ERROR while processing line:  '+str(nLine))
+            print line
+            raise
+    #pp = pprint.PrettyPrinter(indent=2, width=300)
+    #pp.pprint(OBJECTS)
+    
+def parseMaterials(file):
+    if (len(file) == 0):
+        return False
+    print ('\n=== Materials ===')
+    linenumber = 0;
+    currentMaterial = ''
+    for line in open(file, 'r').readlines():
+        linenumber = linenumber + 1
+        try:
+            if line.startswith('newmtl'):
+                words = line.split()
+                if (len(words) == 2):
+                    currentMaterial = words[1]
+                else:
+                    currentMaterial = 'undefined'
+                print ('Material: ' + currentMaterial) 
+                MATERIALS[currentMaterial] = {}
+            elif line.startswith('illum'):
+                words = line.split()
+                MATERIALS[currentMaterial][words[0]] = int(words[1])
+            elif line.startswith('Ns') or line.startswith('Ni') or line.startswith('d'):
+                words = line.split()
+                MATERIALS[currentMaterial][words[0]] = float(words[1])
+            elif line.startswith('Ka') or line.startswith('Kd') or line.startswith('Ks'):
+                words = line.split()
+                MATERIALS[currentMaterial][words[0]] = [float(words[1]), float(words[2]), float(words[3])]
             continue
-    except:
-        print 'Error while processing line '+str(linenumber)
-        print line
-        raise
-createWebGLFile(name,vertices,indices,group_count)
-print 'END'
+        except:
+            print ('Error while processing line '+str(linenumber))
+            print line
+            raise
+    return True
+   
+
+if __name__ == '__main__':
+   if (len(sys.argv) == 1):
+        print ('Usage: python vxl_obj_importer.py objfile.obj mtlfile.mtl')
+        sys.exit(0)
+   
+   print('----------------------------------------------------------')
+   print(' Processing: ' + sys.argv[1])
+   print('----------------------------------------------------------')
+   FILE = sys.argv[1]     
+   hasMaterials = parseMaterials(sys.argv[2])
+   parseGeometry(FILE, hasMaterials)
+   createWebGLFile()
+   print('----------------------------------------------------------')
+   print("                       DONE                               ")
+   print('----------------------------------------------------------')     
+        
+   

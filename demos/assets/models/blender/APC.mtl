@@ -1,0 +1,85 @@
+# Blender MTL File: 'APC.blend'
+# Material Count: 7
+newmtl body
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd APC.blend/textures/Body_diff.png
+map_Bump APC.blend/textures/Body_bump.png
+map_Ks APC.blend/textures/Body_spec.png
+
+
+newmtl bottom
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+
+
+newmtl details
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd APC.blend/textures/Rest_diff.png
+map_Bump APC.blend/textures/rest_bump.png
+map_Ks APC.blend/textures/rest_spec.png
+
+
+newmtl lights
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd APC.blend/textures/Lights_diffuse.png
+map_Bump APC.blend/textures/Lights_bump.png
+map_Ks APC.blend/textures/Lights_spec.png
+
+
+newmtl rubber
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+
+
+newmtl turrets
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd APC.blend/textures/Turrets_diff.png
+map_Bump APC.blend/textures/turrets_bump.png
+map_Ks APC.blend/textures/Turrets_spec.png
+
+
+newmtl wheel_plates
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd APC.blend/textures/Wheels_plates_diff.png
+
+

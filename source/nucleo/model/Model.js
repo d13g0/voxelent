@@ -51,14 +51,17 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
 	if (JSON_OBJECT.name != null){
 		this.name = JSON_OBJECT.name;
 	}
-	//copy by reference (no slicing) as models are loaded once
-	this.vertices 	= JSON_OBJECT.vertices;
-	this.indices 	= JSON_OBJECT.indices;
-	this.diffuse 	= JSON_OBJECT.diffuse;
-	this.scalars 	= JSON_OBJECT.scalars;
-	this.wireframe  = JSON_OBJECT.wireframe;
-	this.colors     = JSON_OBJECT.colors;
-	this.mode       = JSON_OBJECT.mode;	
+	
+	//Load all properties
+	for(i in JSON_OBJECT){
+		this[i] = JSON_OBJECT[i];
+	}
+	
+	//Now minimal checks
+	if (this.vertices == undefined){
+		alert('The model '+ this.name+' does not have vertices. Impossible to render!');
+	}
+	
 
 	if(this.normals == undefined && this.indices != undefined){
 		this.computeNormals();
@@ -78,6 +81,8 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
 	}
 	this.computeBoundingBox();
 };
+
+
 
 
 /**

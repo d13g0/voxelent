@@ -30,6 +30,14 @@ Kamyar: please how to use this in your tutorial
 
 10. Gimbal lock fixed using quaternions. Thanks tojiro!!
 
+11. New Blender Program! now we can render blender objects (obj files + mtl files) --> JSON
+
+12. Added idea of rendering strategies to decouple the interaction between actors and programs.
+We need to create a tutorial about this! It's reall cool!
+
+13. getProperty and setProperty methods implemented in vxlActor. The scope determines what copy to pass
+(model or actor property). We need to write a tutorial about this too.
+
 -------------------------------------------------------------------------------------------
 VERSION 0.87.5 - Mother's Day
 -------------------------------------------------------------------------------------------

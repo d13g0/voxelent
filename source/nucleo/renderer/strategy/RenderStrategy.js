@@ -20,25 +20,30 @@
  * 
  *  Any rendering strategy should extend from vxlRenderStrategy or one of its descendants
  */
-function vxlRenderStrategy(){}
-
-
-/**
- * 
- * @param {vxlActor} actor the actor to allocate memory for
- * @param {vxlRenderer} renderer the renderer from which the gl context will be obtained
- */
-vxlRenderStrategy.prototype.allocate = function(actor, renderer){
-	
+function vxlRenderStrategy(renderer){
+	this.renderer = renderer;
 }
 
+
 /**
- * 
- * @param {vxlActor} actor	the actor to render
- * @param {vxlRenderer} renderer the renderer to use
+ * @param {vxlActor} actor the actor to allocate memory for
  */
-vxlRenderStrategy.prototype.render = function(actor, renderer){
-	throw('Abstract method');
+vxlRenderStrategy.prototype.allocate = function(actor){
+	//DO NOTHING. THE DESCENDANTS WILL.
+}
+
+
+/**
+ * @param {vxlActor} actor the actor to deallocate memory from
+ */
+vxlRenderStrategy.prototype.deallocate = function(actor){
+	//DO NOTHING. THE DESCENDANTS WILL.
+}
+/**
+ * @param {vxlActor} actor	the actor to render
+ */
+vxlRenderStrategy.prototype.render = function(actor){
+	//DO NOTHING. THE DESCENDANTS WILL.
 }
 
 

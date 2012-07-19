@@ -335,7 +335,9 @@ height:135px;
 	
 	<li><a href="../symbols/vxl.def.glsl.html">vxl.def.glsl</a></li>
 	
-	<li><a href="../symbols/vxl.def.glsl.diffusive.html">vxl.def.glsl.diffusive</a></li>
+	<li><a href="../symbols/vxl.def.glsl.blender.html">vxl.def.glsl.blender</a></li>
+	
+	<li><a href="../symbols/vxl.def.glsl.lambert.html">vxl.def.glsl.lambert</a></li>
 	
 	<li><a href="../symbols/vxl.def.glsl.phong.html">vxl.def.glsl.phong</a></li>
 	
@@ -360,6 +362,8 @@ height:135px;
 	<li><a href="../symbols/vxlActor.html">vxlActor</a></li>
 	
 	<li><a href="../symbols/vxlAxis.html">vxlAxis</a></li>
+	
+	<li><a href="../symbols/vxlBasicStrategy.html">vxlBasicStrategy</a></li>
 	
 	<li><a href="../symbols/vxlBoundingBox.html">vxlBoundingBox</a></li>
 	
@@ -386,6 +390,8 @@ height:135px;
 	<li><a href="../symbols/vxlProgram.html">vxlProgram</a></li>
 	
 	<li><a href="../symbols/vxlRenderer.html">vxlRenderer</a></li>
+	
+	<li><a href="../symbols/vxlRenderStrategy.html">vxlRenderStrategy</a></li>
 	
 	<li><a href="../symbols/vxlScene.html">vxlScene</a></li>
 	
@@ -438,7 +444,7 @@ height:135px;
 							<div class="fixedFont">
 								<b><a href="../symbols/vxlActor.html#constructor">vxlActor</a></b>(model)
 							</div>
-							<div class="description"></div>
+							<div class="description"><p>An actor is a representation of a model in voxelent.</div>
 						</td>
 					</tr>
 				</tbody>
@@ -465,15 +471,6 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlActor.html#allocate">allocate</a></b>(renderer)
-								</div>
-								<div class="description">Creates the internal WebGL buffers that will store geometry, normals, colors, etc for this Actor.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/vxlActor.html#clone">clone</a></b>()
 								</div>
 								<div class="description">Duplicates this actor.</div>
@@ -483,9 +480,9 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlActor.html#deallocate">deallocate</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/vxlActor.html#computePosition">computePosition</a></b>()
 								</div>
-								<div class="description">Deletes the WebGL buffers used for this object.</div>
+								<div class="description">Estimates the current position asthe center of the current bounding box.</div>
 							</td>
 						</tr>
 					
@@ -501,18 +498,18 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlActor.html#isVisible">isVisible</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/vxlActor.html#getProperty">getProperty</a></b>(property)
 								</div>
-								<div class="description">Is visible?</div>
+								<div class="description">Returns an actor property if that property exists in the actor.</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlActor.html#render">render</a></b>(renderer)
+								<div class="fixedFont"><b><a href="../symbols/vxlActor.html#isVisible">isVisible</a></b>()
 								</div>
-								<div class="description">Performs the rendering of this actor using the WebGL context provided by the rendererThis method has the most WebGL code in all Nucleo.</div>
+								<div class="description">Is visible?</div>
 							</td>
 						</tr>
 					
@@ -530,7 +527,7 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/vxlActor.html#setLookupTable">setLookupTable</a></b>(lutID, min, max)
 								</div>
-								<div class="description">Sets the lookup table for this actor</div>
+								<div class="description">Sets the lookup table for this actor.</div>
 							</td>
 						</tr>
 					
@@ -555,7 +552,7 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlActor.html#setProperty">setProperty</a></b>(property, value)
+								<div class="fixedFont"><b><a href="../symbols/vxlActor.html#setProperty">setProperty</a></b>(property, value, scope)
 								</div>
 								<div class="description">If the property exists, then it updates it</div>
 							</td>
@@ -588,15 +585,6 @@ height:135px;
 							</td>
 						</tr>
 					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlActor.html#updateMatrixStack">updateMatrixStack</a></b>(renderer)
-								</div>
-								<div class="description">Passes the matrices to the shading program</div>
-							</td>
-						</tr>
-					
 					</tbody>
 				</table>
 				
@@ -618,7 +606,7 @@ height:135px;
 				</div>
 
 				<div class="description">
-					
+					<p>An actor is a representation of a model in voxelent. Actors can cache model properties and modified them. This is useful when there are several actors based in the same modelbut each one of them needs to have a different version of any given model property (i.e. color)</p><p> To propagate one change for all the actors based in the same model, the setProperty methodshould be invoked by setting the third parameter (scope) like this:</p><pre>var actor = vxl.c.scene.getActorByName('example.json');actor.setProperty('color',[1.0,0.0,0.0], vxl.def.model)</pre><p>If the change should be local (for just that actor)  then you should write:</p><pre>var actor = vxl.c.scene.getActorByName('example.json');actor.setProperty('color',[1.0,0.0,0.0], vxl.def.actor)</pre><p> Or simply </p> <pre>var actor = vxl.c.scene.getActorByName('example.json');actor.setProperty('color',[1.0,0.0,0.0])</pre>
 					
 				</div>
 
@@ -655,42 +643,6 @@ height:135px;
 				<div class="sectionTitle">
 					Method Detail
 				</div>
-				
-					<a name="allocate"> </a>
-					<div class="fixedFont">
-
-					
-					<b>allocate</b>(renderer)
-
-					</div>
-					<div class="description">
-						Creates the internal WebGL buffers that will store geometry, normals, colors, etc for this Actor.It uses the renderer passed as a parameter to retrieve the gl context to use.
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<b>renderer</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
 				
 					<a name="clone"> </a>
 					<div class="fixedFont">
@@ -731,15 +683,15 @@ height:135px;
 
 					<hr />
 				
-					<a name="deallocate"> </a>
+					<a name="computePosition"> </a>
 					<div class="fixedFont">
 
 					
-					<b>deallocate</b>()
+					<b>computePosition</b>()
 
 					</div>
 					<div class="description">
-						Deletes the WebGL buffers used for this object. After this the actor will not be rendered until a new allocation takes place
+						Estimates the current position asthe center of the current bounding box. This method does not update the internal position of the actorit only returns an estimate based on the location of its bounding box.
 						
 						
 					</div>
@@ -781,6 +733,42 @@ height:135px;
 
 					<hr />
 				
+					<a name="getProperty"> </a>
+					<div class="fixedFont">
+
+					
+					<b>getProperty</b>(property)
+
+					</div>
+					<div class="description">
+						Returns an actor property if that property exists in the actor. Otherwise it will search in the model. This method is used by the renderer. There are some cases where actors have local changesthat are not reflected in the model. In these cases the renderer should pick the actor propertyover the model property
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>property</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name="isVisible"> </a>
 					<div class="fixedFont">
 
@@ -796,42 +784,6 @@ height:135px;
 
 					
 
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="render"> </a>
-					<div class="fixedFont">
-
-					
-					<b>render</b>(renderer)
-
-					</div>
-					<div class="description">
-						Performs the rendering of this actor using the WebGL context provided by the rendererThis method has the most WebGL code in all Nucleo.
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<b>renderer</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
 						
 						
 						
@@ -886,7 +838,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						Sets the lookup table for this actor
+						Sets the lookup table for this actor.This method will only succeed if the model that this actor represents has scalars
 						
 						
 					</div>
@@ -898,22 +850,22 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>lutID</b>
+									<span class="light fixedFont">{String}</span> <b>lutID</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the lookup table id. @see{vxl.def.lut.list} for currently supported ids.</dd>
 							
 								<dt>
-									<b>min</b>
+									<span class="light fixedFont">{Number}</span> <b>min</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>lowest value for interpolation</dd>
 							
 								<dt>
-									<b>max</b>
+									<span class="light fixedFont">{Number}</span> <b>max</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>highest value for interpolation</dd>
 							
 							</dl>
 						
@@ -985,7 +937,7 @@ height:135px;
 									<span class="light fixedFont">{Number|<a href="../symbols/Array.html">Array</a>|<a href="../symbols/vec3.html">vec3</a>}</span> <b>x</b>
 									
 								</dt>
-								<dd>it can be the x coordinate, a 3-dimensional Array or a glMatrix vec3</dd>
+								<dd>it can be the x coordinate, a 3-dimensional Array or a vec3 (glMatrix)</dd>
 							
 								<dt>
 									<span class="light fixedFont">{Number}</span> <b>y</b>
@@ -1014,7 +966,7 @@ height:135px;
 					<div class="fixedFont">
 
 					
-					<b>setProperty</b>(property, value)
+					<b>setProperty</b>(property, value, scope)
 
 					</div>
 					<div class="description">
@@ -1040,6 +992,12 @@ height:135px;
 									
 								</dt>
 								<dd></dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>scope</b>
+									
+								</dt>
+								<dd>indicates if the change is made at the actor level or at the model levelvalid values for scope are vxl.def.model and vxl.def.actor</dd>
 							
 							</dl>
 						
@@ -1158,42 +1116,6 @@ height:135px;
 						
 						
 
-					<hr />
-				
-					<a name="updateMatrixStack"> </a>
-					<div class="fixedFont">
-
-					
-					<b>updateMatrixStack</b>(renderer)
-
-					</div>
-					<div class="description">
-						Passes the matrices to the shading program
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/vxlRenderer.html">vxlRenderer</a>}</span> <b>renderer</b>
-									
-								</dt>
-								<dd>determines the context for the transformations, different renderers can have different matrices transformations we will update each Model-View matrix of each renderer according tothe actor position,scale and rotation.</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
 					
 				
 			
@@ -1208,7 +1130,7 @@ height:135px;
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Jul 13 2012 12:19:42 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Jul 19 2012 14:47:34 GMT-0400 (EDT)
 		</div>
         </div>
         </div>

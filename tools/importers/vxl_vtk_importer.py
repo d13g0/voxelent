@@ -273,7 +273,6 @@ def main():
 
     print('----------------------------------------------------------')
     print(' Processing: ' + sys.argv[1])
-    
     print('----------------------------------------------------------')
     parseVTK(sys.argv[1])
     processIndexBlocks()

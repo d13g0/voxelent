@@ -61,9 +61,14 @@ def : {
      * @property {String} FRAGMENT_SHADER Fragment Shader Id
      */
 	glsl			: { 
-						VERTEX_SHADER   : 'VERTEX_SHADER',
-						FRAGMENT_SHADER : 'FRAGMENT_SHADER'
-						
+						VERTEX_SHADER   	: 'VERTEX_SHADER',
+						FRAGMENT_SHADER 	: 'FRAGMENT_SHADER',
+						MODEL_VIEW_MATRIX  	: 'mModelView',
+						NORMAL_MATRIX   	: 'mNormal',
+						PERSPECTIVE_MATRIX 	: 'mPerspective',
+						VERTEX_ATTRIBUTE    : 'aVertexPosition',
+						NORMAL_ATTRIBUTE    : 'aVertexNormal',
+						COLOR_ATTRIBUTE     : 'aVertexColor'
 					},
     /** 
      * @namespace Lookup Table Definitions 
@@ -4982,9 +4987,9 @@ vxl.def.glsl.lambert = {
 	"aVertexNormal"],
 	
 	UNIFORMS : [
-	"uMVMatrix",
-	"uNMatrix",
-	"uPMatrix",
+	"mModelView",
+	"mNormal",
+	"mPerspective",
 	"uPointSize",
 	"uLightDirection",
 	"uLightAmbient",
@@ -5001,9 +5006,9 @@ vxl.def.glsl.lambert = {
 	"attribute vec3 aVertexNormal;",
 	"attribute vec3 aVertexColor;",
     "uniform float uPointSize;",
-	"uniform mat4 uMVMatrix;",
-	"uniform mat4 uPMatrix;",
-	"uniform mat4 uNMatrix;",
+	"uniform mat4 mModelView;",
+	"uniform mat4 mPerspective;",
+	"uniform mat4 mNormal;",
 	"uniform vec3 uLightDirection;",
 	"uniform vec4 uLightAmbient;",  
 	"uniform vec4 uLightDiffuse;",
@@ -5014,7 +5019,7 @@ vxl.def.glsl.lambert = {
 	"varying vec4 vFinalColor;",
     
     "void main(void) {",
-    "	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);",
+    "	gl_Position = mPerspective * mModelView * vec4(aVertexPosition, 1.0);",
     "	gl_PointSize = uPointSize;",
     "	if (uUseVertexColors) {",
     "		vFinalColor = vec4(aVertexColor,1.0);",
@@ -5023,9 +5028,9 @@ vxl.def.glsl.lambert = {
     "       vFinalColor = uMaterialDiffuse;",
     "   }",
     "	if (uUseShading){",
-    "		vec3 N = vec3(uNMatrix * vec4(aVertexNormal, 1.0));",
+    "		vec3 N = vec3(mNormal * vec4(aVertexNormal, 1.0));",
 	"		vec3 L = normalize(uLightDirection);",
-	"		if (uUseLightTranslation){ L = vec3(uNMatrix * vec4(L,1.0));}",
+	"		if (uUseLightTranslation){ L = vec3(mNormal * vec4(L,1.0));}",
 	"		float lambertTerm = max(dot(N,-L),0.4);",
 	"		vec4 Ia = uLightAmbient;",
 	"		vec4 Id = vFinalColor * uLightDiffuse * lambertTerm;",
@@ -5198,9 +5203,156 @@ vxl.def.glsl.phong = {
 
     You should have received a copy of the GNU General Public License
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------------------------------------------*/   
+
+/**
+ * @class
+ */
+vxl.def.glsl.blender = {
+	
+	ID : 'blender',
+
+	ATTRIBUTES : [
+	"aVertexPosition", 
+	"aVertexNormal"],
+	
+	UNIFORMS : [
+	"mModelView",
+	"mNormal",
+	"mPerspective",
+	"uLa",
+	"uLd",
+	"uLs",
+	"uLightPosition",
+	"uTranslateLight",
+	"uKa",
+	"uKd",
+	"uKs",
+	"uNs",
+	"d",
+	"illum"
+	],
+	
+	
+    VERTEX_SHADER : [
+    
+    "attribute vec3 aVertexPosition;",
+	"attribute vec3 aVertexNormal;",
+
+	"uniform mat4 mModelView;",
+	"uniform mat4 mPerspective;",
+	"uniform mat4 mNormal;",
+	
+	"uniform vec3 uLightPosition;",
+	"uniform bool uTranslateLight;",
+    
+    "varying vec3 vNormal;",
+    "varying vec3 vLightRay;",
+    "varying vec3 vEye;",
+	
+    
+    "void main(void) {",
+    " vec4 vertex = mModelView * vec4(aVertexPosition, 1.0);",
+    " vNormal = vec3(mNormal * vec4(aVertexNormal, 1.0));",
+    " vec4 lightPosition = vec4(0.0);",
+     
+    "if (uTranslateLight){",
+    "      lightPosition =   mModelView * vec4(uLightPosition, 1.0);",
+    "      vLightRay = vertex.xyz - lightPosition.xyz;",
+    "      vEye = -vec3(vertex.xyz);",
+    "}",    
+    "else {",
+    "     lightPosition = vec4(uLightPosition, 1.0);",
+    "     vLightRay = vertex.xyz - lightPosition.xyz;",
+    "     vEye = -vec3(vertex.xyz);",
+    "}",
+    "gl_Position = mPerspective * mModelView * vec4(aVertexPosition, 1.0);",
+	"}"].join('\n'),
+    
+    FRAGMENT_SHADER : [
+    "#ifdef GL_ES",
+    "precision highp float;",
+    "#endif",
+    "uniform vec3 uLa;",
+	"uniform vec3 uLd;",  
+	"uniform vec3 uLs;",
+	
+    "uniform vec3 uKa;",
+	"uniform vec3 uKd;",  
+	"uniform vec3 uKs;",
+	"uniform float uNs;",
+	"uniform float d;",
+    "uniform int illum;",
+ 
+    "varying vec3 vNormal;",
+    "varying vec3 vLightRay;",
+    "varying vec3 vEye;",
+
+    "void main(void)  {",
+    "	if (illum ==0){",
+    "		gl_FragColor = vec4(uKd,d);",
+    "		return;",
+    "	}",
+    "	vec3 COLOR = vec3(0.0,0.0,0.0);",
+    "   vec3 N =  normalize(vNormal);",
+    "   vec3 L =  vec3(0.0,0.0,0.0);",
+    "   vec3 E =  vec3(0.0,0.0,0.0);",
+    "   vec3 R =  vec3(0.0,0.0,0.0);",
+	"    if (illum == 1){",
+	"        L = normalize(vLightRay);",	
+	"        N = normalize(vNormal);",	
+	"        COLOR += (uLa * uKa) + (uLd * uKd * clamp(dot(N, -L),0.0,1.0));",
+	"        gl_FragColor =  vec4(COLOR,d);",
+	"        return;",
+	"   }",
+	"   if (illum == 2){",
+	"        E = normalize(vEye);",
+	"        L = normalize(vLightRay);",
+	"        R = reflect(L, N);",
+	"        COLOR += (uLa * uKa);",
+	"        COLOR += (uLd * uKd * clamp(dot(N,-L),0.0,1.0));",
+	"        COLOR += (uLs * uKs * pow( max(dot(R, E), 0.0), uNs) * 4.0);",
+	"        gl_FragColor =  vec4(COLOR,d);",
+	"       return;",
+    "	}" ,
+    "}"].join('\n'),
+    
+    DEFAULTS : {
+        "uLa" 	: [1.0,1.0,1.0],
+        "uLd"   : [1.0,1.0,1.0],
+        "uLs"  	: [0.8,0.8,0.8],
+        "uKa"   : [1.0,1.0,1.0],
+        "uKd"   : [1.0,1.0,1.0],
+        "uKs"   : [1.0,1.0,1.0],
+        "uNs"   : 1.0,
+        "uTranslateLight" : false,
+        "uLightPosition"   : [0,50,50]
+    }
+};/*-------------------------------------------------------------------------
+    This file is part of Voxelent's Nucleo
+
+    Nucleo is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation version 3.
+
+    Nucleo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/  
 
 /**
+ * <p>Presents a simple interface to communicate with a ESSL (GLSL) program
+ * This class is responsible for creating, compiling and linking any ESSL program.
+ * It also has methods to query and set uniforms and attributes belonging to the program
+ * that is being currently executed in the GPU</P>
+ * 
+ * <p>a vxlProgram maintains a database of the programs that have been linked to the GPU. 
+ * This way, program switching is easier as it is not necessary to go through the 
+ * compilation and linking process every time</p>
  * @class
  * @constructor
  */
@@ -5223,9 +5375,13 @@ function vxlProgram (gl) {
 
 /**
  * Register a program in the database
- * @param {Object} the program to register
+ * @param {JSON} the program to register
  */
 vxlProgram.prototype.register = function(glslObject){
+	/*@TODO: this method receives a JSON Object we could instead
+	 * receive a text file and parse it into JSON. This would make
+	 * the writing of shaders much easier.
+	 */
 	vxl.go.console('Registering program '+ glslObject.ID);
     this._codebase[glslObject.ID] = glslObject;
 };
@@ -5414,7 +5570,8 @@ vxlProgram.prototype.disableAttribute = function(name){
 
 /**
  * Creates a WebGL shader
- * This method is private.
+ * 
+ * @private This method is private.
  */
 vxlProgram.prototype._createShader = function(type,code){
     var gl      = this._gl;
@@ -5445,11 +5602,15 @@ vxlProgram.prototype._createShader = function(type,code){
 /**
  * Parses uniforms
  * This method is private
+ * @private
+ * 
  */
 vxlProgram.prototype._parseUniforms = function(id){
     
     vs = this._codebase[this._currentProgramID].VERTEX_SHADER;
     fs = this._codebase[this._currentProgramID].FRAGMENT_SHADER;
+    /*@TODO: look for a way to retrieve uNames directly from the parsing of the shaders
+    this should simplify the structure of the JSON file representing the program*/
     uNames = this._codebase[this._currentProgramID].UNIFORMS;
     
     uTypes = {};
@@ -5457,7 +5618,7 @@ vxlProgram.prototype._parseUniforms = function(id){
     
     for (var i=0;i< uNames.length; i++){
         var uniformID = uNames[i];
-        var rex = new RegExp('uniform.*'+uniformID,'g');
+        var rex = new RegExp('uniform\\s+\\w+\\s'+uniformID,'g');
         
         if (vs.search(rex) != -1){
             uTypes[uniformID] = vs.substring(vs.search(rex),vs.length).substring(0,vs.indexOf(';')).split(' ')[1];
@@ -5481,6 +5642,7 @@ vxlProgram.prototype._parseUniforms = function(id){
  * Obtains an attribute location
  * This method is private
  * @param {String} name
+ * @private
  */
 vxlProgram.prototype._getAttributeLocation = function(name){
 
@@ -5496,6 +5658,7 @@ vxlProgram.prototype._getAttributeLocation = function(name){
  * program database, it will do the appropriate gl call to set the uniform
  * This method is private. Use setUniform instead.
  * @see vxlProgram#setUniform
+ * @private 
  */
 vxlProgram.prototype._setPolymorphicUniform = function(uniformID, locationID,value,hint){
 
@@ -5585,15 +5748,18 @@ vxlProgram.prototype._setPolymorphicUniform = function(uniformID, locationID,val
  */
 function vxlRenderer(vw){
     
-	this.view       = vw;
-	this.renderRate = vxl.def.renderer.rate.NORMAL;
-	this.mode       = vxl.def.renderer.mode.TIMER;
-    this.timerID    = 0;
-    this.gl         = this.getWebGLContext();
-    this.prg        =   new vxlProgram(this.gl);
-    this.transforms = new vxlTransforms(vw);
-    this.currentProgram      = undefined;
-    this.setProgram(vxl.def.glsl.lambert);
+	this.view       	= vw;
+	this.renderRate 	= vxl.def.renderer.rate.NORMAL;
+	this.mode       	= vxl.def.renderer.mode.TIMER;
+    this.timerID    	= 0;
+    this.gl         	= this.getWebGLContext();
+    this.prg        	=   new vxlProgram(this.gl);
+    this.transforms 	= new vxlTransforms(vw);
+    this.currentProgram = undefined;
+    this.strategy 		= undefined;
+    
+    this.setProgram(vxl.def.glsl.lambert, vxlBasicStrategy);
+    
 }
 
 /**
@@ -5636,11 +5802,12 @@ vxlRenderer.prototype.getWebGLContext = function(){
 
 /**
  * Tries to add a new program definition to this renderer
- * @param {Object} program definition. See the lambert and phong examples below.
+ * @param {Object} program JSON program definition.
+ * @param {vxlRenderStrategy} strategy 
  * @see {vxl.def.glsl.phong}
  * @see {vxl.def.glsl.lambert}
  */
-vxlRenderer.prototype.setProgram = function(program){
+vxlRenderer.prototype.setProgram = function(program,strategy){
     
     if(this.currentProgram != undefined && this.currentProgram == program){
         return;
@@ -5659,6 +5826,14 @@ vxlRenderer.prototype.setProgram = function(program){
 	prg.loadDefaults();
 	
 	this.currentProgram = program;
+	
+	if(strategy != null && strategy != undefined){
+		this.strategy = new strategy(this);
+		//this.strategy.renderer = this;
+	}
+	else{
+		this.strategy = new vxlBasicStrategy(this);
+	}
 };
 
 
@@ -5738,7 +5913,7 @@ vxlRenderer.prototype.setRenderRate = function(rate){ //rate in ms
  * @see vxlView#setBackgroundColor
  */
 vxlRenderer.prototype.clearColor = function(cc){
-	this.gl.clearColor(cc[0], cc[1], cc[2], cc[3]);
+	this.gl.clearColor(cc[0], cc[1], cc[2], 1.0);
 };
 
 /**
@@ -5756,6 +5931,29 @@ vxlRenderer.prototype.render = function(){
     this.clear();	
     this.view.scene.render(this);
 };
+
+/**
+ * @private 
+ * 
+ */
+vxlRenderer.prototype._allocateActor = function(actor){
+	return this.strategy.allocate(actor);
+}
+
+/**
+ * @private 
+ */
+vxlRenderer.prototype._deallocateActor = function(actor){
+	this.strategy.deallocate(actor);
+} 
+
+/**
+ * @private 
+ */
+ 
+ vxlRenderer.prototype._renderActor = function(actor){
+ 	this.strategy.render(actor);
+ }
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
@@ -5809,14 +6007,17 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
 	if (JSON_OBJECT.name != null){
 		this.name = JSON_OBJECT.name;
 	}
-	//copy by reference (no slicing) as models are loaded once
-	this.vertices 	= JSON_OBJECT.vertices;
-	this.indices 	= JSON_OBJECT.indices;
-	this.diffuse 	= JSON_OBJECT.diffuse;
-	this.scalars 	= JSON_OBJECT.scalars;
-	this.wireframe  = JSON_OBJECT.wireframe;
-	this.colors     = JSON_OBJECT.colors;
-	this.mode       = JSON_OBJECT.mode;	
+	
+	//Load all properties
+	for(i in JSON_OBJECT){
+		this[i] = JSON_OBJECT[i];
+	}
+	
+	//Now minimal checks
+	if (this.vertices == undefined){
+		alert('The model '+ this.name+' does not have vertices. Impossible to render!');
+	}
+	
 
 	if(this.normals == undefined && this.indices != undefined){
 		this.computeNormals();
@@ -5836,6 +6037,8 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
 	}
 	this.computeBoundingBox();
 };
+
+
 
 
 /**
@@ -5986,25 +6189,54 @@ vxlModel.prototype.computeBoundingBox = function(){
 //@NOTE: A possible optimization is to combine several actors in one buffer. Watch optimzation video on YouTube by Gregg Tavares
 
 /**
+ * <p>
+ * An actor is a representation of a model in voxelent. Actors can cache model properties 
+ * and modified them. This is useful when there are several actors based in the same model
+ * but each one of them needs to have a different version of any given model property (i.e. color)
+ * </p>
+ * <p> 
+ * To propagate one change for all the actors based in the same model, the setProperty method
+ * should be invoked by setting the third parameter (scope) like this:
+ * </p>
+ * 
+ * <pre>
+ * var actor = vxl.c.scene.getActorByName('example.json');
+ * actor.setProperty('color',[1.0,0.0,0.0], vxl.def.model)
+ * </pre>
+ * 
+ * <p>If the change should be local (for just that actor)  then you should write:</p>
+ * 
+ * <pre>
+ * var actor = vxl.c.scene.getActorByName('example.json');
+ * actor.setProperty('color',[1.0,0.0,0.0], vxl.def.actor)
+ * </pre>
+ * 
+ * <p> Or simply </p>
+ *  
+ * <pre>
+ * var actor = vxl.c.scene.getActorByName('example.json');
+ * actor.setProperty('color',[1.0,0.0,0.0])
+ * </pre>
  * @class
  * @constructor
  */
 function vxlActor(model){
   
   this.bb = [0, 0, 0, 0, 0, 0];
-  this.allocated = false;
+  this.position 	= vec3.create([0, 0, 0]);
+  this.scale 		= vec3.create([1, 1, 1]);
+  this.rotation 	= vec3.create([0, 0, 0]);
+
   this.visible   = true;
   this.mode = vxl.def.actor.mode.SOLID;
   this.opacity = 1.0;
   this.colors = model?(model.colors!=null?model.colors:null):null;	//it will create colors for this actor once a lookup table had been set up
-  this.position 	= vec3.create([0, 0, 0]);
-  this.scale 		= vec3.create([1, 1, 1]);
-  this.rotation 	= vec3.create([0, 0, 0]);
-  this.program       = undefined;
-  this.picking_color = undefined;
   this.clones  = 0;
-  this.strategy = new vxlBasicStrategy();
+  
+  this._renderers = [];
+  this._gl_buffers = [];
 
+  
   if (model){
   	this.model 	 = model;
   	this.name 	 = model.name;
@@ -6012,6 +6244,7 @@ function vxlActor(model){
   	this.bb 	 = model.bb.slice(0);
   	this.mode    = model.mode==undefined?vxl.def.actor.mode.SOLID:model.mode;
   }
+  
 };
 
 
@@ -6022,7 +6255,7 @@ function vxlActor(model){
  * is initially [0,0,0] and it is relative to the model centre. If the model is not centered in 
  * the origin, then the actor's position will be relative to the model centre.
  * 
- * @param {Number, Array, vec3} x it can be the x coordinate, a 3-dimensional Array or a glMatrix vec3
+ * @param {Number, Array, vec3} x it can be the x coordinate, a 3-dimensional Array or a vec3 (glMatrix)
  * @param {Number} y if x is a number, then this parameter corresponds to the y-coordinate
  * @param {Number} z if x is a number, then this parameter corresponds to the z-coordinate
  */
@@ -6087,21 +6320,54 @@ vxlActor.prototype.setOpacity = function(o){
  * If the property exists, then it updates it
  * @param {String} property 
  * @param {Object} value 
+ * @param {String} scope indicates if the change is made at the actor level or at the model level
+ * valid values for scope are vxl.def.model and vxl.def.actor
  * @TODO: if the property is position or scale then call the respective methods from here
  */
-vxlActor.prototype.setProperty = function(property, value){
-    if (property == 'position') throw 'Actor.setProperty(position), please use setPosition instead';
-    if (property == 'scale')    throw 'Actor.setProperty(scale), please use setScale instead';
+vxlActor.prototype.setProperty = function(property, value, scope){
     
-	if (this.hasOwnProperty(property)){
+    if (property == 'position') {
+    	this.setPosition(value);
+    	return;
+    }
+    
+    if (property == 'scale')    {
+    	this.setScale(value);
+    	return;
+    }
+    
+    if (scope == vxl.def.actor || scope == undefined || scope == null){
 		this[property] = value;
 		vxl.go.console('Actor: The actor '+this.name+' has been updated. ['+property+' = '+value+']');
 	}
-	else {
-		throw ('Actor: the property '+ property+' does not exist');
+	else if(scope == vxl.def.model){
+		this.model[property] = value;
 	}
+	else{
+		throw('vxlActor.setProperty. Scope:' + scope +' is not valid');
+	}
+	
 };
 
+/**
+ * Returns an actor property if that property exists in the actor. Otherwise it will search 
+ * in the model. This method is used by the renderer. There are some cases where actors have local changes
+ * that are not reflected in the model. In these cases the renderer should pick the actor property
+ * over the model property
+ * @param{String} property the property name
+ * @returns{Object} the property or undefined if the property is not found 
+ */
+vxlActor.prototype.getProperty = function(property){
+	if (this.hasOwnProperty(property)) {
+		return this[property];
+	}
+	else if (this.model.hasOwnProperty(property)){
+		return this.model[property];
+	}
+	else {
+		return undefined;
+	}
+};
 
 /**
  * Estimates the current position as
@@ -6220,7 +6486,15 @@ vxlActor.prototype.clone = function(){
 * voxelent. Do not invoke directly.
 */
 vxlActor.prototype._allocate = function(renderer){
-	this.strategy.allocate(this,renderer);
+	if (this._renderers.indexOf(renderer)!=-1){ //if this renderer has been allocated then ignore
+   		return;
+   }
+   
+   var buffers = renderer._allocateActor(this);
+   
+   this._renderers.push(renderer);
+   this._gl_buffers.push(buffers);
+
 };
 
 /**
@@ -6230,8 +6504,8 @@ vxlActor.prototype._allocate = function(renderer){
 * This method is private and it is only supposed to be called by other objects inside
 * voxelent. Do not invoke directly. 
 */
-vxlActor.prototype._deallocate = function(){
-  this.strategy.deallocate(this,renderer);
+vxlActor.prototype._deallocate = function(renderer){
+  renderer._deallocateActor(this);
 };
 
 /**
@@ -6246,7 +6520,7 @@ vxlActor.prototype._render = function(renderer){
 	if (!this.visible){ 
 		return;
 	}
-	this.strategy.render(this, renderer);
+	renderer._renderActor(this);
 };
 
 /*-------------------------------------------------------------------------
@@ -6271,25 +6545,30 @@ vxlActor.prototype._render = function(renderer){
  * 
  *  Any rendering strategy should extend from vxlRenderStrategy or one of its descendants
  */
-function vxlRenderStrategy(){}
-
-
-/**
- * 
- * @param {vxlActor} actor the actor to allocate memory for
- * @param {vxlRenderer} renderer the renderer from which the gl context will be obtained
- */
-vxlRenderStrategy.prototype.allocate = function(actor, renderer){
-	
+function vxlRenderStrategy(renderer){
+	this.renderer = renderer;
 }
 
+
 /**
- * 
- * @param {vxlActor} actor	the actor to render
- * @param {vxlRenderer} renderer the renderer to use
+ * @param {vxlActor} actor the actor to allocate memory for
  */
-vxlRenderStrategy.prototype.render = function(actor, renderer){
-	throw('Abstract method');
+vxlRenderStrategy.prototype.allocate = function(actor){
+	//DO NOTHING. THE DESCENDANTS WILL.
+}
+
+
+/**
+ * @param {vxlActor} actor the actor to deallocate memory from
+ */
+vxlRenderStrategy.prototype.deallocate = function(actor){
+	//DO NOTHING. THE DESCENDANTS WILL.
+}
+/**
+ * @param {vxlActor} actor	the actor to render
+ */
+vxlRenderStrategy.prototype.render = function(actor){
+	//DO NOTHING. THE DESCENDANTS WILL.
 }
 
 
@@ -6310,7 +6589,7 @@ vxlRenderStrategy.prototype.render = function(actor, renderer){
 ---------------------------------------------------------------------------*/ 
 
 //Inheritance stuff
-vxlBasicStrategy.prototype = new vxlRenderStrategy()
+vxlBasicStrategy.prototype = new vxlRenderStrategy(undefined)
 vxlBasicStrategy.prototype.constructor = vxlBasicStrategy;
 
 /**
@@ -6328,117 +6607,103 @@ vxlBasicStrategy.prototype.constructor = vxlBasicStrategy;
  * 	communicates with the program) from the actor.
  * 
  */
-function vxlBasicStrategy(){
-  this.renderers = [];
-  this.buffers = [];
+function vxlBasicStrategy(renderer){
+	vxlRenderStrategy.call(this,renderer);
 }
 
 /**
  * Implements basic allocation of memory. Creates the WebGL buffers for the actor
  * @param{vxlActor} actor the actor to allocate memory for
- * @param{vxlRenderer} the renderer that contains the gl context to use
+  * @returns an object that contains the allocated WebGL buffers
  */
-vxlBasicStrategy.prototype.allocate = function(actor, renderer){
-	//if (this.allocated) return; // if we need realocation create method reallocate to force it.
-	
-	//as we don't expect changes we set the buffers' data here.
-   //OTHERWISE it should be done in the draw method as it is done with the axis and the bounding box
+vxlBasicStrategy.prototype.allocate = function(actor){
    
-   if (this.renderers.indexOf(renderer)!=-1){ //if this renderer has been allocated then ignore
-   		return;
-   }
-   
-   vxl.go.console('Actor: Allocating actor '+actor.name+' for view '+ renderer.view.name);
+    vxl.go.console('Actor: Allocating actor '+actor.name+' for view '+ this.renderer.view.name);
    	
-	var gl = renderer.gl;
+	var gl = this.renderer.gl;
 	var model = actor.model;
-    var buffer = {};
+    var buffers = {};
 	
-	buffer.vertex = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertex);
+	//Vertex Buffer
+	buffers.vertex = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices), gl.STATIC_DRAW);
 	
-	if (model.normals){
-		buffer.normal = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, buffer.normal);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals), gl.STATIC_DRAW);
-	}
-	
-	if (model.scalars != undefined || model.colors != undefined){
-		buffer.color = gl.createBuffer(); //we don't BIND values or use the buffer until the lut is loaded and available
-	}
-	
-	
-	
-	if (model.wireframe != undefined){
-		buffer.wireframe = gl.createBuffer();
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.wireframe);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
-	}
-	
+	//Index Buffer
 	if (model.indices != undefined){
-		buffer.index = gl.createBuffer();
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.index);
+		buffers.index = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices), gl.STATIC_DRAW);
 	}
 	
+	//Normals Buffer
+	if (model.normals){
+		buffers.normal = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals), gl.STATIC_DRAW);
+	}
+	
+	//Color Buffer for scalars
+	if (model.scalars != undefined || model.colors != undefined){
+		buffers.color = gl.createBuffer(); //we don't BIND values or use the buffers until the lut is loaded and available
+	}
+	
+	//Wireframe Buffer 
+	if (model.wireframe != undefined){
+		buffers.wireframe = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
+	}
+	
+	//Cleaning up
 	gl.bindBuffer(gl.ARRAY_BUFFER, null);
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 	
-	this.renderers.push(renderer);
-	this.buffers.push(buffer);
-
+	return buffers;
 };
 
 /**
  * Passes the matrices to the shading program
  * @param {vxlActor} the actor 
- * @param {vxlRenderer} renderer determines the context for the transformations, 
- * different renderers can have different matrices transformations 
  * we will update each Model-View matrix of each renderer according to
  * the actor position,scale and rotation.
  */
-vxlBasicStrategy.prototype._updateMatrixStack = function(actor, renderer){
+vxlBasicStrategy.prototype.applyActorTransform = function(actor){
     
-    var r	= renderer,	trx = r.transforms,	prg = r.prg;
+    var r		= this.renderer;
+    var trx 	= r.transforms
+    var	prg 	= r.prg;
+    var glsl 	= vxl.def.glsl;
+    
     trx.calculateModelView();
+    
     trx.push();
         mat4.scale      (trx.mvMatrix, actor.scale);
 		mat4.translate	(trx.mvMatrix, actor.position);
 		//@TODO: IMPLEMENT ACTOR ROTATIONS
-		var negposition = vec3.negate(actor.position, vec3.create());
-		//mat4.translate (trx.mvMatrix, negposition);
-	    prg.setUniform("uMVMatrix",r.transforms.mvMatrix);
+	    prg.setUniform(glsl.MODEL_VIEW_MATRIX,	r.transforms.mvMatrix);
     trx.pop();
+    
     trx.calculateNormal(); 
-    prg.setUniform("uPMatrix", r.transforms.pMatrix);
-    prg.setUniform("uNMatrix", r.transforms.nMatrix);
+    
+    prg.setUniform(glsl.PERSPECTIVE_MATRIX, 	r.transforms.pMatrix);
+    prg.setUniform(glsl.NORMAL_MATRIX, 			r.transforms.nMatrix);
     
  };
 
 
-vxlBasicStrategy.prototype.render = function(actor, renderer){
-	 // @TODO: Analyze this idea
-	//if (this.program){
-	//renderer.setProgram(this.program);
-	//} 
-	//else {
-	//  renderer.setProgram(renderer.defaultProgram);
-	//}
-	
-	
-	var idx = this.renderers.indexOf(renderer);
+vxlBasicStrategy.prototype.render = function(actor){
 
-	var model = actor.model;
-    var buffer = this.buffers[idx]; 
+	var model 	= actor.model;
+	var idx 	= actor._renderers.indexOf(this.renderer);
+    var buffers = actor._gl_buffers[idx]; 
+    var r  		= this.renderer;
+	var gl 		= r.gl;
+	var prg 	= r.prg;
+	var trx 	= r.transforms;
+	var glsl    = vxl.def.glsl;
 	
-    //The actor is a good renderer friend.
-	var gl = renderer.gl;
-	var prg = renderer.prg;
-	var trx = renderer.transforms;
-	
-	//First thing first. Handle actor transformations here
-	this._updateMatrixStack(actor, renderer);
+	this.applyActorTransform(actor);
 	
 	if (actor.opacity < 1.0){
 		gl.disable(gl.DEPTH_TEST);
@@ -6454,14 +6719,15 @@ vxlBasicStrategy.prototype.render = function(actor, renderer){
 	prg.setUniform("uMaterialDiffuse",actor.diffuse);
 	prg.setUniform("uUseVertexColors", false);
     
-    prg.disableAttribute("aVertexColor");
-	prg.disableAttribute("aVertexNormal");
-	prg.enableAttribute("aVertexPosition");
+    prg.disableAttribute(glsl.COLOR_ATTRIBUTE);
+	prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
+	prg.enableAttribute(glsl.VERTEX_ATTRIBUTE);
+	
 	try{
 		
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertex);
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
-		prg.setAttributePointer("aVertexPosition", 3, gl.FLOAT, false, 0, 0);
+		prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
 	}
     catch(err){
         alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
@@ -6471,11 +6737,11 @@ vxlBasicStrategy.prototype.render = function(actor, renderer){
 	if (actor.colors){	
 		try{
 			prg.setUniform("uUseVertexColors", true);
-			gl.bindBuffer(gl.ARRAY_BUFFER, buffer.color);
+			gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.colors.slice(0)), gl.STATIC_DRAW);
 			
-			prg.enableAttribute("aVertexColor");
-			prg.setAttributePointer("aVertexColor", 3, gl.FLOAT, false, 0, 0);
+			prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
+			prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
 		}
 		catch(err){
         	alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
@@ -6485,11 +6751,11 @@ vxlBasicStrategy.prototype.render = function(actor, renderer){
     
     if(model.normals){
 	    try{
-			gl.bindBuffer(gl.ARRAY_BUFFER, buffer.normal);
+			gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals.slice(0)), gl.STATIC_DRAW);
 			
-			prg.enableAttribute("aVertexNormal");
-			prg.setAttributePointer("aVertexNormal",3,gl.FLOAT, false, 0,0);
+			prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
+			prg.setAttributePointer(glsl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
 		}
 	    catch(err){
 	        alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
@@ -6500,40 +6766,38 @@ vxlBasicStrategy.prototype.render = function(actor, renderer){
     try{
 		if (actor.mode == vxl.def.actor.mode.SOLID){
 			prg.setUniform("uUseShading",true);
-			prg.enableAttribute("aVertexNormal");
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.index);
+			prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
 			gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
 		}
 		else if (actor.mode == vxl.def.actor.mode.WIREFRAME){
 			prg.setUniform("uUseShading", false);
 			if (actor.name == 'floor'){
-			     prg.disableAttribute("aVertexNormal");
+			     prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
 			}
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.wireframe);
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
 			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
 			gl.drawElements(gl.LINES, model.wireframe.length, gl.UNSIGNED_SHORT,0);
 		}
 		else if (actor.mode == vxl.def.actor.mode.POINTS){
 			prg.setUniform("uUseShading", true);
-			prg.enableAttribute("aVertexNormal");
+			prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
 			gl.drawArrays(gl.POINTS,0, this.model.vertices.length/3);
 		}
 		else if (actor.mode == vxl.def.actor.mode.LINES){
 			prg.setUniform("uUseShading", false);
-			prg.disableAttribute("aVertexNormal");
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.index);
+			prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
 			gl.drawElements(gl.LINES, actor.model.indices.length, gl.UNSIGNED_SHORT,0);
-		
 		}
 		else{
             alert('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+this.mode+' is not valid.');
 			throw('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+this.mode+' is not valid.');
 			
 		}
+		//Cleaning up
 		 gl.bindBuffer(gl.ARRAY_BUFFER, null);
 	     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-	     
-
     }
 	catch(err){
 		alert('Error rendering actor ['+actor.name+']. Error =' +err.description);
@@ -6542,6 +6806,96 @@ vxlBasicStrategy.prototype.render = function(actor, renderer){
 };
 
 /*-------------------------------------------------------------------------
+    This file is part of Voxelent's Nucleo
+
+    Nucleo is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation version 3.
+
+    Nucleo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------------------------------------------*/ 
+//Inheritance stuff
+vxlBlenderStrategy.prototype = new vxlBasicStrategy()
+vxlBlenderStrategy.prototype.constructor = vxlBlenderStrategy;
+
+
+function vxlBlenderStrategy(renderer) {
+	vxlBasicStrategy.call(this,renderer);
+}
+
+vxlBlenderStrategy.prototype.render = function(actor){
+	
+	if (actor.name == 'bounding box' || actor.name == 'axis' || actor.name =='floor'){
+		return;
+	}
+
+	var model 	= actor.model;
+	var idx 	= actor._renderers.indexOf(this.renderer);
+    var buffers = actor._gl_buffers[idx]; 
+    var r  		= this.renderer;
+	var gl 		= r.gl;
+	var prg 	= r.prg;
+	var trx 	= r.transforms;
+	var glsl    = vxl.def.glsl;
+	
+	this.applyActorTransform(actor);
+	
+	prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
+	prg.enableAttribute(glsl.VERTEX_ATTRIBUTE);
+	
+	prg.setUniform("uKa", actor.getProperty("Ka"));
+	prg.setUniform("uKd", actor.getProperty("Kd"));
+	prg.setUniform("uKs", actor.getProperty("Ks"));
+	prg.setUniform("uNs", actor.getProperty("Ns"));
+	prg.setUniform("d", actor.getProperty("opacity"));
+	prg.setUniform("illum", actor.getProperty("illum"));
+	
+	
+	try{
+		
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
+		prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+	}
+    catch(err){
+        alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
+		throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
+    }
+    
+    if(model.normals){
+	    try{
+			gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals.slice(0)), gl.STATIC_DRAW);
+			
+			prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
+			prg.setAttributePointer(glsl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
+		}
+	    catch(err){
+	        alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
+			throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
+	    }
+	}
+	
+	
+	try{
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+		gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
+
+    	gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	}
+	catch(err){
+		alert('Error rendering actor ['+actor.name+']. Error =' +err.description);
+		throw('Error rendering actor ['+actor.name+']. Error =' +err.description);
+	}
+
+};/*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
     Nucleo is free software: you can redistribute it and/or modify
@@ -7492,12 +7846,15 @@ vxlView.prototype.reset = function(){
 };
 
 /**
- * Sets the background color. Delegated to the renderer
- * @param {Array} v the new color given as an array of three numbers
+ * Sets the view's background color
+ * @param {Number, Array, vec3} r it can be the red component, a 3-dimensional Array or a vec3 (glMatrix)
+ * @param {Number} g if r is a number, then this parameter corresponds to the green component
+ * @param {Number} b if r is a number, then this parameter corresponds to the blue component
+ 
  * @see vxlRenderer#clearColor
  */
-vxlView.prototype.setBackgroundColor = function(v){
-	this.backgroundColor = v.slice(0);
+vxlView.prototype.setBackgroundColor = function(r,g,b){
+	this.backgroundColor = vxl.util.createVec3(r,g,b); 
 	this.renderer.clearColor(this.backgroundColor);
 };
 
@@ -7947,11 +8304,13 @@ vxl.api = {
  
 
 /**
- * Sets the background colour of this view.
- * @param color a 4-valued array containing the [r,g,b,a] values to use.
+ * Sets the background color of the current view.
+ * @param {Number, Array, vec3} r it can be the red component, a 3-dimensional Array or a vec3 (glMatrix)
+ * @param {Number} g if r is a number, then this parameter corresponds to the green component
+ * @param {Number} b if r is a number, then this parameter corresponds to the blue component
  */ 
- setBackgroundColor :  function(color){
-	vxl.c.view.setBackgroundColor(color);
+ setBackgroundColor :  function(r,g,b){
+	vxl.c.view.setBackgroundColor(r,g,b);
  },
 
 
@@ -8165,10 +8524,12 @@ wireframeON :  function(){
  
  /**
   * Loads a program
-  * @param definition one of voxelent's programs
+  * @param{vxlView} view the view to configure
+  * @param{Object} program a JSON object that defines the progrma to execute
+  * @param{vxlRenderStrategy} strategy the strategy that the renderer should follow to communicate with the program
   */
- setProgram :  function(view,program){
-    view.renderer.setProgram(program);
+ setProgram :  function(view,program,strategy){
+    view.renderer.setProgram(program,strategy);
     
  },
  

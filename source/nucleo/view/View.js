@@ -167,12 +167,15 @@ vxlView.prototype.reset = function(){
 };
 
 /**
- * Sets the background color. Delegated to the renderer
- * @param {Array} v the new color given as an array of three numbers
+ * Sets the view's background color
+ * @param {Number, Array, vec3} r it can be the red component, a 3-dimensional Array or a vec3 (glMatrix)
+ * @param {Number} g if r is a number, then this parameter corresponds to the green component
+ * @param {Number} b if r is a number, then this parameter corresponds to the blue component
+ 
  * @see vxlRenderer#clearColor
  */
-vxlView.prototype.setBackgroundColor = function(v){
-	this.backgroundColor = v.slice(0);
+vxlView.prototype.setBackgroundColor = function(r,g,b){
+	this.backgroundColor = vxl.util.createVec3(r,g,b); 
 	this.renderer.clearColor(this.backgroundColor);
 };
 

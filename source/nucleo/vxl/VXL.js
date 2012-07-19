@@ -61,9 +61,14 @@ def : {
      * @property {String} FRAGMENT_SHADER Fragment Shader Id
      */
 	glsl			: { 
-						VERTEX_SHADER   : 'VERTEX_SHADER',
-						FRAGMENT_SHADER : 'FRAGMENT_SHADER'
-						
+						VERTEX_SHADER   	: 'VERTEX_SHADER',
+						FRAGMENT_SHADER 	: 'FRAGMENT_SHADER',
+						MODEL_VIEW_MATRIX  	: 'mModelView',
+						NORMAL_MATRIX   	: 'mNormal',
+						PERSPECTIVE_MATRIX 	: 'mPerspective',
+						VERTEX_ATTRIBUTE    : 'aVertexPosition',
+						NORMAL_ATTRIBUTE    : 'aVertexNormal',
+						COLOR_ATTRIBUTE     : 'aVertexColor'
 					},
     /** 
      * @namespace Lookup Table Definitions 
