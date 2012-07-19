@@ -5,8 +5,8 @@
 # -----------------------------------------------------------------------------------------------
 
 
-import sys,os,string,traceback,pprint
-from threading import Thread
+import sys
+import pdb
 
 MATERIALS = {}  #dictionary for materials
 OBJECTS = {}
@@ -53,7 +53,7 @@ def createWebGLFile():
             
             partNumber +=1
             f.write('{\n')
-            f.write('  "name" : "'+grp+'",\n')                 # ALIAS
+            f.write('  "alias" : "'+grp+'",\n')                 # ALIAS
             
             f.write('  "vertices" : [')                         # VERTICES
             for v in ver[0:numVertices-1]:
@@ -135,6 +135,7 @@ def parseGeometry(file, hasMaterials):
 
     for line in open(file, 'r').readlines():
         nLine = nLine + 1
+        #pdb.set_trace()
         try:
             if line.startswith('usemtl') and hasMaterials:            #there is a material definition file associated .mtl (second argument on cmd line)
                     words = line.split()
@@ -185,7 +186,8 @@ def parseGeometry(file, hasMaterials):
                 if line.startswith('f '):
                     f = line[1:len(line)].split()
                     pl = len(f)
-                    if (pl == 3):                                         #ideal case for WebGL: all faces are triangles
+                    if (pl == 3): 
+                        #pdb.set_trace()                                        #ideal case for WebGL: all faces are triangles
                         fa = int(f[0][0:f[0].find('/')]);
                         fb = int(f[1][0:f[1].find('/')]);
                         fc = int(f[2][0:f[2].find('/')]);
@@ -199,8 +201,9 @@ def parseGeometry(file, hasMaterials):
                         normals_idx.append(nb)
                         normals_idx.append(nc)
                     else:
+                        #pdb.set_trace()
                         print ('ERROR: faces need to be triangular')
-                        raise
+                        #raise
             
 
         except:
