@@ -41,9 +41,14 @@ function vxlScene()
 	this.frameAnimation			= null;
 
 	if (vxl.c.scene  == null) vxl.c.scene 	= this;
-	vxl.go.notifier.addTarget(vxl.events.MODELS_LOADED,this);
-	vxl.go.notifier.addTarget(vxl.events.DEFAULT_LUT_LOADED,this);
-	vxl.go.notifier.addSource(vxl.events.SCENE_UPDATED, this);
+	
+	//Fancier than previous version, eh?
+	//1. simpler semantics
+	//2. one call 
+	var ntf = vxl.go.notifier;
+	var e = vxl.events;
+	ntf.publish([e.SCENE_UPDATED], this);
+	ntf.subscribe([e.MODELS_LOADED, e.DEFAULT_LUT_LOADED, e.ACTOR_BB_UPDATED], this)
 };
 
 /**
@@ -52,26 +57,36 @@ function vxlScene()
  * @param {Object} the source that sent the event. Useful for callbacks
  */
 vxlScene.prototype.handleEvent = function(event,src){
-	if(event  == vxl.events.MODELS_LOADED){
-		this.updateScalarRange();
-		if (this.lutID != null) this.setLookupTable(this.lutID);
-	}
 	
-	if (event == vxl.events.DEFAULT_LUT_LOADED){
+	if (event == vxl.events.ACTOR_BB_UPDATED){
+		if (this.hasActor(src)){
+			this._computeBoundingBox();
+		}
+	}
+	else if(event == vxl.events.MODELS_LOADED){
+		this.updateScalarRange();
+		if (this.lutID != null) {this.setLookupTable(this.lutID);}
+	}
+	else if (event == vxl.events.DEFAULT_LUT_LOADED){
 		this.lutID = 'default';
 		this.setLookupTable(this.lutID);
 	}
+
 };
 
 
-
+/**
+ * Sets the loading mode for this scene 
+ * @param mode one of the valid loading modes
+ * @see {vxl.def.model.loadingMode} 
+ */
 vxlScene.prototype.setLoadingMode = function(mode){
+	var m = vxl.def.model.loadingMode;
+	
 	if (mode == undefined || mode == null || 
-		(mode != vxl.def.model.loadingMode.LIVE && 
-		 mode != vxl.def.model.loadingMode.LATER &&
-		 mode != vxl.def.model.loadingMode.DETACHED)){
+		(mode != m.LIVE &&  mode != m.LATER && mode != m.DETACHED)){
 		 	throw('the mode '+mode+ 'is not a valid loading mode');
-		 }
+	}
 	this.loadingMode = mode;
 };
 
@@ -80,8 +95,9 @@ vxlScene.prototype.setLoadingMode = function(mode){
 
 /**
  * Calculates the global bounding box and the centre for the scene. 
+ * @private
  */
-vxlScene.prototype.updateMetrics = function(b){
+vxlScene.prototype._updateBoundingBox = function(b){
     
     vxl.go.console('Scene: updating metrics with ('+ b[0]+','+b[1]+','+b[2]+') - ('+b[3]+','+b[4]+','+b[5]+')');
     if (this.actors.length == 1){
@@ -117,12 +133,13 @@ vxlScene.prototype.updateMetrics = function(b){
 /**
  * Calculates the global bounding box and the center of the scene.
  * Updates the Scene's axis and bounding box actors.
+ * @private
  */
-vxlScene.prototype.computeMetrics = function() {
+vxlScene.prototype._computeBoundingBox = function() {
 	this.bb = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
 	this.centre = [0.0, 0.0, 0.0];
 	for(var i=0; i<this.actors.length; i++){
-		this.updateMetrics(this.actors[i].bb);
+		this._updateBoundingBox(this.actors[i].bb);
 	}
 };
 
@@ -165,11 +182,11 @@ vxlScene.prototype.addActor = function(actor){
     }
     
     this.actors.push(actor);
-    this.updateMetrics(actor.bb); 
+    this._updateBoundingBox(actor.bb); 
     
     vxl.go.console('Scene: Actor for model '+actor.model.name+' added');
     vxl.c.actor = actor;
-    vxl.go.notifier.fire(vxl.events.SCENE_UPDATED);
+    vxl.go.notifier.fire(vxl.events.SCENE_UPDATED, this);
 };
 
 /**
@@ -179,8 +196,23 @@ vxlScene.prototype.addActor = function(actor){
 vxlScene.prototype.removeActor = function(actor){
 	var idx = this.actors.indexOf(actor);
 	this.actors.splice(idx,1);
-    this.computeMetrics();
+    this._computeBoundingBox();
 };
+
+/**
+ * Verifies if the actor passed as a parameter belongs to this scene
+ * @param {vxlActor, String} actor the actor object or the actor name to verify 
+ */
+vxlScene.prototype.hasActor = function(actor){
+	if (actor instanceof vxlActor){
+		return (this.actors.indexOf(actor)!=-1)
+	}
+	else if (typeof(actor)=='string'){
+		var aux = this.getActorByName(actor);
+		return (aux != undefined);
+	}
+	else return false;
+}
 
 /**
  * Updates the Scene's scalarMAX and scalarMIN properties.
@@ -226,7 +258,7 @@ vxlScene.prototype.reset = function(){
 	}
 	this.actors = [];
 	vxl.c.actor = null;
-	this.computeMetrics();
+	this._computeBoundingBox();
 };
 
 /**

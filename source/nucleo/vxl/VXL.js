@@ -167,7 +167,8 @@ def : {
 events : {
 	DEFAULT_LUT_LOADED 	: 'vxl.events.DEFAULT_LUT_LOADED',
 	SCENE_UPDATED		: 'vxl.events.SCENE_UPDATED',
-	MODELS_LOADED		: 'vxl.events.MODELS_LOADED'
+	MODELS_LOADED		: 'vxl.events.MODELS_LOADED',
+	ACTOR_BB_UPDATED    : 'vxl.events.ACTOR_BB_UPDATED'
 },
 
 

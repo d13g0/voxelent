@@ -167,7 +167,8 @@ def : {
 events : {
 	DEFAULT_LUT_LOADED 	: 'vxl.events.DEFAULT_LUT_LOADED',
 	SCENE_UPDATED		: 'vxl.events.SCENE_UPDATED',
-	MODELS_LOADED		: 'vxl.events.MODELS_LOADED'
+	MODELS_LOADED		: 'vxl.events.MODELS_LOADED',
+	ACTOR_BB_UPDATED    : 'vxl.events.ACTOR_BB_UPDATED'
 },
 
 
@@ -345,6 +346,11 @@ $(window).bind('blur', vxl.go.slowRendering);
 vxl.go.notifier = new vxlNotifier();
 
 /**
+ * <p> 
+ * Handles asynchronous communication among classes in Voxelent 
+ * using a publisher-subscriber mechanism
+ * </p>
+ * 
  * @class
  * @constructor
  */
@@ -354,28 +360,83 @@ function vxlNotifier(){
     
 };
 
-vxlNotifier.prototype.addTarget = function(event,t){
+/**
+ * <p>Used by any class to declare the events that the class will listen for.</p>
+  
+ * @param {Object} list
+ * @param {Object} receiver
+ */
+vxlNotifier.prototype.subscribe = function(list,receiver){
+	if (typeof(list)=='string'){
+		this.addTarget(list,receiver);
+	}
+	else if (list instanceof Array){
+		for (var i=0;i<list.length;i+=1){
+			this.addTarget(list[i],receiver);
+		}
+	}
+	else {
+		throw 'vxlNotifier.receives: this method receives a string or a list of strings'
+	}
+};
+
+/**
+ * <p>Used by any class to declare the events that the class will generate</p> 
+ * @param {Object} list
+ * @param {Object} sender
+ */
+vxlNotifier.prototype.publish = function(list,sender){
+	if (typeof(list)== 'string'){
+		this.addSource(list,sender);
+	}
+	else if (list instanceof Array){
+		for (var i=0;i<list.length;i+=1){
+			this.addSource(list[i],sender);
+		}
+	}
+	else {
+		throw 'vxlNotifier.sends: this method receives a string or a list of strings'
+	}
+}
+
+
+/**
+ * Any class can use this method to tell the notifier that it will listen to 
+ * a particular event.
+ * 
+ * @param {Object} event the event the class will listen to
+ * @param {Object} target the object that will listen for the event
+ */
+vxlNotifier.prototype.addTarget = function(event, target){
 	vxl.go.console('vxlNotifier: adding target for event '+event);
 	var targetList = this.targetList;
 	if (targetList[event]== undefined){
 		targetList[event] = [];
 	}
-	targetList[event].push(t);
+	targetList[event].push(target);
 };
 
 
+/**
+ * Any class can use this method to tell the notifier that it will emit a particular event
+ * 
+ * @param {Object} event the event to emit
+ * @param {Object} src the object that will emit the event
+ */
 vxlNotifier.prototype.addSource = function(event,src){
 	vxl.go.console('vxlNotifier: adding source for event '+event);
 	var targetList = this.targetList;
 	var sourceList = this.sourceList;
 	
 	if (sourceList[event]== undefined){
-		sourceList[event] = src;
+		sourceList[event] = [];
 	}
 	
 	if (targetList[event]== undefined){
 		targetList[event] = [];
 	}
+	
+	sourceList[event].push(src);
 	
 	$(document).bind(event, function(e,event,src,targetList){
 		for (var index=0;index<targetList[event].length;index++){
@@ -384,13 +445,33 @@ vxlNotifier.prototype.addSource = function(event,src){
 	});
 };
 
-vxlNotifier.prototype.fire = function(event){
+/**
+ * <p>Invoked by any class when it needs to emit an event that should be propagated to other
+ * objects in the library</p>
+ * 
+ * <p>The notifier will first verify if the object emitting the event has been authorized to do so.
+ * This is, the object should have registered using either <code>addSource</code> or <code>sends</code>.
+ * After that, the notifier will retrieve a list of the objects that have registered as listeners of 
+ * the particular event and fires the event to them using JQuery.
+ * </p>
+ *  
+ * @param {Object} event
+ * @param {Object} src
+ */
+vxlNotifier.prototype.fire = function(event, src){
 	var targetList = this.targetList;
-	var src = this.sourceList[event];
+	
+    var idx = this.sourceList[event].indexOf(src);
+    if (idx == -1){
+    	throw 'The source '+src+' is not registered to trigger the event '+event+'. Did you use vxlNotifier.addSource?';
+    }
 	vxl.go.console('vxlNotifier: firing ' +event);
 	$(document).trigger(event,[event,src,targetList]);
 };
 
+/**
+ * Gets a list of the events handled by this vxlNotifier 
+ */
 vxlNotifier.prototype.getEvents = function(){
 	var list = [];
 	for (var event in this.sourceList){
@@ -399,6 +480,11 @@ vxlNotifier.prototype.getEvents = function(){
 	return list;
 };
 
+
+/**
+ * Get a list of the objects that are currently registered to listen for a particular event 
+ * @param {Object} event the event in question
+ */
 vxlNotifier.prototype.getTargetsFor = function(event){
 	var targets = this.targetList[event];
 	var list = [];
@@ -6240,10 +6326,12 @@ function vxlActor(model){
   if (model){
   	this.model 	 = model;
   	this.name 	 = model.name;
-  	this.diffuse = model.diffuse;
+  	this.color   = model.diffuse;
   	this.bb 	 = model.bb.slice(0);
   	this.mode    = model.mode==undefined?vxl.def.actor.mode.SOLID:model.mode;
   }
+  
+  vxl.go.notifier.addSource(vxl.events.ACTOR_BB_UPDATED, this);
   
 };
 
@@ -6262,10 +6350,9 @@ function vxlActor(model){
 vxlActor.prototype.setPosition = function (x,y,z){
     
     var bb = this.bb;
+    var currentPos = vec3.set(this.position, vec3.create());
     
     this.position = vxl.util.createVec3(x,y,z); 
-    
-    var currentPos = vec3.set(this.position, vec3.create()); 
     
     //Now recalculate the bounding box 
     var shift = vec3.subtract(this.position, currentPos, vec3.create());
@@ -6276,6 +6363,7 @@ vxlActor.prototype.setPosition = function (x,y,z){
     bb[4] += shift[1];
     bb[5] += shift[2];
     
+    vxl.go.notifier.fire(vxl.events.ACTOR_BB_UPDATED, this);
 };
 /**
  * Scales this actor. 
@@ -6284,21 +6372,42 @@ vxlActor.prototype.setPosition = function (x,y,z){
  */
 vxlActor.prototype.setScale = function(s){
     
+    var bb = this.bb;
+    
     if (typeof(s)=="number"){
         this.scale = vxl.util.createVec3(s,s,s);
+        //@TODO: TEST
+        bb[0] *= s
+    	bb[1] += s
+    	bb[2] += s
+    	bb[3] += s
+    	bb[4] += s
+    	bb[5] += s
     }
     else{
         this.scale = vxl.util.createVec3(s);
+        
+        //@TODO: TEST
+        bb[0] *= this.scale[0];
+    	bb[1] += this.scale[1];
+    	bb[2] += this.scale[2];
+    	
+    	bb[3] += this.scale[0];
+    	bb[4] += this.scale[1];
+    	bb[5] += this.scale[2];
     }
-    //TODO: Recalculate bounding box
+    
+    vxl.go.notifier.fire(vxl.events.ACTOR_BB_UPDATED, this);
 };
 
 /**
 * Sets the actor color. This color can be different from the original model color
-* @TODO: Deprecated
+* @param {Number, Array, vec3} r it can be the red component, a 3-dimensional Array or a vec3 (glMatrix)
+* @param {Number} g if r is a number, then this parameter corresponds to the green component
+* @param {Number} b if r is a number, then this parameter corresponds to the blue component
 */
-vxlActor.prototype.setColor = function (c){
-	this.color = c.slice(0);
+vxlActor.prototype.setColor = function (r,g,b){
+	this.color = vxl.util.createVec3(r,g,b); 
 	vxl.go.console('Actor '+this.name+': color changed to : (' + this.color[0] +','+ this.color[1] +','+ this.color[2]+')');
 };
 
@@ -6705,18 +6814,20 @@ vxlBasicStrategy.prototype.render = function(actor){
 	
 	this.applyActorTransform(actor);
 	
+	var diffuse = [actor.color[0], actor.color[1], actor.color[2],1.0];
+	
 	if (actor.opacity < 1.0){
 		gl.disable(gl.DEPTH_TEST);
 		gl.enable(gl.BLEND);
-		actor.diffuse[3] = this.opacity;
+		diffuse[3] = this.opacity;
 	}
 	else {
 		gl.enable(gl.DEPTH_TEST);
 		gl.disable(gl.BLEND);
-		actor.diffuse[3] = 1.0;
+		diffuse[3] = 1.0;
 	}
 	
-	prg.setUniform("uMaterialDiffuse",actor.diffuse);
+	prg.setUniform("uMaterialDiffuse",diffuse);
 	prg.setUniform("uUseVertexColors", false);
     
     prg.disableAttribute(glsl.COLOR_ATTRIBUTE);
@@ -6938,9 +7049,14 @@ function vxlScene()
 	this.frameAnimation			= null;
 
 	if (vxl.c.scene  == null) vxl.c.scene 	= this;
-	vxl.go.notifier.addTarget(vxl.events.MODELS_LOADED,this);
-	vxl.go.notifier.addTarget(vxl.events.DEFAULT_LUT_LOADED,this);
-	vxl.go.notifier.addSource(vxl.events.SCENE_UPDATED, this);
+	
+	//Fancier than previous version, eh?
+	//1. simpler semantics
+	//2. one call 
+	var ntf = vxl.go.notifier;
+	var e = vxl.events;
+	ntf.publish([e.SCENE_UPDATED], this);
+	ntf.subscribe([e.MODELS_LOADED, e.DEFAULT_LUT_LOADED, e.ACTOR_BB_UPDATED], this)
 };
 
 /**
@@ -6949,26 +7065,36 @@ function vxlScene()
  * @param {Object} the source that sent the event. Useful for callbacks
  */
 vxlScene.prototype.handleEvent = function(event,src){
-	if(event  == vxl.events.MODELS_LOADED){
-		this.updateScalarRange();
-		if (this.lutID != null) this.setLookupTable(this.lutID);
-	}
 	
-	if (event == vxl.events.DEFAULT_LUT_LOADED){
+	if (event == vxl.events.ACTOR_BB_UPDATED){
+		if (this.hasActor(src)){
+			this._computeBoundingBox();
+		}
+	}
+	else if(event == vxl.events.MODELS_LOADED){
+		this.updateScalarRange();
+		if (this.lutID != null) {this.setLookupTable(this.lutID);}
+	}
+	else if (event == vxl.events.DEFAULT_LUT_LOADED){
 		this.lutID = 'default';
 		this.setLookupTable(this.lutID);
 	}
+
 };
 
 
-
+/**
+ * Sets the loading mode for this scene 
+ * @param mode one of the valid loading modes
+ * @see {vxl.def.model.loadingMode} 
+ */
 vxlScene.prototype.setLoadingMode = function(mode){
+	var m = vxl.def.model.loadingMode;
+	
 	if (mode == undefined || mode == null || 
-		(mode != vxl.def.model.loadingMode.LIVE && 
-		 mode != vxl.def.model.loadingMode.LATER &&
-		 mode != vxl.def.model.loadingMode.DETACHED)){
+		(mode != m.LIVE &&  mode != m.LATER && mode != m.DETACHED)){
 		 	throw('the mode '+mode+ 'is not a valid loading mode');
-		 }
+	}
 	this.loadingMode = mode;
 };
 
@@ -6977,8 +7103,9 @@ vxlScene.prototype.setLoadingMode = function(mode){
 
 /**
  * Calculates the global bounding box and the centre for the scene. 
+ * @private
  */
-vxlScene.prototype.updateMetrics = function(b){
+vxlScene.prototype._updateBoundingBox = function(b){
     
     vxl.go.console('Scene: updating metrics with ('+ b[0]+','+b[1]+','+b[2]+') - ('+b[3]+','+b[4]+','+b[5]+')');
     if (this.actors.length == 1){
@@ -7014,12 +7141,13 @@ vxlScene.prototype.updateMetrics = function(b){
 /**
  * Calculates the global bounding box and the center of the scene.
  * Updates the Scene's axis and bounding box actors.
+ * @private
  */
-vxlScene.prototype.computeMetrics = function() {
+vxlScene.prototype._computeBoundingBox = function() {
 	this.bb = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
 	this.centre = [0.0, 0.0, 0.0];
 	for(var i=0; i<this.actors.length; i++){
-		this.updateMetrics(this.actors[i].bb);
+		this._updateBoundingBox(this.actors[i].bb);
 	}
 };
 
@@ -7062,11 +7190,11 @@ vxlScene.prototype.addActor = function(actor){
     }
     
     this.actors.push(actor);
-    this.updateMetrics(actor.bb); 
+    this._updateBoundingBox(actor.bb); 
     
     vxl.go.console('Scene: Actor for model '+actor.model.name+' added');
     vxl.c.actor = actor;
-    vxl.go.notifier.fire(vxl.events.SCENE_UPDATED);
+    vxl.go.notifier.fire(vxl.events.SCENE_UPDATED, this);
 };
 
 /**
@@ -7076,8 +7204,23 @@ vxlScene.prototype.addActor = function(actor){
 vxlScene.prototype.removeActor = function(actor){
 	var idx = this.actors.indexOf(actor);
 	this.actors.splice(idx,1);
-    this.computeMetrics();
+    this._computeBoundingBox();
 };
+
+/**
+ * Verifies if the actor passed as a parameter belongs to this scene
+ * @param {vxlActor, String} actor the actor object or the actor name to verify 
+ */
+vxlScene.prototype.hasActor = function(actor){
+	if (actor instanceof vxlActor){
+		return (this.actors.indexOf(actor)!=-1)
+	}
+	else if (typeof(actor)=='string'){
+		var aux = this.getActorByName(actor);
+		return (aux != undefined);
+	}
+	else return false;
+}
 
 /**
  * Updates the Scene's scalarMAX and scalarMIN properties.
@@ -7123,7 +7266,7 @@ vxlScene.prototype.reset = function(){
 	}
 	this.actors = [];
 	vxl.c.actor = null;
-	this.computeMetrics();
+	this._computeBoundingBox();
 };
 
 /**
@@ -7405,7 +7548,7 @@ vxlLookupTableManager.prototype.handle = function (ID, payload) {
 	this.tables.push(lut);
 	
 	if (lut.ID == vxl.def.lut.main){
-		vxl.go.notifier.fire(vxl.events.DEFAULT_LUT_LOADED);
+		vxl.go.notifier.fire(vxl.events.DEFAULT_LUT_LOADED, this);
 	}
 };
 /**
@@ -8003,7 +8146,7 @@ vxlModelManager.prototype.add = function(JSON_OBJECT,name,scene){
 	}
 	
 	if(this.allLoaded()){ 
-		vxl.go.notifier.fire(vxl.events.MODELS_LOADED);
+		vxl.go.notifier.fire(vxl.events.MODELS_LOADED, this);
 	}
  };
  

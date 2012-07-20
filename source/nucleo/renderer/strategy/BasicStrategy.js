@@ -131,18 +131,20 @@ vxlBasicStrategy.prototype.render = function(actor){
 	
 	this.applyActorTransform(actor);
 	
+	var diffuse = [actor.color[0], actor.color[1], actor.color[2],1.0];
+	
 	if (actor.opacity < 1.0){
 		gl.disable(gl.DEPTH_TEST);
 		gl.enable(gl.BLEND);
-		actor.diffuse[3] = this.opacity;
+		diffuse[3] = this.opacity;
 	}
 	else {
 		gl.enable(gl.DEPTH_TEST);
 		gl.disable(gl.BLEND);
-		actor.diffuse[3] = 1.0;
+		diffuse[3] = 1.0;
 	}
 	
-	prg.setUniform("uMaterialDiffuse",actor.diffuse);
+	prg.setUniform("uMaterialDiffuse",diffuse);
 	prg.setUniform("uUseVertexColors", false);
     
     prg.disableAttribute(glsl.COLOR_ATTRIBUTE);

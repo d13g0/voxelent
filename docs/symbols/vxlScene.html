@@ -489,15 +489,6 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlScene.html#computeMetrics">computeMetrics</a></b>()
-								</div>
-								<div class="description">Calculates the global bounding box and the center of the scene.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/vxlScene.html#createActor">createActor</a></b>(the)
 								</div>
 								<div class="description">This function creates AND ADD a new actor to this scene</div>
@@ -552,6 +543,15 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/vxlScene.html#hasActor">hasActor</a></b>(actor)
+								</div>
+								<div class="description">Verifies if the actor passed as a parameter belongs to this scene</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/vxlScene.html#removeActor">removeActor</a></b>(actor)
 								</div>
 								<div class="description">Removes one actor</div>
@@ -590,7 +590,7 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/vxlScene.html#setLoadingMode">setLoadingMode</a></b>(mode)
 								</div>
-								<div class="description"></div>
+								<div class="description">Sets the loading mode for this scene</div>
 							</td>
 						</tr>
 					
@@ -618,15 +618,6 @@ height:135px;
 								<div class="fixedFont"><b><a href="../symbols/vxlScene.html#setVisualizationMode">setVisualizationMode</a></b>(mode)
 								</div>
 								<div class="description">Changes the visualization mode for all the objects in the scene</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlScene.html#updateMetrics">updateMetrics</a></b>(b)
-								</div>
-								<div class="description">Calculates the global bounding box and the centre for the scene.</div>
 							</td>
 						</tr>
 					
@@ -751,31 +742,6 @@ height:135px;
 								<dd><a href="../symbols/vxlFrameAnimation.html">vxlFrameAnimation</a></dd>
 							
 							</dl>
-						
-
-					<hr />
-				
-					<a name="computeMetrics"> </a>
-					<div class="fixedFont">
-
-					
-					<b>computeMetrics</b>()
-
-					</div>
-					<div class="description">
-						Calculates the global bounding box and the center of the scene.Updates the Scene's axis and bounding box actors.
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
 						
 
 					<hr />
@@ -1005,6 +971,42 @@ height:135px;
 
 					<hr />
 				
+					<a name="hasActor"> </a>
+					<div class="fixedFont">
+
+					
+					<b>hasActor</b>(actor)
+
+					</div>
+					<div class="description">
+						Verifies if the actor passed as a parameter belongs to this scene
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/vxlActor.html">vxlActor</a>|String}</span> <b>actor</b>
+									
+								</dt>
+								<dd>the actor object or the actor name to verify</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name="removeActor"> </a>
 					<div class="fixedFont">
 
@@ -1164,7 +1166,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						
+						Sets the loading mode for this scene
 						
 						
 					</div>
@@ -1179,7 +1181,7 @@ height:135px;
 									<b>mode</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>one of the valid loading modes</dd>
 							
 							</dl>
 						
@@ -1188,6 +1190,13 @@ height:135px;
 						
 						
 						
+						
+							<dl class="detailList">
+							<dt class="heading">See:</dt>
+							
+								<dd></dd>
+							
+							</dl>
 						
 
 					<hr />
@@ -1306,42 +1315,6 @@ height:135px;
 
 					<hr />
 				
-					<a name="updateMetrics"> </a>
-					<div class="fixedFont">
-
-					
-					<b>updateMetrics</b>(b)
-
-					</div>
-					<div class="description">
-						Calculates the global bounding box and the centre for the scene.
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<b>b</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
 					<a name="updateScalarRange"> </a>
 					<div class="fixedFont">
 
@@ -1379,7 +1352,7 @@ height:135px;
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Jul 19 2012 14:47:34 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Jul 20 2012 19:42:26 GMT-0400 (EDT)
 		</div>
         </div>
         </div>

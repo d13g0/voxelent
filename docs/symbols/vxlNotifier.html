@@ -444,7 +444,7 @@ height:135px;
 							<div class="fixedFont">
 								<b><a href="../symbols/vxlNotifier.html#constructor">vxlNotifier</a></b>()
 							</div>
-							<div class="description"></div>
+							<div class="description"><p> Handles asynchronous communication among classes in Voxelent using a publisher-subscriber mechanism</p></div>
 						</td>
 					</tr>
 				</tbody>
@@ -473,25 +473,25 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/vxlNotifier.html#addSource">addSource</a></b>(event, src)
 								</div>
-								<div class="description"></div>
+								<div class="description">Any class can use this method to tell the notifier that it will emit a particular event</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlNotifier.html#addTarget">addTarget</a></b>(event, t)
+								<div class="fixedFont"><b><a href="../symbols/vxlNotifier.html#addTarget">addTarget</a></b>(event, target)
 								</div>
-								<div class="description"></div>
+								<div class="description">Any class can use this method to tell the notifier that it will listen to a particular event.</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlNotifier.html#fire">fire</a></b>(event)
+								<div class="fixedFont"><b><a href="../symbols/vxlNotifier.html#fire">fire</a></b>(event, src)
 								</div>
-								<div class="description"></div>
+								<div class="description"><p>Invoked by any class when it needs to emit an event that should be propagated to otherobjects in the library</p><p>The notifier will first verify if the object emitting the event has been authorized to do so.</div>
 							</td>
 						</tr>
 					
@@ -500,7 +500,7 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/vxlNotifier.html#getEvents">getEvents</a></b>()
 								</div>
-								<div class="description"></div>
+								<div class="description">Gets a list of the events handled by this vxlNotifier</div>
 							</td>
 						</tr>
 					
@@ -509,7 +509,25 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/vxlNotifier.html#getTargetsFor">getTargetsFor</a></b>(event)
 								</div>
-								<div class="description"></div>
+								<div class="description">Get a list of the objects that are currently registered to listen for a particular event</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/vxlNotifier.html#publish">publish</a></b>(list, sender)
+								</div>
+								<div class="description"><p>Used by any class to declare the events that the class will generate</p></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/vxlNotifier.html#subscribe">subscribe</a></b>(list, receiver)
+								</div>
+								<div class="description"><p>Used by any class to declare the events that the class will listen for.</div>
 							</td>
 						</tr>
 					
@@ -534,7 +552,7 @@ height:135px;
 				</div>
 
 				<div class="description">
-					
+					<p> Handles asynchronous communication among classes in Voxelent using a publisher-subscriber mechanism</p>
 					
 				</div>
 
@@ -569,7 +587,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						
+						Any class can use this method to tell the notifier that it will emit a particular event
 						
 						
 					</div>
@@ -581,16 +599,16 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>event</b>
+									<span class="light fixedFont">{Object}</span> <b>event</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the event to emit</dd>
 							
 								<dt>
-									<b>src</b>
+									<span class="light fixedFont">{Object}</span> <b>src</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the object that will emit the event</dd>
 							
 							</dl>
 						
@@ -607,11 +625,11 @@ height:135px;
 					<div class="fixedFont">
 
 					
-					<b>addTarget</b>(event, t)
+					<b>addTarget</b>(event, target)
 
 					</div>
 					<div class="description">
-						
+						Any class can use this method to tell the notifier that it will listen to a particular event.
 						
 						
 					</div>
@@ -623,16 +641,16 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>event</b>
+									<span class="light fixedFont">{Object}</span> <b>event</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the event the class will listen to</dd>
 							
 								<dt>
-									<b>t</b>
+									<span class="light fixedFont">{Object}</span> <b>target</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>the object that will listen for the event</dd>
 							
 							</dl>
 						
@@ -649,11 +667,11 @@ height:135px;
 					<div class="fixedFont">
 
 					
-					<b>fire</b>(event)
+					<b>fire</b>(event, src)
 
 					</div>
 					<div class="description">
-						
+						<p>Invoked by any class when it needs to emit an event that should be propagated to otherobjects in the library</p><p>The notifier will first verify if the object emitting the event has been authorized to do so.This is, the object should have registered using either <code>addSource</code> or <code>sends</code>.After that, the notifier will retrieve a list of the objects that have registered as listeners of the particular event and fires the event to them using JQuery.</p>
 						
 						
 					</div>
@@ -665,7 +683,13 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>event</b>
+									<span class="light fixedFont">{Object}</span> <b>event</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>src</b>
 									
 								</dt>
 								<dd></dd>
@@ -689,7 +713,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						
+						Gets a list of the events handled by this vxlNotifier
 						
 						
 					</div>
@@ -714,7 +738,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						
+						Get a list of the objects that are currently registered to listen for a particular event
 						
 						
 					</div>
@@ -726,7 +750,91 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>event</b>
+									<span class="light fixedFont">{Object}</span> <b>event</b>
+									
+								</dt>
+								<dd>the event in question</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="publish"> </a>
+					<div class="fixedFont">
+
+					
+					<b>publish</b>(list, sender)
+
+					</div>
+					<div class="description">
+						<p>Used by any class to declare the events that the class will generate</p>
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>list</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>sender</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="subscribe"> </a>
+					<div class="fixedFont">
+
+					
+					<b>subscribe</b>(list, receiver)
+
+					</div>
+					<div class="description">
+						<p>Used by any class to declare the events that the class will listen for.</p>
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>list</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>receiver</b>
 									
 								</dt>
 								<dd></dd>
@@ -754,7 +862,7 @@ height:135px;
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Jul 19 2012 14:47:34 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Jul 20 2012 19:42:26 GMT-0400 (EDT)
 		</div>
         </div>
         </div>

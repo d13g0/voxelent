@@ -115,7 +115,7 @@ vxlModelManager.prototype.add = function(JSON_OBJECT,name,scene){
 	}
 	
 	if(this.allLoaded()){ 
-		vxl.go.notifier.fire(vxl.events.MODELS_LOADED);
+		vxl.go.notifier.fire(vxl.events.MODELS_LOADED, this);
 	}
  };
  

@@ -48,7 +48,7 @@ vxlLookupTableManager.prototype.handle = function (ID, payload) {
 	this.tables.push(lut);
 	
 	if (lut.ID == vxl.def.lut.main){
-		vxl.go.notifier.fire(vxl.events.DEFAULT_LUT_LOADED);
+		vxl.go.notifier.fire(vxl.events.DEFAULT_LUT_LOADED, this);
 	}
 };
 /**

@@ -71,10 +71,12 @@ function vxlActor(model){
   if (model){
   	this.model 	 = model;
   	this.name 	 = model.name;
-  	this.diffuse = model.diffuse;
+  	this.color   = model.diffuse;
   	this.bb 	 = model.bb.slice(0);
   	this.mode    = model.mode==undefined?vxl.def.actor.mode.SOLID:model.mode;
   }
+  
+  vxl.go.notifier.addSource(vxl.events.ACTOR_BB_UPDATED, this);
   
 };
 
@@ -93,10 +95,9 @@ function vxlActor(model){
 vxlActor.prototype.setPosition = function (x,y,z){
     
     var bb = this.bb;
+    var currentPos = vec3.set(this.position, vec3.create());
     
     this.position = vxl.util.createVec3(x,y,z); 
-    
-    var currentPos = vec3.set(this.position, vec3.create()); 
     
     //Now recalculate the bounding box 
     var shift = vec3.subtract(this.position, currentPos, vec3.create());
@@ -107,6 +108,7 @@ vxlActor.prototype.setPosition = function (x,y,z){
     bb[4] += shift[1];
     bb[5] += shift[2];
     
+    vxl.go.notifier.fire(vxl.events.ACTOR_BB_UPDATED, this);
 };
 /**
  * Scales this actor. 
@@ -115,21 +117,42 @@ vxlActor.prototype.setPosition = function (x,y,z){
  */
 vxlActor.prototype.setScale = function(s){
     
+    var bb = this.bb;
+    
     if (typeof(s)=="number"){
         this.scale = vxl.util.createVec3(s,s,s);
+        //@TODO: TEST
+        bb[0] *= s
+    	bb[1] += s
+    	bb[2] += s
+    	bb[3] += s
+    	bb[4] += s
+    	bb[5] += s
     }
     else{
         this.scale = vxl.util.createVec3(s);
+        
+        //@TODO: TEST
+        bb[0] *= this.scale[0];
+    	bb[1] += this.scale[1];
+    	bb[2] += this.scale[2];
+    	
+    	bb[3] += this.scale[0];
+    	bb[4] += this.scale[1];
+    	bb[5] += this.scale[2];
     }
-    //TODO: Recalculate bounding box
+    
+    vxl.go.notifier.fire(vxl.events.ACTOR_BB_UPDATED, this);
 };
 
 /**
 * Sets the actor color. This color can be different from the original model color
-* @TODO: Deprecated
+* @param {Number, Array, vec3} r it can be the red component, a 3-dimensional Array or a vec3 (glMatrix)
+* @param {Number} g if r is a number, then this parameter corresponds to the green component
+* @param {Number} b if r is a number, then this parameter corresponds to the blue component
 */
-vxlActor.prototype.setColor = function (c){
-	this.color = c.slice(0);
+vxlActor.prototype.setColor = function (r,g,b){
+	this.color = vxl.util.createVec3(r,g,b); 
 	vxl.go.console('Actor '+this.name+': color changed to : (' + this.color[0] +','+ this.color[1] +','+ this.color[2]+')');
 };
 
