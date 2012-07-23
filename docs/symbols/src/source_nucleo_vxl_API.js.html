@@ -506,9 +506,26 @@
 <span class='line'>499</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">vxl.c.view.renderer.prg._uniformList</span><span class="PUNC">[</span><span class="NAME">vxl.c.view.renderer.prg._currentProgramID</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>500</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>501</span> </span><span class="WHIT">  </span><span class="WHIT">
-<span class='line'>502</span> </span><span class="WHIT">  </span><span class="NAME">subscribe</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">event</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">context</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>503</span> </span><span class="WHIT">  	</span><span class="NAME">vxl.go.notifier.addTarget</span><span class="PUNC">(</span><span class="NAME">event</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">context</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>504</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>505</span> </span><span class="WHIT">  </span><span class="WHIT">
-<span class='line'>506</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>507</span> </span><span class="WHIT"> </span></pre></body></html>
+<span class='line'>502</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>503</span>    * &lt;p>Suscribes the to Voxelent events &lt;/p>
+<span class='line'>504</span>    * 
+<span class='line'>505</span>    * &lt;p>The context parameter corresponds to the class that is going to listen for Voxelent events.&lt;/p>
+<span class='line'>506</span>    * 
+<span class='line'>507</span>    * &lt;p>Such class needs to implement a method to handle the events that it has subscribed to. This method/function needs
+<span class='line'>508</span>    * to have the following signature:&lt;/p>
+<span class='line'>509</span>    * 
+<span class='line'>510</span>    * &lt;p>&lt;code>handleEvent(event, src)&lt;/code>&lt;/p>
+<span class='line'>511</span>    * 
+<span class='line'>512</span>    * &lt;p> The event parameter corresponds to the event that has been fired by Voxelent. Notice that 
+<span class='line'>513</span>    * your class will only be notified of those events that it has been subscribed to.
+<span class='line'>514</span>    * 
+<span class='line'>515</span>    * @param {String, Array} list the event or events that we are going to subscribe to
+<span class='line'>516</span>    * @param {context} the object that needs to implement the handleEvent method
+<span class='line'>517</span>    * 
+<span class='line'>518</span>    */</span><span class="WHIT">
+<span class='line'>519</span> </span><span class="WHIT">  </span><span class="NAME">subscribe</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">list</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">context</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>520</span> </span><span class="WHIT">  	</span><span class="NAME">vxl.go.notifier.subscribe</span><span class="PUNC">(</span><span class="NAME">list</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">context</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>521</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>522</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>523</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>524</span> </span><span class="WHIT"> </span></pre></body></html>

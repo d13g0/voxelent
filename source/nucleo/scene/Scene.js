@@ -212,7 +212,19 @@ vxlScene.prototype.hasActor = function(actor){
 		return (aux != undefined);
 	}
 	else return false;
-}
+};
+
+
+/**
+ * Sets a property for all the actors in the scene
+ * @param {String} property the name of the actor property
+ * @param {Object} value the value of the property
+ */
+vxlScene.prototype.setPropertyForAll = function (property, value){
+    for(var i=0; i<this.actors.length; i++){
+        this.actors[i].setProperty(property, value);
+    }
+};
 
 /**
  * Updates the Scene's scalarMAX and scalarMIN properties.

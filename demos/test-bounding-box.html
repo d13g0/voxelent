@@ -29,15 +29,16 @@ function handleEvent(event){
     var sphere 		= vxl.api.getActorByName('sphere.json');
 
     cone.setPosition(10,0,0);  
-    
     cylinder.setPosition(-10,0,10);
-    
     sphere.setPosition(0,0,-5);
     sphere.setColor(0,0.9,0.2);
+    
+    var cam = vxl.c.camera;
      
-    vxl.c.camera.longShot();
-    vxl.c.camera.setAzimuth(15);
-    vxl.c.camera.setElevation(-15);
+    cam.longShot();
+    cam.setAzimuth(15);
+    cam.setElevation(-15);
+    cam.clear();
     
     vxl.api.boundingBoxON();
 }

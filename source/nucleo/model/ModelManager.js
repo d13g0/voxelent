@@ -26,7 +26,7 @@
 function vxlModelManager(){
 	this.toLoad = new Array(); //analyze
 	this.models = [];
-	vxl.go.notifier.addSource(vxl.events.MODELS_LOADED,this);
+	vxl.go.notifier.publish(vxl.events.MODELS_LOADED,this);
 };
 
 

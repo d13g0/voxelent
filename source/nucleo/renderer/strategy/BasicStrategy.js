@@ -193,7 +193,7 @@ vxlBasicStrategy.prototype.render = function(actor){
     
     try{
 		if (actor.mode == vxl.def.actor.mode.SOLID){
-			prg.setUniform("uUseShading",true);
+			prg.setUniform("uUseShading",actor.shading);
 			prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
 			gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);

@@ -33,7 +33,7 @@
 <span class='line'> 26</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">vxlModelManager</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 27</span> </span><span class="WHIT">	</span><span class="NAME">this.toLoad</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Array</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">//analyze</span><span class="WHIT">
 <span class='line'> 28</span> </span><span class="WHIT">	</span><span class="NAME">this.models</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 29</span> </span><span class="WHIT">	</span><span class="NAME">vxl.go.notifier.addSource</span><span class="PUNC">(</span><span class="NAME">vxl.events.MODELS_LOADED</span><span class="PUNC">,</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 29</span> </span><span class="WHIT">	</span><span class="NAME">vxl.go.notifier.publish</span><span class="PUNC">(</span><span class="NAME">vxl.events.MODELS_LOADED</span><span class="PUNC">,</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 30</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 31</span> 
 <span class='line'> 32</span> 

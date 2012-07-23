@@ -38,6 +38,10 @@ We need to create a tutorial about this! It's reall cool!
 13. getProperty and setProperty methods implemented in vxlActor. The scope determines what copy to pass
 (model or actor property). We need to write a tutorial about this too.
 
+14. New demo testing the actor cloning mechanism (see demo-lookup-table.html)
+
+15. Publish/Subscribe mechanism updated for vxlNotifier
+
 -------------------------------------------------------------------------------------------
 VERSION 0.87.5 - Mother's Day
 -------------------------------------------------------------------------------------------

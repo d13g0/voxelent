@@ -21,7 +21,7 @@
 
 /**
  * <p>
- * An actor is a representation of a model in voxelent. Actors can cache model properties 
+ * An actor is a representation of a model in Voxelent. Actors can cache model properties 
  * and modified them. This is useful when there are several actors based in the same model
  * but each one of them needs to have a different version of any given model property (i.e. color)
  * </p>
@@ -58,25 +58,27 @@ function vxlActor(model){
   this.scale 		= vec3.create([1, 1, 1]);
   this.rotation 	= vec3.create([0, 0, 0]);
 
-  this.visible   = true;
-  this.mode = vxl.def.actor.mode.SOLID;
-  this.opacity = 1.0;
-  this.colors = model?(model.colors!=null?model.colors:null):null;	//it will create colors for this actor once a lookup table had been set up
-  this.clones  = 0;
+  this.visible      = true;
+  this.mode         = vxl.def.actor.mode.SOLID;
+  this.opacity      = 1.0;
+  this.colors       = model?(model.colors!=null?model.colors:null):null;	//it will create colors for this actor once a lookup table had been set up
+  this.clones       = 0;
   
-  this._renderers = [];
-  this._gl_buffers = [];
+  this._renderers   = [];
+  this._gl_buffers  = [];
+  this.shading      = true;
 
   
   if (model){
-  	this.model 	 = model;
-  	this.name 	 = model.name;
-  	this.color   = model.diffuse;
-  	this.bb 	 = model.bb.slice(0);
-  	this.mode    = model.mode==undefined?vxl.def.actor.mode.SOLID:model.mode;
+  	this.model 	    = model;
+  	this.name 	    = model.name;
+  	//In the newest versions of Voxelent JSON format, the diffuse property has been replaced with color property.
+  	this.color      = model.color!=undefined?model.color:(model.diffuse!=undefined?model.diffuse:undefined); 
+  	this.bb 	    = model.bb.slice(0);
+  	this.mode       = model.mode==undefined?vxl.def.actor.mode.SOLID:model.mode;
   }
   
-  vxl.go.notifier.addSource(vxl.events.ACTOR_BB_UPDATED, this);
+  vxl.go.notifier.publish(vxl.events.ACTOR_BB_UPDATED, this);
   
 };
 
@@ -153,7 +155,6 @@ vxlActor.prototype.setScale = function(s){
 */
 vxlActor.prototype.setColor = function (r,g,b){
 	this.color = vxl.util.createVec3(r,g,b); 
-	vxl.go.console('Actor '+this.name+': color changed to : (' + this.color[0] +','+ this.color[1] +','+ this.color[2]+')');
 };
 
 
@@ -202,6 +203,16 @@ vxlActor.prototype.setProperty = function(property, value, scope){
 	}
 	
 };
+
+/**
+ * Enables or disables the calculation of the shading. Any shader should take into account this 
+ * actor property to decide how to render it.
+ * 
+ * @param {Boolean} flag can be true or false
+ */
+vxlActor.prototype.setShading = function(flag){
+    this.shading = flag;
+}
 
 /**
  * Returns an actor property if that property exists in the actor. Otherwise it will search 
@@ -317,15 +328,15 @@ vxlActor.prototype.clone = function(){
     this.clones++;
 	
 	var duplicate = new vxlActor(this.model);
-	duplicate['program']   = this['program'];
+	
 	vec3.set(this.scale,    duplicate.scale);
 	vec3.set(this.position, duplicate.position);
 	
 	
 	//Now to save us some memory, let's SHARE the WebGL buffers that the current actor has already allocated'
-	//duplicate.renderers = this.renderers;
-	//duplicate.buffers   = this.buffers;
-	//duplicate.model 	= this.model;
+	//duplicate.renderers = this._renderers;
+	//duplicate.buffers   = this._gl_buffers;
+
 	duplicate.name     += '-'+this.clones; 
 	return duplicate;
 };

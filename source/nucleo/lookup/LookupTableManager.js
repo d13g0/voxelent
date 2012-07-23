@@ -9,7 +9,7 @@ function vxlLookupTableManager(){
 	this.lutTimerID = 0;
 	this.tables = [];
 	this.location = "";
-	vxl.go.notifier.addSource(vxl.events.DEFAULT_LUT_LOADED,this);
+	vxl.go.notifier.publish(vxl.events.DEFAULT_LUT_LOADED,this);
 };
 
 vxlLookupTableManager.prototype.setLocation = function(loc){

@@ -191,8 +191,7 @@ vxlTrackerInteractor.prototype.rotate = function(dx, dy){
 	var nAzimuth = dx * delta_azimuth * this.MOTION_FACTOR;
 	var nElevation = dy * delta_elevation * this.MOTION_FACTOR;
 	
-	camera.setAzimuth(nAzimuth);
-	camera.setElevation(nElevation);
+	camera._rotate(nAzimuth,nElevation);
 	camera.refresh();
 	
 };

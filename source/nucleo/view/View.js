@@ -74,7 +74,7 @@ function vxlView(canvasID, scene){
 	//Namespace access updates
 	
 
-	vxl.go.notifier.addTarget(vxl.events.DEFAULT_LUT_LOADED,this);     //Register events to listen to
+	vxl.go.notifier.subscribe(vxl.events.DEFAULT_LUT_LOADED,this);   
 	
 	if (vxl.c.view == undefined){
 		vxl.c.view = this;

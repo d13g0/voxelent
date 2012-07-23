@@ -24,11 +24,11 @@ function vxlNotifier(){
  */
 vxlNotifier.prototype.subscribe = function(list,receiver){
 	if (typeof(list)=='string'){
-		this.addTarget(list,receiver);
+		this._addTarget(list,receiver);
 	}
 	else if (list instanceof Array){
 		for (var i=0;i<list.length;i+=1){
-			this.addTarget(list[i],receiver);
+			this._addTarget(list[i],receiver);
 		}
 	}
 	else {
@@ -43,11 +43,11 @@ vxlNotifier.prototype.subscribe = function(list,receiver){
  */
 vxlNotifier.prototype.publish = function(list,sender){
 	if (typeof(list)== 'string'){
-		this.addSource(list,sender);
+		this._addSource(list,sender);
 	}
 	else if (list instanceof Array){
 		for (var i=0;i<list.length;i+=1){
-			this.addSource(list[i],sender);
+			this._addSource(list[i],sender);
 		}
 	}
 	else {
@@ -62,8 +62,9 @@ vxlNotifier.prototype.publish = function(list,sender){
  * 
  * @param {Object} event the event the class will listen to
  * @param {Object} target the object that will listen for the event
+ * @private
  */
-vxlNotifier.prototype.addTarget = function(event, target){
+vxlNotifier.prototype._addTarget = function(event, target){
 	vxl.go.console('vxlNotifier: adding target for event '+event);
 	var targetList = this.targetList;
 	if (targetList[event]== undefined){
@@ -78,8 +79,9 @@ vxlNotifier.prototype.addTarget = function(event, target){
  * 
  * @param {Object} event the event to emit
  * @param {Object} src the object that will emit the event
+ * @private 
  */
-vxlNotifier.prototype.addSource = function(event,src){
+vxlNotifier.prototype._addSource = function(event,src){
 	vxl.go.console('vxlNotifier: adding source for event '+event);
 	var targetList = this.targetList;
 	var sourceList = this.sourceList;
@@ -94,11 +96,11 @@ vxlNotifier.prototype.addSource = function(event,src){
 	
 	sourceList[event].push(src);
 	
-	$(document).bind(event, function(e,event,src,targetList){
-		for (var index=0;index<targetList[event].length;index++){
-			targetList[event][index].handleEvent(event,src);
-		}
-	});
+	//$(document).bind(event, function(e,event,src,targetList){
+	//	for (var index=0;index<targetList[event].length;index++){
+	//		targetList[event][index].handleEvent(event,src);
+	//	}
+	//});
 };
 
 /**
@@ -106,7 +108,7 @@ vxlNotifier.prototype.addSource = function(event,src){
  * objects in the library</p>
  * 
  * <p>The notifier will first verify if the object emitting the event has been authorized to do so.
- * This is, the object should have registered using either <code>addSource</code> or <code>sends</code>.
+ * This is, the object should have registered using <code>publish</code>.
  * After that, the notifier will retrieve a list of the objects that have registered as listeners of 
  * the particular event and fires the event to them using JQuery.
  * </p>
@@ -119,10 +121,16 @@ vxlNotifier.prototype.fire = function(event, src){
 	
     var idx = this.sourceList[event].indexOf(src);
     if (idx == -1){
-    	throw 'The source '+src+' is not registered to trigger the event '+event+'. Did you use vxlNotifier.addSource?';
+    	throw 'The source '+src+' is not registered to trigger the event '+event+'. Did you use vxlNotifier.publish?';
     }
 	vxl.go.console('vxlNotifier: firing ' +event);
-	$(document).trigger(event,[event,src,targetList]);
+	
+	var targets = this.targetList[event];
+	
+	for (var index=0;index<targets.length;index++){
+         targets[index].handleEvent(event,src);
+    }
+	//$(document).trigger(event,[event,src,targetList]);
 };
 
 /**
@@ -145,9 +153,9 @@ vxlNotifier.prototype.getTargetsFor = function(event){
 	var targets = this.targetList[event];
 	var list = [];
 	for (var index=0;index<targets.length;index++){
-		list.push(getObjectName(targets[index]));
+		list.push(targets[index]);
 	}
-	return list;
+	return list; //@TODO: Reevaluate
 };
 
 

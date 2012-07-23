@@ -499,8 +499,25 @@ wireframeON :  function(){
       return vxl.c.view.renderer.prg._uniformList[vxl.c.view.renderer.prg._currentProgramID].slice(0);
   },
   
-  subscribe: function(event, context){
-  	vxl.go.notifier.addTarget(event, context);
+  /**
+   * <p>Suscribes the to Voxelent events </p>
+   * 
+   * <p>The context parameter corresponds to the class that is going to listen for Voxelent events.</p>
+   * 
+   * <p>Such class needs to implement a method to handle the events that it has subscribed to. This method/function needs
+   * to have the following signature:</p>
+   * 
+   * <p><code>handleEvent(event, src)</code></p>
+   * 
+   * <p> The event parameter corresponds to the event that has been fired by Voxelent. Notice that 
+   * your class will only be notified of those events that it has been subscribed to.
+   * 
+   * @param {String, Array} list the event or events that we are going to subscribe to
+   * @param {context} the object that needs to implement the handleEvent method
+   * 
+   */
+  subscribe: function(list, context){
+  	vxl.go.notifier.subscribe(list, context);
   }
   
  }; 

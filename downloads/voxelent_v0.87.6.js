@@ -368,11 +368,11 @@ function vxlNotifier(){
  */
 vxlNotifier.prototype.subscribe = function(list,receiver){
 	if (typeof(list)=='string'){
-		this.addTarget(list,receiver);
+		this._addTarget(list,receiver);
 	}
 	else if (list instanceof Array){
 		for (var i=0;i<list.length;i+=1){
-			this.addTarget(list[i],receiver);
+			this._addTarget(list[i],receiver);
 		}
 	}
 	else {
@@ -387,11 +387,11 @@ vxlNotifier.prototype.subscribe = function(list,receiver){
  */
 vxlNotifier.prototype.publish = function(list,sender){
 	if (typeof(list)== 'string'){
-		this.addSource(list,sender);
+		this._addSource(list,sender);
 	}
 	else if (list instanceof Array){
 		for (var i=0;i<list.length;i+=1){
-			this.addSource(list[i],sender);
+			this._addSource(list[i],sender);
 		}
 	}
 	else {
@@ -406,8 +406,9 @@ vxlNotifier.prototype.publish = function(list,sender){
  * 
  * @param {Object} event the event the class will listen to
  * @param {Object} target the object that will listen for the event
+ * @private
  */
-vxlNotifier.prototype.addTarget = function(event, target){
+vxlNotifier.prototype._addTarget = function(event, target){
 	vxl.go.console('vxlNotifier: adding target for event '+event);
 	var targetList = this.targetList;
 	if (targetList[event]== undefined){
@@ -422,8 +423,9 @@ vxlNotifier.prototype.addTarget = function(event, target){
  * 
  * @param {Object} event the event to emit
  * @param {Object} src the object that will emit the event
+ * @private 
  */
-vxlNotifier.prototype.addSource = function(event,src){
+vxlNotifier.prototype._addSource = function(event,src){
 	vxl.go.console('vxlNotifier: adding source for event '+event);
 	var targetList = this.targetList;
 	var sourceList = this.sourceList;
@@ -438,11 +440,11 @@ vxlNotifier.prototype.addSource = function(event,src){
 	
 	sourceList[event].push(src);
 	
-	$(document).bind(event, function(e,event,src,targetList){
-		for (var index=0;index<targetList[event].length;index++){
-			targetList[event][index].handleEvent(event,src);
-		}
-	});
+	//$(document).bind(event, function(e,event,src,targetList){
+	//	for (var index=0;index<targetList[event].length;index++){
+	//		targetList[event][index].handleEvent(event,src);
+	//	}
+	//});
 };
 
 /**
@@ -450,7 +452,7 @@ vxlNotifier.prototype.addSource = function(event,src){
  * objects in the library</p>
  * 
  * <p>The notifier will first verify if the object emitting the event has been authorized to do so.
- * This is, the object should have registered using either <code>addSource</code> or <code>sends</code>.
+ * This is, the object should have registered using <code>publish</code>.
  * After that, the notifier will retrieve a list of the objects that have registered as listeners of 
  * the particular event and fires the event to them using JQuery.
  * </p>
@@ -463,10 +465,16 @@ vxlNotifier.prototype.fire = function(event, src){
 	
     var idx = this.sourceList[event].indexOf(src);
     if (idx == -1){
-    	throw 'The source '+src+' is not registered to trigger the event '+event+'. Did you use vxlNotifier.addSource?';
+    	throw 'The source '+src+' is not registered to trigger the event '+event+'. Did you use vxlNotifier.publish?';
     }
 	vxl.go.console('vxlNotifier: firing ' +event);
-	$(document).trigger(event,[event,src,targetList]);
+	
+	var targets = this.targetList[event];
+	
+	for (var index=0;index<targets.length;index++){
+         targets[index].handleEvent(event,src);
+    }
+	//$(document).trigger(event,[event,src,targetList]);
 };
 
 /**
@@ -489,9 +497,9 @@ vxlNotifier.prototype.getTargetsFor = function(event){
 	var targets = this.targetList[event];
 	var list = [];
 	for (var index=0;index<targets.length;index++){
-		list.push(getObjectName(targets[index]));
+		list.push(targets[index]);
 	}
-	return list;
+	return list; //@TODO: Reevaluate
 };
 
 
@@ -3934,6 +3942,8 @@ function vxlCamera(vw,t) {
     this.azimuth 	= 0;
     this.elevation 	= 0;
 	this.dstep  	= 0; //dollying step
+	
+	this.rotation   = [0,0];
 
     this.m = mat4.identity();
 
@@ -4092,7 +4102,8 @@ vxlCamera.prototype.setAzimuth = function(az){
     if (c.azimuth > 360 || c.azimuth <-360) {
         c.azimuth = c.azimuth % 360;
     }
-    c._updateMatrix();
+    c._rotate(az,0);
+    c.clear();
 };
 
 /**
@@ -4108,7 +4119,8 @@ vxlCamera.prototype.setElevation = function(el){
     if (c.elevation > 360 || c.elevation <-360) {
         c.elevation = c.elevation % 360;
     }
-    c._updateMatrix();
+    c._rotate(0,el);
+    c.clear();
 };
 
 /**
@@ -4188,8 +4200,10 @@ vxlCamera.prototype._updateCentreRotation = function(){
  * @private
  */
 vxlCamera.prototype._clearRotation = function(){
-    this.azimuth = 0;
-    this.elevation = 0;
+    
+    this.azimuth += this.rotation[0];
+    this.elevation += this.rotation[1];
+    this.rotation = [0,0];
 };
 
 
@@ -4206,6 +4220,14 @@ vxlCamera.prototype.clear = function(){
     this._clearRotation();
     this._updateDistance();
 };
+
+/**
+ * @private
+ */
+vxlCamera.prototype._rotate = function(x,y){
+    this.rotation = [x,y];
+    this._updateMatrix();
+}
 
 /**
  * This method updates the current camera matrix upon changes in location, 
@@ -4225,8 +4247,8 @@ vxlCamera.prototype._updateMatrix = function(){
          
                
                 //Rotations according to Tojiro
-                var rotY  = quat4.fromAngleAxis(this.azimuth * Math.PI/180, [0,1,0]);
-                var rotX  = quat4.fromAngleAxis(this.elevation * Math.PI/180, [1,0,0]);
+                var rotY  = quat4.fromAngleAxis(this.rotation[0] * Math.PI/180, [0,1,0]);
+                var rotX  = quat4.fromAngleAxis(this.rotation[1] * Math.PI/180, [1,0,0]);
                 var rotQ = quat4.multiply(rotY, rotX, quat4.create());
                 var rotMatrix = quat4.toMat4(rotQ);
                 
@@ -4739,8 +4761,7 @@ vxlTrackerInteractor.prototype.rotate = function(dx, dy){
 	var nAzimuth = dx * delta_azimuth * this.MOTION_FACTOR;
 	var nElevation = dy * delta_elevation * this.MOTION_FACTOR;
 	
-	camera.setAzimuth(nAzimuth);
-	camera.setElevation(nElevation);
+	camera._rotate(nAzimuth,nElevation);
 	camera.refresh();
 	
 };
@@ -6276,7 +6297,7 @@ vxlModel.prototype.computeBoundingBox = function(){
 
 /**
  * <p>
- * An actor is a representation of a model in voxelent. Actors can cache model properties 
+ * An actor is a representation of a model in Voxelent. Actors can cache model properties 
  * and modified them. This is useful when there are several actors based in the same model
  * but each one of them needs to have a different version of any given model property (i.e. color)
  * </p>
@@ -6313,25 +6334,27 @@ function vxlActor(model){
   this.scale 		= vec3.create([1, 1, 1]);
   this.rotation 	= vec3.create([0, 0, 0]);
 
-  this.visible   = true;
-  this.mode = vxl.def.actor.mode.SOLID;
-  this.opacity = 1.0;
-  this.colors = model?(model.colors!=null?model.colors:null):null;	//it will create colors for this actor once a lookup table had been set up
-  this.clones  = 0;
+  this.visible      = true;
+  this.mode         = vxl.def.actor.mode.SOLID;
+  this.opacity      = 1.0;
+  this.colors       = model?(model.colors!=null?model.colors:null):null;	//it will create colors for this actor once a lookup table had been set up
+  this.clones       = 0;
   
-  this._renderers = [];
-  this._gl_buffers = [];
+  this._renderers   = [];
+  this._gl_buffers  = [];
+  this.shading      = true;
 
   
   if (model){
-  	this.model 	 = model;
-  	this.name 	 = model.name;
-  	this.color   = model.diffuse;
-  	this.bb 	 = model.bb.slice(0);
-  	this.mode    = model.mode==undefined?vxl.def.actor.mode.SOLID:model.mode;
+  	this.model 	    = model;
+  	this.name 	    = model.name;
+  	//In the newest versions of Voxelent JSON format, the diffuse property has been replaced with color property.
+  	this.color      = model.color!=undefined?model.color:(model.diffuse!=undefined?model.diffuse:undefined); 
+  	this.bb 	    = model.bb.slice(0);
+  	this.mode       = model.mode==undefined?vxl.def.actor.mode.SOLID:model.mode;
   }
   
-  vxl.go.notifier.addSource(vxl.events.ACTOR_BB_UPDATED, this);
+  vxl.go.notifier.publish(vxl.events.ACTOR_BB_UPDATED, this);
   
 };
 
@@ -6408,7 +6431,6 @@ vxlActor.prototype.setScale = function(s){
 */
 vxlActor.prototype.setColor = function (r,g,b){
 	this.color = vxl.util.createVec3(r,g,b); 
-	vxl.go.console('Actor '+this.name+': color changed to : (' + this.color[0] +','+ this.color[1] +','+ this.color[2]+')');
 };
 
 
@@ -6457,6 +6479,16 @@ vxlActor.prototype.setProperty = function(property, value, scope){
 	}
 	
 };
+
+/**
+ * Enables or disables the calculation of the shading. Any shader should take into account this 
+ * actor property to decide how to render it.
+ * 
+ * @param {Boolean} flag can be true or false
+ */
+vxlActor.prototype.setShading = function(flag){
+    this.shading = flag;
+}
 
 /**
  * Returns an actor property if that property exists in the actor. Otherwise it will search 
@@ -6572,15 +6604,15 @@ vxlActor.prototype.clone = function(){
     this.clones++;
 	
 	var duplicate = new vxlActor(this.model);
-	duplicate['program']   = this['program'];
+	
 	vec3.set(this.scale,    duplicate.scale);
 	vec3.set(this.position, duplicate.position);
 	
 	
 	//Now to save us some memory, let's SHARE the WebGL buffers that the current actor has already allocated'
-	//duplicate.renderers = this.renderers;
-	//duplicate.buffers   = this.buffers;
-	//duplicate.model 	= this.model;
+	//duplicate.renderers = this._renderers;
+	//duplicate.buffers   = this._gl_buffers;
+
 	duplicate.name     += '-'+this.clones; 
 	return duplicate;
 };
@@ -6876,7 +6908,7 @@ vxlBasicStrategy.prototype.render = function(actor){
     
     try{
 		if (actor.mode == vxl.def.actor.mode.SOLID){
-			prg.setUniform("uUseShading",true);
+			prg.setUniform("uUseShading",actor.shading);
 			prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
 			gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
@@ -7220,7 +7252,19 @@ vxlScene.prototype.hasActor = function(actor){
 		return (aux != undefined);
 	}
 	else return false;
-}
+};
+
+
+/**
+ * Sets a property for all the actors in the scene
+ * @param {String} property the name of the actor property
+ * @param {Object} value the value of the property
+ */
+vxlScene.prototype.setPropertyForAll = function (property, value){
+    for(var i=0; i<this.actors.length; i++){
+        this.actors[i].setProperty(property, value);
+    }
+};
 
 /**
  * Updates the Scene's scalarMAX and scalarMIN properties.
@@ -7447,6 +7491,11 @@ function vxlLookupTable(){
 	this.min = Number.MAX_VALUE;
 }
 
+/**
+ * Creates a lookup table
+ * @param {String} ID the unique identifier of this lookup table in the system
+ * @param {JSON} the JSON object that contains the lookup table entries. This JSON should follow Voxelent's syntax
+ */
 vxlLookupTable.prototype.load = function(ID,payload){
 	this.ID = ID;
 	this.map = payload;
@@ -7457,19 +7506,37 @@ vxlLookupTable.prototype.load = function(ID,payload){
     }
 }
 
-vxlLookupTable.prototype.getColor = function(value){
+/**
+ * Performs the lookup table value scaling to find the appropriate index according to the
+ * number of entries and the extension of the scalar map determined by <code>min</code> and <code>max</code>
+ */
+vxlLookupTable.prototype._scale = function(value, min,max){
+    return  value * this.max / max;
+}
+
+
+/**
+ * Gets the correspondent color. To obtain the right entry, the scale method should be called first.
+ */
+vxlLookupTable.prototype.getColor = function(val, min, max){
+    var value = this._scale(val, min,max);
+	
 	var l = this;
 	var key = Math.round(value);
+	
 	if (key >= l.min && key <= l.max){
 	    var c = [l.map[key][0],l.map[key][1],l.map[key][2]];
 		return c;
 	}
+	
 	else if (key <l.min) { //truncate to min value
 			return  [l.map[l.min][0],l.map[l.min][1],l.map[l.min][2]];
 	}
+	
 	else if (key>l.max){ //truncate to max value
 		return  [l.map[l.max][0],l.map[l.max][1],l.map[l.max][2]];
 	}
+	
 	else{
 		alert('assertion error in getColor routine');
 		return  [l.map[l.min][0],l.map[l.min][1],l.map[l.min][2]];
@@ -7488,8 +7555,7 @@ vxlLookupTable.prototype.getColors = function(s,min,max){
 	var c = [];
 	
 	for(var i=0;i<s.length;i++){
-		var value = s[i] * this.max / max;
-		var cc = this.getColor(value);
+		var cc = this.getColor(s[i], min, max);
 		c.push(cc[0]);
 		c.push(cc[1]);
 		c.push(cc[2]);
@@ -7509,7 +7575,7 @@ function vxlLookupTableManager(){
 	this.lutTimerID = 0;
 	this.tables = [];
 	this.location = "";
-	vxl.go.notifier.addSource(vxl.events.DEFAULT_LUT_LOADED,this);
+	vxl.go.notifier.publish(vxl.events.DEFAULT_LUT_LOADED,this);
 };
 
 vxlLookupTableManager.prototype.setLocation = function(loc){
@@ -7896,7 +7962,7 @@ function vxlView(canvasID, scene){
 	//Namespace access updates
 	
 
-	vxl.go.notifier.addTarget(vxl.events.DEFAULT_LUT_LOADED,this);     //Register events to listen to
+	vxl.go.notifier.subscribe(vxl.events.DEFAULT_LUT_LOADED,this);   
 	
 	if (vxl.c.view == undefined){
 		vxl.c.view = this;
@@ -8057,7 +8123,7 @@ vxlView.prototype.refresh = function(){
 function vxlModelManager(){
 	this.toLoad = new Array(); //analyze
 	this.models = [];
-	vxl.go.notifier.addSource(vxl.events.MODELS_LOADED,this);
+	vxl.go.notifier.publish(vxl.events.MODELS_LOADED,this);
 };
 
 
@@ -8697,8 +8763,25 @@ wireframeON :  function(){
       return vxl.c.view.renderer.prg._uniformList[vxl.c.view.renderer.prg._currentProgramID].slice(0);
   },
   
-  subscribe: function(event, context){
-  	vxl.go.notifier.addTarget(event, context);
+  /**
+   * <p>Suscribes the to Voxelent events </p>
+   * 
+   * <p>The context parameter corresponds to the class that is going to listen for Voxelent events.</p>
+   * 
+   * <p>Such class needs to implement a method to handle the events that it has subscribed to. This method/function needs
+   * to have the following signature:</p>
+   * 
+   * <p><code>handleEvent(event, src)</code></p>
+   * 
+   * <p> The event parameter corresponds to the event that has been fired by Voxelent. Notice that 
+   * your class will only be notified of those events that it has been subscribed to.
+   * 
+   * @param {String, Array} list the event or events that we are going to subscribe to
+   * @param {context} the object that needs to implement the handleEvent method
+   * 
+   */
+  subscribe: function(list, context){
+  	vxl.go.notifier.subscribe(list, context);
   }
   
  }; 

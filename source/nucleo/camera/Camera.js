@@ -59,6 +59,8 @@ function vxlCamera(vw,t) {
     this.azimuth 	= 0;
     this.elevation 	= 0;
 	this.dstep  	= 0; //dollying step
+	
+	this.rotation   = [0,0];
 
     this.m = mat4.identity();
 
@@ -217,7 +219,8 @@ vxlCamera.prototype.setAzimuth = function(az){
     if (c.azimuth > 360 || c.azimuth <-360) {
         c.azimuth = c.azimuth % 360;
     }
-    c._updateMatrix();
+    c._rotate(az,0);
+    c.clear();
 };
 
 /**
@@ -233,7 +236,8 @@ vxlCamera.prototype.setElevation = function(el){
     if (c.elevation > 360 || c.elevation <-360) {
         c.elevation = c.elevation % 360;
     }
-    c._updateMatrix();
+    c._rotate(0,el);
+    c.clear();
 };
 
 /**
@@ -313,8 +317,10 @@ vxlCamera.prototype._updateCentreRotation = function(){
  * @private
  */
 vxlCamera.prototype._clearRotation = function(){
-    this.azimuth = 0;
-    this.elevation = 0;
+    
+    this.azimuth += this.rotation[0];
+    this.elevation += this.rotation[1];
+    this.rotation = [0,0];
 };
 
 
@@ -331,6 +337,14 @@ vxlCamera.prototype.clear = function(){
     this._clearRotation();
     this._updateDistance();
 };
+
+/**
+ * @private
+ */
+vxlCamera.prototype._rotate = function(x,y){
+    this.rotation = [x,y];
+    this._updateMatrix();
+}
 
 /**
  * This method updates the current camera matrix upon changes in location, 
@@ -350,8 +364,8 @@ vxlCamera.prototype._updateMatrix = function(){
          
                
                 //Rotations according to Tojiro
-                var rotY  = quat4.fromAngleAxis(this.azimuth * Math.PI/180, [0,1,0]);
-                var rotX  = quat4.fromAngleAxis(this.elevation * Math.PI/180, [1,0,0]);
+                var rotY  = quat4.fromAngleAxis(this.rotation[0] * Math.PI/180, [0,1,0]);
+                var rotX  = quat4.fromAngleAxis(this.rotation[1] * Math.PI/180, [1,0,0]);
                 var rotQ = quat4.multiply(rotY, rotX, quat4.create());
                 var rotMatrix = quat4.toMat4(rotQ);
                 
