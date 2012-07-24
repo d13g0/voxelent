@@ -185,7 +185,14 @@ vxlScene.prototype.addActor = function(actor){
     this._updateBoundingBox(actor.bb); 
     
     vxl.go.console('Scene: Actor for model '+actor.model.name+' added');
-    vxl.c.actor = actor;
+    
+    if (this.actors.length ==1){
+    	vxl.c.actor = actor; //if we have only one
+    }
+    else{
+    	vxl.c.actor = undefined; //if we have a bunch then we don't have a current one
+    }
+    
     vxl.go.notifier.fire(vxl.events.SCENE_UPDATED, this);
 };
 
@@ -226,6 +233,30 @@ vxlScene.prototype.setPropertyForAll = function (property, value){
     }
 };
 
+
+/**
+ *Sets a property for a list of actors.
+ * @param {Array} list list of actors (String or vxlActor)
+ * @param {String} property the name of the actor property
+ * @param {Object} value the value of the property
+ 
+ */
+vxlScene.prototype.setPropertyFor = function (list, property, value){
+    for(var i=0; i<list.length; i++){
+        if (this.hasActor(list[i])){
+            var actor = undefined;
+            if (typeof(list[i])=='string'){
+                actor = this.getActorByName(list[i]);
+            }
+            else if (list[i] instanceof vxlActor){
+                list[i].setProperty(property, value);
+            }
+            else{
+                throw 'vxlScene.setPropertyFor: ERROR, the list of actors is invalid';
+            }
+        }
+    }
+};
 /**
  * Updates the Scene's scalarMAX and scalarMIN properties.
  */
@@ -284,6 +315,30 @@ vxlScene.prototype.getActorByName = function(name){
 		}
 	}
 	return undefined;
+};
+
+
+/**
+ * <p>Returns a list of actors based on the condition passed as parameter.</p>
+ * <p>The condition is a function with the following signature:</p>
+ * <p><code> condition(vxlActor): returns boolean</code></p>
+ * <p>If the condition evaluates true then that actor is included in the results</p>
+ * 
+ * @param {function} condition the condition to evaluate in the actor list
+ * @returns {Array} list of actors 
+ */
+vxlScene.prototype.getActorsThat = function(condition){
+    var idx = [];
+    for (var i=0; i<this.actors.length; i+=1){
+        if (condition(this.actors[i])) {
+            idx.push(i);
+        }
+    }
+    var results = [];
+    for (var j=0; j<idx.length;j+=1){
+        results.push(this.actors[idx[j]]);
+    }
+    return results;
 };
 
 /**
@@ -361,12 +416,18 @@ vxlScene.prototype.setAnimation = function(animation){
 	if (animation instanceof vxlFrameAnimation){
 		this.frameAnimation = animation;
 		this.frameAnimation.scene = this;
+		
+		for (var i=0;i<this.views.length;i+=1){
+			this.views[i].renderer.setMode(vxl.def.renderer.mode.ANIMFRAME);
+		}
+		
 		vxl.go.console('Scene: animation added');
 	}
 };
 /**
  * Removes the animation if there is one associated to this scene
  * @see vxlFrameAnimation
+ * @TODO: Review what happens to the actors. Should we remove them too?
  */
 vxlScene.prototype.clearAnimation = function(){
 	if (this.frameAnimation) {

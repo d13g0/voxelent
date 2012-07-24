@@ -16,7 +16,7 @@
 	function runVoxApp(){
 		
 		vxl.go.debug = true;
-	    vxl.go.notifier.addTarget(vxl.events.MODELS_LOADED, this);
+	    vxl.go.notifier.subscribe(vxl.events.MODELS_LOADED, this);
 	    
 	    vxl.api.loadLUTS('assets/tables');
 	    
@@ -39,7 +39,6 @@
 	    	vxl.api.setLookupTable('default');
 	    	vxl.c.camera.longShot();
 	    	$('.info').animate({top:"0"},600);
-	    	
 	    }
 	}
 </script>

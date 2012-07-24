@@ -80,7 +80,7 @@ function vxlView(canvasID, scene){
 		vxl.c.view = this;
 	}
 	
-	vxl.go.views.push(this);
+	vxl.go.renderman._views.push(this);
 	this.setAutoResize(true);
 
 	vxl.go.console('View: the view '+ this.name+' has been created');

@@ -534,6 +534,15 @@ height:135px;
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.getActorsThat">getActorsThat</a></b>(condition, scene)
+								</div>
+								<div class="description"><p>Returns a list of actors based on the condition passed as parameter.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.getCurrentActor">getCurrentActor</a></b>()
 								</div>
 								<div class="description"></div>
@@ -653,7 +662,7 @@ height:135px;
 							<td class="nameDescription">
 								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.setActorProperty">setActorProperty</a></b>(actor, property, value)
 								</div>
-								<div class="description"></div>
+								<div class="description">Sets a property for one of the actors in the current scene.</div>
 							</td>
 						</tr>
 					
@@ -744,6 +753,24 @@ height:135px;
 								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.setProgram">setProgram</a></b>(view, program, strategy)
 								</div>
 								<div class="description">Loads a program</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.setPropertyFor">setPropertyFor</a></b>(list, property, value, scene)
+								</div>
+								<div class="description">Sets a property for all the actors in the list</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">vxl.api.<b><a href="../symbols/vxl.api.html#.setPropertyForAll">setPropertyForAll</a></b>(property, value, scene)
+								</div>
+								<div class="description">Sets a property for all the actors</div>
 							</td>
 						</tr>
 					
@@ -1073,6 +1100,55 @@ height:135px;
 						
 						
 						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".getActorsThat"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+
+					<span class="light">{<a href="../symbols/Array.html">Array</a>}</span>
+					<span class="light">vxl.api.</span><b>getActorsThat</b>(condition, scene)
+
+					</div>
+					<div class="description">
+						<p>Returns a list of actors based on the condition passed as parameter.</p><p>The condition is a function with the following signature:</p><p><code> condition(vxlActor): returns boolean</code></p><p>If the condition evaluates true then that actor is included in the results</p>
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{function}</span> <b>condition</b>
+									
+								</dt>
+								<dd>the condition to evaluate in the actor list</dd>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/vxlScene.html">vxlScene</a>}</span> <b>scene</b>
+									
+								</dt>
+								<dd>(Optional) If this parameter is not set, the current scene will be used</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> list of actors</dd>
+							
+							</dl>
 						
 						
 						
@@ -1488,7 +1564,7 @@ height:135px;
 
 					</div>
 					<div class="description">
-						
+						Sets a property for one of the actors in the current scene.This metod requires a current scene
 						
 						
 					</div>
@@ -1500,7 +1576,7 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>actor</b>
+									<span class="light fixedFont">{<a href="../symbols/vxlActor.html">vxlActor</a>|String}</span> <b>actor</b>
 									
 								</dt>
 								<dd>it can be a vxlActor or a String with the actor name</dd>
@@ -1912,6 +1988,108 @@ height:135px;
 
 					<hr />
 				
+					<a name=".setPropertyFor"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+
+					
+					<span class="light">vxl.api.</span><b>setPropertyFor</b>(list, property, value, scene)
+
+					</div>
+					<div class="description">
+						Sets a property for all the actors in the list
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> <b>list</b>
+									
+								</dt>
+								<dd>list of actors (String or vxlActor)</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>property</b>
+									
+								</dt>
+								<dd>the property to change</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>value</b>
+									
+								</dt>
+								<dd>the new value</dd>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/vxlScene.html">vxlScene</a>}</span> <b>scene</b>
+									
+								</dt>
+								<dd>the scene (optional). If this parameter is not passed the current scene is used</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".setPropertyForAll"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+
+					
+					<span class="light">vxl.api.</span><b>setPropertyForAll</b>(property, value, scene)
+
+					</div>
+					<div class="description">
+						Sets a property for all the actors
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>property</b>
+									
+								</dt>
+								<dd>the property to change</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>value</b>
+									
+								</dt>
+								<dd>the new value</dd>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/vxlScene.html">vxlScene</a>}</span> <b>scene</b>
+									
+								</dt>
+								<dd>the scene (optional). If this parameter is not passed the current scene is used</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name=".setRenderRate"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 
@@ -2245,7 +2423,7 @@ height:135px;
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Jul 23 2012 20:45:22 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jul 24 2012 19:31:42 GMT-0400 (EDT)
 		</div>
         </div>
         </div>

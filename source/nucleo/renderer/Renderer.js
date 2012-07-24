@@ -32,7 +32,7 @@ function vxlRenderer(vw){
 	this.mode       	= vxl.def.renderer.mode.TIMER;
     this.timerID    	= 0;
     this.gl         	= this.getWebGLContext();
-    this.prg        	=   new vxlProgram(this.gl);
+    this.prg        	= new vxlProgram(this.gl);
     this.transforms 	= new vxlTransforms(vw);
     this.currentProgram = undefined;
     this.strategy 		= undefined;
@@ -49,11 +49,11 @@ function vxlRenderer(vw){
 vxlRenderer.prototype.getWebGLContext = function(){
 	
 	var WEB_GL_CONTEXT = null;
-	var canvas = this.view.canvas;
-	this.width = canvas.width;
-	this.height = canvas.height;
+	var canvas     = this.view.canvas;
+	this.width     = canvas.width;
+	this.height    = canvas.height;
 	
-	var names = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
+	var names      = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
 	
 	for (var i = 0; i < names.length; ++i) {
 		try {
@@ -148,7 +148,7 @@ vxlRenderer.prototype.start = function(){
 	}
 	else if(this.mode == vxl.def.renderer.mode.ANIMFRAME){
 	    vxl.go.console('Renderer: starting rendering at the fastest speed',true);
-		vxl.go.render();
+		vxl.go.renderman.render();
 	}
 };
 
@@ -160,7 +160,7 @@ vxlRenderer.prototype.stop = function(){
 		clearInterval(this.timerID);
 	}
 	else if (this.mode == vxl.def.renderer.mode.ANIMFRAME){
-		//vxl.go.cancelRender();
+		vxl.go.renderman.cancel();
 	}
 };
 

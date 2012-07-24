@@ -182,42 +182,51 @@ events : {
 */
 go : {
     debug 	 		    : false,					  
-    views 			    : [], //TODO: REFACTOR THIS.Remember is here for JQuery focus and blur bindings
-	_rates			    : [],
-    timid 			    : 0,
     notifier            : undefined,
     modelManager        : undefined,
     lookupTableManager  : undefined,
+    renderman : {
 
-    
-	render : function(){
-		vxl.c.view.renderer.render(); 
-		this.timid = window.requestAnimFrame(vxl.go.render);
-	},
-	
-	cancelRender : function(){
-		//message('vxl.go.cancelRender invoked'); 
-		window.cancelRequestAnimFrame(this.timid);    // not implemented yet in any browser :(
-	},
-	
-	slowRendering : function(){
-
-		/*vxl.go._rates = [];
-		for(var i = 0; i < vxl.go.views.length; i++){
-		    if (vxl.go.views[i].renderer.mode == vxl.def.renderer.mode.ANIMFRAME) continue;
-			vxl.go.console('vxl.go.slowRendering: slow rendering on view '+vxl.go.views[i].name,true);
-			vxl.go._rates.push(vxl.go.views[i].renderer.renderRate);
-			vxl.go.views[i].renderer.setRenderRate(vxl.def.renderer.rate.SLOW);
-		}*/
-	},
-	
-	normalRendering : function(){
+		_timid : 0,
+		_rates : [],
+		_views : [],
+		_stop  : false,
 		
-		/*for(var i = 0; i < vxl.go.views.length; i++){
-		    if (vxl.go.views[i].renderer.mode == vxl.def.renderer.mode.ANIMFRAME) continue;
-			vxl.go.console('vxl.go.normalRendering: go back to normal rendering on view '+vxl.go.views[i].name,true);
-			vxl.go.views[i].renderer.setRenderRate(vxl.go._rates[i]);
-		}*/
+		render : function(){
+			for(var i=0; i<vxl.go.renderman._views.length;i+=1){
+				vxl.go.renderman._views[i].renderer.render();
+			}
+			if (vxl.go.renderman._stop != true){
+			 vxl.go.renderman._timid = window.requestAnimFrame(vxl.go.renderman.render);
+			}
+			else{
+			    vxl.go.renderman._stop = false;
+			}
+		},
+		
+		cancel : function(){
+		    vxl.go.renderman._stop = true;
+		},
+		
+		slow : function(){
+			/*vxl.go.renderman._rates = [];
+			for(var i = 0; i < vxl.go.renderman._views.length; i++){
+			    if (vxl.go.renderman._views[i].renderer.mode == vxl.def.renderer.mode.ANIMFRAME) continue;
+				vxl.go.console('vxl.go.slowRendering: slow rendering on view '+vxl.go.renderman._views[i].name,true);
+				vxl.go.renderman._rates.push(vxl.go.renderman._views[i].renderer.renderRate);
+				vxl.go.renderman._views[i].renderer.setRenderRate(vxl.def.renderer.rate.SLOW);
+			}*/
+		},
+		
+		normal : function(){
+			/*for(var i = 0; i < vxl.go.renderman._views.length; i++){
+			    if (vxl.go.renderman._views[i].renderer.mode == vxl.def.renderer.mode.ANIMFRAME) continue;
+				vxl.go.console('vxl.go.normalRendering: go back to normal rendering on view '+vxl.go.renderman._views[i].name,true);
+				if (vxl.go.renderman._rates[i] != undefined){
+				    vxl.go.renderman._views[i].renderer.setRenderRate(vxl.go.renderman._rates[i]);
+				}
+			}*/
+		}
 	},
 	
 	console : function(txt,flag) { 
@@ -225,6 +234,7 @@ go : {
 			console.info(txt);
 		}
 	}
+	
 },
 
 /**
@@ -340,5 +350,5 @@ window.cancelRequestAnimFrame = ( function() {
 })();
 
 
-$(window).bind('focus', vxl.go.normalRendering);
-$(window).bind('blur', vxl.go.slowRendering);
+//$(window).bind('focus', vxl.go.renderman.normal);
+//$(window).bind('blur', vxl.go.renderman.slow);

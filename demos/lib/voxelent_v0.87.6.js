@@ -182,42 +182,51 @@ events : {
 */
 go : {
     debug 	 		    : false,					  
-    views 			    : [], //TODO: REFACTOR THIS.Remember is here for JQuery focus and blur bindings
-	_rates			    : [],
-    timid 			    : 0,
     notifier            : undefined,
     modelManager        : undefined,
     lookupTableManager  : undefined,
+    renderman : {
 
-    
-	render : function(){
-		vxl.c.view.renderer.render(); 
-		this.timid = window.requestAnimFrame(vxl.go.render);
-	},
-	
-	cancelRender : function(){
-		//message('vxl.go.cancelRender invoked'); 
-		window.cancelRequestAnimFrame(this.timid);    // not implemented yet in any browser :(
-	},
-	
-	slowRendering : function(){
-
-		/*vxl.go._rates = [];
-		for(var i = 0; i < vxl.go.views.length; i++){
-		    if (vxl.go.views[i].renderer.mode == vxl.def.renderer.mode.ANIMFRAME) continue;
-			vxl.go.console('vxl.go.slowRendering: slow rendering on view '+vxl.go.views[i].name,true);
-			vxl.go._rates.push(vxl.go.views[i].renderer.renderRate);
-			vxl.go.views[i].renderer.setRenderRate(vxl.def.renderer.rate.SLOW);
-		}*/
-	},
-	
-	normalRendering : function(){
+		_timid : 0,
+		_rates : [],
+		_views : [],
+		_stop  : false,
 		
-		/*for(var i = 0; i < vxl.go.views.length; i++){
-		    if (vxl.go.views[i].renderer.mode == vxl.def.renderer.mode.ANIMFRAME) continue;
-			vxl.go.console('vxl.go.normalRendering: go back to normal rendering on view '+vxl.go.views[i].name,true);
-			vxl.go.views[i].renderer.setRenderRate(vxl.go._rates[i]);
-		}*/
+		render : function(){
+			for(var i=0; i<vxl.go.renderman._views.length;i+=1){
+				vxl.go.renderman._views[i].renderer.render();
+			}
+			if (vxl.go.renderman._stop != true){
+			 vxl.go.renderman._timid = window.requestAnimFrame(vxl.go.renderman.render);
+			}
+			else{
+			    vxl.go.renderman._stop = false;
+			}
+		},
+		
+		cancel : function(){
+		    vxl.go.renderman._stop = true;
+		},
+		
+		slow : function(){
+			/*vxl.go.renderman._rates = [];
+			for(var i = 0; i < vxl.go.renderman._views.length; i++){
+			    if (vxl.go.renderman._views[i].renderer.mode == vxl.def.renderer.mode.ANIMFRAME) continue;
+				vxl.go.console('vxl.go.slowRendering: slow rendering on view '+vxl.go.renderman._views[i].name,true);
+				vxl.go.renderman._rates.push(vxl.go.renderman._views[i].renderer.renderRate);
+				vxl.go.renderman._views[i].renderer.setRenderRate(vxl.def.renderer.rate.SLOW);
+			}*/
+		},
+		
+		normal : function(){
+			/*for(var i = 0; i < vxl.go.renderman._views.length; i++){
+			    if (vxl.go.renderman._views[i].renderer.mode == vxl.def.renderer.mode.ANIMFRAME) continue;
+				vxl.go.console('vxl.go.normalRendering: go back to normal rendering on view '+vxl.go.renderman._views[i].name,true);
+				if (vxl.go.renderman._rates[i] != undefined){
+				    vxl.go.renderman._views[i].renderer.setRenderRate(vxl.go.renderman._rates[i]);
+				}
+			}*/
+		}
 	},
 	
 	console : function(txt,flag) { 
@@ -225,6 +234,7 @@ go : {
 			console.info(txt);
 		}
 	}
+	
 },
 
 /**
@@ -340,8 +350,8 @@ window.cancelRequestAnimFrame = ( function() {
 })();
 
 
-$(window).bind('focus', vxl.go.normalRendering);
-$(window).bind('blur', vxl.go.slowRendering);
+//$(window).bind('focus', vxl.go.renderman.normal);
+//$(window).bind('blur', vxl.go.renderman.slow);
 
 vxl.go.notifier = new vxlNotifier();
 
@@ -4097,14 +4107,18 @@ vxlCamera.prototype.setFocalPoint = function(x,y,z){
  */
 vxlCamera.prototype.setAzimuth = function(az){
     var c = this;
+    
     c.azimuth =az;
     
     if (c.azimuth > 360 || c.azimuth <-360) {
         c.azimuth = c.azimuth % 360;
     }
-    c._rotate(az,0);
-    c.clear();
-};
+    
+    this.matrix = mat4.identity();
+    mat4.rotateY(this.matrix, c.azimuth   * Math.PI / 180);
+    mat4.rotateX(this.matrix, c.elevation * Math.PI / 180);
+    mat4.translate(this.matrix, this.position);
+}
 
 /**
  * Sets the elevation of the camera
@@ -4119,9 +4133,35 @@ vxlCamera.prototype.setElevation = function(el){
     if (c.elevation > 360 || c.elevation <-360) {
         c.elevation = c.elevation % 360;
     }
-    c._rotate(0,el);
-    c.clear();
+    
+    this.matrix = mat4.identity();
+    mat4.rotateY(this.matrix, c.azimuth   * Math.PI / 180);
+    mat4.rotateX(this.matrix, c.elevation * Math.PI / 180);
+    mat4.translate(this.matrix, this.position);
+
+
 };
+
+/**
+ * Change the azimuth of the camera
+ * @param {Number} el the azimuth increment in degrees
+ */
+vxlCamera.prototype.changeAzimuth = function(az){
+    var c = this;
+    var newA =  c.azimuth + az;
+    this.setAzimuth(newA);
+};
+
+/**
+ * Change the elevation of the camera
+ * @param {Number} el the elevation increment in degrees
+ */
+vxlCamera.prototype.changeElevation = function(el){
+    var c = this;
+    var newE = c.elevation + el;
+    this.setElevation(newE);
+};
+
 
 /**
  * Performs the dollying operation in the direction indicated by the camera normal axis.
@@ -4244,21 +4284,16 @@ vxlCamera.prototype._updateMatrix = function(){
               
      }
      else if (this.type ==  vxl.def.camera.type.ORBITING){
-         
                
                 //Rotations according to Tojiro
                 var rotY  = quat4.fromAngleAxis(this.rotation[0] * Math.PI/180, [0,1,0]);
                 var rotX  = quat4.fromAngleAxis(this.rotation[1] * Math.PI/180, [1,0,0]);
                 var rotQ = quat4.multiply(rotY, rotX, quat4.create());
                 var rotMatrix = quat4.toMat4(rotQ);
-                
-                
 
                 mat4.translate(this.matrix, this.cRot)
                 mat4.multiply(this.matrix, rotMatrix);
                 mat4.translate(this.matrix, vec3.negate(this.cRot, vec3.create()));
-
-                
     } 
 };
 
@@ -5860,7 +5895,7 @@ function vxlRenderer(vw){
 	this.mode       	= vxl.def.renderer.mode.TIMER;
     this.timerID    	= 0;
     this.gl         	= this.getWebGLContext();
-    this.prg        	=   new vxlProgram(this.gl);
+    this.prg        	= new vxlProgram(this.gl);
     this.transforms 	= new vxlTransforms(vw);
     this.currentProgram = undefined;
     this.strategy 		= undefined;
@@ -5877,11 +5912,11 @@ function vxlRenderer(vw){
 vxlRenderer.prototype.getWebGLContext = function(){
 	
 	var WEB_GL_CONTEXT = null;
-	var canvas = this.view.canvas;
-	this.width = canvas.width;
-	this.height = canvas.height;
+	var canvas     = this.view.canvas;
+	this.width     = canvas.width;
+	this.height    = canvas.height;
 	
-	var names = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
+	var names      = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
 	
 	for (var i = 0; i < names.length; ++i) {
 		try {
@@ -5976,7 +6011,7 @@ vxlRenderer.prototype.start = function(){
 	}
 	else if(this.mode == vxl.def.renderer.mode.ANIMFRAME){
 	    vxl.go.console('Renderer: starting rendering at the fastest speed',true);
-		vxl.go.render();
+		vxl.go.renderman.render();
 	}
 };
 
@@ -5988,7 +6023,7 @@ vxlRenderer.prototype.stop = function(){
 		clearInterval(this.timerID);
 	}
 	else if (this.mode == vxl.def.renderer.mode.ANIMFRAME){
-		//vxl.go.cancelRender();
+		vxl.go.renderman.cancel();
 	}
 };
 
@@ -6851,7 +6886,7 @@ vxlBasicStrategy.prototype.render = function(actor){
 	if (actor.opacity < 1.0){
 		gl.disable(gl.DEPTH_TEST);
 		gl.enable(gl.BLEND);
-		diffuse[3] = this.opacity;
+		diffuse[3] = actor.opacity;
 	}
 	else {
 		gl.enable(gl.DEPTH_TEST);
@@ -6905,16 +6940,15 @@ vxlBasicStrategy.prototype.render = function(actor){
 			throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
 	    }
 	}
+    prg.setUniform("uUseShading",actor.shading);
     
     try{
 		if (actor.mode == vxl.def.actor.mode.SOLID){
-			prg.setUniform("uUseShading",actor.shading);
 			prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
 			gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
 		}
 		else if (actor.mode == vxl.def.actor.mode.WIREFRAME){
-			prg.setUniform("uUseShading", false);
 			if (actor.name == 'floor'){
 			     prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
 			}
@@ -7225,7 +7259,14 @@ vxlScene.prototype.addActor = function(actor){
     this._updateBoundingBox(actor.bb); 
     
     vxl.go.console('Scene: Actor for model '+actor.model.name+' added');
-    vxl.c.actor = actor;
+    
+    if (this.actors.length ==1){
+    	vxl.c.actor = actor; //if we have only one
+    }
+    else{
+    	vxl.c.actor = undefined; //if we have a bunch then we don't have a current one
+    }
+    
     vxl.go.notifier.fire(vxl.events.SCENE_UPDATED, this);
 };
 
@@ -7266,6 +7307,30 @@ vxlScene.prototype.setPropertyForAll = function (property, value){
     }
 };
 
+
+/**
+ *Sets a property for a list of actors.
+ * @param {Array} list list of actors (String or vxlActor)
+ * @param {String} property the name of the actor property
+ * @param {Object} value the value of the property
+ 
+ */
+vxlScene.prototype.setPropertyFor = function (list, property, value){
+    for(var i=0; i<list.length; i++){
+        if (this.hasActor(list[i])){
+            var actor = undefined;
+            if (typeof(list[i])=='string'){
+                actor = this.getActorByName(list[i]);
+            }
+            else if (list[i] instanceof vxlActor){
+                list[i].setProperty(property, value);
+            }
+            else{
+                throw 'vxlScene.setPropertyFor: ERROR, the list of actors is invalid';
+            }
+        }
+    }
+};
 /**
  * Updates the Scene's scalarMAX and scalarMIN properties.
  */
@@ -7324,6 +7389,30 @@ vxlScene.prototype.getActorByName = function(name){
 		}
 	}
 	return undefined;
+};
+
+
+/**
+ * <p>Returns a list of actors based on the condition passed as parameter.</p>
+ * <p>The condition is a function with the following signature:</p>
+ * <p><code> condition(vxlActor): returns boolean</code></p>
+ * <p>If the condition evaluates true then that actor is included in the results</p>
+ * 
+ * @param {function} condition the condition to evaluate in the actor list
+ * @returns {Array} list of actors 
+ */
+vxlScene.prototype.getActorsThat = function(condition){
+    var idx = [];
+    for (var i=0; i<this.actors.length; i+=1){
+        if (condition(this.actors[i])) {
+            idx.push(i);
+        }
+    }
+    var results = [];
+    for (var j=0; j<idx.length;j+=1){
+        results.push(this.actors[idx[j]]);
+    }
+    return results;
 };
 
 /**
@@ -7401,12 +7490,18 @@ vxlScene.prototype.setAnimation = function(animation){
 	if (animation instanceof vxlFrameAnimation){
 		this.frameAnimation = animation;
 		this.frameAnimation.scene = this;
+		
+		for (var i=0;i<this.views.length;i+=1){
+			this.views[i].renderer.setMode(vxl.def.renderer.mode.ANIMFRAME);
+		}
+		
 		vxl.go.console('Scene: animation added');
 	}
 };
 /**
  * Removes the animation if there is one associated to this scene
  * @see vxlFrameAnimation
+ * @TODO: Review what happens to the actors. Should we remove them too?
  */
 vxlScene.prototype.clearAnimation = function(){
 	if (this.frameAnimation) {
@@ -7707,6 +7802,7 @@ function vxlBoundingBox() {
     this.mode 		= vxl.def.actor.mode.WIREFRAME;
     this.visible 	= false;
     this.toy    	= true;
+    this.shading    = false;
 };
 
 /**
@@ -7771,6 +7867,7 @@ function vxlAxis() {
 	this.mode 		= vxl.def.actor.mode.WIREFRAME;
 	this.visible 	= false;
 	this.toy     	= true;
+	this.shading    = false;
 };
 
 /**
@@ -7843,6 +7940,7 @@ function vxlFloor(){
 	this.mode 		= vxl.def.actor.mode.WIREFRAME;
     this.visible 	= false;
     this.toy    	= true;
+    this.shading    = false;
 };
 
 /**
@@ -7968,7 +8066,7 @@ function vxlView(canvasID, scene){
 		vxl.c.view = this;
 	}
 	
-	vxl.go.views.push(this);
+	vxl.go.renderman._views.push(this);
 	this.setAutoResize(true);
 
 	vxl.go.console('View: the view '+ this.name+' has been created');
@@ -8164,7 +8262,7 @@ vxlModelManager.prototype.load = function(filename, scene) {
 	};
 	
 	
-	//$.getJSON(filename, callback(manager, name, scene));*/
+	
 	var request  = $.ajax({
 		url			:filename,
 		type		:"GET",
@@ -8642,7 +8740,9 @@ wireframeON :  function(){
   
  
  /**
-  * @param actor it can be a vxlActor or a String with the actor name
+  * Sets a property for one of the actors in the current scene.
+  * This metod requires a current scene
+  * @param {vxlActor, String} actor it can be a vxlActor or a String with the actor name
   * @param {String} property the property to change 
   * @param {Object} value the new value
   */
@@ -8659,6 +8759,66 @@ wireframeON :  function(){
 		_actor = scene.getActorByName(_actor);
 		_actor.setPropert(property,value);
 	}
+ },
+ 
+ /**
+  * Sets a property for all the actors 
+  * @param {String} property the property to change 
+  * @param {Object} value the new value
+  * @param {vxlScene} scene the scene (optional). If this parameter is not passed the current scene is used 
+  */
+ setPropertyForAll : function (property, value, scene){
+    var s = undefined; 
+    if (vxl.c.scene == undefined && scene == undefined) throw ('vxl.api.setPropertyForAll: there is no current scene. Please call vxl.api.setCurrentScene');
+    if (scene == undefined){
+        s  = vxl.c.scene;
+    }
+    else {
+        s = scene;
+    }
+    s.setPropertyForAll(property,value);         
+ },
+ 
+ 
+ /**
+  * Sets a property for all the actors in the list 
+  * @param {Array} list list of actors (String or vxlActor)
+  * @param {String} property the property to change 
+  * @param {Object} value the new value
+  * @param {vxlScene} scene the scene (optional). If this parameter is not passed the current scene is used 
+  */
+ setPropertyFor : function(list, property, value, scene){
+    var s = undefined; 
+    if (vxl.c.scene == undefined && scene == undefined) throw ('vxl.api.setPropertyForAll: there is no current scene. Please call vxl.api.setCurrentScene');
+    if (scene == undefined){
+        s  = vxl.c.scene;
+    }
+    else {
+        s = scene;
+    }
+    s.setPropertyFor(list,property,value);
+ },
+ 
+ /**
+ * <p>Returns a list of actors based on the condition passed as parameter.</p>
+ * <p>The condition is a function with the following signature:</p>
+ * <p><code> condition(vxlActor): returns boolean</code></p>
+ * <p>If the condition evaluates true then that actor is included in the results</p>
+ * 
+ * @param {function} condition the condition to evaluate in the actor list
+ * @param {vxlScene} scene (Optional) If this parameter is not set, the current scene will be used
+ * @returns {Array} list of actors 
+ */
+ getActorsThat : function(condition, scene){
+    var s = undefined;
+    if (vxl.c.scene == undefined && scene == undefined) throw ('vxl.api.setPropertyForAll: there is no current scene. Please call vxl.api.setCurrentScene');
+    if (scene == undefined){
+        s = vxl.c.scene;
+    }
+    else{
+        s = scene;
+    }
+    return s.getActorsThat(condition);
  },
  
  /**
@@ -8879,7 +9039,7 @@ vxlFrameAnimation.prototype.addActorToFrame = function(frame,actorName){
  * is a list of actors 
  * 
  * var map = {"frame1":["actor1","actor2"], "frame2":["actor3","actor4"]}
- * 
+ * @private
  */
 vxlFrameAnimation.prototype._setup = function(map){
 	this.activeFrame = 1;
@@ -8896,11 +9056,15 @@ vxlFrameAnimation.prototype._setup = function(map){
 
 /**
  * Starts the animation loop
+ * @param {Number} rate the framerate for the animation (optional)
  */
-vxlFrameAnimation.prototype.start = function(){
+vxlFrameAnimation.prototype.start = function(rate){
 	if (this.scene == null) throw 'FrameAnimation: the animation is not associated with any scene. Please use scene.setFrameAnimation method';
 
     this.running = true;
+    if (rate != undefined && rate >=0){
+    	this.renderRate = rate;
+    }
 	this.timerID = setInterval((function(self) {return function() {self.nextFrame();}})(this),this.renderRate);
 };
 
@@ -8914,8 +9078,8 @@ vxlFrameAnimation.prototype.stop = function(){
 
 vxlFrameAnimation.prototype.setFrameRate = function(rate){
 	if (rate <=0) return;
-	this.renderRate = rate;
 	this.stop();
+	this.renderRate = rate;
 	this.start();
 };
 
@@ -8932,8 +9096,8 @@ vxlFrameAnimation.prototype.render = function(renderer){
 		var actorName = this.actorByFrameMap[this.activeFrame][i];
 		var actor = this.scene.getActorByName(actorName);
 		if (actor != null){
-			actor.allocate(renderer);
-			actor.render(renderer);
+			actor._allocate(renderer);
+			actor._render(renderer);
 		}
 	}
 };

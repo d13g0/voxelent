@@ -16,6 +16,9 @@
 var view;
 var S = 3;
 var T = (Math.pow(S*2+1,3) - Math.pow(S*2-1,3)); //external cube minus internal cube. Easy!
+var cubes = [];
+var normals = [];
+var pos = [];
 
 function runVoxApp(){
     vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
@@ -47,6 +50,7 @@ function handleEvent(event){
     			clonedCube.setPosition(i*1.5,j*1.5,k*1.5);
     			clonedCube.setColor(lut.getColor(count,0,T));
     			clonedCube.setShading(false);
+    			cubes.push(clonedCube);
     			view.scene.addActor(clonedCube);
     		}
     	}
@@ -58,6 +62,8 @@ function handleEvent(event){
     cam.setAzimuth(-45);   
     cam.setElevation(-45); 
 
+    //view.renderer.setRenderRate(50);
+    view.renderer.setMode(vxl.def.renderer.mode.ANIMFRAME);
     
     var tables = vxl.api.getLookupTables();
 	var options = "";
@@ -68,7 +74,18 @@ function handleEvent(event){
 	
     $('#lutPicker').change(function(){
     	setLookupTable($('#lutPicker').val());
-    });    
+    });
+    
+    
+    //populate normals
+    for(var i=0;i<cubes.length;i+=1){
+        normals[i] = vec3.create();
+        vec3.set(cubes[i].position, normals[i]);
+        vec3.normalize(normals[i]);
+        pos.push(cubes[i].position);
+    }
+    
+    startAnimation();    
 };
 
 function setLookupTable(ID){
@@ -78,6 +95,31 @@ function setLookupTable(ID){
 		actor.setColor(lut.getColor(i,0,T));
 	}
 };
+
+
+var azimuth = 0, elevation = 0, t = 0;
+
+function animate(){
+    var cam = vxl.c.camera;
+    cam.setAzimuth(t*5);   
+
+    var p = vec3.create();
+    var s = vec3.create();
+    for(var i=0;i<cubes.length;i+=1){
+        vec3.set(pos[i], p);
+        vec3.set(normals[i],s);
+        vec3.scale(s,20*Math.sin(t*50 * Math.PI/180));
+        vec3.add(p,s);
+        cubes[i].setPosition(p);
+       
+    }
+    
+    t += 0.1; 
+};
+
+function startAnimation(){
+    //setInterval(animate,60/1000);
+}
 </script>
 
 <script type="text/javascript">

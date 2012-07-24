@@ -13,7 +13,7 @@
 var view, actor;
 function runVoxApp(){
 	vxl.go.debug = true;
-	vxl.go.notifier.addTarget(vxl.events.MODELS_LOADED, this);
+	vxl.go.notifier.subscribe(vxl.events.MODELS_LOADED, this);
     view = vxl.api.setup('view-1');
     vxl.api.load('assets/models/geometry/cone.json');
     view.start();

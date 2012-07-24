@@ -214,14 +214,18 @@ vxlCamera.prototype.setFocalPoint = function(x,y,z){
  */
 vxlCamera.prototype.setAzimuth = function(az){
     var c = this;
+    
     c.azimuth =az;
     
     if (c.azimuth > 360 || c.azimuth <-360) {
         c.azimuth = c.azimuth % 360;
     }
-    c._rotate(az,0);
-    c.clear();
-};
+    
+    this.matrix = mat4.identity();
+    mat4.rotateY(this.matrix, c.azimuth   * Math.PI / 180);
+    mat4.rotateX(this.matrix, c.elevation * Math.PI / 180);
+    mat4.translate(this.matrix, this.position);
+}
 
 /**
  * Sets the elevation of the camera
@@ -236,9 +240,35 @@ vxlCamera.prototype.setElevation = function(el){
     if (c.elevation > 360 || c.elevation <-360) {
         c.elevation = c.elevation % 360;
     }
-    c._rotate(0,el);
-    c.clear();
+    
+    this.matrix = mat4.identity();
+    mat4.rotateY(this.matrix, c.azimuth   * Math.PI / 180);
+    mat4.rotateX(this.matrix, c.elevation * Math.PI / 180);
+    mat4.translate(this.matrix, this.position);
+
+
 };
+
+/**
+ * Change the azimuth of the camera
+ * @param {Number} el the azimuth increment in degrees
+ */
+vxlCamera.prototype.changeAzimuth = function(az){
+    var c = this;
+    var newA =  c.azimuth + az;
+    this.setAzimuth(newA);
+};
+
+/**
+ * Change the elevation of the camera
+ * @param {Number} el the elevation increment in degrees
+ */
+vxlCamera.prototype.changeElevation = function(el){
+    var c = this;
+    var newE = c.elevation + el;
+    this.setElevation(newE);
+};
+
 
 /**
  * Performs the dollying operation in the direction indicated by the camera normal axis.
@@ -361,21 +391,16 @@ vxlCamera.prototype._updateMatrix = function(){
               
      }
      else if (this.type ==  vxl.def.camera.type.ORBITING){
-         
                
                 //Rotations according to Tojiro
                 var rotY  = quat4.fromAngleAxis(this.rotation[0] * Math.PI/180, [0,1,0]);
                 var rotX  = quat4.fromAngleAxis(this.rotation[1] * Math.PI/180, [1,0,0]);
                 var rotQ = quat4.multiply(rotY, rotX, quat4.create());
                 var rotMatrix = quat4.toMat4(rotQ);
-                
-                
 
                 mat4.translate(this.matrix, this.cRot)
                 mat4.multiply(this.matrix, rotMatrix);
                 mat4.translate(this.matrix, vec3.negate(this.cRot, vec3.create()));
-
-                
     } 
 };
 

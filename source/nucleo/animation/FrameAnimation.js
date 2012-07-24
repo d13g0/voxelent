@@ -59,7 +59,7 @@ vxlFrameAnimation.prototype.addActorToFrame = function(frame,actorName){
  * is a list of actors 
  * 
  * var map = {"frame1":["actor1","actor2"], "frame2":["actor3","actor4"]}
- * 
+ * @private
  */
 vxlFrameAnimation.prototype._setup = function(map){
 	this.activeFrame = 1;
@@ -76,11 +76,15 @@ vxlFrameAnimation.prototype._setup = function(map){
 
 /**
  * Starts the animation loop
+ * @param {Number} rate the framerate for the animation (optional)
  */
-vxlFrameAnimation.prototype.start = function(){
+vxlFrameAnimation.prototype.start = function(rate){
 	if (this.scene == null) throw 'FrameAnimation: the animation is not associated with any scene. Please use scene.setFrameAnimation method';
 
     this.running = true;
+    if (rate != undefined && rate >=0){
+    	this.renderRate = rate;
+    }
 	this.timerID = setInterval((function(self) {return function() {self.nextFrame();}})(this),this.renderRate);
 };
 
@@ -94,8 +98,8 @@ vxlFrameAnimation.prototype.stop = function(){
 
 vxlFrameAnimation.prototype.setFrameRate = function(rate){
 	if (rate <=0) return;
-	this.renderRate = rate;
 	this.stop();
+	this.renderRate = rate;
 	this.start();
 };
 
@@ -112,8 +116,8 @@ vxlFrameAnimation.prototype.render = function(renderer){
 		var actorName = this.actorByFrameMap[this.activeFrame][i];
 		var actor = this.scene.getActorByName(actorName);
 		if (actor != null){
-			actor.allocate(renderer);
-			actor.render(renderer);
+			actor._allocate(renderer);
+			actor._render(renderer);
 		}
 	}
 };

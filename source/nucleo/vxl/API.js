@@ -345,7 +345,9 @@ wireframeON :  function(){
   
  
  /**
-  * @param actor it can be a vxlActor or a String with the actor name
+  * Sets a property for one of the actors in the current scene.
+  * This metod requires a current scene
+  * @param {vxlActor, String} actor it can be a vxlActor or a String with the actor name
   * @param {String} property the property to change 
   * @param {Object} value the new value
   */
@@ -362,6 +364,66 @@ wireframeON :  function(){
 		_actor = scene.getActorByName(_actor);
 		_actor.setPropert(property,value);
 	}
+ },
+ 
+ /**
+  * Sets a property for all the actors 
+  * @param {String} property the property to change 
+  * @param {Object} value the new value
+  * @param {vxlScene} scene the scene (optional). If this parameter is not passed the current scene is used 
+  */
+ setPropertyForAll : function (property, value, scene){
+    var s = undefined; 
+    if (vxl.c.scene == undefined && scene == undefined) throw ('vxl.api.setPropertyForAll: there is no current scene. Please call vxl.api.setCurrentScene');
+    if (scene == undefined){
+        s  = vxl.c.scene;
+    }
+    else {
+        s = scene;
+    }
+    s.setPropertyForAll(property,value);         
+ },
+ 
+ 
+ /**
+  * Sets a property for all the actors in the list 
+  * @param {Array} list list of actors (String or vxlActor)
+  * @param {String} property the property to change 
+  * @param {Object} value the new value
+  * @param {vxlScene} scene the scene (optional). If this parameter is not passed the current scene is used 
+  */
+ setPropertyFor : function(list, property, value, scene){
+    var s = undefined; 
+    if (vxl.c.scene == undefined && scene == undefined) throw ('vxl.api.setPropertyForAll: there is no current scene. Please call vxl.api.setCurrentScene');
+    if (scene == undefined){
+        s  = vxl.c.scene;
+    }
+    else {
+        s = scene;
+    }
+    s.setPropertyFor(list,property,value);
+ },
+ 
+ /**
+ * <p>Returns a list of actors based on the condition passed as parameter.</p>
+ * <p>The condition is a function with the following signature:</p>
+ * <p><code> condition(vxlActor): returns boolean</code></p>
+ * <p>If the condition evaluates true then that actor is included in the results</p>
+ * 
+ * @param {function} condition the condition to evaluate in the actor list
+ * @param {vxlScene} scene (Optional) If this parameter is not set, the current scene will be used
+ * @returns {Array} list of actors 
+ */
+ getActorsThat : function(condition, scene){
+    var s = undefined;
+    if (vxl.c.scene == undefined && scene == undefined) throw ('vxl.api.setPropertyForAll: there is no current scene. Please call vxl.api.setCurrentScene');
+    if (scene == undefined){
+        s = vxl.c.scene;
+    }
+    else{
+        s = scene;
+    }
+    return s.getActorsThat(condition);
  },
  
  /**
