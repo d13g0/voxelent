@@ -40,15 +40,47 @@ function vxlModelManager(){
  */  
 vxlModelManager.prototype.load = function(filename, scene) {
     var manager = this;
-	if (manager.isModelLoaded(filename)) return;
+    
+    var name = filename.replace(/^.*[\\\/]/, '');
+	
+	if (manager.isModelLoaded(name)) return;
 	
 	vxl.go.console('ModelManager.load: Requesting '+filename+'...');
-    var request = new XMLHttpRequest();
+	
+	var successHandler = function(manager,name,scene){
+		return function(json, textStatus){
+			manager.add(json,name,scene);
+		}
+	};
+	
+	var errorHandler = function(filename){
+		return function(request, status, error){
+			
+			if(error.code = 1012){
+				alert('The file '+filename+' could not be accessed. \n\n'+
+    			'Please make sure that the path is correct and that you have the right pemissions');
+			}
+			else{
+				alert ('There was a problem loading the file '+filename+'. HTTP error code:'+request.status);
+			}		
+		}
+	};
+	
+	
+	
+	var request  = $.ajax({
+		url			:filename,
+		type		:"GET",
+		dataType	:"json",
+		success 	: successHandler(manager,name,scene),
+		error		: errorHandler(filename)
+	});    
+    /*var request = new XMLHttpRequest();
     request.open("GET", filename);
     
     request.onreadystatechange = function() {
     	if (request.readyState == 4) {
-      		if (request.status == 200 || ( request.status == 0 && document.domain.length ==0)){
+      		if (request.status == 200 || ( request.status == 0)){ //&& document.domain.length ==0)){
       			var name = filename.replace(/^.*[\\\/]/, '');
        			manager.add(JSON.parse(request.responseText),name,scene);
       		}
@@ -69,7 +101,8 @@ vxlModelManager.prototype.load = function(filename, scene) {
     	else{
     		alert(e);
     	}
-    }	
+    }*/
+   	
 };
 
 /**
