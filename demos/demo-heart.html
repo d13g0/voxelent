@@ -87,13 +87,16 @@
 				//Start the view
 				view.start();
 				
-			}
+			};
 
 			function handleEvent(event, src) {
 				var cam = view.cameraman.getActiveCamera();
 				
-				
-				if (event == vxl.events.MODELS_LOADED) {
+				if (event == vxl.events.SCENE_UPDATED) {
+                    var loaded = src.actors.length;
+                    $('#status').html('Objects loaded: ' + loaded + ' out of 60');
+                }
+				else if (event == vxl.events.MODELS_LOADED) {
 					
 					//Set up the camera
 					cam.setPosition([0, 0, 500]);
@@ -102,35 +105,31 @@
 					//Start the animation at 100ms per frame
 					animation.start(100);
 
-					$('#status').html('DONE').fadeOut(600);
+					$('#overlay-div').html('DONE').fadeOut(600);
 					
-				} else if (event == vxl.events.SCENE_UPDATED) {
-					var loaded = src.actors.length;
-					$('#status').html('Objects loaded: ' + loaded + ' out of 60');
-				}
-			}
+				} 
+			};
 		</script>
 
 <style type="text/css">
 
 
 .show {
-	 position: relative;
-	 height:85%;
-	 width:100%;
+
+     position: relative;
 }
 
-
 .overlay {
-    width: 160px;
-    height: 30px;
+    background: rgba(100,100,100,0.5);
+    padding: 5px;
+    width: 170px;
+    height: 8%;
     position: absolute;
-    top: 5px;
-    right: 55px;
-    font-size:12px;
+    top: 4px;
+    right: 6px;
+    font-size:13px;
     font-family: Arial,Helvetica;
     color: white;
-    text-align:right;
 }
 
 </style> 
@@ -150,7 +149,7 @@
 			Your browser does not support WebGL :-(
 		</p>
 	</canvas>
-    <div class='overlay'>
+    <div id ='overlay-div' class='overlay'>
       <p id='status'>Loading models...</p>
     </div>  
     </div>

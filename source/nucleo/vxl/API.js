@@ -45,6 +45,24 @@ vxl.api = {
   },
   
   /**
+   *Sets the render mode for the current view or the view passed as second
+   * parameter 
+   * @param {String} mode one of the modes defined in <code>vxl.def.renderer.mode</code>
+   * @param {vxlView} view the view (Optional) If this is not set up then the current view is used
+   */
+  setRenderMode : function(mode, view){
+      if (view == undefined && vxl.c.view == undefined){
+          throw ('api.setRnederMode: you need to define a view');
+      }
+      else if (view != undefined && view instanceof vxlView){
+          view.renderer.setMode(mode);
+      }
+      else {
+          vxl.c.view.renderer.setMode(mode);
+      }
+      
+  },
+  /**
    * @TODO: is this deprecated?
    */
  setCameraDistance :  function(op){

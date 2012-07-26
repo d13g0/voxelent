@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - vxlRenderer</title>
+		<title>JsDoc Reference - vxlViewInteractor</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -414,7 +414,7 @@ height:135px;
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class vxlRenderer
+				Class vxlViewInteractor
 			</h1>
 
 <!-- ============================== class summary ========================== -->
@@ -425,13 +425,13 @@ height:135px;
 				
 
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_renderer_Renderer.js.html">Renderer.js</a>.
+					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_view_interactor_ViewInteractor.js.html">ViewInteractor.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class vxlRenderer.">
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class vxlViewInteractor.">
 				<caption>Class Summary</caption>
 				<thead>
 					<tr>
@@ -444,9 +444,9 @@ height:135px;
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/vxlRenderer.html#constructor">vxlRenderer</a></b>(vw)
+								<b><a href="../symbols/vxlViewInteractor.html#constructor">vxlViewInteractor</a></b>(view, camera)
 							</div>
-							<div class="description">One of the main classes of Voxelent's NucleoA renderer object encapsulates most of the low level calls to WebGL.</div>
+							<div class="description"><p> Handles the interaction between a camera and a view </p></div>
 						</td>
 					</tr>
 				</tbody>
@@ -460,7 +460,7 @@ height:135px;
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class vxlRenderer.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class vxlViewInteractor.">
 					<caption>Method Summary</caption>
 					<thead>
 						<tr>
@@ -473,90 +473,72 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlRenderer.html#clear">clear</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/vxlViewInteractor.html#connectCamera">connectCamera</a></b>(c)
 								</div>
-								<div class="description">Clears the rendering context</div>
+								<div class="description"></div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlRenderer.html#clearColor">clearColor</a></b>(cc)
+								<div class="fixedFont"><b><a href="../symbols/vxlViewInteractor.html#connectView">connectView</a></b>(view)
 								</div>
-								<div class="description">Sets the color used to clear the rendering context</div>
+								<div class="description"></div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlRenderer.html#clearDepth">clearDepth</a></b>(d)
+								<div class="fixedFont"><b><a href="../symbols/vxlViewInteractor.html#getType">getType</a></b>()
 								</div>
-								<div class="description">Sets the clear depth for the rendering context</div>
+								<div class="description"></div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlRenderer.html#getWebGLContext">getWebGLContext</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/vxlViewInteractor.html#onKeyDown">onKeyDown</a></b>(ev)
 								</div>
-								<div class="description">Tries to obtain a WebGL context from the canvas associated with the view to which thisrenderer belongs to.</div>
+								<div class="description">Abstract method to be implemented by the descendants</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlRenderer.html#render">render</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/vxlViewInteractor.html#onKeyUp">onKeyUp</a></b>(ev)
 								</div>
-								<div class="description">Delegates rendering to the scene</div>
+								<div class="description">Abstract method to be implemented by the descendants</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlRenderer.html#setMode">setMode</a></b>(mode)
+								<div class="fixedFont"><b><a href="../symbols/vxlViewInteractor.html#onMouseDown">onMouseDown</a></b>(ev)
 								</div>
-								<div class="description">Sets the rendering mode.</div>
+								<div class="description">Abstract method to be implemented by the descendants</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlRenderer.html#setProgram">setProgram</a></b>(program, strategy)
+								<div class="fixedFont"><b><a href="../symbols/vxlViewInteractor.html#onMouseMove">onMouseMove</a></b>(ev)
 								</div>
-								<div class="description">Tries to add a new program definition to this renderer</div>
+								<div class="description">Abstract method to be implemented by the descendants</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlRenderer.html#setRenderRate">setRenderRate</a></b>(rate)
+								<div class="fixedFont"><b><a href="../symbols/vxlViewInteractor.html#onMouseUp">onMouseUp</a></b>(ev)
 								</div>
-								<div class="description">Sets the rendering rate in ms</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlRenderer.html#start">start</a></b>()
-								</div>
-								<div class="description">Starts the renderer</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlRenderer.html#stop">stop</a></b>()
-								</div>
-								<div class="description">Stops the renderer</div>
+								<div class="description">Abstract method to be implemented by the descendants</div>
 							</td>
 						</tr>
 					
@@ -577,12 +559,12 @@ height:135px;
 				</div>
 
 				<div class="fixedFont">
-						<b>vxlRenderer</b>(vw)
+						<b>vxlViewInteractor</b>(view, camera)
 				</div>
 
 				<div class="description">
-					One of the main classes of Voxelent's NucleoA renderer object encapsulates most of the low level calls to WebGL.It is here where Nucleo obtains a reference to the WebGL context.It is also here here (and in the Actor class) where all the attributes and uniforms are passedto the rendering program.
-					<br /><i>Author: </i>Diego Cantor.
+					<p> Handles the interaction between a camera and a view </p>
+					
 				</div>
 
 				
@@ -593,7 +575,13 @@ height:135px;
 						<dt class="heading">Parameters:</dt>
 						
 							<dt>
-								 <b>vw</b>
+								 <b>view</b>
+								
+							</dt>
+								<dd></dd>
+						
+							<dt>
+								 <b>camera</b>
 								
 							</dt>
 								<dd></dd>
@@ -619,40 +607,15 @@ height:135px;
 					Method Detail
 				</div>
 				
-					<a name="clear"> </a>
+					<a name="connectCamera"> </a>
 					<div class="fixedFont">
 
 					
-					<b>clear</b>()
+					<b>connectCamera</b>(c)
 
 					</div>
 					<div class="description">
-						Clears the rendering context
 						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="clearColor"> </a>
-					<div class="fixedFont">
-
-					
-					<b>clearColor</b>(cc)
-
-					</div>
-					<div class="description">
-						Sets the color used to clear the rendering context
 						
 						
 					</div>
@@ -664,53 +627,10 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> <b>cc</b>
+									<span class="light fixedFont">{<a href="../symbols/vxlCamera.html">vxlCamera</a>}</span> <b>c</b>
 									
 								</dt>
-								<dd>the new color passed as a numeric array of three elements</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">See:</dt>
-							
-								<dd><a href="../symbols/vxlView.html#setBackgroundColor">vxlView#setBackgroundColor</a></dd>
-							
-							</dl>
-						
-
-					<hr />
-				
-					<a name="clearDepth"> </a>
-					<div class="fixedFont">
-
-					
-					<b>clearDepth</b>(d)
-
-					</div>
-					<div class="description">
-						Sets the clear depth for the rendering context
-						
-						
-					</div>
-
-					
-
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Number}</span> <b>d</b>
-									
-								</dt>
-								<dd>the new clear depth</dd>
+								<dd>the camera to connect to this interactor</dd>
 							
 							</dl>
 						
@@ -723,65 +643,15 @@ height:135px;
 
 					<hr />
 				
-					<a name="getWebGLContext"> </a>
+					<a name="connectView"> </a>
 					<div class="fixedFont">
 
 					
-					<b>getWebGLContext</b>()
+					<b>connectView</b>(view)
 
 					</div>
 					<div class="description">
-						Tries to obtain a WebGL context from the canvas associated with the view to which thisrenderer belongs to.
 						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="render"> </a>
-					<div class="fixedFont">
-
-					
-					<b>render</b>()
-
-					</div>
-					<div class="description">
-						Delegates rendering to the scene
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="setMode"> </a>
-					<div class="fixedFont">
-
-					
-					<b>setMode</b>(mode)
-
-					</div>
-					<div class="description">
-						Sets the rendering mode. Options are in vxl.def.renderer.modeThis method updates the rendering mode and tries to restart the rendering process
 						
 						
 					</div>
@@ -793,10 +663,10 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{String}</span> <b>mode</b>
+									<span class="light fixedFont">{<a href="../symbols/vxlView.html">vxlView</a>}</span> <b>view</b>
 									
 								</dt>
-								<dd>the mode to set</dd>
+								<dd>the view</dd>
 							
 							</dl>
 						
@@ -809,15 +679,40 @@ height:135px;
 
 					<hr />
 				
-					<a name="setProgram"> </a>
+					<a name="getType"> </a>
 					<div class="fixedFont">
 
 					
-					<b>setProgram</b>(program, strategy)
+					<b>getType</b>()
 
 					</div>
 					<div class="description">
-						Tries to add a new program definition to this renderer
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="onKeyDown"> </a>
+					<div class="fixedFont">
+
+					
+					<b>onKeyDown</b>(ev)
+
+					</div>
+					<div class="description">
+						Abstract method to be implemented by the descendants
 						
 						
 					</div>
@@ -829,13 +724,7 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Object}</span> <b>program</b>
-									
-								</dt>
-								<dd>JSON program definition.</dd>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/vxlRenderStrategy.html">vxlRenderStrategy</a>}</span> <b>strategy</b>
+									<span class="light fixedFont">{Object}</span> <b>ev</b>
 									
 								</dt>
 								<dd></dd>
@@ -848,27 +737,18 @@ height:135px;
 						
 						
 						
-							<dl class="detailList">
-							<dt class="heading">See:</dt>
-							
-								<dd></dd>
-							
-								<dd></dd>
-							
-							</dl>
-						
 
 					<hr />
 				
-					<a name="setRenderRate"> </a>
+					<a name="onKeyUp"> </a>
 					<div class="fixedFont">
 
 					
-					<b>setRenderRate</b>(rate)
+					<b>onKeyUp</b>(ev)
 
 					</div>
 					<div class="description">
-						Sets the rendering rate in ms
+						Abstract method to be implemented by the descendants
 						
 						
 					</div>
@@ -880,10 +760,10 @@ height:135px;
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Number}</span> <b>rate</b>
+									<span class="light fixedFont">{Object}</span> <b>ev</b>
 									
 								</dt>
-								<dd>the new rendering rate in milliseconds</dd>
+								<dd></dd>
 							
 							</dl>
 						
@@ -896,21 +776,32 @@ height:135px;
 
 					<hr />
 				
-					<a name="start"> </a>
+					<a name="onMouseDown"> </a>
 					<div class="fixedFont">
 
 					
-					<b>start</b>()
+					<b>onMouseDown</b>(ev)
 
 					</div>
 					<div class="description">
-						Starts the renderer
+						Abstract method to be implemented by the descendants
 						
 						
 					</div>
 
 					
 
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>ev</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
 						
 						
 						
@@ -921,21 +812,68 @@ height:135px;
 
 					<hr />
 				
-					<a name="stop"> </a>
+					<a name="onMouseMove"> </a>
 					<div class="fixedFont">
 
 					
-					<b>stop</b>()
+					<b>onMouseMove</b>(ev)
 
 					</div>
 					<div class="description">
-						Stops the renderer
+						Abstract method to be implemented by the descendants
 						
 						
 					</div>
 
 					
 
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>ev</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="onMouseUp"> </a>
+					<div class="fixedFont">
+
+					
+					<b>onMouseUp</b>(ev)
+
+					</div>
+					<div class="description">
+						Abstract method to be implemented by the descendants
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>ev</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
 						
 						
 						

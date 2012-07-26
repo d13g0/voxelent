@@ -8,118 +8,122 @@
 
 <title>Voxelent - Cube Lookup Table Demo</title>
 
-<script src="lib/jquery.js" type="text/javascript"></script>
+<script type="text/javascript" src="lib/jquery.js" ></script>
+<script type="text/javascript" src="lib/jquery-ui.js" ></script>
 <script type='text/javascript' src='lib/voxelent_v0.87.6.js'></script>
+
+<link rel='stylesheet' type='text/css' href='css/jquery-ui/theme-1.css'/>
 
 <script type='text/javascript'>
 
+//Some global variables
 var view;
-var S = 3;
+var S = 2;
 var T = (Math.pow(S*2+1,3) - Math.pow(S*2-1,3)); //external cube minus internal cube. Easy!
 var cubes = [];
-var normals = [];
-var pos = [];
 
+/**
+ * Main function
+ */
 function runVoxApp(){
     vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
     vxl.api.loadLUTS('assets/tables');
-    
     view = vxl.api.setup('view-1');
     vxl.api.load('assets/models/geometry/cube.json');
-    
     view.start();
+    
 };
 
+/**
+ * Creates the cube array
+ */
+function createCubes(cube){
+    var count = 0, clon = undefined;
+    for (var i=-S;i<=S;i+=1){
+        for (var j=-S;j<=S;j+=1){
+            for (var k=-S;k<=S;k+=1){
+                if (Math.abs(i) <S && Math.abs(j) <S  && Math.abs(k) < S) {
+                    continue;  //don't bother with internal cubes that are not rendered
+                }
+                count++;
+                //Create a cube
+                clon = cube.clone();
+                clon.setPosition(i*1.5,j*1.5,k*1.5);
+                clon.setShading(false);
+                cubes.push(clon);
+                //add it to the current scene
+                view.scene.addActor(clon);
+            }
+        }
+    }
+};
+
+/**
+ * Colors the cube array according to the lookup table passed as a parameter
+ * @param {String} ID the lookup table ID
+ */
+function colorCubes(ID){
+    var lut = vxl.go.lookupTableManager.get(ID);
+    for(var i=0; i<cubes.length; i+=1){
+        cubes[i].setColor(lut.getColor(i,0,T));
+    }
+};
+
+
+/**
+ * Creates the dropdown selector from which lookup tables can be selected
+ */
+function setupLUTSelector(){
+    
+    var tables = vxl.api.getLookupTables();
+    var options = "";
+    
+    for (var i=0;i<tables.length;i+=1){
+        options += '<option value=\"'+tables[i]+'\">'+tables[i]+'</option>';
+    }
+    
+    $('#lutPicker').html(options);
+    $('#lutPicker').change(function(){
+        colorCubes($('#lutPicker').val());
+    });
+}; 
+
+/**
+ * Callback that is invoked for the events that we have subscribed to (check main function)
+ * In this case we are only listening form vxl.events.MODELS_LOADED
+ */
+var timer = -1;
 function handleEvent(event){
 
+    
     var cube = vxl.api.getActorByName('cube.json');
     view.scene.removeActor(cube);
     
-    var lut = vxl.go.lookupTableManager.get('default');
-    
-    var count = 0, clonedCube = undefined;
-    
-    for (var i=-S;i<=S;i+=1){
-    	for (var j=-S;j<=S;j+=1){
-    		for (var k=-S;k<=S;k+=1){
-    			if (Math.abs(i) <S && Math.abs(j) <S  && Math.abs(k) < S) {
-    				continue;  //don't bother with internal cubes that are not rendered
-    			}
-    			count++;
-    			clonedCube = cube.clone();
-    			clonedCube.setPosition(i*1.5,j*1.5,k*1.5);
-    			clonedCube.setColor(lut.getColor(count,0,T));
-    			clonedCube.setShading(false);
-    			cubes.push(clonedCube);
-    			view.scene.addActor(clonedCube);
-    		}
-    	}
-    }
+    //Create all the copies based on the cube actor that was removed from the scene
+    createCubes(cube);
+    colorCubes('default');
+    setupLUTSelector();    
  
-
+    //Setup our camera
     var cam = vxl.c.camera;
-    cam.setPosition(0,0,40);
-    cam.setAzimuth(-45);   
-    cam.setElevation(-45); 
+    cam.setPosition(0,0,13);
+    cam.setAzimuth(-43);   
+    cam.setElevation(-17);
 
-    //view.renderer.setRenderRate(50);
-    view.renderer.setMode(vxl.def.renderer.mode.ANIMFRAME);
+    //Start the animation
+    vxl.api.setRenderMode(vxl.def.renderer.mode.ANIMFRAME);
+    timer = setInterval(animate,30);  
     
-    var tables = vxl.api.getLookupTables();
-	var options = "";
-	for (var i=0;i<tables.length;i+=1){
-		options += '<option value=\"'+tables[i]+'\">'+tables[i]+'</option>';
-	}
-	$('#lutPicker').html(options);
-	
-    $('#lutPicker').change(function(){
-    	setLookupTable($('#lutPicker').val());
-    });
-    
-    
-    //populate normals
-    for(var i=0;i<cubes.length;i+=1){
-        normals[i] = vec3.create();
-        vec3.set(cubes[i].position, normals[i]);
-        vec3.normalize(normals[i]);
-        pos.push(cubes[i].position);
-    }
-    
-    startAnimation();    
-};
-
-function setLookupTable(ID){
-	var lut = vxl.go.lookupTableManager.get(ID);
-	for(var i=0; i<view.scene.actors.length; i+=1){
-		var actor = view.scene.actors[i];
-		actor.setColor(lut.getColor(i,0,T));
-	}
-};
-
-
-var azimuth = 0, elevation = 0, t = 0;
-
+    $('#overlay-div').fadeIn(3000);  
+}; 
+/**
+ * Updates the camera position
+ */
 function animate(){
     var cam = vxl.c.camera;
-    cam.setAzimuth(t*5);   
-
-    var p = vec3.create();
-    var s = vec3.create();
-    for(var i=0;i<cubes.length;i+=1){
-        vec3.set(pos[i], p);
-        vec3.set(normals[i],s);
-        vec3.scale(s,20*Math.sin(t*50 * Math.PI/180));
-        vec3.add(p,s);
-        cubes[i].setPosition(p);
-       
-    }
-    
-    t += 0.1; 
+    cam.rotate(0.3,0.2);   
 };
 
-function startAnimation(){
-    //setInterval(animate,60/1000);
-}
 </script>
 
 <script type="text/javascript">
@@ -134,13 +138,16 @@ function startAnimation(){
 }
 
 .overlay {
+    background: rgba(150,150,150,0.5);
+    padding: 5px;
     width: 150px;
     height: 20%;
     position: absolute;
-    top: 0px;
-    right: 0px;
+    top: 5px;
+    right: 5px;
     font-size:12px;
 	font-family: Arial,Helvetica;
+	color: white;
 }
 
 .overlay select{
@@ -148,7 +155,7 @@ function startAnimation(){
    color: #BCBCBC;
    width: 100px;
    padding: 5px;
-   font-size: 14px;
+   font-size: 13px;
    height: 30px;
    border: 0px;
 }
@@ -164,11 +171,28 @@ function startAnimation(){
 	</canvas>
     
     
-    <div class='overlay'>
+    <div id = 'overlay-div' class='overlay'>
+      <p><input type='checkbox' id='toggleAnimation'/><label for='toggleAnimation'>Stop Animation</label></p>
       <p>Please select one lookup table</p>
       <select id='lutPicker'></select>
+      
     </div>  
     
     </div>
+    
+<script>
+$('#toggleAnimation').button().click(
+    function(){
+        if (this.checked){
+            clearInterval(timer);
+            $('#toggleAnimation').button('option','label','Start Animation');
+        }
+        else{
+            timer = setInterval(animate,30);
+            $('#toggleAnimation').button('option','label','Stop Animation');
+        }
+    }
+);
+</script>    
 </body>			
 </html>

@@ -13,7 +13,11 @@
     You should have received a copy of the GNU General Public License
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/ 
-
+/**
+ * <p> Handles the interaction between a camera and a view </p>
+ * @class
+ * @constructor 
+ */
 function vxlViewInteractor(view, camera){
     this.view   = view;
 	this.camera = camera;
@@ -25,13 +29,18 @@ function vxlViewInteractor(view, camera){
 	if (camera != undefined){
 	    this.connectCamera(camera);
 	}
-}
+};
 
+/**
+ * 
+ */
 vxlViewInteractor.prototype.getType = function(){
     return "vxlViewInteractor";
-}
+};
 
-
+/**
+ * @param {vxlView} view the view 
+ */
 vxlViewInteractor.prototype.connectView = function(view){
   
     if (!(view instanceof vxlView)){
@@ -80,10 +89,30 @@ vxlViewInteractor.prototype.connectCamera = function(c){
 	}
 };
 
+/**
+ * Abstract method to be implemented by the descendants 
+ * @param {Object} ev
+ */
 vxlViewInteractor.prototype.onMouseUp   = function(ev){ alert('implement onMouseUp');};
+/**
+ * Abstract method to be implemented by the descendants 
+ * @param {Object} ev
+ */
 vxlViewInteractor.prototype.onMouseDown = function(ev){ alert('implement onMouseDown');};
+/**
+ * Abstract method to be implemented by the descendants 
+ * @param {Object} ev
+ */
 vxlViewInteractor.prototype.onMouseMove = function(ev){ alert('implement onMouseMove');};
+/**
+ * Abstract method to be implemented by the descendants 
+ * @param {Object} ev
+ */
 vxlViewInteractor.prototype.onKeyDown   = function(ev){ alert('implement onKeyDown');};
+/**
+ * Abstract method to be implemented by the descendants 
+ * @param {Object} ev
+ */
 vxlViewInteractor.prototype.onKeyUp     = function(ev){ alert('implement onKeyUp');};
 
 
