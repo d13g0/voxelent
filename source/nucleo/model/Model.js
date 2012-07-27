@@ -200,7 +200,7 @@ vxlModel.prototype.computeBoundingBox = function(){
 	
 	
 	var c = [0, 0, 0];
-      
+     //computes the centre 
     c[0] = (bbm[3] + bbm[0]) /2;
     c[1] = (bbm[4] + bbm[1]) /2;
     c[2] = (bbm[5] + bbm[2]) /2;

@@ -55,6 +55,8 @@ vxlTrackerInteractor.prototype.onKeyDown = function(ev){
     this.altPressed = ev.altKey;
     this.shiftPressed = ev.shiftKey;
     
+    var camera = this.camera;
+    
     //ROTATING
     if (!this.altPressed && !this.shiftPressed){
         switch(this.keyPressed){

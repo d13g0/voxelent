@@ -4178,6 +4178,10 @@ vxlCamera.prototype.focusOn = function(actorName){
  * @param {vxlBoundingBox} bb the bounding box
  */
 vxlCamera.prototype.shot = function(bb){
+    
+    this.setElevation(0);
+    this.setAzimuth(0);
+    
 	var maxDim = Math.max(bb[3] - bb[0], bb[4] - bb[1]);
 	
 	cc = [0,0,0];
@@ -4635,6 +4639,8 @@ vxlTrackerInteractor.prototype.onKeyDown = function(ev){
     this.keyPressed = ev.keyCode;
     this.altPressed = ev.altKey;
     this.shiftPressed = ev.shiftKey;
+    
+    var camera = this.camera;
     
     //ROTATING
     if (!this.altPressed && !this.shiftPressed){
@@ -6264,7 +6270,7 @@ vxlModel.prototype.computeBoundingBox = function(){
 	
 	
 	var c = [0, 0, 0];
-      
+     //computes the centre 
     c[0] = (bbm[3] + bbm[0]) /2;
     c[1] = (bbm[4] + bbm[1]) /2;
     c[2] = (bbm[5] + bbm[2]) /2;
@@ -6333,6 +6339,7 @@ function vxlActor(model){
   
   this.bb = [0, 0, 0, 0, 0, 0];
   this.position 	= vec3.create([0, 0, 0]);
+  this.centre       = vec3.create([0, 0, 0]);
   this.scale 		= vec3.create([1, 1, 1]);
   this.rotation 	= vec3.create([0, 0, 0]);
 
@@ -6354,15 +6361,13 @@ function vxlActor(model){
   	this.color      = model.color!=undefined?model.color:(model.diffuse!=undefined?model.diffuse:undefined); 
   	this.bb 	    = model.bb.slice(0);
   	this.mode       = model.mode==undefined?vxl.def.actor.mode.SOLID:model.mode;
+  	this.centre     = vec3.set(model.centre, vec3.create());
   }
   
   vxl.go.notifier.publish(vxl.events.ACTOR_BB_UPDATED, this);
   
   this.UID = vxl.util.generateUID();
-
-  
 };
-
 
 /**
  * Sets the position of this actor. 
@@ -6376,56 +6381,81 @@ function vxlActor(model){
  * @param {Number} z if x is a number, then this parameter corresponds to the z-coordinate
  */
 vxlActor.prototype.setPosition = function (x,y,z){
-    
-    var bb = this.bb;
-    var currentPos = vec3.set(this.position, vec3.create());
-    
     this.position = vxl.util.createVec3(x,y,z); 
-    
-    //Now recalculate the bounding box 
-    var shift = vec3.subtract(this.position, currentPos, vec3.create());
-    bb[0] += shift[0];
-    bb[1] += shift[1];
-    bb[2] += shift[2];
-    bb[3] += shift[0];
-    bb[4] += shift[1];
-    bb[5] += shift[2];
-    
+    this._computeBoundingBox();
     vxl.go.notifier.fire(vxl.events.ACTOR_BB_UPDATED, this);
 };
+
+
 /**
  * Scales this actor. 
  * @param {Number, Array, vec3} s the scaling factor. The scaling factor is applied in all axes.
  *
  */
-vxlActor.prototype.setScale = function(s){
+vxlActor.prototype.setScale = function(s,a,b){
+    if (s == 0 && a == undefined && b==undefined) return;
     
-    var bb = this.bb;
     
-    if (typeof(s)=="number"){
+    if (typeof(s)=="number" && a == undefined && b == undefined){
         this.scale = vxl.util.createVec3(s,s,s);
-        //@TODO: TEST
-        bb[0] *= s
-    	bb[1] += s
-    	bb[2] += s
-    	bb[3] += s
-    	bb[4] += s
-    	bb[5] += s
     }
     else{
-        this.scale = vxl.util.createVec3(s);
-        
-        //@TODO: TEST
-        bb[0] *= this.scale[0];
-    	bb[1] += this.scale[1];
-    	bb[2] += this.scale[2];
-    	
-    	bb[3] += this.scale[0];
-    	bb[4] += this.scale[1];
-    	bb[5] += this.scale[2];
+        this.scale = vxl.util.createVec3(s,a,b);
     }
     
+    this._computeBoundingBox();    
     vxl.go.notifier.fire(vxl.events.ACTOR_BB_UPDATED, this);
+};
+
+/**
+ *@private 
+ */
+vxlActor.prototype._computeBoundingBox = function(){
+
+    this.bb  = this.model.bb.slice(0);
+
+    var bb = this.bb;
+    var cc = this.model.centre;
+
+    var pos =this.position;
+    
+    //Calculate position
+    bb[0] += pos[0];
+    bb[1] += pos[1];
+    bb[2] += pos[2];
+    bb[3] += pos[0];
+    bb[4] += pos[1];
+    bb[5] += pos[2];
+    
+    var minY = bb[1];
+
+    //Recalculate centre 
+    cc[0] = (bb[3] + bb[0]) /2;
+    cc[1] = (bb[4] + bb[1]) /2;
+    cc[2] = (bb[5] + bb[2]) /2;
+    
+    //Calculate scale
+    bb[0] *= this.scale[0];
+    bb[1] *= this.scale[1];
+    bb[2] *= this.scale[2];
+    bb[3] *= this.scale[0];
+    bb[4] *= this.scale[1];
+    bb[5] *= this.scale[2];
+    
+    //Now recenter
+    var c = [0,0,0];
+    c[0] = (bb[3] + bb[0]) /2;
+    c[1] = (bb[4] + bb[1]) /2;
+    c[2] = (bb[5] + bb[2]) /2;
+    
+    //recalculate boundingbox
+    var shift = [c[0]-cc[0], bb[1]-minY,c[2]-cc[2]];
+    bb[0] -= shift[0];
+    bb[1] -= shift[1];
+    bb[2] -= shift[2];
+    bb[3] -= shift[0];
+    bb[4] -= shift[1];
+    bb[5] -= shift[2];
 };
 
 /**
@@ -6825,8 +6855,10 @@ vxlBasicStrategy.prototype._applyActorTransform = function(actor){
     var glsl 	= vxl.def.glsl;
 
     trx.push();
-        mat4.scale      (trx.mvMatrix, actor.scale);
+        
+        
 		mat4.translate	(trx.mvMatrix, actor.position);
+		mat4.scale      (trx.mvMatrix, actor.scale);
 		//@TODO: IMPLEMENT ACTOR ROTATIONS
 	    
 	    prg.setUniform(glsl.MODEL_VIEW_MATRIX,	r.transforms.mvMatrix);
@@ -7025,8 +7057,8 @@ vxlBlenderStrategy.prototype._applyActorTransform = function(actor){
     var glsl    = vxl.def.glsl;
 
     trx.push();
-        mat4.scale      (trx.mvMatrix, actor.scale);
         mat4.translate  (trx.mvMatrix, actor.position);
+        mat4.scale      (trx.mvMatrix, actor.scale);
         //@TODO: IMPLEMENT ACTOR ROTATIONS
         
         prg.setUniform(glsl.MODEL_VIEW_MATRIX,  r.transforms.mvMatrix);
@@ -7850,7 +7882,7 @@ vxl.def.model.axis = new vxlModel();
 vxl.def.model.axis.load('axis', {
                     	"vertices": [	-1, 0, 0, 	 1, 0, 0, 	 0,-2, 0,	 0, 2, 0,	 0, 0,-1,	 0, 0, 1	],
                     	"wireframe": [ 	0, 1, 	2, 3, 	4, 5	],
-                    	"colors": [	1, 1, 0, 	  1, 1, 0, 	0, 1 ,0, 	 0, 1 ,0,   0, 0, 1,	 0, 0, 1 	]
+                    	"colors": [	1, 0, 0, 	  1, 0, 0, 	0, 1 ,0, 	 0, 1 ,0,   0, 0, 1,	 0, 0, 1 	]
                     	});
  
 
@@ -7870,6 +7902,7 @@ function vxlAxis() {
 	this.toy     	= true;
 	this.shading    = false;
 };
+
 
 /**
 * Sets the centre of the axis actor in the scene

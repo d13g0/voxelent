@@ -306,6 +306,10 @@ vxlCamera.prototype.focusOn = function(actorName){
  * @param {vxlBoundingBox} bb the bounding box
  */
 vxlCamera.prototype.shot = function(bb){
+    
+    this.setElevation(0);
+    this.setAzimuth(0);
+    
 	var maxDim = Math.max(bb[3] - bb[0], bb[4] - bb[1]);
 	
 	cc = [0,0,0];
