@@ -298,7 +298,14 @@ util : {
             vec3.set(vec3.createFrom(x,y,z), vvv);
         }
         return vvv;
-	}
+	},
+	
+	generateUID: function(){
+	       function S4() {
+                return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+            }
+        return (S4()+"-"+S4()+"-"+S4()+"-"+S4());
+    }
 }
 
 };
@@ -3824,71 +3831,42 @@ vxlNotifier.prototype.getTargetsFor = function(event){
  * @see vxlCamera
   */
 
-function vxlCameraState(camera) {
+function vxlCameraState(name, camera) {
 	if(!( camera instanceof vxlCamera)) {
 		alert('vxlCameraState needs a vxlCamera as argument');
 		return null;
 	}
-
+    
+    this.name          = name;
 	this.c             = camera;
-	this.position      = vec3.createFrom(0, 0, 1);
-	this.focus    	   = vec3.createFrom(0, 0, 0);
-	
-    this.up            = vec3.createFrom(0, 1, 0);
-	this.right         = vec3.createFrom(1, 0, 0);
-    
-	this.distance      = 0;
-	this.azimuth       = 0;
-	this.elevation     = 0;
-    
-	this.xTr           = 0;
-	this.yTr           = 0;
+    this.FOV            = c.FOV
+    this.Z_NEAR         = c.Z_NEAR;    
+    this.Z_FAR          = c.Z_FAR;
+    this.matrix         = mat4.identity();
+    this.right          = vec3.createFrom(1, 0, 0); //@TODO: COPY REAL VALUES
+    this.up             = vec3.createFrom(0, 1, 0);
+    this.normal         = vec3.createFrom(0, 0, 1); 
+    this.position       = vec3.createFrom(0, 0, 1);
+    this.focalPoint     = vec3.createFrom(0, 0, 0);
+    this.cRot           = vec3.createFrom(0, 0, 0);
+    this.azimuth        = c.azimuth;
+    this.elevation      = c.elevation;
+    this.type           = c.type;
+    this.distance       = c.distance;
 };
 
-/**
- * Resets current camera to the standard location an orientation. This is,
- * the camera is looking at the center of the scene, located at [0,0,1] along the z axis and
- * aligned with the y axis.
- * 
- */
-vxlCameraState.prototype.reset = function() {
-	var c = this.c;
-	c.focus            = vec3.createFrom(0, 0, 0);
-	c.up               = vec3.createFrom(0, 1, 0);
-	c.right            = vec3.createFrom(1, 0, 0);
-	c.distance         = 0;
-	c.elevation        = 0;
-	c.azimuth          = 0;
-	c.setPosition(0, 0, 1);
-};
-
-/**
- * Saves the current state of the camera that this vxlCameraState object is associated with.
- */
-
-vxlCameraState.prototype.save = function() {
-	var c = this.c;
-	this.distance = c.distance;
-	this.azimuth = c.azimuth;
-	this.elevation = c.elevation;
-	vec3.set(c.position, this.position);
-	vec3.set(c.focus, this.focus);
-	vec3.set(c.up, this.up);
-	vec3.set(c.right, this.right);
-};
 
 /**
  * Updates the camera with the state stored in vxlCameraState.
  */
 vxlCameraState.prototype.retrieve = function() {
+    //@TODO: Finish implementation
 	var c = this.c;
 	c.azimuth = this.azimuth;
 	c.elevation = this.elevation;
-
 	vec3.set(this.focus, c.focus);
 	vec3.set(this.up, c.up);
 	vec3.set(this.right, c.right);
-
 	c.setPosition(this.position);
 };
 /*-------------------------------------------------------------------------
@@ -3935,27 +3913,23 @@ function vxlCamera(vw,t) {
     this.FOV            = vxl.def.camera.fov;
     this.Z_NEAR         = vxl.def.camera.near;    
     this.Z_FAR          = vxl.def.camera.far;
-	
 	this.view 		    = vw;
-    
     this.matrix 	    = mat4.identity();
-
     this.right 		    = vec3.createFrom(1, 0, 0);
 	this.up             = vec3.createFrom(0, 1, 0);
 	this.normal         = vec3.createFrom(0, 0, 1);	
 	this.position       = vec3.createFrom(0, 0, 1);
 	this.focalPoint     = vec3.createFrom(0, 0, 0);
-	this.tr             = vec3.createFrom(0, 0, 0);
 	this.cRot           = vec3.createFrom(0, 0, 0);
-    
-    
     this.azimuth 	    = 0;
     this.elevation 	    = 0;
     this.relAzimuth     = 0;
     this.relElevation   = 0;
 	this.dstep  	    = 0; //dollying step
-	
-    this.m = mat4.identity();
+    this.m              = mat4.identity();
+    this.distance       = 1;
+    this.debug          = false;
+    this.states         = [];
 
 	if (t != undefined && t !=null){
         this.type = t;
@@ -3963,10 +3937,6 @@ function vxlCamera(vw,t) {
     else {
         this.type = vxl.def.camera.type.ORBITING;
     }
-    
-	this.distance 	= 1;
-	this.debug 		= false;
-	this.state 	    = new vxlCameraState(this);
 };
 
 /**
@@ -4241,24 +4211,25 @@ vxlCamera.prototype.longShot = function() {
  * Saves the current camera state in a memento (vxlCameraState)
  * @see vxlCameraState
  */
-vxlCamera.prototype.save = function() {
-	this.state.save(this);
+vxlCamera.prototype.save = function(name) {
+    var landmark = new vxlCameraState(name, this);
+	this.states.push(landmark);
 };
 
 /**
  * Retrieves the last saved camera state from the memento (vxlCameraState)
  * @see vxlCameraState
  */
-vxlCamera.prototype.retrieve = function() {
-	this.state.retrieve();
+vxlCamera.prototype.retrieve = function(name) {
+	for(var i=0;i<this.states.length;i+=1){
+	    if (this.states[i].name == name){
+	        this.states[i].retrieve();
+	        return;
+	    }
+	}
+    throw 'vxlCamera.retrieve: state '+name+' not found'
 };
 
-/**
- * Resets the memento to the original camera state
- */
-vxlCamera.prototype.reset = function() {
-	this.state.reset();
-};
 
 
 /**
@@ -4285,8 +4256,11 @@ vxlCamera.prototype.status = function() {
  */
 vxlCamera.prototype._setInitialMatrix = function(){
     this.matrix = mat4.identity();
+    
+    mat4.translate(this.matrix, this.focalPoint);
     mat4.rotateY  (this.matrix, this.azimuth   * Math.PI / 180);
     mat4.rotateX  (this.matrix, this.elevation * Math.PI / 180);
+    mat4.translate(this.matrix, vec3.negate(this.focalPoint, vec3.create()));
     mat4.translate(this.matrix, this.position);
 };
 
@@ -4317,7 +4291,6 @@ vxlCamera.prototype._updateMatrix = function(){
     
         this.relAzimuth = 0;
         this.relElevation = 0;
-        //this._updateAxes();
     } 
 };
 
@@ -6050,35 +6023,17 @@ vxlRenderer.prototype.clearDepth = function(d){
 };
 
 /**
- * Delegates rendering to the scene
+ * Renders the scene according to the currently set strategy
  */
 vxlRenderer.prototype.render = function(){
-    this.clear();	
-    this.view.scene.render(this);
+    var strategy = this.strategy, scene = this.view.scene;
+    
+    this.clear();
+    strategy.allocate(scene);	//REVIEW 
+    strategy.render(scene);
+    strategy.deallocate(scene);
 };
 
-/**
- * @private 
- * 
- */
-vxlRenderer.prototype._allocateActor = function(actor){
-	return this.strategy.allocate(actor);
-}
-
-/**
- * @private 
- */
-vxlRenderer.prototype._deallocateActor = function(actor){
-	this.strategy.deallocate(actor);
-} 
-
-/**
- * @private 
- */
- 
- vxlRenderer.prototype._renderActor = function(actor){
- 	this.strategy.render(actor);
- }
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
@@ -6309,6 +6264,7 @@ vxlModel.prototype.computeBoundingBox = function(){
 ---------------------------------------------------------------------------*/   
 
 
+
 //@NOTE: Actors take care of rendering models
 //@NOTE: model has to be loaded to be able to create actor. look for a way to enforce this.
 //@NOTE: A possible optimization is to combine several actors in one buffer. Watch optimzation video on YouTube by Gregg Tavares
@@ -6373,6 +6329,9 @@ function vxlActor(model){
   }
   
   vxl.go.notifier.publish(vxl.events.ACTOR_BB_UPDATED, this);
+  
+  this.UID = vxl.util.generateUID();
+
   
 };
 
@@ -6633,56 +6592,7 @@ vxlActor.prototype.clone = function(){
 
 	duplicate.name     += '-'+this.clones; 
 	return duplicate;
-};
-
-
-/**
-* @private
-* It gives the strategy the opportunity to allocate memory for this actor. For instance
-* WebGL buffers.
-* 
-* This method is private and it is only supposed to be called by other objects inside
-* voxelent. Do not invoke directly.
-*/
-vxlActor.prototype._allocate = function(renderer){
-	if (this._renderers.indexOf(renderer)!=-1){ //if this renderer has been allocated then ignore
-   		return;
-   }
-   
-   var buffers = renderer._allocateActor(this);
-   
-   this._renderers.push(renderer);
-   this._gl_buffers.push(buffers);
-
-};
-
-/**
-* @private
-* It gives the strategy the opportunity to deallocate memory for this actor.
-* 
-* This method is private and it is only supposed to be called by other objects inside
-* voxelent. Do not invoke directly. 
-*/
-vxlActor.prototype._deallocate = function(renderer){
-  renderer._deallocateActor(this);
-};
-
-/**
-* @private
-* Delegates the rendering of the actor to the strategy
-* 
-* This method is private and it is only supposed to be called by other objects inside
-* voxelent. Do not invoke directly. 
-*/
-vxlActor.prototype._render = function(renderer){
-	
-	if (!this.visible){ 
-		return;
-	}
-	renderer._renderActor(this);
-};
-
-/*-------------------------------------------------------------------------
+};/*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
     Nucleo is free software: you can redistribute it and/or modify
@@ -6700,7 +6610,7 @@ vxlActor.prototype._render = function(renderer){
 /**
  * @class
  *  A rendering strategy allows decoupling rendering specific code (i.e. code that access and 
- * 	communicates with the program) from the actor.
+ * 	communicates with the program) from the scene.
  * 
  *  Any rendering strategy should extend from vxlRenderStrategy or one of its descendants
  */
@@ -6710,23 +6620,24 @@ function vxlRenderStrategy(renderer){
 
 
 /**
- * @param {vxlActor} actor the actor to allocate memory for
+ * @param {vxlScene} scene the scene to allocate memory for
  */
-vxlRenderStrategy.prototype.allocate = function(actor){
+vxlRenderStrategy.prototype.allocate = function(scene){
 	//DO NOTHING. THE DESCENDANTS WILL.
 }
 
 
 /**
- * @param {vxlActor} actor the actor to deallocate memory from
+ * @param {vxlScene} scene the scene to deallocate memory from
  */
-vxlRenderStrategy.prototype.deallocate = function(actor){
+vxlRenderStrategy.prototype.deallocate = function(scene){
 	//DO NOTHING. THE DESCENDANTS WILL.
 }
+
 /**
- * @param {vxlActor} actor	the actor to render
+ * @param {vxlScene} scene the scene to render
  */
-vxlRenderStrategy.prototype.render = function(actor){
+vxlRenderStrategy.prototype.render = function(scene){
 	//DO NOTHING. THE DESCENDANTS WILL.
 }
 
@@ -6768,16 +6679,57 @@ vxlBasicStrategy.prototype.constructor = vxlBasicStrategy;
  */
 function vxlBasicStrategy(renderer){
 	vxlRenderStrategy.call(this,renderer);
+	this._gl_buffers  = {};
 }
 
 /**
  * Implements basic allocation of memory. Creates the WebGL buffers for the actor
- * @param{vxlActor} actor the actor to allocate memory for
-  * @returns an object that contains the allocated WebGL buffers
+ * @param {vxlScene} scene the scene to allocate memory for
+ * @returns an object that contains the allocated WebGL buffers
  */
-vxlBasicStrategy.prototype.allocate = function(actor){
+vxlBasicStrategy.prototype.allocate = function(scene){
+    var elements = scene.actors.concat(scene.toys.list);
+    var NUM = elements.length;
+    
+    for(var i = 0; i < NUM; i+=1){
+        this._allocateActor(elements[i]);
+    }
+};
+
+/**
+ * @param {vxlScene} scene the scene to deallocate memory from
+ */
+vxlBasicStrategy.prototype.deallocate = function(scene){
+    //DO NOTHING. THE DESCENDANTS WILL.
+}
+
+
+/**
+ * Renders the actors one by one
+ * @param {vxlScene} scene the scene to render
+ */
+vxlBasicStrategy.prototype.render = function(scene){
+    
+    var elements = scene.actors.concat(scene.toys.list);
+    var NUM = elements.length;
+    
+    if (scene.frameAnimation != undefined){
+        scene.frameAnimation.update();
+    }
+
+    for(var i = 0; i < NUM; i+=1){
+        this._renderActor(elements[i]);
+    }
+};
+
+
+
+/**
+ * Receives one actor and returns the GL buffers
+ */
+vxlBasicStrategy.prototype._allocateActor = function(actor){
    
-    vxl.go.console('Actor: Allocating actor '+actor.name+' for view '+ this.renderer.view.name);
+    if (this._gl_buffers[actor.UID] != undefined) return; // the actor has already been allocated
    	
 	var gl = this.renderer.gl;
 	var model = actor.model;
@@ -6818,7 +6770,7 @@ vxlBasicStrategy.prototype.allocate = function(actor){
 	gl.bindBuffer(gl.ARRAY_BUFFER, null);
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 	
-	return buffers;
+	this._gl_buffers[actor.UID] = buffers; 
 };
 
 /**
@@ -6827,7 +6779,7 @@ vxlBasicStrategy.prototype.allocate = function(actor){
  * we will update each Model-View matrix of each renderer according to
  * the actor position,scale and rotation.
  */
-vxlBasicStrategy.prototype.applyActorTransform = function(actor){
+vxlBasicStrategy.prototype._applyActorTransform = function(actor){
     
     var r		= this.renderer;
     var trx 	= r.transforms
@@ -6851,18 +6803,19 @@ vxlBasicStrategy.prototype.applyActorTransform = function(actor){
  };
 
 
-vxlBasicStrategy.prototype.render = function(actor){
+vxlBasicStrategy.prototype._renderActor = function(actor){
 
+    if (!actor.visible) return; //Quick and simple
+    
 	var model 	= actor.model;
-	var idx 	= actor._renderers.indexOf(this.renderer);
-    var buffers = actor._gl_buffers[idx]; 
+    var buffers = this._gl_buffers[actor.UID]; 
     var r  		= this.renderer;
 	var gl 		= r.gl;
 	var prg 	= r.prg;
 	var trx 	= r.transforms;
 	var glsl    = vxl.def.glsl;
 	
-	this.applyActorTransform(actor);
+	this._applyActorTransform(actor);
 	
 	var diffuse = [actor.color[0], actor.color[1], actor.color[2],1.0];
 	
@@ -6989,22 +6942,38 @@ function vxlBlenderStrategy(renderer) {
 	vxlBasicStrategy.call(this,renderer);
 }
 
-vxlBlenderStrategy.prototype.render = function(actor){
+/**
+ * Renders the scene
+ * @param {Object} scene
+ */
+vxlBlenderStrategy.prototype.render = function(scene){
+    var elements = scene.actors.concat(scene.toys.list);
+    var NUM = elements.length;
+    
+    if (scene.frameAnimation != undefined){
+        scene.frameAnimation.update();
+    }
+
+    for(var i = 0; i < NUM; i+=1){
+        this._renderActor(elements[i]);
+    }
+}
+
+vxlBlenderStrategy.prototype._renderActor = function(actor){
 	
 	if (actor.name == 'bounding box' || actor.name == 'axis' || actor.name =='floor'){
 		return;
 	}
 
 	var model 	= actor.model;
-	var idx 	= actor._renderers.indexOf(this.renderer);
-    var buffers = actor._gl_buffers[idx]; 
+    var buffers = this._gl_buffers[actor.UID]; 
     var r  		= this.renderer;
 	var gl 		= r.gl;
 	var prg 	= r.prg;
 	var trx 	= r.transforms;
 	var glsl    = vxl.def.glsl;
 	
-	this.applyActorTransform(actor);
+	this._applyActorTransform(actor);
 	
 	prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
 	prg.enableAttribute(glsl.VERTEX_ATTRIBUTE);
@@ -7440,29 +7409,6 @@ vxlScene.prototype.setVisualizationMode = function(mode){
 	}
 };
 
-/**
- * Calls the renderer process for all the views this scene is associated with
- */
-vxlScene.prototype.render = function(renderer){
-
-	//for (var i = 0, viewCount = this.views.length; i < viewCount; i+=1){
-	//	var r = this.views[i].renderer;
-		var r = renderer;
-		r.clear();
-		
-		this.toys.render(r);
-		
-		if (this.frameAnimation != undefined){
-			this.frameAnimation.render(r);
-		}
-		else{
-			for(var a=0, actorCount = this.actors.length; a < actorCount; a+=1){
-				   this.actors[a]._allocate(r);
-			       this.actors[a]._render(r);
-			}
-	    }
-	//}
-};
 
 /**
  * Sets the animation for this scene
@@ -7549,16 +7495,8 @@ vxlSceneToys.prototype.update = function(){
     this.axis.setCentre(this.scene.centre);
     this.boundingbox.setBoundingBox(this.scene.bb);
 };
+
 /**
- * Renders the toys
- * @param {vxlRenderer} r the renderer
- */
-vxlSceneToys.prototype.render = function(r){
-    for(var t = 0, max = this.list.length; t < max; t +=1){
-        this.list[t]._allocate(r);
-        this.list[t]._render(r);
-    }
-};/**
  * @class
  * @constructor
  */
@@ -9086,19 +9024,23 @@ vxlFrameAnimation.prototype.setFrameRate = function(rate){
 
 
 /**
- * Performs the animation rendering. The Scene delegates the rendering to a FrameAnimation object
- * when this object is registered with the scene.
+ * Selects the actors that will be visible in the current frame
  */
-vxlFrameAnimation.prototype.render = function(renderer){
-	if (this.scene == null) throw 'FrameAnimation: the animation is not associated with any scene. Please use scene.setFrameAnimation method';
-	//if (!this.running) return;
+vxlFrameAnimation.prototype.update = function(){
 	
-	for (var i=0; i<this.actorByFrameMap[this.activeFrame].length; i++){
-		var actorName = this.actorByFrameMap[this.activeFrame][i];
-		var actor = this.scene.getActorByName(actorName);
+	if (this.scene == null) throw 'FrameAnimation: the animation is not associated with any scene. Please use scene.setFrameAnimation method';
+	
+	
+	//we hide them all first
+	this.scene.setPropertyForAll('visible', false);  
+	 
+	//then we decide which ones are visible
+	var currentActors = this.actorByFrameMap[this.activeFrame]
+	var NUM = currentActors.length;
+	for (var i=0; i<NUM; i++){
+		var actor = this.scene.getActorByName(currentActors[i]);
 		if (actor != null){
-			actor._allocate(renderer);
-			actor._render(renderer);
+			actor.setVisible(true);
 		}
 	}
 };

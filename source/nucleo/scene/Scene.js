@@ -383,29 +383,6 @@ vxlScene.prototype.setVisualizationMode = function(mode){
 	}
 };
 
-/**
- * Calls the renderer process for all the views this scene is associated with
- */
-vxlScene.prototype.render = function(renderer){
-
-	//for (var i = 0, viewCount = this.views.length; i < viewCount; i+=1){
-	//	var r = this.views[i].renderer;
-		var r = renderer;
-		r.clear();
-		
-		this.toys.render(r);
-		
-		if (this.frameAnimation != undefined){
-			this.frameAnimation.render(r);
-		}
-		else{
-			for(var a=0, actorCount = this.actors.length; a < actorCount; a+=1){
-				   this.actors[a]._allocate(r);
-			       this.actors[a]._render(r);
-			}
-	    }
-	//}
-};
 
 /**
  * Sets the animation for this scene

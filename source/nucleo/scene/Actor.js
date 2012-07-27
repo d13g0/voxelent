@@ -15,6 +15,7 @@
 ---------------------------------------------------------------------------*/   
 
 
+
 //@NOTE: Actors take care of rendering models
 //@NOTE: model has to be loaded to be able to create actor. look for a way to enforce this.
 //@NOTE: A possible optimization is to combine several actors in one buffer. Watch optimzation video on YouTube by Gregg Tavares
@@ -79,6 +80,9 @@ function vxlActor(model){
   }
   
   vxl.go.notifier.publish(vxl.events.ACTOR_BB_UPDATED, this);
+  
+  this.UID = vxl.util.generateUID();
+
   
 };
 
@@ -340,51 +344,3 @@ vxlActor.prototype.clone = function(){
 	duplicate.name     += '-'+this.clones; 
 	return duplicate;
 };
-
-
-/**
-* @private
-* It gives the strategy the opportunity to allocate memory for this actor. For instance
-* WebGL buffers.
-* 
-* This method is private and it is only supposed to be called by other objects inside
-* voxelent. Do not invoke directly.
-*/
-vxlActor.prototype._allocate = function(renderer){
-	if (this._renderers.indexOf(renderer)!=-1){ //if this renderer has been allocated then ignore
-   		return;
-   }
-   
-   var buffers = renderer._allocateActor(this);
-   
-   this._renderers.push(renderer);
-   this._gl_buffers.push(buffers);
-
-};
-
-/**
-* @private
-* It gives the strategy the opportunity to deallocate memory for this actor.
-* 
-* This method is private and it is only supposed to be called by other objects inside
-* voxelent. Do not invoke directly. 
-*/
-vxlActor.prototype._deallocate = function(renderer){
-  renderer._deallocateActor(this);
-};
-
-/**
-* @private
-* Delegates the rendering of the actor to the strategy
-* 
-* This method is private and it is only supposed to be called by other objects inside
-* voxelent. Do not invoke directly. 
-*/
-vxlActor.prototype._render = function(renderer){
-	
-	if (!this.visible){ 
-		return;
-	}
-	renderer._renderActor(this);
-};
-

@@ -40,13 +40,4 @@ vxlSceneToys.prototype.update = function(){
     this.axis.setCentre(this.scene.centre);
     this.boundingbox.setBoundingBox(this.scene.bb);
 };
-/**
- * Renders the toys
- * @param {vxlRenderer} r the renderer
- */
-vxlSceneToys.prototype.render = function(r){
-    for(var t = 0, max = this.list.length; t < max; t +=1){
-        this.list[t]._allocate(r);
-        this.list[t]._render(r);
-    }
-};
+

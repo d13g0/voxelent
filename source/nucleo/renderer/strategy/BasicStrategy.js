@@ -35,16 +35,57 @@ vxlBasicStrategy.prototype.constructor = vxlBasicStrategy;
  */
 function vxlBasicStrategy(renderer){
 	vxlRenderStrategy.call(this,renderer);
+	this._gl_buffers  = {};
 }
 
 /**
  * Implements basic allocation of memory. Creates the WebGL buffers for the actor
- * @param{vxlActor} actor the actor to allocate memory for
-  * @returns an object that contains the allocated WebGL buffers
+ * @param {vxlScene} scene the scene to allocate memory for
+ * @returns an object that contains the allocated WebGL buffers
  */
-vxlBasicStrategy.prototype.allocate = function(actor){
+vxlBasicStrategy.prototype.allocate = function(scene){
+    var elements = scene.actors.concat(scene.toys.list);
+    var NUM = elements.length;
+    
+    for(var i = 0; i < NUM; i+=1){
+        this._allocateActor(elements[i]);
+    }
+};
+
+/**
+ * @param {vxlScene} scene the scene to deallocate memory from
+ */
+vxlBasicStrategy.prototype.deallocate = function(scene){
+    //DO NOTHING. THE DESCENDANTS WILL.
+}
+
+
+/**
+ * Renders the actors one by one
+ * @param {vxlScene} scene the scene to render
+ */
+vxlBasicStrategy.prototype.render = function(scene){
+    
+    var elements = scene.actors.concat(scene.toys.list);
+    var NUM = elements.length;
+    
+    if (scene.frameAnimation != undefined){
+        scene.frameAnimation.update();
+    }
+
+    for(var i = 0; i < NUM; i+=1){
+        this._renderActor(elements[i]);
+    }
+};
+
+
+
+/**
+ * Receives one actor and returns the GL buffers
+ */
+vxlBasicStrategy.prototype._allocateActor = function(actor){
    
-    vxl.go.console('Actor: Allocating actor '+actor.name+' for view '+ this.renderer.view.name);
+    if (this._gl_buffers[actor.UID] != undefined) return; // the actor has already been allocated
    	
 	var gl = this.renderer.gl;
 	var model = actor.model;
@@ -85,7 +126,7 @@ vxlBasicStrategy.prototype.allocate = function(actor){
 	gl.bindBuffer(gl.ARRAY_BUFFER, null);
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 	
-	return buffers;
+	this._gl_buffers[actor.UID] = buffers; 
 };
 
 /**
@@ -94,7 +135,7 @@ vxlBasicStrategy.prototype.allocate = function(actor){
  * we will update each Model-View matrix of each renderer according to
  * the actor position,scale and rotation.
  */
-vxlBasicStrategy.prototype.applyActorTransform = function(actor){
+vxlBasicStrategy.prototype._applyActorTransform = function(actor){
     
     var r		= this.renderer;
     var trx 	= r.transforms
@@ -118,18 +159,19 @@ vxlBasicStrategy.prototype.applyActorTransform = function(actor){
  };
 
 
-vxlBasicStrategy.prototype.render = function(actor){
+vxlBasicStrategy.prototype._renderActor = function(actor){
 
+    if (!actor.visible) return; //Quick and simple
+    
 	var model 	= actor.model;
-	var idx 	= actor._renderers.indexOf(this.renderer);
-    var buffers = actor._gl_buffers[idx]; 
+    var buffers = this._gl_buffers[actor.UID]; 
     var r  		= this.renderer;
 	var gl 		= r.gl;
 	var prg 	= r.prg;
 	var trx 	= r.transforms;
 	var glsl    = vxl.def.glsl;
 	
-	this.applyActorTransform(actor);
+	this._applyActorTransform(actor);
 	
 	var diffuse = [actor.color[0], actor.color[1], actor.color[2],1.0];
 	

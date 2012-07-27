@@ -16,7 +16,7 @@
 /**
  * @class
  *  A rendering strategy allows decoupling rendering specific code (i.e. code that access and 
- * 	communicates with the program) from the actor.
+ * 	communicates with the program) from the scene.
  * 
  *  Any rendering strategy should extend from vxlRenderStrategy or one of its descendants
  */
@@ -26,23 +26,24 @@ function vxlRenderStrategy(renderer){
 
 
 /**
- * @param {vxlActor} actor the actor to allocate memory for
+ * @param {vxlScene} scene the scene to allocate memory for
  */
-vxlRenderStrategy.prototype.allocate = function(actor){
+vxlRenderStrategy.prototype.allocate = function(scene){
 	//DO NOTHING. THE DESCENDANTS WILL.
 }
 
 
 /**
- * @param {vxlActor} actor the actor to deallocate memory from
+ * @param {vxlScene} scene the scene to deallocate memory from
  */
-vxlRenderStrategy.prototype.deallocate = function(actor){
+vxlRenderStrategy.prototype.deallocate = function(scene){
 	//DO NOTHING. THE DESCENDANTS WILL.
 }
+
 /**
- * @param {vxlActor} actor	the actor to render
+ * @param {vxlScene} scene the scene to render
  */
-vxlRenderStrategy.prototype.render = function(actor){
+vxlRenderStrategy.prototype.render = function(scene){
 	//DO NOTHING. THE DESCENDANTS WILL.
 }
 

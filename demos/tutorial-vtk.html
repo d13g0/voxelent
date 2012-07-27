@@ -23,6 +23,7 @@ function runVoxApp(){
 
 function handleEvent(event){
     vxl.c.camera.focusOn('myVTKModel.json');
+    vxl.c.camera.setElevation(90); //this particular model happens to be rotated -90 degrees.
     vxl.api.boundingBoxON();
 }
 </script>
@@ -34,16 +35,13 @@ function handleEvent(event){
 
 </head>
 <body onload='runVoxApp()'>
-    <canvas id ='view-1' width=800 height=650></canvas>
-    <select id='lutPicker'>
-        <option value='default'>default</option>
-        <option value='cte'>cte</option>
-    </select>
-
-<script type='text/javascript'>
-        $('#lutPicker').change(function(){
-        vxl.api.setLookupTable($('#lutPicker').val());
-        });
-    </script>
+<div><img src="css/img/voxelent.png" /></div>
+    <div>
+    <canvas id = 'view-1' width='1200' height='600'>
+        <p>
+            Your browser does not support WebGL :-(
+        </p>
+    </canvas>
+    </div>
 </body>
 </html>

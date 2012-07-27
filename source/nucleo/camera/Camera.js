@@ -42,27 +42,23 @@ function vxlCamera(vw,t) {
     this.FOV            = vxl.def.camera.fov;
     this.Z_NEAR         = vxl.def.camera.near;    
     this.Z_FAR          = vxl.def.camera.far;
-	
 	this.view 		    = vw;
-    
     this.matrix 	    = mat4.identity();
-
     this.right 		    = vec3.createFrom(1, 0, 0);
 	this.up             = vec3.createFrom(0, 1, 0);
 	this.normal         = vec3.createFrom(0, 0, 1);	
 	this.position       = vec3.createFrom(0, 0, 1);
 	this.focalPoint     = vec3.createFrom(0, 0, 0);
-	this.tr             = vec3.createFrom(0, 0, 0);
 	this.cRot           = vec3.createFrom(0, 0, 0);
-    
-    
     this.azimuth 	    = 0;
     this.elevation 	    = 0;
     this.relAzimuth     = 0;
     this.relElevation   = 0;
 	this.dstep  	    = 0; //dollying step
-	
-    this.m = mat4.identity();
+    this.m              = mat4.identity();
+    this.distance       = 1;
+    this.debug          = false;
+    this.states         = [];
 
 	if (t != undefined && t !=null){
         this.type = t;
@@ -70,10 +66,6 @@ function vxlCamera(vw,t) {
     else {
         this.type = vxl.def.camera.type.ORBITING;
     }
-    
-	this.distance 	= 1;
-	this.debug 		= false;
-	this.state 	    = new vxlCameraState(this);
 };
 
 /**
@@ -348,24 +340,25 @@ vxlCamera.prototype.longShot = function() {
  * Saves the current camera state in a memento (vxlCameraState)
  * @see vxlCameraState
  */
-vxlCamera.prototype.save = function() {
-	this.state.save(this);
+vxlCamera.prototype.save = function(name) {
+    var landmark = new vxlCameraState(name, this);
+	this.states.push(landmark);
 };
 
 /**
  * Retrieves the last saved camera state from the memento (vxlCameraState)
  * @see vxlCameraState
  */
-vxlCamera.prototype.retrieve = function() {
-	this.state.retrieve();
+vxlCamera.prototype.retrieve = function(name) {
+	for(var i=0;i<this.states.length;i+=1){
+	    if (this.states[i].name == name){
+	        this.states[i].retrieve();
+	        return;
+	    }
+	}
+    throw 'vxlCamera.retrieve: state '+name+' not found'
 };
 
-/**
- * Resets the memento to the original camera state
- */
-vxlCamera.prototype.reset = function() {
-	this.state.reset();
-};
 
 
 /**
@@ -392,8 +385,11 @@ vxlCamera.prototype.status = function() {
  */
 vxlCamera.prototype._setInitialMatrix = function(){
     this.matrix = mat4.identity();
+    
+    mat4.translate(this.matrix, this.focalPoint);
     mat4.rotateY  (this.matrix, this.azimuth   * Math.PI / 180);
     mat4.rotateX  (this.matrix, this.elevation * Math.PI / 180);
+    mat4.translate(this.matrix, vec3.negate(this.focalPoint, vec3.create()));
     mat4.translate(this.matrix, this.position);
 };
 
@@ -424,7 +420,6 @@ vxlCamera.prototype._updateMatrix = function(){
     
         this.relAzimuth = 0;
         this.relElevation = 0;
-        //this._updateAxes();
     } 
 };
 

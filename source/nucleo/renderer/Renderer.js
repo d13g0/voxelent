@@ -204,32 +204,14 @@ vxlRenderer.prototype.clearDepth = function(d){
 };
 
 /**
- * Delegates rendering to the scene
+ * Renders the scene according to the currently set strategy
  */
 vxlRenderer.prototype.render = function(){
-    this.clear();	
-    this.view.scene.render(this);
+    var strategy = this.strategy, scene = this.view.scene;
+    
+    this.clear();
+    strategy.allocate(scene);	//REVIEW 
+    strategy.render(scene);
+    strategy.deallocate(scene);
 };
 
-/**
- * @private 
- * 
- */
-vxlRenderer.prototype._allocateActor = function(actor){
-	return this.strategy.allocate(actor);
-}
-
-/**
- * @private 
- */
-vxlRenderer.prototype._deallocateActor = function(actor){
-	this.strategy.deallocate(actor);
-} 
-
-/**
- * @private 
- */
- 
- vxlRenderer.prototype._renderActor = function(actor){
- 	this.strategy.render(actor);
- }

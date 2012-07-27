@@ -22,22 +22,38 @@ function vxlBlenderStrategy(renderer) {
 	vxlBasicStrategy.call(this,renderer);
 }
 
-vxlBlenderStrategy.prototype.render = function(actor){
+/**
+ * Renders the scene
+ * @param {Object} scene
+ */
+vxlBlenderStrategy.prototype.render = function(scene){
+    var elements = scene.actors.concat(scene.toys.list);
+    var NUM = elements.length;
+    
+    if (scene.frameAnimation != undefined){
+        scene.frameAnimation.update();
+    }
+
+    for(var i = 0; i < NUM; i+=1){
+        this._renderActor(elements[i]);
+    }
+}
+
+vxlBlenderStrategy.prototype._renderActor = function(actor){
 	
 	if (actor.name == 'bounding box' || actor.name == 'axis' || actor.name =='floor'){
 		return;
 	}
 
 	var model 	= actor.model;
-	var idx 	= actor._renderers.indexOf(this.renderer);
-    var buffers = actor._gl_buffers[idx]; 
+    var buffers = this._gl_buffers[actor.UID]; 
     var r  		= this.renderer;
 	var gl 		= r.gl;
 	var prg 	= r.prg;
 	var trx 	= r.transforms;
 	var glsl    = vxl.def.glsl;
 	
-	this.applyActorTransform(actor);
+	this._applyActorTransform(actor);
 	
 	prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
 	prg.enableAttribute(glsl.VERTEX_ATTRIBUTE);

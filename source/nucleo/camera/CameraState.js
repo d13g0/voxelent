@@ -27,70 +27,41 @@
  * @see vxlCamera
   */
 
-function vxlCameraState(camera) {
+function vxlCameraState(name, camera) {
 	if(!( camera instanceof vxlCamera)) {
 		alert('vxlCameraState needs a vxlCamera as argument');
 		return null;
 	}
-
+    
+    this.name          = name;
 	this.c             = camera;
-	this.position      = vec3.createFrom(0, 0, 1);
-	this.focus    	   = vec3.createFrom(0, 0, 0);
-	
-    this.up            = vec3.createFrom(0, 1, 0);
-	this.right         = vec3.createFrom(1, 0, 0);
-    
-	this.distance      = 0;
-	this.azimuth       = 0;
-	this.elevation     = 0;
-    
-	this.xTr           = 0;
-	this.yTr           = 0;
+    this.FOV            = c.FOV
+    this.Z_NEAR         = c.Z_NEAR;    
+    this.Z_FAR          = c.Z_FAR;
+    this.matrix         = mat4.identity();
+    this.right          = vec3.createFrom(1, 0, 0); //@TODO: COPY REAL VALUES
+    this.up             = vec3.createFrom(0, 1, 0);
+    this.normal         = vec3.createFrom(0, 0, 1); 
+    this.position       = vec3.createFrom(0, 0, 1);
+    this.focalPoint     = vec3.createFrom(0, 0, 0);
+    this.cRot           = vec3.createFrom(0, 0, 0);
+    this.azimuth        = c.azimuth;
+    this.elevation      = c.elevation;
+    this.type           = c.type;
+    this.distance       = c.distance;
 };
 
-/**
- * Resets current camera to the standard location an orientation. This is,
- * the camera is looking at the center of the scene, located at [0,0,1] along the z axis and
- * aligned with the y axis.
- * 
- */
-vxlCameraState.prototype.reset = function() {
-	var c = this.c;
-	c.focus            = vec3.createFrom(0, 0, 0);
-	c.up               = vec3.createFrom(0, 1, 0);
-	c.right            = vec3.createFrom(1, 0, 0);
-	c.distance         = 0;
-	c.elevation        = 0;
-	c.azimuth          = 0;
-	c.setPosition(0, 0, 1);
-};
-
-/**
- * Saves the current state of the camera that this vxlCameraState object is associated with.
- */
-
-vxlCameraState.prototype.save = function() {
-	var c = this.c;
-	this.distance = c.distance;
-	this.azimuth = c.azimuth;
-	this.elevation = c.elevation;
-	vec3.set(c.position, this.position);
-	vec3.set(c.focus, this.focus);
-	vec3.set(c.up, this.up);
-	vec3.set(c.right, this.right);
-};
 
 /**
  * Updates the camera with the state stored in vxlCameraState.
  */
 vxlCameraState.prototype.retrieve = function() {
+    //@TODO: Finish implementation
 	var c = this.c;
 	c.azimuth = this.azimuth;
 	c.elevation = this.elevation;
-
 	vec3.set(this.focus, c.focus);
 	vec3.set(this.up, c.up);
 	vec3.set(this.right, c.right);
-
 	c.setPosition(this.position);
 };

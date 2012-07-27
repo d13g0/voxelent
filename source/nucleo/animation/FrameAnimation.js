@@ -105,19 +105,23 @@ vxlFrameAnimation.prototype.setFrameRate = function(rate){
 
 
 /**
- * Performs the animation rendering. The Scene delegates the rendering to a FrameAnimation object
- * when this object is registered with the scene.
+ * Selects the actors that will be visible in the current frame
  */
-vxlFrameAnimation.prototype.render = function(renderer){
-	if (this.scene == null) throw 'FrameAnimation: the animation is not associated with any scene. Please use scene.setFrameAnimation method';
-	//if (!this.running) return;
+vxlFrameAnimation.prototype.update = function(){
 	
-	for (var i=0; i<this.actorByFrameMap[this.activeFrame].length; i++){
-		var actorName = this.actorByFrameMap[this.activeFrame][i];
-		var actor = this.scene.getActorByName(actorName);
+	if (this.scene == null) throw 'FrameAnimation: the animation is not associated with any scene. Please use scene.setFrameAnimation method';
+	
+	
+	//we hide them all first
+	this.scene.setPropertyForAll('visible', false);  
+	 
+	//then we decide which ones are visible
+	var currentActors = this.actorByFrameMap[this.activeFrame]
+	var NUM = currentActors.length;
+	for (var i=0; i<NUM; i++){
+		var actor = this.scene.getActorByName(currentActors[i]);
 		if (actor != null){
-			actor._allocate(renderer);
-			actor._render(renderer);
+			actor.setVisible(true);
 		}
 	}
 };
