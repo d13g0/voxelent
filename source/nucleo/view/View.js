@@ -190,7 +190,7 @@ vxlView.prototype.setClearDepth = function(d){
 };
 
 /**
- * Refresh the view by invoking the rendering method on the renderer
+ * Refresh the view 
  * @see vxlRenderer#render
  */
 vxlView.prototype.refresh = function(){

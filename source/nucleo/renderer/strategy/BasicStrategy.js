@@ -65,6 +65,16 @@ vxlBasicStrategy.prototype.deallocate = function(scene){
  * @param {vxlScene} scene the scene to render
  */
 vxlBasicStrategy.prototype.render = function(scene){
+
+    //Updates the perspective matrix and passes it to the program
+    var r       = this.renderer;
+    var trx     = r.transforms
+    var prg     = r.prg;
+    var glsl    = vxl.def.glsl;
+    
+    trx.calculatePerspective();
+    trx.calculateModelView();
+    prg.setUniform(glsl.PERSPECTIVE_MATRIX, trx.pMatrix);
     
     var elements = scene.actors.concat(scene.toys.list);
     var NUM = elements.length;
@@ -141,20 +151,22 @@ vxlBasicStrategy.prototype._applyActorTransform = function(actor){
     var trx 	= r.transforms
     var	prg 	= r.prg;
     var glsl 	= vxl.def.glsl;
-    
-    trx.calculateModelView();
-    
+
     trx.push();
         mat4.scale      (trx.mvMatrix, actor.scale);
 		mat4.translate	(trx.mvMatrix, actor.position);
 		//@TODO: IMPLEMENT ACTOR ROTATIONS
+	    
 	    prg.setUniform(glsl.MODEL_VIEW_MATRIX,	r.transforms.mvMatrix);
+
+	    trx.calculateModelViewPerspective();
+        prg.setUniform(glsl.MVP_MATRIX, r.transforms.mvpMatrix);
     trx.pop();
     
     trx.calculateNormal(); 
+    prg.setUniform(glsl.NORMAL_MATRIX, r.transforms.nMatrix);
     
-    prg.setUniform(glsl.PERSPECTIVE_MATRIX, 	r.transforms.pMatrix);
-    prg.setUniform(glsl.NORMAL_MATRIX, 			r.transforms.nMatrix);
+    
     
  };
 

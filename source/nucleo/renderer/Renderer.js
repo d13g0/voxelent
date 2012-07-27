@@ -34,9 +34,9 @@ function vxlRenderer(vw){
     this.gl         	= this.getWebGLContext();
     this.prg        	= new vxlProgram(this.gl);
     this.transforms 	= new vxlTransforms(vw);
+    this.fps            = 0;
     this.currentProgram = undefined;
     this.strategy 		= undefined;
-    
     this.setProgram(vxl.def.glsl.lambert, vxlBasicStrategy);
     
 }
@@ -106,16 +106,24 @@ vxlRenderer.prototype.setProgram = function(program,strategy){
 	
 	this.currentProgram = program;
 	
-	if(strategy != null && strategy != undefined){
-		this.strategy = new strategy(this);
-		//this.strategy.renderer = this;
-	}
-	else{
-		this.strategy = new vxlBasicStrategy(this);
-	}
+	this.setStrategy(strategy);
 };
 
-
+/**
+ * Sets the current rendering strategy. If the strat parameter is null or undefined, this method will check if 
+ * the current strategy is null and in that case sets the strategy as an instance of <code>vxlBasicStrategy</code>
+ * 
+ * @param {function} strat a descendant from vxlRenderStrategy. This parameter 
+ * corresponds to the constructor of the strategy that should be used.  
+ */
+vxlRenderer.prototype.setStrategy = function(strat){
+    if (strat != null && strat != undefined){
+        this.strategy = new strat(this);
+    }
+    else if (this.strategy == undefined){
+        this.strategy = new vxlBasicStrategy(this);
+    }
+}
 
 
 /**
@@ -207,11 +215,22 @@ vxlRenderer.prototype.clearDepth = function(d){
  * Renders the scene according to the currently set strategy
  */
 vxlRenderer.prototype.render = function(){
-    var strategy = this.strategy, scene = this.view.scene;
+    var strategy = this.strategy, scene = this.view.scene, start = undefined, elapsed = undefined;
     
-    this.clear();
-    strategy.allocate(scene);	//REVIEW 
+    this.clear();                   //clear the canvas
+    strategy.allocate(scene);	    //allocate memory for actors added since last rendering
+    
+    start = new Date().getTime();
     strategy.render(scene);
-    strategy.deallocate(scene);
+    elapsed = new Date().getTime() - start;
+    
+    strategy.deallocate(scene);     //deallocate memory if necessary
+    
+    // calculating FPS metric
+    if(elapsed >0){
+        this.fps = Math.round((this.fps * 0.90 + (1000.0/elapsed) * 0.1)* 100)/100;
+    }
+    
+    $('#'+this.view.name+'-fps').html(this.fps);
 };
 

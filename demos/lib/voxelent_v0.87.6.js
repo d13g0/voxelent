@@ -66,6 +66,7 @@ def : {
 						MODEL_VIEW_MATRIX  	: 'mModelView',
 						NORMAL_MATRIX   	: 'mNormal',
 						PERSPECTIVE_MATRIX 	: 'mPerspective',
+						MVP_MATRIX          : 'mModelViewPerspective',
 						VERTEX_ATTRIBUTE    : 'aVertexPosition',
 						NORMAL_ATTRIBUTE    : 'aVertexNormal',
 						COLOR_ATTRIBUTE     : 'aVertexColor'
@@ -176,7 +177,7 @@ events : {
 * @namespace Voxelent Global Objects
 * @property {Boolean}                   debug
 * @property {vxlNotifier}               notifier
-* @property {vxlModelManager}           modelManager
+* @propertthaty {vxlModelManager}           modelManager
 * @property {vxlLookupTableManager}     lookupTableManager
 *
 */
@@ -4996,7 +4997,8 @@ function vxlTransforms(vw){
 	this.mvMatrix    = mat4.identity();    // The Model-View matrix
 	this.pMatrix     = mat4.identity();    // The projection matrix
 	this.nMatrix     = mat4.identity();    // The normal matrix
-	this.cMatrix     = mat4.identity();    // The camera matrix	
+	this.cMatrix     = mat4.identity();    // The camera matrix
+	this.mvpMatrix   = mat4.identity();	
 };
 
 /**
@@ -5027,6 +5029,10 @@ vxlTransforms.prototype.calculatePerspective = function(){
 	mat4.perspective(c.FOV, vw.width/vw.height, c.Z_NEAR, c.Z_FAR, this.pMatrix);
 };
 
+
+vxlTransforms.prototype.calculateModelViewPerspective = function(){
+    mat4.multiply(this.pMatrix, this.mvMatrix, this.mvpMatrix);
+}
 /**
  * Calculate the transforms for the current view.renderer
  * 
@@ -5035,6 +5041,7 @@ vxlTransforms.prototype.update = function(){
     this.calculateModelView();
     this.calculatePerspective();
     this.calculateNormal();
+    this.calculateModelViewPerspective();
 };
 
 /**
@@ -5088,6 +5095,7 @@ vxl.def.glsl.lambert = {
 	"mModelView",
 	"mNormal",
 	"mPerspective",
+	"mModelViewPerspective",
 	"uPointSize",
 	"uLightDirection",
 	"uLightAmbient",
@@ -5106,6 +5114,7 @@ vxl.def.glsl.lambert = {
     "uniform float uPointSize;",
 	"uniform mat4 mModelView;",
 	"uniform mat4 mPerspective;",
+	"uniform mat4 mModelViewPerspective;",
 	"uniform mat4 mNormal;",
 	"uniform vec3 uLightDirection;",
 	"uniform vec4 uLightAmbient;",  
@@ -5117,7 +5126,7 @@ vxl.def.glsl.lambert = {
 	"varying vec4 vFinalColor;",
     
     "void main(void) {",
-    "	gl_Position = mPerspective * mModelView * vec4(aVertexPosition, 1.0);",
+    "	gl_Position = mModelViewPerspective * vec4(aVertexPosition, 1.0);",
     "	gl_PointSize = uPointSize;",
     "	if (uUseVertexColors) {",
     "		vFinalColor = vec4(aVertexColor,1.0);",
@@ -5853,9 +5862,9 @@ function vxlRenderer(vw){
     this.gl         	= this.getWebGLContext();
     this.prg        	= new vxlProgram(this.gl);
     this.transforms 	= new vxlTransforms(vw);
+    this.fps            = 0;
     this.currentProgram = undefined;
     this.strategy 		= undefined;
-    
     this.setProgram(vxl.def.glsl.lambert, vxlBasicStrategy);
     
 }
@@ -5925,16 +5934,24 @@ vxlRenderer.prototype.setProgram = function(program,strategy){
 	
 	this.currentProgram = program;
 	
-	if(strategy != null && strategy != undefined){
-		this.strategy = new strategy(this);
-		//this.strategy.renderer = this;
-	}
-	else{
-		this.strategy = new vxlBasicStrategy(this);
-	}
+	this.setStrategy(strategy);
 };
 
-
+/**
+ * Sets the current rendering strategy. If the strat parameter is null or undefined, this method will check if 
+ * the current strategy is null and in that case sets the strategy as an instance of <code>vxlBasicStrategy</code>
+ * 
+ * @param {function} strat a descendant from vxlRenderStrategy. This parameter 
+ * corresponds to the constructor of the strategy that should be used.  
+ */
+vxlRenderer.prototype.setStrategy = function(strat){
+    if (strat != null && strat != undefined){
+        this.strategy = new strat(this);
+    }
+    else if (this.strategy == undefined){
+        this.strategy = new vxlBasicStrategy(this);
+    }
+}
 
 
 /**
@@ -6026,12 +6043,23 @@ vxlRenderer.prototype.clearDepth = function(d){
  * Renders the scene according to the currently set strategy
  */
 vxlRenderer.prototype.render = function(){
-    var strategy = this.strategy, scene = this.view.scene;
+    var strategy = this.strategy, scene = this.view.scene, start = undefined, elapsed = undefined;
     
-    this.clear();
-    strategy.allocate(scene);	//REVIEW 
+    this.clear();                   //clear the canvas
+    strategy.allocate(scene);	    //allocate memory for actors added since last rendering
+    
+    start = new Date().getTime();
     strategy.render(scene);
-    strategy.deallocate(scene);
+    elapsed = new Date().getTime() - start;
+    
+    strategy.deallocate(scene);     //deallocate memory if necessary
+    
+    // calculating FPS metric
+    if(elapsed >0){
+        this.fps = Math.round((this.fps * 0.90 + (1000.0/elapsed) * 0.1)* 100)/100;
+    }
+    
+    $('#'+this.view.name+'-fps').html(this.fps);
 };
 
 /*-------------------------------------------------------------------------
@@ -6709,6 +6737,16 @@ vxlBasicStrategy.prototype.deallocate = function(scene){
  * @param {vxlScene} scene the scene to render
  */
 vxlBasicStrategy.prototype.render = function(scene){
+
+    //Updates the perspective matrix and passes it to the program
+    var r       = this.renderer;
+    var trx     = r.transforms
+    var prg     = r.prg;
+    var glsl    = vxl.def.glsl;
+    
+    trx.calculatePerspective();
+    trx.calculateModelView();
+    prg.setUniform(glsl.PERSPECTIVE_MATRIX, trx.pMatrix);
     
     var elements = scene.actors.concat(scene.toys.list);
     var NUM = elements.length;
@@ -6785,20 +6823,22 @@ vxlBasicStrategy.prototype._applyActorTransform = function(actor){
     var trx 	= r.transforms
     var	prg 	= r.prg;
     var glsl 	= vxl.def.glsl;
-    
-    trx.calculateModelView();
-    
+
     trx.push();
         mat4.scale      (trx.mvMatrix, actor.scale);
 		mat4.translate	(trx.mvMatrix, actor.position);
 		//@TODO: IMPLEMENT ACTOR ROTATIONS
+	    
 	    prg.setUniform(glsl.MODEL_VIEW_MATRIX,	r.transforms.mvMatrix);
+
+	    trx.calculateModelViewPerspective();
+        prg.setUniform(glsl.MVP_MATRIX, r.transforms.mvpMatrix);
     trx.pop();
     
     trx.calculateNormal(); 
+    prg.setUniform(glsl.NORMAL_MATRIX, r.transforms.nMatrix);
     
-    prg.setUniform(glsl.PERSPECTIVE_MATRIX, 	r.transforms.pMatrix);
-    prg.setUniform(glsl.NORMAL_MATRIX, 			r.transforms.nMatrix);
+    
     
  };
 
@@ -6947,6 +6987,17 @@ function vxlBlenderStrategy(renderer) {
  * @param {Object} scene
  */
 vxlBlenderStrategy.prototype.render = function(scene){
+    
+    //Updates the perspective matrix and passes it to the program
+    var r       = this.renderer;
+    var trx     = r.transforms
+    var prg     = r.prg;
+    var glsl    = vxl.def.glsl;
+    
+    trx.calculatePerspective();
+    trx.calculateModelView();
+    prg.setUniform(glsl.PERSPECTIVE_MATRIX, trx.pMatrix);
+    
     var elements = scene.actors.concat(scene.toys.list);
     var NUM = elements.length;
     
@@ -6957,7 +7008,36 @@ vxlBlenderStrategy.prototype.render = function(scene){
     for(var i = 0; i < NUM; i+=1){
         this._renderActor(elements[i]);
     }
-}
+};
+
+
+/**
+ * Passes the matrices to the shading program
+ * @param {vxlActor} the actor 
+ * we will update each Model-View matrix of each renderer according to
+ * the actor position,scale and rotation.
+ */
+vxlBlenderStrategy.prototype._applyActorTransform = function(actor){
+    
+    var r       = this.renderer;
+    var trx     = r.transforms
+    var prg     = r.prg;
+    var glsl    = vxl.def.glsl;
+
+    trx.push();
+        mat4.scale      (trx.mvMatrix, actor.scale);
+        mat4.translate  (trx.mvMatrix, actor.position);
+        //@TODO: IMPLEMENT ACTOR ROTATIONS
+        
+        prg.setUniform(glsl.MODEL_VIEW_MATRIX,  r.transforms.mvMatrix);
+    trx.pop();
+    
+    trx.calculateNormal(); 
+    prg.setUniform(glsl.NORMAL_MATRIX, r.transforms.nMatrix);
+    
+    
+    
+ };
 
 vxlBlenderStrategy.prototype._renderActor = function(actor){
 	
@@ -8097,7 +8177,7 @@ vxlView.prototype.setClearDepth = function(d){
 };
 
 /**
- * Refresh the view by invoking the rendering method on the renderer
+ * Refresh the view 
  * @see vxlRenderer#render
  */
 vxlView.prototype.refresh = function(){

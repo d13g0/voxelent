@@ -66,6 +66,7 @@ def : {
 						MODEL_VIEW_MATRIX  	: 'mModelView',
 						NORMAL_MATRIX   	: 'mNormal',
 						PERSPECTIVE_MATRIX 	: 'mPerspective',
+						MVP_MATRIX          : 'mModelViewPerspective',
 						VERTEX_ATTRIBUTE    : 'aVertexPosition',
 						NORMAL_ATTRIBUTE    : 'aVertexNormal',
 						COLOR_ATTRIBUTE     : 'aVertexColor'
@@ -176,7 +177,7 @@ events : {
 * @namespace Voxelent Global Objects
 * @property {Boolean}                   debug
 * @property {vxlNotifier}               notifier
-* @property {vxlModelManager}           modelManager
+* @propertthaty {vxlModelManager}           modelManager
 * @property {vxlLookupTableManager}     lookupTableManager
 *
 */

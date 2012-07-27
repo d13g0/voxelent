@@ -25,7 +25,8 @@ function vxlTransforms(vw){
 	this.mvMatrix    = mat4.identity();    // The Model-View matrix
 	this.pMatrix     = mat4.identity();    // The projection matrix
 	this.nMatrix     = mat4.identity();    // The normal matrix
-	this.cMatrix     = mat4.identity();    // The camera matrix	
+	this.cMatrix     = mat4.identity();    // The camera matrix
+	this.mvpMatrix   = mat4.identity();	
 };
 
 /**
@@ -56,6 +57,10 @@ vxlTransforms.prototype.calculatePerspective = function(){
 	mat4.perspective(c.FOV, vw.width/vw.height, c.Z_NEAR, c.Z_FAR, this.pMatrix);
 };
 
+
+vxlTransforms.prototype.calculateModelViewPerspective = function(){
+    mat4.multiply(this.pMatrix, this.mvMatrix, this.mvpMatrix);
+}
 /**
  * Calculate the transforms for the current view.renderer
  * 
@@ -64,6 +69,7 @@ vxlTransforms.prototype.update = function(){
     this.calculateModelView();
     this.calculatePerspective();
     this.calculateNormal();
+    this.calculateModelViewPerspective();
 };
 
 /**
