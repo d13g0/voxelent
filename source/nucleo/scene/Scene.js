@@ -42,13 +42,10 @@ function vxlScene()
 
 	if (vxl.c.scene  == null) vxl.c.scene 	= this;
 	
-	//Fancier than previous version, eh?
-	//1. simpler semantics
-	//2. one call 
 	var ntf = vxl.go.notifier;
 	var e = vxl.events;
 	ntf.publish([e.SCENE_UPDATED], this);
-	ntf.subscribe([e.MODELS_LOADED, e.DEFAULT_LUT_LOADED, e.ACTOR_BB_UPDATED], this)
+	ntf.subscribe([e.MODELS_LOADED, e.DEFAULT_LUT_LOADED], this)
 };
 
 /**
@@ -58,12 +55,7 @@ function vxlScene()
  */
 vxlScene.prototype.handleEvent = function(event,src){
 	
-	if (event == vxl.events.ACTOR_BB_UPDATED){
-		if (this.hasActor(src)){
-			this._computeBoundingBox();
-		}
-	}
-	else if(event == vxl.events.MODELS_LOADED){
+    if(event == vxl.events.MODELS_LOADED){
 		this.updateScalarRange();
 		if (this.lutID != null) {this.setLookupTable(this.lutID);}
 	}
@@ -97,7 +89,11 @@ vxlScene.prototype.setLoadingMode = function(mode){
  * Calculates the global bounding box and the centre for the scene. 
  * @private
  */
-vxlScene.prototype._updateBoundingBox = function(b){
+vxlScene.prototype._updateBoundingBoxWith = function(actor){
+
+    actor.computeBoundingBox();
+    
+    var b = actor.bb;
     
     vxl.go.console('Scene: updating metrics with ('+ b[0]+','+b[1]+','+b[2]+') - ('+b[3]+','+b[4]+','+b[5]+')');
     if (this.actors.length == 1){
@@ -133,13 +129,21 @@ vxlScene.prototype._updateBoundingBox = function(b){
 /**
  * Calculates the global bounding box and the center of the scene.
  * Updates the Scene's axis and bounding box actors.
- * @private
  */
-vxlScene.prototype._computeBoundingBox = function() {
-	this.bb = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+vxlScene.prototype.computeBoundingBox = function() {
+    
+    if (this.actors.length >0){
+	   this.bb = this.actors[0].bb.slice(0);
+	}
+	else{
+	    this.bb = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+	}
+	
 	this.centre = [0.0, 0.0, 0.0];
-	for(var i=0; i<this.actors.length; i++){
-		this._updateBoundingBox(this.actors[i].bb);
+	
+	var LEN = this.actors.length;
+	for(var i=0; i<LEN; i++){
+		this._updateBoundingBoxWith(this.actors[i]);
 	}
 };
 
@@ -173,6 +177,9 @@ vxlScene.prototype.createActors = function(models){
  * @param actor the actor to be added to the scene
  */
 vxlScene.prototype.addActor = function(actor){
+    
+    actor.setScene(this);
+    
     if (this.normalsFlipped){
         actor.flipNormals(true);
     }
@@ -182,7 +189,7 @@ vxlScene.prototype.addActor = function(actor){
     }
     
     this.actors.push(actor);
-    this._updateBoundingBox(actor.bb); 
+    this._updateBoundingBoxWith(actor); 
     
     vxl.go.console('Scene: Actor for model '+actor.model.name+' added');
     
@@ -203,7 +210,7 @@ vxlScene.prototype.addActor = function(actor){
 vxlScene.prototype.removeActor = function(actor){
 	var idx = this.actors.indexOf(actor);
 	this.actors.splice(idx,1);
-    this._computeBoundingBox();
+    this.computeBoundingBox();
 };
 
 /**
@@ -281,15 +288,6 @@ vxlScene.prototype.setLookupTable = function(lutID){
 		}
 	}
 };
-/**
- * Allocates WebGL memory for the actors in this scene
- * @param renderer the renderer that will render the scene
- */
-//vxlScene.prototype.allocate = function(renderer){
-	//for(var i=0; i<this.actors.length; i++){
-		//this.actors[i].allocate(renderer);
-	//}
-//}
 
 /*
  * Removes all the actors from the Scene and resets the actor list
@@ -301,7 +299,7 @@ vxlScene.prototype.reset = function(){
 	}
 	this.actors = [];
 	vxl.c.actor = null;
-	this._computeBoundingBox();
+	this.computeBoundingBox();
 };
 
 /**
@@ -309,12 +307,28 @@ vxlScene.prototype.reset = function(){
  * @param name the name of the actor to retrieve
  */
 vxlScene.prototype.getActorByName = function(name){
-	for(var i=0; i<this.actors.length; i++){
+	var LEN = this.actors.length;
+    for(var i=0; i<LEN; i+=1){
 		if(this.actors[i].name == name){
 			return this.actors[i];
 		}
 	}
 	return undefined;
+};
+
+
+/**
+ * Retrieves an actor object by Unique Identifier (UID)
+ * @param UID the actor's UID
+ */
+vxlScene.prototype.getActorByUID = function(UID){
+    var LEN = this.actors.length;
+    for(var i=0; i<LEN; i+=1){
+        if(this.actors[i].UID == UID){
+            return this.actors[i];
+        }
+    }
+    return undefined;
 };
 
 

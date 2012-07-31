@@ -69,6 +69,8 @@ function vxlActor(model){
   this._renderers   = [];
   this._gl_buffers  = [];
   this.shading      = true;
+  
+  this.scene        = undefined;
 
   
   if (model){
@@ -81,10 +83,28 @@ function vxlActor(model){
   	this.centre     = vec3.set(model.centre, vec3.create());
   }
   
-  vxl.go.notifier.publish(vxl.events.ACTOR_BB_UPDATED, this);
+  var e = vxl.events;
+  vxl.go.notifier.publish(
+      [
+        e.ACTOR_MOVED,
+        e.ACTOR_SCALED,
+        e.ACTOR_CHANGED_COLOR,
+        e.ACTOR_CHANGED_SHADING
+      ], this);
+  
   
   this.UID = vxl.util.generateUID();
 };
+
+
+/**
+ *Sets the scene the actor belongs to. Used to notifiy the scene
+ * about changes in actor properties 
+ */
+vxlActor.prototype.setScene = function(scene){
+    this.scene = scene;
+}
+
 
 /**
  * Sets the position of this actor. 
@@ -99,8 +119,7 @@ function vxlActor(model){
  */
 vxlActor.prototype.setPosition = function (x,y,z){
     this.position = vxl.util.createVec3(x,y,z); 
-    this._computeBoundingBox();
-    vxl.go.notifier.fire(vxl.events.ACTOR_BB_UPDATED, this);
+    vxl.go.notifier.fire(vxl.events.ACTOR_MOVED, this);
 };
 
 
@@ -119,15 +138,17 @@ vxlActor.prototype.setScale = function(s,a,b){
     else{
         this.scale = vxl.util.createVec3(s,a,b);
     }
-    
-    this._computeBoundingBox();    
-    vxl.go.notifier.fire(vxl.events.ACTOR_BB_UPDATED, this);
+    vxl.go.notifier.fire(vxl.events.ACTOR_SCALED, this);
 };
 
 /**
- *@private 
+ * Computes the current bounding box for this actor.
+ * This method is called on demand by the scene or any other object. 
+ * The bounding box is NOT automatically recalculated when 
+ * moving or scaling an actor for performance reasons.
+ *  
  */
-vxlActor.prototype._computeBoundingBox = function(){
+vxlActor.prototype.computeBoundingBox = function(){
 
     this.bb  = this.model.bb.slice(0);
 
@@ -183,6 +204,7 @@ vxlActor.prototype._computeBoundingBox = function(){
 */
 vxlActor.prototype.setColor = function (r,g,b){
 	this.color = vxl.util.createVec3(r,g,b); 
+	vxl.go.notifier.fire(vxl.events.ACTOR_CHANGED_COLOR, this);
 };
 
 
@@ -219,6 +241,16 @@ vxlActor.prototype.setProperty = function(property, value, scope){
     	return;
     }
     
+    if (property == 'color') {
+        this.setColor(value);
+        return;
+    }
+    
+    if (property == 'shading'){
+        this.setShading(value);
+        return;
+    }
+    
     if (scope == vxl.def.actor || scope == undefined || scope == null){
 		this[property] = value;
 		vxl.go.console('Actor: The actor '+this.name+' has been updated. ['+property+' = '+value+']');
@@ -240,6 +272,7 @@ vxlActor.prototype.setProperty = function(property, value, scope){
  */
 vxlActor.prototype.setShading = function(flag){
     this.shading = flag;
+    vxl.go.notifier.fire(vxl.events.ACTOR_CHANGED_SHADING, this);
 }
 
 /**
@@ -356,6 +389,7 @@ vxlActor.prototype.clone = function(){
     this.clones++;
 	
 	var duplicate = new vxlActor(this.model);
+	duplicate.setScene(this.scene);
 	
 	vec3.set(this.scale,    duplicate.scale);
 	vec3.set(this.position, duplicate.position);

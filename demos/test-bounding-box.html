@@ -18,7 +18,7 @@ function runVoxApp(){
     vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
     view = vxl.api.setup('view-1');
     var list = ['cone.json','cylinder.json','sphere.json']
-    vxl.api.load(list,null,null,'assets/models/geometry');
+    vxl.api.load(list,'assets/models/geometry');
     view.start();
 }
 
@@ -34,7 +34,6 @@ function handleEvent(event){
     sphere.setColor(0,0.9,0.2);
     
     var cam = vxl.c.camera;
-
     cam.longShot();
     cam.setAzimuth(15);
     cam.setElevation(-15);

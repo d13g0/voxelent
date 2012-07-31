@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - vxlTransforms</title>
+		<title>JsDoc Reference - vxlBakeStrategy</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -418,7 +418,7 @@ height:135px;
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class vxlTransforms
+				Class vxlBakeStrategy
 			</h1>
 
 <!-- ============================== class summary ========================== -->
@@ -426,16 +426,18 @@ height:135px;
 				
 				
 
-				
+				Implements a basic rendering strategy that works with the following programs:
+
+vxl.def.glsl.bake
 
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_renderer_Transforms.js.html">Transforms.js</a>.
+					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_renderer_strategy_BakeStrategy.js.html">BakeStrategy.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class vxlTransforms.">
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class vxlBakeStrategy.">
 				<caption>Class Summary</caption>
 				<thead>
 					<tr>
@@ -448,7 +450,7 @@ height:135px;
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/vxlTransforms.html#constructor">vxlTransforms</a></b>(vw)
+								<b><a href="../symbols/vxlBakeStrategy.html#constructor">vxlBakeStrategy</a></b>(renderer)
 							</div>
 							<div class="description"></div>
 						</td>
@@ -464,7 +466,7 @@ height:135px;
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class vxlTransforms.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class vxlBakeStrategy.">
 					<caption>Method Summary</caption>
 					<thead>
 						<tr>
@@ -477,16 +479,16 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlTransforms.html#calculateModelView">calculateModelView</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/vxlBakeStrategy.html#allocate">allocate</a></b>(scene)
 								</div>
-								<div class="description">Calculates the Model-View matrix for the current camera.</div>
+								<div class="description">Implements basic allocation of memory.</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlTransforms.html#calculateModelViewPerspective">calculateModelViewPerspective</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/vxlBakeStrategy.html#deallocate">deallocate</a></b>(scene)
 								</div>
 								<div class="description"></div>
 							</td>
@@ -495,45 +497,18 @@ height:135px;
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlTransforms.html#calculateNormal">calculateNormal</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/vxlBakeStrategy.html#handleEvent">handleEvent</a></b>(event, actor)
 								</div>
-								<div class="description">Calculates the normal matrix corresponding to the current Model-View matrix</div>
+								<div class="description">Handle voxelent events</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlTransforms.html#calculatePerspective">calculatePerspective</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/vxlBakeStrategy.html#render">render</a></b>(scene)
 								</div>
-								<div class="description">Calculates the perspective matrix given the current camera</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlTransforms.html#pop">pop</a></b>()
-								</div>
-								<div class="description">Retrieves the last Model-View transformation in the matrix stack.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlTransforms.html#push">push</a></b>()
-								</div>
-								<div class="description">Saves the current Model-View matrix in the stack.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/vxlTransforms.html#update">update</a></b>()
-								</div>
-								<div class="description">Calculate the transforms for the current view.renderer</div>
+								<div class="description">Renders the actors one by one</div>
 							</td>
 						</tr>
 					
@@ -554,12 +529,12 @@ height:135px;
 				</div>
 
 				<div class="fixedFont">
-						<b>vxlTransforms</b>(vw)
+						<b>vxlBakeStrategy</b>(renderer)
 				</div>
 
 				<div class="description">
 					
-					<br /><i>Author: </i>Diego Cantor.
+					
 				</div>
 
 				
@@ -570,7 +545,7 @@ height:135px;
 						<dt class="heading">Parameters:</dt>
 						
 							<dt>
-								 <b>vw</b>
+								 <b>renderer</b>
 								
 							</dt>
 								<dd></dd>
@@ -596,15 +571,15 @@ height:135px;
 					Method Detail
 				</div>
 				
-					<a name="calculateModelView"> </a>
+					<a name="allocate"> </a>
 					<div class="fixedFont">
 
 					
-					<b>calculateModelView</b>()
+					<b>allocate</b>(scene)
 
 					</div>
 					<div class="description">
-						Calculates the Model-View matrix for the current camera.
+						Implements basic allocation of memory. Creates the WebGL buffers for the actor
 						
 						
 					</div>
@@ -612,162 +587,137 @@ height:135px;
 					
 
 						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="calculateModelViewPerspective"> </a>
-					<div class="fixedFont">
-
-					
-					<b>calculateModelViewPerspective</b>()
-
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="calculateNormal"> </a>
-					<div class="fixedFont">
-
-					
-					<b>calculateNormal</b>()
-
-					</div>
-					<div class="description">
-						Calculates the normal matrix corresponding to the current Model-View matrix
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="calculatePerspective"> </a>
-					<div class="fixedFont">
-
-					
-					<b>calculatePerspective</b>()
-
-					</div>
-					<div class="description">
-						Calculates the perspective matrix given the current camera
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="pop"> </a>
-					<div class="fixedFont">
-
-					
-					<b>pop</b>()
-
-					</div>
-					<div class="description">
-						Retrieves the last Model-View transformation in the matrix stack.This operation is called by vxlActor.updateMatrixStack
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="push"> </a>
-					<div class="fixedFont">
-
-					
-					<b>push</b>()
-
-					</div>
-					<div class="description">
-						Saves the current Model-View matrix in the stack. Thisoperation is called by vxlActor.updateMatrixStack
-						
-						
-					</div>
-
-					
-
-						
-						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/vxlScene.html">vxlScene</a>}</span> <b>scene</b>
+									
+								</dt>
+								<dd>the scene to allocate memory for</dd>
+							
+							</dl>
 						
 						
 						
 						
 						
 							<dl class="detailList">
-							<dt class="heading">See:</dt>
+							<dt class="heading">Returns:</dt>
 							
-								<dd>vxlActor#updateMatrixStack</dd>
+								<dd>an object that contains the allocated WebGL buffers</dd>
 							
 							</dl>
+						
+						
 						
 
 					<hr />
 				
-					<a name="update"> </a>
+					<a name="deallocate"> </a>
 					<div class="fixedFont">
 
 					
-					<b>update</b>()
+					<b>deallocate</b>(scene)
 
 					</div>
 					<div class="description">
-						Calculate the transforms for the current view.renderer
+						
 						
 						
 					</div>
 
 					
 
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/vxlScene.html">vxlScene</a>}</span> <b>scene</b>
+									
+								</dt>
+								<dd>the scene to deallocate memory from</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="handleEvent"> </a>
+					<div class="fixedFont">
+
+					
+					<b>handleEvent</b>(event, actor)
+
+					</div>
+					<div class="description">
+						Handle voxelent events
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>event</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>actor</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="render"> </a>
+					<div class="fixedFont">
+
+					
+					<b>render</b>(scene)
+
+					</div>
+					<div class="description">
+						Renders the actors one by one
+						
+						
+					</div>
+
+					
+
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/vxlScene.html">vxlScene</a>}</span> <b>scene</b>
+									
+								</dt>
+								<dd>the scene to render</dd>
+							
+							</dl>
 						
 						
 						

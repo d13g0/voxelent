@@ -75,34 +75,6 @@ vxlModelManager.prototype.load = function(filename, scene) {
 		success 	: successHandler(manager,name,scene),
 		error		: errorHandler(filename)
 	});    
-    /*var request = new XMLHttpRequest();
-    request.open("GET", filename);
-    
-    request.onreadystatechange = function() {
-    	if (request.readyState == 4) {
-      		if (request.status == 200 || ( request.status == 0)){ //&& document.domain.length ==0)){
-      			var name = filename.replace(/^.*[\\\/]/, '');
-       			manager.add(JSON.parse(request.responseText),name,scene);
-      		}
-	    	else {
-				alert ('There was a problem loading the file '+filename+'. HTTP error code:'+request.status);
-	  		}
-    	}
-    };
-    
-    try{
-    	request.send();
-    } 
-    catch(e){
-    	if (e.code = 1012){
-    		alert('The file '+filename+' could not be accessed. \n\n'+
-    		'Please make sure that the path is correct and that you have the right pemissions');
-    	}
-    	else{
-    		alert(e);
-    	}
-    }*/
-   	
 };
 
 /**

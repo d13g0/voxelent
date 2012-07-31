@@ -42,7 +42,9 @@ We need to create a tutorial about this! It's reall cool!
 
 15. Publish/Subscribe mechanism updated for vxlNotifier
 
+16. vxlBakeStrategy and vxlBakeProgram added. Working on improving rendering performance by interleaving buffers
 
+17. Calculation of the bounding box is done BY DEMAND for performance reasons.
 -------------------------------------------------------------------------------------------
 VERSION 0.87.5 - Mother's Day
 -------------------------------------------------------------------------------------------

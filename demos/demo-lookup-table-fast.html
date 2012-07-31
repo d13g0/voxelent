@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name='keywords' content='webgl, webgl platform, medical imaging, webgl api'>
 
-<title>Voxelent - Cube Lookup Table Demo - Baked!</title>
+<title>Voxelent - Cube Lookup Table Demo</title>
 
 <script type="text/javascript" src="lib/jquery.js" ></script>
 <script type="text/javascript" src="lib/jquery-ui.js" ></script>
@@ -18,9 +18,10 @@
 
 //Some global variables
 var view;
-var S = 2;
+var S = 7;
 var T = (Math.pow(S*2+1,3) - Math.pow(S*2-1,3)); //external cube minus internal cube. Easy!
 var cubes = [];
+
 
 /**
  * Main function
@@ -28,10 +29,9 @@ var cubes = [];
 function runVoxApp(){
     vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
     vxl.api.loadLUTS('assets/tables');
-    
     view = vxl.api.setup('view-1');
-    
-    vxl.api.load('cube.json','assets/models/geometry/');
+    vxl.api.setProgram(view, vxl.def.glsl.bake, vxlBakeStrategy);
+    vxl.api.load('assets/models/geometry/cube.json');
     view.start();
     
 };
@@ -108,24 +108,70 @@ function handleEvent(event){
  
     //Setup our camera
     var cam = vxl.c.camera;
-    cam.setPosition(0,0,20);
-  
+    cam.setPosition(0,0,200);
     cam.setAzimuth(-43);   
     cam.setElevation(-17);
     
+    cubetimes = computeMotion();
+    
+
     //Start the animation
     vxl.api.setRenderMode(vxl.def.renderer.mode.ANIMFRAME);
-    timer = setInterval(animate,30);  
+    timer = setInterval(animate,15);
+      
     
     $('#overlay-div').fadeIn(3000);
+    $('#cube-count').html('Cube count: '+T);  
 }; 
+
+
+var cubetimes = [];
+
+function computeMotion(){
+    var normals = [];
+    
+    for(var i=0;i<cubes.length;i+=1){
+        normals[i] = vec3.create();
+        vec3.set(cubes[i].position, normals[i]);
+        vec3.normalize(normals[i]);
+    }
+    
+    var p = vec3.create();
+    var s = vec3.create();
+    var pos = [];
+    var k = 0;
+    for (var angle = 0; angle<=360; angle+=1){
+        pos[k] = [];  
+        for(var i=0;i<cubes.length;i+=1){
+            
+            vec3.set(cubes[i].position, p);
+            vec3.set(normals[i],s);
+            vec3.scale(s,50*Math.sin(angle * Math.PI/180));
+            vec3.add(p,s);
+            
+            pos[k][i] = vec3.create();
+            vec3.set(p,pos[k][i]);
+        }
+        k++;
+    }
+    return pos;
+};
+
 /**
  * Updates the camera position
  */
 var t = 0;
 function animate(){
     var cam = vxl.c.camera;
-    cam.rotate(-0.5,-0.3);   
+    //cam.rotate(0.9,0.0);   
+    
+    for (var i = 0; i<cubes.length; i+=1){
+        cubes[i].setPosition(cubetimes[t][i]);    
+    }
+    t += 1;
+    t %= 360;
+   // console.info(t);
+    view.refresh(); 
 };
 
 </script>
@@ -182,6 +228,7 @@ function animate(){
     
     <div id = 'overlay-div' class='overlay'>
       <p id='view-1-fps'></p>        
+      <p id='cube-count'></p>
       <p><input type='checkbox' id='toggleAnimation'/><label for='toggleAnimation'>Stop Animation</label></p>
       <p>Please select one lookup table</p>
       <select id='lutPicker'></select>

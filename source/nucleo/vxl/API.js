@@ -191,7 +191,7 @@ vxl.api = {
   * @see {vxlScene#setLoadingMode}
   * 
   */
- load :  function(arguments,mode,scene,path){
+ load :  function(arguments,path,mode,scene){
  	
  	function getPath(path){
  		if (path ==undefined || path == null) {
@@ -324,6 +324,22 @@ wireframeON :  function(){
 	}
  },
  
+ /**
+  * Returns a list of actor names. 
+  * @param {vxlScene} scene the scene. This parameter is optional 
+  */
+ getActorNames : function(scene){
+    var _scene = scene;
+    if (_scene == undefined){ //look in the current scene
+        if (vxl.c.scene == undefined){
+            throw ('vxl.api.getActorNames: There is no current scene');
+        }
+        else{
+            _scene = vxl.c.scene;
+        }
+    }
+    return _scene.getActorNames();
+ },
  /**
   * Retrieves an actor object by name
   * @param {String} actorName the name of the actor

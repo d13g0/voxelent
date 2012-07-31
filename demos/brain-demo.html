@@ -32,7 +32,7 @@
 	    			"part6.json"];
 	    
 	
-	    vxl.api.load(list,vxl.def.model.loadingMode.LATER,null,'assets/models/brain');
+	    vxl.api.load(list,'assets/models/brain',vxl.def.model.loadingMode.LATER);
 	    vxl.c.view.start();
 	}
 	
@@ -40,6 +40,7 @@
 	    if (event == vxl.events.MODELS_LOADED){
 	    	vxl.api.setLookupTable('default');
 	    	vxl.c.camera.longShot();
+	    	vxl.api.boundingBoxON();
 	    	$('#overlay-div').fadeIn(3000);
 	    }
 	}

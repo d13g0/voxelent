@@ -32,6 +32,7 @@ function vxlProgram (gl) {
 
     this._program           = {};
     this._attributeList     = {};
+    this._enabledAttributes = [];
     this._uniformList       = {};
     this._uniformType       = {};
 
@@ -224,8 +225,12 @@ vxlProgram.prototype.setAttributePointer = function(name, numElements, type, nor
  * @param {String} name the name of the attribute array to enable
  */
 vxlProgram.prototype.enableAttribute = function(name){
+    
+   if (this._enabledAttributes.indexOf(name) != -1) return; //Speeds up
+     
    var a = this._getAttributeLocation(name);
    this._gl.enableVertexAttribArray(a);
+   this._enabledAttributes.push(name);
 };
 
 /**
@@ -234,8 +239,13 @@ vxlProgram.prototype.enableAttribute = function(name){
  * 
  */
 vxlProgram.prototype.disableAttribute = function(name){
-    var a = this._getAttributeLocation(name);
-    this._gl.disableVertexAttribArray(a);
+    
+    var idx = this._enabledAttributes.indexOf(name); 
+    if (idx != -1) { //so it is enabled
+        var a = this._getAttributeLocation(name);
+        this._gl.disableVertexAttribArray(a);
+        this._enabledAttributes.splice(idx,1);
+    }
 };
 
 /**

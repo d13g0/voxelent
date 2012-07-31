@@ -337,6 +337,7 @@ vxlCamera.prototype.shot = function(bb){
  * A long shot uses the global bounding box of the view's scene
  */
 vxlCamera.prototype.longShot = function() {
+    this.view.scene.computeBoundingBox(); //perfect example of BY DEMAND UPDATING OF BB
 	this.shot(this.view.scene.bb);
 };
 

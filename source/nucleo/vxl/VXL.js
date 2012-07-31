@@ -166,10 +166,13 @@ def : {
 * @property {String} MODELS_LOADED
 */
 events : {
-	DEFAULT_LUT_LOADED 	: 'vxl.events.DEFAULT_LUT_LOADED',
-	SCENE_UPDATED		: 'vxl.events.SCENE_UPDATED',
-	MODELS_LOADED		: 'vxl.events.MODELS_LOADED',
-	ACTOR_BB_UPDATED    : 'vxl.events.ACTOR_BB_UPDATED'
+	DEFAULT_LUT_LOADED 	   : 'vxl.events.DEFAULT_LUT_LOADED',
+	SCENE_UPDATED		   : 'vxl.events.SCENE_UPDATED',
+	MODELS_LOADED		   : 'vxl.events.MODELS_LOADED',
+	ACTOR_MOVED            : 'vxl.events.ACTOR_MOVED',
+	ACTOR_SCALED           : 'vxl.events.ACTOR_SCALED',
+	ACTOR_CHANGED_COLOR    : 'vxl.events.ACTOR_CHANGED_COLOR',
+	ACTOR_CHANGED_SHADING  : 'vxl.events.ACTOR_CHANGED_SHADING'
 },
 
 
@@ -306,6 +309,19 @@ util : {
                 return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
             }
         return (S4()+"-"+S4()+"-"+S4()+"-"+S4());
+    },
+    
+    extend : function(){
+      var ret = {};
+      var len = arguments.length;
+      for (var i=0; i<len; i++) {
+        for (p in arguments[i]) {
+          if (arguments[i].hasOwnProperty(p)) {
+            ret[p] = arguments[i][p];
+          }
+        }
+      }
+      return ret;
     }
 }
 
@@ -318,6 +334,9 @@ Array.prototype.max = function(){
 Array.prototype.min = function(){
 	return Math.min.apply(null, this);
 };
+
+
+
 
 Array.prototype.hasObject = (
   !Array.indexOf ? function (o)

@@ -174,7 +174,7 @@ vxlRenderer.prototype.stop = function(){
 
 /**
  * Sets the rendering rate in ms
- * @param {Number} rate the new rendering rate in milliseconds
+ * @param {Number} /test-baking.htmlrate the new rendering rate in milliseconds
  */
 vxlRenderer.prototype.setRenderRate = function(rate){ //rate in ms
     
@@ -228,7 +228,7 @@ vxlRenderer.prototype.render = function(){
     
     // calculating FPS metric
     if(elapsed >0){
-        this.fps = Math.round((this.fps * 0.90 + (1000.0/elapsed) * 0.1)* 100)/100;
+        this.fps = Math.round((this.fps * 0.80 + (1000.0/elapsed) * 0.2)* 100)/100;
     }
     
     $('#'+this.view.name+'-fps').html(this.fps);
