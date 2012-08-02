@@ -24,19 +24,22 @@
  * @author Diego Cantor
  */
 function vxlModelManager(){
-	this.toLoad = new Array(); //analyze
+	this.toLoad = []; 
 	this.models = [];
-	vxl.go.notifier.publish(vxl.events.MODELS_LOADED,this);
+	
+	var e = vxl.events;
+	vxl.go.notifier.publish([
+	       e.MODELS_LOADING,
+	       e.MODEL_NEW,
+	       e.MODELS_LOADED
+	    ],this);
 };
 
 
 /**
- * Uses a JSON/Ajax mechanism to load models from the webserver.
- * @param {String} filename name of the file that will be loaded. Voxelent will look for this file inside of the 
- * 						folder defined by the configuration variable vxl.def.model.folder
- * @param {vxlScene} optional parameter. The scene that will contain an actor for this model.
- * @param {Array} attributes to add to the respective actor once the model is being loaded
- * @param {Function} callback function once the model is loaded
+ * Uses a JSON/Ajax mechanism to load models from a Web Server.
+ * @param {String} filename The name of the file that will be loaded. 
+ * @param {vxlScene} scene The scene that will create an actor for this model. This parameter is optional.
  */  
 vxlModelManager.prototype.load = function(filename, scene) {
     var manager = this;
@@ -46,6 +49,7 @@ vxlModelManager.prototype.load = function(filename, scene) {
 	if (manager.isModelLoaded(name)) return;
 	
 	vxl.go.console('ModelManager.load: Requesting '+filename+'...');
+	vxl.go.notifier.fire(vxl.events.MODELS_LOADING, this);
 	
 	var successHandler = function(manager,name,scene){
 		return function(json, textStatus){
@@ -65,8 +69,6 @@ vxlModelManager.prototype.load = function(filename, scene) {
 			}		
 		}
 	};
-	
-	
 	
 	var request  = $.ajax({
 		url			:filename,
@@ -98,30 +100,46 @@ vxlModelManager.prototype.loadList = function(list,scene){
  */
 vxlModelManager.prototype.add = function(JSON_OBJECT,name,scene){
 	
-	var model = new vxlModel(name, JSON_OBJECT);
+	var self = this;
 	
-	model.loaded = true;
-	this.models.push(model);
-	vxl.go.console('ModelManager: model '+model.name+' created.'); 
+	function scheduledAdd(){
 	
-	if (scene != undefined && scene instanceof vxlScene){
-		vxl.go.console('ModelManager: notifying the scene...');
-		if (scene.loadingMode == vxl.def.model.loadingMode.LIVE){
-			scene.createActor(model);
-		}
-		else if (scene.loadingMode == vxl.def.model.loadingMode.LATER){
-			if(this.allLoaded()){
-				scene.createActors(this.models);
-			}
-		}
-		else if (scene.loadingMode == vxl.def.model.loadingMode.DETACHED){
-			//do nothing
-		}
+    	
+    	var model = new vxlModel(name, JSON_OBJECT);
+    	
+    	model.loaded = true;
+    	self.models.push(model);
+    	self.toLoad.splice(name,1); //removes it from the pending list if exists
+    	
+    	vxl.go.console('ModelManager: model '+model.name+' created.'); 
+    	
+    	if (scene != undefined && scene instanceof vxlScene){
+    		vxl.go.console('ModelManager: notifying the scene...');
+    		if (scene.loadingMode == vxl.def.model.loadingMode.LIVE){
+    			scene.createActor(model);
+    		}
+    		else if (scene.loadingMode == vxl.def.model.loadingMode.LATER){
+    			if(self.allLoaded()){
+    				scene.createActors(self.models);
+    			}
+    		}
+    		else if (scene.loadingMode == vxl.def.model.loadingMode.DETACHED){
+    			//do nothing
+    		}
+    	}
+    	
+        
+        
+        
+    	if(self.allLoaded()){ 
+    		vxl.go.notifier.fire(vxl.events.MODELS_LOADED, self);
+    	}
+    	else{
+    	    vxl.go.notifier.fire(vxl.events.MODEL_NEW, self);
+    	}
 	}
 	
-	if(this.allLoaded()){ 
-		vxl.go.notifier.fire(vxl.events.MODELS_LOADED, this);
-	}
+	setTimeout(function(){scheduledAdd()},0);
  };
  
 /**
@@ -149,10 +167,10 @@ vxlModelManager.prototype.isModelLoaded = function(name){
 };
 
 /**
- * Returns true if all the models in the list passed to the method loadList.
+ * Returns true if all the models in the list passed to the method loadList have been loaded.
  */
 vxlModelManager.prototype.allLoaded = function(){
-	return (this.models.length == this.toLoad.length); //TODO: Verify one by one
+	return (this.toLoad.length == 0);
 };
 
 

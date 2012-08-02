@@ -168,11 +168,15 @@ def : {
 events : {
 	DEFAULT_LUT_LOADED 	   : 'vxl.events.DEFAULT_LUT_LOADED',
 	SCENE_UPDATED		   : 'vxl.events.SCENE_UPDATED',
+	MODELS_LOADING         : 'vxl.events.MODELS_LOADING',
+	MODEL_NEW              : 'vxl.events.MODEL_NEW',
 	MODELS_LOADED		   : 'vxl.events.MODELS_LOADED',
 	ACTOR_MOVED            : 'vxl.events.ACTOR_MOVED',
 	ACTOR_SCALED           : 'vxl.events.ACTOR_SCALED',
 	ACTOR_CHANGED_COLOR    : 'vxl.events.ACTOR_CHANGED_COLOR',
-	ACTOR_CHANGED_SHADING  : 'vxl.events.ACTOR_CHANGED_SHADING'
+	ACTOR_CHANGED_SHADING  : 'vxl.events.ACTOR_CHANGED_SHADING',
+	VIEW_NEW               : 'vxl.events.VIEW_NEW',
+	SCENE_NEW              : 'vxl.events.SCENE_NEW'
 },
 
 
@@ -189,16 +193,17 @@ go : {
     notifier            : undefined,
     modelManager        : undefined,
     lookupTableManager  : undefined,
+    views               : [],
+    scenes              : [],
     renderman : {
 
 		_timid : 0,
 		_rates : [],
-		_views : [],
 		_stop  : false,
 		
 		render : function(){
-			for(var i=0; i<vxl.go.renderman._views.length;i+=1){
-				vxl.go.renderman._views[i].renderer.render();
+			for(var i=0; i<vxl.go.views.length;i+=1){
+				vxl.go.views[i].renderer.render();
 			}
 			if (vxl.go.renderman._stop != true){
 			 vxl.go.renderman._timid = window.requestAnimFrame(vxl.go.renderman.render);
@@ -498,21 +503,29 @@ vxlNotifier.prototype._addSource = function(event,src){
  * @param {Object} src
  */
 vxlNotifier.prototype.fire = function(event, src){
-	var targetList = this.targetList;
-	
-    var idx = this.sourceList[event].indexOf(src);
-    if (idx == -1){
-    	throw 'The source '+src+' is not registered to trigger the event '+event+'. Did you use vxlNotifier.publish?';
-    }
-	vxl.go.console('vxlNotifier: firing ' +event);
-	
-	var targets = this.targetList[event];
-	
-	for (var index=0;index<targets.length;index++){
-         targets[index].handleEvent(event,src);
-    }
-	//$(document).trigger(event,[event,src,targetList]);
+    
+    var self = this;
+    
+    function processEvent(){
+    	var targetList = self.targetList;
+        var idx = self.sourceList[event].indexOf(src);
+        if (idx == -1){
+        	throw 'The source '+src+' is not registered to trigger the event '+event+'. Did you use vxlNotifier.publish?';
+        }
+    	vxl.go.console('vxlNotifier: firing ' +event);
+    	
+    	var targets = self.targetList[event];
+    	
+    	for (var index=0;index<targets.length;index++){
+             targets[index].handleEvent(event,src);
+        }
+	}
+	processEvent();
+	setTimeout(function(){processEvent()},0)
 };
+
+
+
 
 /**
  * Gets a list of the events handled by this vxlNotifier 
@@ -4285,8 +4298,13 @@ vxlCamera.prototype._setInitialMatrix = function(){
     mat4.translate(this.matrix, this.focalPoint);
     mat4.rotateY  (this.matrix, this.azimuth   * Math.PI / 180);
     mat4.rotateX  (this.matrix, this.elevation * Math.PI / 180);
-    mat4.translate(this.matrix, vec3.negate(this.focalPoint, vec3.create()));
-    mat4.translate(this.matrix, this.position);
+    var r = vec3.subtract(this.position, this.focalPoint, vec3.create());
+    mat4.translate(this.matrix, r);
+    //vec3.negate(this.cRot, vec3.create()));
+    //mat4.translate(this.matrix, this.position);
+    
+    var pos  = vec3.set(mat4.multiplyVec4(this.matrix, [0, 0, 0, 1]), vec3.create());
+    this._updateCentreRotation(pos);
 };
 
 /**
@@ -4310,15 +4328,24 @@ vxlCamera.prototype._updateMatrix = function(){
         var rotQ = quat4.multiply(rotY, rotX, quat4.create());
         var rotMatrix = quat4.toMat4(rotQ);
     
+        var r = vec3.subtract(this.position, this.focalPoint, vec3.create());
+        
         mat4.translate(this.matrix, this.cRot)
         mat4.multiply(this.matrix, rotMatrix);
         mat4.translate(this.matrix, vec3.negate(this.cRot, vec3.create()));
+        
     
         this.relAzimuth = 0;
         this.relElevation = 0;
     } 
 };
 
+/**
+ * Uses the current camera axes as the standard rotation and translation axes 
+ */
+vxlCamera.prototype.setAxes = function(){
+    this._updateAxes();
+};
 /**
  * Updates the x,y and z axis of the camera according to the current camera matrix.
  * This is useful when one needs to know the values of the axis and operate with them directly.
@@ -4359,8 +4386,11 @@ vxlCamera.prototype._updateDistance = function(){
  * update the position or the focal point
  * @private
  */
-vxlCamera.prototype._updateCentreRotation = function(){
-    this.cRot = vec3.subtract(this.focalPoint, this.position, vec3.create());
+vxlCamera.prototype._updateCentreRotation = function(pos){
+    if (pos == undefined) {
+        pos = this.position;
+    }
+    this.cRot = vec3.subtract(this.focalPoint, pos, vec3.create());
     var cMat = mat4.inverse(mat4.toRotationMat(this.matrix), mat4.create());
     mat4.multiplyVec3(cMat, this.cRot);
 };
@@ -6898,6 +6928,17 @@ vxlBasicStrategy.prototype.constructor = vxlBasicStrategy;
 function vxlBasicStrategy(renderer){
 	vxlRenderStrategy.call(this,renderer);
 	this._gl_buffers  = {};
+	
+	if (renderer){
+	var gl = this.renderer.gl;
+	
+	gl.enable(gl.BLEND);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	gl.enable(gl.DEPTH_TEST);
+	gl.depthFunc(gl.LESS);
+	gl.clearDepth(1.0);
+	gl.disable(gl.CULL_FACE);
+    }	
 }
 
 /**
@@ -7052,13 +7093,9 @@ vxlBasicStrategy.prototype._renderActor = function(actor){
 	var diffuse = [actor.color[0], actor.color[1], actor.color[2],1.0];
 	
 	if (actor.opacity < 1.0){
-		gl.disable(gl.DEPTH_TEST);
-		gl.enable(gl.BLEND);
 		diffuse[3] = actor.opacity;
 	}
 	else {
-		gl.enable(gl.DEPTH_TEST);
-		gl.disable(gl.BLEND);
 		diffuse[3] = 1.0;
 	}
 	
@@ -7723,13 +7760,17 @@ function vxlScene()
 	this.bb 					= [0, 0, 0, 0, 0, 0];
 	this.centre 				= [0, 0, 0];
 	this.frameAnimation			= null;
+	this.UID                    = vxl.util.generateUID();
 
 	if (vxl.c.scene  == null) vxl.c.scene 	= this;
+
+	vxl.go.scenes.push(this);
 	
 	var ntf = vxl.go.notifier;
-	var e = vxl.events;
-	ntf.publish([e.SCENE_UPDATED], this);
-	ntf.subscribe([e.MODELS_LOADED, e.DEFAULT_LUT_LOADED], this)
+    var e = vxl.events;
+    ntf.publish([e.SCENE_NEW, e.SCENE_UPDATED], this);
+    ntf.subscribe([e.MODELS_LOADED, e.DEFAULT_LUT_LOADED], this);
+	ntf.fire(e.SCENE_NEW, this);
 };
 
 /**
@@ -8650,18 +8691,21 @@ function vxlView(canvasID, scene){
 	//Add this view to the scene;
 	this.scene.views.push(this);
 	
-	
-	//Namespace access updates
-	
-
-	vxl.go.notifier.subscribe(vxl.events.DEFAULT_LUT_LOADED,this);   
-	
 	if (vxl.c.view == undefined){
 		vxl.c.view = this;
 	}
 	
-	vxl.go.renderman._views.push(this);
+	vxl.go.views.push(this);
 	this.setAutoResize(true);
+	
+	this.UID = vxl.util.generateUID();
+
+
+    var ntf = vxl.go.notifier;
+    var e   = vxl.events;
+    ntf.publish(e.VIEW_NEW, this);
+    ntf.subscribe(e.DEFAULT_LUT_LOADED,this);
+    ntf.fire(e.VIEW_NEW, this);
 
 	vxl.go.console('View: the view '+ this.name+' has been created');
 };
@@ -8813,19 +8857,22 @@ vxlView.prototype.refresh = function(){
  * @author Diego Cantor
  */
 function vxlModelManager(){
-	this.toLoad = new Array(); //analyze
+	this.toLoad = []; 
 	this.models = [];
-	vxl.go.notifier.publish(vxl.events.MODELS_LOADED,this);
+	
+	var e = vxl.events;
+	vxl.go.notifier.publish([
+	       e.MODELS_LOADING,
+	       e.MODEL_NEW,
+	       e.MODELS_LOADED
+	    ],this);
 };
 
 
 /**
- * Uses a JSON/Ajax mechanism to load models from the webserver.
- * @param {String} filename name of the file that will be loaded. Voxelent will look for this file inside of the 
- * 						folder defined by the configuration variable vxl.def.model.folder
- * @param {vxlScene} optional parameter. The scene that will contain an actor for this model.
- * @param {Array} attributes to add to the respective actor once the model is being loaded
- * @param {Function} callback function once the model is loaded
+ * Uses a JSON/Ajax mechanism to load models from a Web Server.
+ * @param {String} filename The name of the file that will be loaded. 
+ * @param {vxlScene} scene The scene that will create an actor for this model. This parameter is optional.
  */  
 vxlModelManager.prototype.load = function(filename, scene) {
     var manager = this;
@@ -8835,6 +8882,7 @@ vxlModelManager.prototype.load = function(filename, scene) {
 	if (manager.isModelLoaded(name)) return;
 	
 	vxl.go.console('ModelManager.load: Requesting '+filename+'...');
+	vxl.go.notifier.fire(vxl.events.MODELS_LOADING, this);
 	
 	var successHandler = function(manager,name,scene){
 		return function(json, textStatus){
@@ -8854,8 +8902,6 @@ vxlModelManager.prototype.load = function(filename, scene) {
 			}		
 		}
 	};
-	
-	
 	
 	var request  = $.ajax({
 		url			:filename,
@@ -8887,30 +8933,46 @@ vxlModelManager.prototype.loadList = function(list,scene){
  */
 vxlModelManager.prototype.add = function(JSON_OBJECT,name,scene){
 	
-	var model = new vxlModel(name, JSON_OBJECT);
+	var self = this;
 	
-	model.loaded = true;
-	this.models.push(model);
-	vxl.go.console('ModelManager: model '+model.name+' created.'); 
+	function scheduledAdd(){
 	
-	if (scene != undefined && scene instanceof vxlScene){
-		vxl.go.console('ModelManager: notifying the scene...');
-		if (scene.loadingMode == vxl.def.model.loadingMode.LIVE){
-			scene.createActor(model);
-		}
-		else if (scene.loadingMode == vxl.def.model.loadingMode.LATER){
-			if(this.allLoaded()){
-				scene.createActors(this.models);
-			}
-		}
-		else if (scene.loadingMode == vxl.def.model.loadingMode.DETACHED){
-			//do nothing
-		}
+    	
+    	var model = new vxlModel(name, JSON_OBJECT);
+    	
+    	model.loaded = true;
+    	self.models.push(model);
+    	self.toLoad.splice(name,1); //removes it from the pending list if exists
+    	
+    	vxl.go.console('ModelManager: model '+model.name+' created.'); 
+    	
+    	if (scene != undefined && scene instanceof vxlScene){
+    		vxl.go.console('ModelManager: notifying the scene...');
+    		if (scene.loadingMode == vxl.def.model.loadingMode.LIVE){
+    			scene.createActor(model);
+    		}
+    		else if (scene.loadingMode == vxl.def.model.loadingMode.LATER){
+    			if(self.allLoaded()){
+    				scene.createActors(self.models);
+    			}
+    		}
+    		else if (scene.loadingMode == vxl.def.model.loadingMode.DETACHED){
+    			//do nothing
+    		}
+    	}
+    	
+        
+        
+        
+    	if(self.allLoaded()){ 
+    		vxl.go.notifier.fire(vxl.events.MODELS_LOADED, self);
+    	}
+    	else{
+    	    vxl.go.notifier.fire(vxl.events.MODEL_NEW, self);
+    	}
 	}
 	
-	if(this.allLoaded()){ 
-		vxl.go.notifier.fire(vxl.events.MODELS_LOADED, this);
-	}
+	setTimeout(function(){scheduledAdd()},0);
  };
  
 /**
@@ -8938,10 +9000,10 @@ vxlModelManager.prototype.isModelLoaded = function(name){
 };
 
 /**
- * Returns true if all the models in the list passed to the method loadList.
+ * Returns true if all the models in the list passed to the method loadList have been loaded.
  */
 vxlModelManager.prototype.allLoaded = function(){
-	return (this.models.length == this.toLoad.length); //TODO: Verify one by one
+	return (this.toLoad.length == 0);
 };
 
 
@@ -9357,7 +9419,8 @@ wireframeON :  function(){
 	}
 	else{ //TODO: assuming string.VALIDATE!
 		_actor = scene.getActorByName(_actor);
-		_actor.setPropert(property,value);
+		if (_actor == undefined) throw 'The actor '+_actor+' does not belong to the current scene'
+		_actor.setProperty(property,value);
 	}
  },
  

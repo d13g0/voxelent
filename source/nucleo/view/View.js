@@ -70,18 +70,21 @@ function vxlView(canvasID, scene){
 	//Add this view to the scene;
 	this.scene.views.push(this);
 	
-	
-	//Namespace access updates
-	
-
-	vxl.go.notifier.subscribe(vxl.events.DEFAULT_LUT_LOADED,this);   
-	
 	if (vxl.c.view == undefined){
 		vxl.c.view = this;
 	}
 	
-	vxl.go.renderman._views.push(this);
+	vxl.go.views.push(this);
 	this.setAutoResize(true);
+	
+	this.UID = vxl.util.generateUID();
+
+
+    var ntf = vxl.go.notifier;
+    var e   = vxl.events;
+    ntf.publish(e.VIEW_NEW, this);
+    ntf.subscribe(e.DEFAULT_LUT_LOADED,this);
+    ntf.fire(e.VIEW_NEW, this);
 
 	vxl.go.console('View: the view '+ this.name+' has been created');
 };

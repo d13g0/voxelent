@@ -39,13 +39,17 @@ function vxlScene()
 	this.bb 					= [0, 0, 0, 0, 0, 0];
 	this.centre 				= [0, 0, 0];
 	this.frameAnimation			= null;
+	this.UID                    = vxl.util.generateUID();
 
 	if (vxl.c.scene  == null) vxl.c.scene 	= this;
+
+	vxl.go.scenes.push(this);
 	
 	var ntf = vxl.go.notifier;
-	var e = vxl.events;
-	ntf.publish([e.SCENE_UPDATED], this);
-	ntf.subscribe([e.MODELS_LOADED, e.DEFAULT_LUT_LOADED], this)
+    var e = vxl.events;
+    ntf.publish([e.SCENE_NEW, e.SCENE_UPDATED], this);
+    ntf.subscribe([e.MODELS_LOADED, e.DEFAULT_LUT_LOADED], this);
+	ntf.fire(e.SCENE_NEW, this);
 };
 
 /**

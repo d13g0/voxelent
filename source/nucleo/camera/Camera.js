@@ -394,8 +394,13 @@ vxlCamera.prototype._setInitialMatrix = function(){
     mat4.translate(this.matrix, this.focalPoint);
     mat4.rotateY  (this.matrix, this.azimuth   * Math.PI / 180);
     mat4.rotateX  (this.matrix, this.elevation * Math.PI / 180);
-    mat4.translate(this.matrix, vec3.negate(this.focalPoint, vec3.create()));
-    mat4.translate(this.matrix, this.position);
+    var r = vec3.subtract(this.position, this.focalPoint, vec3.create());
+    mat4.translate(this.matrix, r);
+    //vec3.negate(this.cRot, vec3.create()));
+    //mat4.translate(this.matrix, this.position);
+    
+    var pos  = vec3.set(mat4.multiplyVec4(this.matrix, [0, 0, 0, 1]), vec3.create());
+    this._updateCentreRotation(pos);
 };
 
 /**
@@ -419,15 +424,24 @@ vxlCamera.prototype._updateMatrix = function(){
         var rotQ = quat4.multiply(rotY, rotX, quat4.create());
         var rotMatrix = quat4.toMat4(rotQ);
     
+        var r = vec3.subtract(this.position, this.focalPoint, vec3.create());
+        
         mat4.translate(this.matrix, this.cRot)
         mat4.multiply(this.matrix, rotMatrix);
         mat4.translate(this.matrix, vec3.negate(this.cRot, vec3.create()));
+        
     
         this.relAzimuth = 0;
         this.relElevation = 0;
     } 
 };
 
+/**
+ * Uses the current camera axes as the standard rotation and translation axes 
+ */
+vxlCamera.prototype.setAxes = function(){
+    this._updateAxes();
+};
 /**
  * Updates the x,y and z axis of the camera according to the current camera matrix.
  * This is useful when one needs to know the values of the axis and operate with them directly.
@@ -468,8 +482,11 @@ vxlCamera.prototype._updateDistance = function(){
  * update the position or the focal point
  * @private
  */
-vxlCamera.prototype._updateCentreRotation = function(){
-    this.cRot = vec3.subtract(this.focalPoint, this.position, vec3.create());
+vxlCamera.prototype._updateCentreRotation = function(pos){
+    if (pos == undefined) {
+        pos = this.position;
+    }
+    this.cRot = vec3.subtract(this.focalPoint, pos, vec3.create());
     var cMat = mat4.inverse(mat4.toRotationMat(this.matrix), mat4.create());
     mat4.multiplyVec3(cMat, this.cRot);
 };

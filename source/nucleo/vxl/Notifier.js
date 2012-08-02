@@ -117,21 +117,29 @@ vxlNotifier.prototype._addSource = function(event,src){
  * @param {Object} src
  */
 vxlNotifier.prototype.fire = function(event, src){
-	var targetList = this.targetList;
-	
-    var idx = this.sourceList[event].indexOf(src);
-    if (idx == -1){
-    	throw 'The source '+src+' is not registered to trigger the event '+event+'. Did you use vxlNotifier.publish?';
-    }
-	vxl.go.console('vxlNotifier: firing ' +event);
-	
-	var targets = this.targetList[event];
-	
-	for (var index=0;index<targets.length;index++){
-         targets[index].handleEvent(event,src);
-    }
-	//$(document).trigger(event,[event,src,targetList]);
+    
+    var self = this;
+    
+    function processEvent(){
+    	var targetList = self.targetList;
+        var idx = self.sourceList[event].indexOf(src);
+        if (idx == -1){
+        	throw 'The source '+src+' is not registered to trigger the event '+event+'. Did you use vxlNotifier.publish?';
+        }
+    	vxl.go.console('vxlNotifier: firing ' +event);
+    	
+    	var targets = self.targetList[event];
+    	
+    	for (var index=0;index<targets.length;index++){
+             targets[index].handleEvent(event,src);
+        }
+	}
+	processEvent();
+	setTimeout(function(){processEvent()},0)
 };
+
+
+
 
 /**
  * Gets a list of the events handled by this vxlNotifier 

@@ -10,12 +10,16 @@
 		<meta name='robots' content='all'>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name='keywords' content='webgl, webgl platform, medical imaging, webgl api'>
-		<script src="lib/jquery.js" type="text/javascript"></script>
-		<script type='text/javascript' src='lib/voxelent_v0.87.6.js'></script>
+		<link rel='stylesheet' type='text/css' href='css/jquery-ui-bs/theme.css'/>
+
+        <script src="lib/jquery.js" type="text/javascript"> </script>
+        <script src="lib/jquery-ui.js" type="text/javascript"> </script>
+        <script type='text/javascript' src='lib/voxelent_v0.87.6.js'> </script>
+        <script type='text/javascript' src='lib/vox-gui_v0.1.js'> </script>
 
 		<title>Voxelent - Heart Demo</title>
 		<script type='text/javascript' id='code-js'>
-			var view, scene, animation, view2;
+			var view, scene, animation, gui;
 
 			function runVoxApp() {
 
@@ -26,7 +30,7 @@
 				//1. Setup the view
 				view = vxl.api.setup('view-1');
 				scene = view.scene;
-				
+				gui   = new vxlGUI(view);
 				
 				
 
@@ -101,11 +105,9 @@
 					//Set up the camera
 					cam.setPosition([0, 0, 500]);
 					cam.setElevation(90);
-					
 					//Start the animation at 100ms per frame
 					animation.start(100);
 
-					$('#overlay-div').html('DONE').fadeOut(600);
 					
 				} 
 			};
@@ -119,18 +121,7 @@
      position: relative;
 }
 
-.overlay {
-    background: rgba(100,100,100,0.5);
-    padding: 5px;
-    width: 170px;
-    height: 8%;
-    position: absolute;
-    top: 4px;
-    right: 6px;
-    font-size:13px;
-    font-family: Arial,Helvetica;
-    color: white;
-}
+
 
 </style> 
 
@@ -149,9 +140,6 @@
 			Your browser does not support WebGL :-(
 		</p>
 	</canvas>
-    <div id ='overlay-div' class='overlay'>
-      <p id='status'>Loading models...</p>
-    </div>  
     </div>
     
 </body>    

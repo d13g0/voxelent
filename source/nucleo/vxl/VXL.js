@@ -168,11 +168,15 @@ def : {
 events : {
 	DEFAULT_LUT_LOADED 	   : 'vxl.events.DEFAULT_LUT_LOADED',
 	SCENE_UPDATED		   : 'vxl.events.SCENE_UPDATED',
+	MODELS_LOADING         : 'vxl.events.MODELS_LOADING',
+	MODEL_NEW              : 'vxl.events.MODEL_NEW',
 	MODELS_LOADED		   : 'vxl.events.MODELS_LOADED',
 	ACTOR_MOVED            : 'vxl.events.ACTOR_MOVED',
 	ACTOR_SCALED           : 'vxl.events.ACTOR_SCALED',
 	ACTOR_CHANGED_COLOR    : 'vxl.events.ACTOR_CHANGED_COLOR',
-	ACTOR_CHANGED_SHADING  : 'vxl.events.ACTOR_CHANGED_SHADING'
+	ACTOR_CHANGED_SHADING  : 'vxl.events.ACTOR_CHANGED_SHADING',
+	VIEW_NEW               : 'vxl.events.VIEW_NEW',
+	SCENE_NEW              : 'vxl.events.SCENE_NEW'
 },
 
 
@@ -189,16 +193,17 @@ go : {
     notifier            : undefined,
     modelManager        : undefined,
     lookupTableManager  : undefined,
+    views               : [],
+    scenes              : [],
     renderman : {
 
 		_timid : 0,
 		_rates : [],
-		_views : [],
 		_stop  : false,
 		
 		render : function(){
-			for(var i=0; i<vxl.go.renderman._views.length;i+=1){
-				vxl.go.renderman._views[i].renderer.render();
+			for(var i=0; i<vxl.go.views.length;i+=1){
+				vxl.go.views[i].renderer.render();
 			}
 			if (vxl.go.renderman._stop != true){
 			 vxl.go.renderman._timid = window.requestAnimFrame(vxl.go.renderman.render);

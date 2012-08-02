@@ -57,7 +57,7 @@ def pack(VOX_VERSION_NUMBER):
     
     
     vox_files = [os.path.join(root,name)
-                 for root, dirs, files in os.walk(".."+SEP+"source") #in windows replace / with \\
+                 for root, dirs, files in os.walk(".."+SEP+"source"+SEP+"nucleo")
                  for name in files
                  if name.endswith(".js")]
 

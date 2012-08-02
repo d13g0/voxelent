@@ -6,24 +6,30 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name='keywords' content='webgl, webgl platform, medical imaging, webgl api'>
 
-<script type="text/javascript" src="lib/jquery.js" ></script>
-<script type="text/javascript" src="lib/jquery-ui.js" ></script>
-<script type='text/javascript' src='lib/voxelent_v0.87.6.js'></script>
+<link rel='stylesheet' type='text/css' href='css/jquery-ui-bs/theme.css'/>
 
-<link rel='stylesheet' type='text/css' href='css/jquery-ui/theme-1.css'/>
+<script src="lib/jquery.js" type="text/javascript"> </script>
+<script src="lib/jquery-ui.js" type="text/javascript"> </script>
+<script type='text/javascript' src='lib/voxelent_v0.87.6.js'> </script>
+<script type='text/javascript' src='lib/vox-gui_v0.1.js'> </script>
 
 <title>Voxelent - Demo Brain</title>
 <script type='text/javascript' id='code-js'>
 
+
+    
 	function runVoxApp(){
 		
-		vxl.go.debug = true;
 	    vxl.go.notifier.subscribe(vxl.events.MODELS_LOADED, this);
 	    
 	    vxl.api.loadLUTS('assets/tables');
 	    
 	
-	    vxl.api.setup('view-1');
+	    vxl.api.setup('view-1');  // as there are no other views, this one becomes vxl.c.view
+	    
+	    var gui = new vxlGUI(vxl.c.view); //and can be used here
+	    
+	    
 	    var list = ["part1.json",
 	    			"part2.json",
 	    			"part3.json",
@@ -31,18 +37,16 @@
 	    			"part5.json",
 	    			"part6.json"];
 	    
-	
+	     
 	    vxl.api.load(list,'assets/models/brain',vxl.def.model.loadingMode.LATER);
 	    vxl.c.view.start();
 	}
 	
 	function handleEvent(event, src){
-	    if (event == vxl.events.MODELS_LOADED){
-	    	vxl.api.setLookupTable('default');
-	    	vxl.c.camera.longShot();
-	    	vxl.api.boundingBoxON();
-	    	$('#overlay-div').fadeIn(3000);
-	    }
+    	vxl.api.setLookupTable('default');
+    	vxl.c.camera.longShot();
+    	vxl.api.boundingBoxON();
+    	$('#overlay-div').fadeIn(3000);
 	}
 </script>
         
@@ -59,9 +63,9 @@
 
 .overlay {
     background: rgba(100,100,100,0.5);
-    padding: 5px;
-    width: 150px;
-    height: 20%;
+    padding: 10px;
+    width: 170px;
+    height: 30%;
     position: absolute;
     top: 5px;
     right: 5px;
@@ -69,6 +73,11 @@
     font-family: Arial,Helvetica;
     color: white;
     display: none;
+}
+
+.overlay p {
+    padding-left:10px;
+    padding-right:10px;
 }
 
 </style> 
@@ -88,16 +97,20 @@
       <p> Alt + Left Click + Drag: Camera dollying</p>
       <p> Shift + Left Click + Drag: Camera panning</p>
       <p>
-      <input type='checkbox' id='toggleMesh'/><label for='toggleMesh'>Show Wireframe</label>
+      <button class='ui-button-success' id='toggleMesh'> Show Wireframe</button>
       </p> 
+      <p>
+          Opacity: <div id='op-slider-id'> </div>
+      </p>
     </div>  
 </div>
 
 <script>
-
+//JQuery UI code
+var stateSolid = true;
 $('#toggleMesh').button().click(
     function(){
-        if (this.checked){
+        if (stateSolid){
             vxl.api.wireframeON();
             $('#toggleMesh').button('option','label','Show Surface');
         }
@@ -105,8 +118,35 @@ $('#toggleMesh').button().click(
             vxl.api.surfaceON();
             $('#toggleMesh').button('option','label','Show Wireframe');
         }
+        stateSolid = !stateSolid;
     }
 );
+
+function changeOpacity(){
+    var v = $('#op-slider-id').slider('value');
+    
+    var gl = vxl.c.view.renderer.gl;
+    
+    if (v < 1){
+        //gl.disable(gl.DEPTH_TEST);
+        gl.enable(gl.BLEND);
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.BACK);
+        vxl.api.setUniform('uLightDiffuse',[0.5,0.5,0.5,1.0]);
+    }
+    else{
+        //gl.enable(gl.DEPTH_TEST);
+        gl.disable(gl.BLEND);
+        gl.disable(gl.CULL_FACE);
+        vxl.api.setUniform('uLightDiffuse',[1.0,1.0,1.0,1.0]);
+    }
+    
+    vxl.api.setPropertyForAll('opacity', v);    
+}
+
+$('#op-slider-id').slider({max:1, min:0, step:0.05, value:1, slide: changeOpacity, change: changeOpacity});
+
+
 </script>
 </body>
 </html>

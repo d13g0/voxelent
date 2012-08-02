@@ -36,6 +36,17 @@ vxlBasicStrategy.prototype.constructor = vxlBasicStrategy;
 function vxlBasicStrategy(renderer){
 	vxlRenderStrategy.call(this,renderer);
 	this._gl_buffers  = {};
+	
+	if (renderer){
+	var gl = this.renderer.gl;
+	
+	gl.enable(gl.BLEND);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	gl.enable(gl.DEPTH_TEST);
+	gl.depthFunc(gl.LESS);
+	gl.clearDepth(1.0);
+	gl.disable(gl.CULL_FACE);
+    }	
 }
 
 /**
@@ -190,13 +201,9 @@ vxlBasicStrategy.prototype._renderActor = function(actor){
 	var diffuse = [actor.color[0], actor.color[1], actor.color[2],1.0];
 	
 	if (actor.opacity < 1.0){
-		gl.disable(gl.DEPTH_TEST);
-		gl.enable(gl.BLEND);
 		diffuse[3] = actor.opacity;
 	}
 	else {
-		gl.enable(gl.DEPTH_TEST);
-		gl.disable(gl.BLEND);
 		diffuse[3] = 1.0;
 	}
 	

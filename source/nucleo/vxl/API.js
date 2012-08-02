@@ -396,7 +396,8 @@ wireframeON :  function(){
 	}
 	else{ //TODO: assuming string.VALIDATE!
 		_actor = scene.getActorByName(_actor);
-		_actor.setPropert(property,value);
+		if (_actor == undefined) throw 'The actor '+_actor+' does not belong to the current scene'
+		_actor.setProperty(property,value);
 	}
  },
  
