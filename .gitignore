@@ -37,3 +37,4 @@ c4n3l4/
 *.pyc
 .settings
 .html~
+.gitignore~
