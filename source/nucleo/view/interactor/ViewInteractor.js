@@ -65,6 +65,18 @@ vxlViewInteractor.prototype.connectView = function(view){
         interactor.onMouseMove(ev);
     };
     
+    canvas.ondragover = function(ev){
+        interactor.onDragOver(ev);
+    };
+    
+    canvas.ondragleave = function(ev){
+        interactor.onDragLeave(ev);
+    };
+    
+    canvas.ondrop = function(ev){
+        interactor.onDrop(ev);
+    };
+    
     window.onkeydown = function(ev){
         interactor.onKeyDown(ev);
     };
@@ -114,5 +126,23 @@ vxlViewInteractor.prototype.onKeyDown   = function(ev){ alert('implement onKeyDo
  * @param {Object} ev
  */
 vxlViewInteractor.prototype.onKeyUp     = function(ev){ alert('implement onKeyUp');};
+/**
+ * Abstract method to be implemented by the descendants 
+ * @param {Object} ev
+ */
+vxlViewInteractor.prototype.onDragOver     = function(ev){ alert('implement onDragOver');};
+/**
+ * Abstract method to be implemented by the descendants 
+ * @param {Object} ev
+ */
+vxlViewInteractor.prototype.onDragLeave     = function(ev){ alert('implement onDragLeave');};
+
+/**
+ * Abstract method to be implemented by the descendants 
+ * @param {Object} ev
+ */
+vxlViewInteractor.prototype.onDrop     = function(ev){ alert('implement onDrop');};
+
+
 
 

@@ -1,0 +1,60 @@
+@charset "utf-8";
+/* CSS Document */
+
+body,
+html {
+	background-color: #FCFCFC;
+	font: 14px "Lucida Grande", Tahoma, Arial, Helvetica, sans-serif;
+	margin: 5px;
+	color: #666666;
+
+	
+}
+
+canvas{
+	cursor: move;
+
+-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	-o-border-radius: 6px;
+	-ms-border-radius: 6px;
+	-khtml-border-radius: 6px;
+	border-radius: 6px;
+	
+}
+
+a{ color:#00A9E0; text-decoration:none;}
+a:hover{ color:#333; text-decoration:underline;}
+h2{ font-family: "VegurRegular", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size:26px; color:#00A9E0; font-weight:lighter;}
+h3{ font-family: "VegurRegular", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size:33px; color:#00A9E0; font-weight:lighter;}
+
+
+
+h1, h2, h3, h4, h5, h6 { font-weight: bold; color: #333333; }
+h1, h2, h3, h4, h5, h6 { margin-bottom: 15px; }
+h4, h5, h6 { margin-bottom: 10px; }
+h1, h2, h3, h4 { letter-spacing: -0.5px; }
+h1 { font-size: 24px; line-height: 30px; }
+h2 { font-size: 22px; line-height: 26px;}
+h3 { font-size: 20px; line-height: 24px;}
+h4 { font-size: 18px; line-height: 24px;}
+h5 { font-size: 16px; line-height: 20px;}
+h6 { font-size: 14px; line-height: 18px;}
+
+h1{
+	color:#00A9E0;
+	}
+
+h2{
+	color:#1874CD;
+	}
+
+
+h3{
+	color:#104E8B;
+	}
+
+
+
+
+

@@ -38,6 +38,7 @@ function vxlTrackerInteractor(view,camera){
 	this.keyPressed = 0;
 	this.button = -1;
 	this.dragging = false;
+	this.dragndrop = false;
 };
 
 /**
@@ -199,3 +200,31 @@ vxlTrackerInteractor.prototype.pan = function(dx,dy){
 	camera.pan(ndx,ndy);
 };
 
+
+vxlTrackerInteractor.prototype.onDragOver = function(event){
+    event.stopPropagation();
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+};
+
+vxlTrackerInteractor.prototype.onDragLeave = function(event){
+    event.stopPropagation();
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+    
+};
+
+vxlTrackerInteractor.prototype.onDrop = function(event){
+    event.stopPropagation();
+    event.preventDefault();
+    if (!this.view.dragndrop) return; //the view is configured to not accept dnd
+    
+    var files = event.dataTransfer.files;
+    var reader = new vxlVTKReader(this.view.scene);
+    if (reader.isSupported()){
+        reader.read(files[0]);
+    }
+    else {
+        throw 'vxlTrackerInteractor.drop: File API is not supported on this browser';
+    }
+};

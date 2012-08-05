@@ -38,12 +38,16 @@ function vxlView(canvasID, scene){
 		throw('View: the canvas ' + canvasID+ ' does not exist.');
 	}
 	
-
+    //View dimensions
 	this.width = this.canvas.width;
 	this.height = this.canvas.height;
 	
+	//Clear depth and background color
 	this.clearDepth = 1.0;
 	this.backgroundColor = vxl.def.view.background.slice(0);
+	
+	//Drag and drop
+	this.dragndrop = false;
 
 	//Create Renderer
 	this.renderer = new vxlRenderer(this);
@@ -209,4 +213,12 @@ vxlView.prototype.refresh = function(){
     this.interactor = i;
     this.interactor.connectView(this);
 };
+
+/**
+ *Sets the drag and drop flag 
+ * @param {Boolean} flag
+ */
+vxlView.prototype.setDragAndDrop = function(flag){
+    this.dragndrop = flag;
+}
 

@@ -48,7 +48,7 @@ function vxlModel(name, JSON_OBJECT){
  */
 vxlModel.prototype.load = function(nm,JSON_OBJECT){
 	this.name		= nm;
-	if (JSON_OBJECT.name != null){
+	if (JSON_OBJECT.name != null){ //if the name is defined in the JSON object, then use it
 		this.name = JSON_OBJECT.name;
 	}
 	

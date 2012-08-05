@@ -26,523 +26,361 @@
 <span class='line'> 19</span>  * @class
 <span class='line'> 20</span>  * @constructor 
 <span class='line'> 21</span>  */</span><span class="WHIT">
-<span class='line'> 22</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">vxlVTKReader</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 22</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">vxlVTKReader</span><span class="PUNC">(</span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 23</span> 
-<span class='line'> 24</span> </span><span class="WHIT">    </span><span class="NAME">this.ARRAY_SIZE</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">65536</span><span class="PUNC">*</span><span class="NUMB">3</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 25</span> </span><span class="WHIT">    </span><span class="NAME">this.vertices</span><span class="WHIT">   </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 26</span> </span><span class="WHIT">    </span><span class="NAME">this.indices</span><span class="WHIT">    </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 27</span> </span><span class="WHIT">    </span><span class="NAME">this.normals</span><span class="WHIT">    </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 28</span> </span><span class="WHIT">    </span><span class="NAME">this.scalars</span><span class="WHIT">    </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 29</span> </span><span class="WHIT">    </span><span class="NAME">this.colors</span><span class="WHIT">     </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 30</span> 
-<span class='line'> 31</span> </span><span class="WHIT">    </span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"SOLID"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 24</span> </span><span class="WHIT">    </span><span class="NAME">this.scene</span><span class="WHIT">      </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">//the scene that will be updated</span><span class="WHIT">
+<span class='line'> 25</span> </span><span class="WHIT">    </span><span class="NAME">this.ARRAY_SIZE</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">65536</span><span class="PUNC">*</span><span class="NUMB">3</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 26</span> </span><span class="WHIT">    </span><span class="NAME">this.vertices</span><span class="WHIT">   </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 27</span> </span><span class="WHIT">    </span><span class="NAME">this.indices</span><span class="WHIT">    </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 28</span> </span><span class="WHIT">    </span><span class="NAME">this.normals</span><span class="WHIT">    </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 29</span> </span><span class="WHIT">    </span><span class="NAME">this.scalars</span><span class="WHIT">    </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 30</span> </span><span class="WHIT">    </span><span class="NAME">this.colors</span><span class="WHIT">     </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 31</span> </span><span class="WHIT">    
 <span class='line'> 32</span> 
-<span class='line'> 33</span> </span><span class="WHIT">    </span><span class="NAME">this.tags</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 34</span> </span><span class="WHIT">        </span><span class="NAME">NOWHERE</span><span class="WHIT">             </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">    
-<span class='line'> 35</span>         </span><span class="NAME">POINTS</span><span class="WHIT">              </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 36</span> </span><span class="WHIT">        </span><span class="NAME">LINES</span><span class="WHIT">               </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 37</span> </span><span class="WHIT">        </span><span class="NAME">POLYGONS</span><span class="WHIT">            </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">3</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 38</span> </span><span class="WHIT">        </span><span class="NAME">POINT_DATA</span><span class="WHIT">          </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">4</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 39</span> </span><span class="WHIT">        </span><span class="NAME">NORMALS</span><span class="WHIT">             </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">5</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 40</span> </span><span class="WHIT">        </span><span class="NAME">CELL_DATA</span><span class="WHIT">           </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">6</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 41</span> </span><span class="WHIT">        </span><span class="NAME">TEXTURE_COORDINATES</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">7</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 42</span> </span><span class="WHIT">        </span><span class="NAME">SCALARS</span><span class="WHIT">             </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">8</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 43</span> </span><span class="WHIT">        </span><span class="NAME">LOOKUP_TABLE</span><span class="WHIT">        </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">9</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 44</span> </span><span class="WHIT">        </span><span class="NAME">COLOR_SCALARS</span><span class="WHIT">       </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">10</span><span class="WHIT">
-<span class='line'> 45</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 46</span> </span><span class="WHIT">    
-<span class='line'> 47</span>     </span><span class="NAME">this.parts</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 33</span>     </span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"SOLID"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 34</span> 
+<span class='line'> 35</span> </span><span class="WHIT">    </span><span class="NAME">this.tags</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 36</span> </span><span class="WHIT">        </span><span class="NAME">NOWHERE</span><span class="WHIT">             </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">    
+<span class='line'> 37</span>         </span><span class="NAME">POINTS</span><span class="WHIT">              </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 38</span> </span><span class="WHIT">        </span><span class="NAME">LINES</span><span class="WHIT">               </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 39</span> </span><span class="WHIT">        </span><span class="NAME">POLYGONS</span><span class="WHIT">            </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">3</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 40</span> </span><span class="WHIT">        </span><span class="NAME">POINT_DATA</span><span class="WHIT">          </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">4</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 41</span> </span><span class="WHIT">        </span><span class="NAME">NORMALS</span><span class="WHIT">             </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">5</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 42</span> </span><span class="WHIT">        </span><span class="NAME">CELL_DATA</span><span class="WHIT">           </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">6</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 43</span> </span><span class="WHIT">        </span><span class="NAME">TEXTURE_COORDINATES</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">7</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 44</span> </span><span class="WHIT">        </span><span class="NAME">SCALARS</span><span class="WHIT">             </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">8</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 45</span> </span><span class="WHIT">        </span><span class="NAME">LOOKUP_TABLE</span><span class="WHIT">        </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">9</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 46</span> </span><span class="WHIT">        </span><span class="NAME">COLOR_SCALARS</span><span class="WHIT">       </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">10</span><span class="WHIT">
+<span class='line'> 47</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 48</span> </span><span class="WHIT">    
-<span class='line'> 49</span>     </span><span class="NAME">vxl.go.notifier.publish</span><span class="PUNC">(</span><span class="NAME">vxl.events.READER_DONE</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 50</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 51</span> 
-<span class='line'> 52</span> </span><span class="COMM">/**
-<span class='line'> 53</span>  * Verifies if the HTML5 API is available. 
-<span class='line'> 54</span>  */</span><span class="WHIT">
-<span class='line'> 55</span> </span><span class="NAME">vxlVTKReader.prototype.isSupported</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 56</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">window.File</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">window.FileReader</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">window.FileList</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">window.Blob</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 57</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 58</span> 
-<span class='line'> 59</span> 
-<span class='line'> 60</span> </span><span class="COMM">/**
-<span class='line'> 61</span>  * @param {File} file an HTML5 File object
-<span class='line'> 62</span>  */</span><span class="WHIT">
-<span class='line'> 63</span> </span><span class="NAME">vxlVTKReader.prototype.read</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">file</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 64</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">vtkReader</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 65</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">filename</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">file.name</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 66</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">reader</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">FileReader</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 67</span> </span><span class="WHIT">    
-<span class='line'> 68</span>     </span><span class="NAME">reader.onload</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">event</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 69</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">contents</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">event.target.result.trim</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 70</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">lines</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">contents.split</span><span class="PUNC">(</span><span class="REGX">/\r\n|\r|\n/</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 71</span> </span><span class="WHIT">        </span><span class="NAME">vtkReader._parse</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">  
-<span class='line'> 72</span>         </span><span class="NAME">vtkReader._processIndexBlocks</span><span class="PUNC">(</span><span class="NAME">filename</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 73</span> </span><span class="WHIT">        </span><span class="NAME">vxl.go.notifier.fire</span><span class="PUNC">(</span><span class="NAME">vxl.events.READER_DONE</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">vtkReader</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 74</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 75</span> </span><span class="WHIT">    
-<span class='line'> 76</span>     </span><span class="NAME">reader.readAsText</span><span class="PUNC">(</span><span class="NAME">file</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 77</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 78</span> 
-<span class='line'> 79</span> </span><span class="COMM">/**
-<span class='line'> 80</span>  * Reads the file line by line and populates the respective arrays
-<span class='line'> 81</span>  */</span><span class="WHIT">
-<span class='line'> 82</span> </span><span class="NAME">vxlVTKReader.prototype._parse</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 83</span> </span><span class="COMM">/*
-<span class='line'> 84</span>  *  outputfile = ''
-<span class='line'> 85</span>     numBlocks = 0
-<span class='line'> 86</span>     global mode
-<span class='line'> 87</span>     location = NOWHERE
-<span class='line'> 88</span>     linenumber = 0
-<span class='line'> 89</span>         */</span><span class="WHIT">
-<span class='line'> 90</span> </span><span class="WHIT">       
-<span class='line'> 91</span>        </span><span class="NAME">this.outputfile</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">''</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 92</span> </span><span class="WHIT">       </span><span class="NAME">this.numBlocks</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 93</span> </span><span class="WHIT">       </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'NOWHERE'</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 94</span> </span><span class="WHIT">       </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">linenumber</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 95</span> </span><span class="WHIT">       
-<span class='line'> 96</span>        
-<span class='line'> 97</span>        </span><span class="COMM">/*
-<span class='line'> 98</span>     for line in open(filename, 'r').readlines():
-<span class='line'> 99</span>         linenumber = linenumber + 1
-<span class='line'>100</span>         */</span><span class="WHIT">
-<span class='line'>101</span> </span><span class="WHIT">       </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">linenumber</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">linenumber</span><span class="PUNC">&lt;</span><span class="NAME">lines.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">linenumber</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>102</span> </span><span class="WHIT">       </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>103</span> </span><span class="WHIT">        
-<span class='line'>104</span>            </span><span class="KEYW">try</span><span class="WHIT">
-<span class='line'>105</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>106</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'POINTS'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>107</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>108</span> </span><span class="WHIT">                        </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>109</span> </span><span class="WHIT">                        </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.POINTS</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>110</span> </span><span class="WHIT">                        </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>111</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>112</span> </span><span class="WHIT">                    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'LINES'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>113</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>114</span> </span><span class="WHIT">                        </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>115</span> </span><span class="WHIT">                        </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.LINES</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>116</span> </span><span class="WHIT">                        </span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"LINES"</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>117</span> </span><span class="WHIT">                        </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>118</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>119</span> </span><span class="WHIT">                    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'POLYGONS'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>120</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>121</span> </span><span class="WHIT">                        </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>122</span> </span><span class="WHIT">                        </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.POLYGONS</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>123</span> </span><span class="WHIT">                        </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>124</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>125</span> </span><span class="WHIT">                    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'POINT_DATA'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>126</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">                   
-<span class='line'>127</span>                         </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.POINT_DATA</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>128</span> </span><span class="WHIT">                        </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>129</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>130</span> </span><span class="WHIT">                    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'NORMALS'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>131</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">      
-<span class='line'>132</span>                         </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">             
-<span class='line'>133</span>                         </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.NORMALS</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>134</span> </span><span class="WHIT">                        </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>135</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>136</span> </span><span class="WHIT">                    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'CELL_DATA'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>137</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">      
-<span class='line'>138</span>                         </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">             
-<span class='line'>139</span>                         </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.CELL_DATA</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>140</span> </span><span class="WHIT">                        </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>141</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>142</span> </span><span class="WHIT">                    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'TEXTURE_COORDINATES'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>143</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">      
-<span class='line'>144</span>                         </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">             
-<span class='line'>145</span>                         </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.TEXTURE_COORDINATES</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>146</span> </span><span class="WHIT">                        </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>147</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>148</span> </span><span class="WHIT">                    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'SCALARS'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>149</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">      
-<span class='line'>150</span>                         </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">             
-<span class='line'>151</span>                         </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.SCALARS</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>152</span> </span><span class="WHIT">                        </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>153</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>154</span> </span><span class="WHIT">                    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'LOOKUP_TABLE'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>155</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">      
-<span class='line'>156</span>                         </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">             
-<span class='line'>157</span>                         </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.LOOKUP_TABLE</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>158</span> </span><span class="WHIT">                        </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>159</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">   
-<span class='line'>160</span>                     </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'COLOR_SCALARS'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>161</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">      
-<span class='line'>162</span>                         </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">             
-<span class='line'>163</span>                         </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.COLOR_SCALARS</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>164</span> </span><span class="WHIT">                        </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>165</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">           
-<span class='line'>166</span>                     </span><span class="COMM">// -------------------</span><span class="WHIT">
-<span class='line'>167</span> </span><span class="WHIT">                    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">this.tags.POINTS</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>168</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>169</span> </span><span class="WHIT">                        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">v</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">trim</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">split</span><span class="PUNC">(</span><span class="STRN">' '</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>170</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">v</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>171</span> </span><span class="WHIT">                        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">v.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>172</span> </span><span class="WHIT">                        </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>173</span> </span><span class="WHIT">                             </span><span class="NAME">this.vertices.push</span><span class="PUNC">(</span><span class="NAME">parseFloat</span><span class="PUNC">(</span><span class="NAME">v</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>174</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>175</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>176</span> </span><span class="WHIT">                    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">this.tags.LINES</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>177</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>178</span> </span><span class="WHIT">                        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">tt</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">trim</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">split</span><span class="PUNC">(</span><span class="STRN">' '</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>179</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">tt</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>180</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">tt.length</span><span class="PUNC">></span><span class="NUMB">0</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">tt</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">'2'</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>181</span> </span><span class="WHIT">                        </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>182</span> </span><span class="WHIT">                            </span><span class="NAME">this.indices.push</span><span class="PUNC">(</span><span class="NAME">parseInt</span><span class="PUNC">(</span><span class="NAME">tt</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>183</span> </span><span class="WHIT">                            </span><span class="NAME">this.indices.push</span><span class="PUNC">(</span><span class="NAME">parseInt</span><span class="PUNC">(</span><span class="NAME">tt</span><span class="PUNC">[</span><span class="NUMB">2</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>184</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>185</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>186</span> </span><span class="WHIT">                   </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">this.tags.POLYGONS</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="COMM">//they have to be triangles</span><span class="WHIT">
-<span class='line'>187</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>188</span> </span><span class="WHIT">                        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">tt</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">trim</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">split</span><span class="PUNC">(</span><span class="STRN">' '</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>189</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">tt</span><span class="PUNC">==</span><span class="STRN">""</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT"> 
-<span class='line'>190</span>                         </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">tt.length</span><span class="PUNC">></span><span class="NUMB">0</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">tt</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="STRN">'3'</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>191</span> </span><span class="WHIT">                        </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>192</span> </span><span class="WHIT">                            </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="STRN">"Not triangles here"</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>193</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>194</span> </span><span class="WHIT">                        </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">tt.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>195</span> </span><span class="WHIT">                        </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>196</span> </span><span class="WHIT">                            </span><span class="NAME">this.indices.push</span><span class="PUNC">(</span><span class="NAME">parseInt</span><span class="PUNC">(</span><span class="NAME">tt</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>197</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>198</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>199</span> </span><span class="WHIT">                    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">this.tags.LOOKUP_TABLE</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>200</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>201</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'LOOKUP_TABLE'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>202</span> </span><span class="WHIT">                            </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>203</span> </span><span class="WHIT">                        </span><span class="KEYW">else</span><span class="WHIT">
-<span class='line'>204</span> </span><span class="WHIT">                        </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>205</span> </span><span class="WHIT">                            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pd</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">trim</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">split</span><span class="PUNC">(</span><span class="STRN">' '</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>206</span> </span><span class="WHIT">                            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">pd</span><span class="PUNC">==</span><span class="STRN">""</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>207</span> </span><span class="WHIT">                            </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">pd.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>208</span> </span><span class="WHIT">                            </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>209</span> </span><span class="WHIT">                                </span><span class="NAME">this.scalars.push</span><span class="PUNC">(</span><span class="NAME">parseFloat</span><span class="PUNC">(</span><span class="NAME">pd</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>210</span> </span><span class="WHIT">                            </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>211</span> </span><span class="WHIT">                       </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>212</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>213</span> </span><span class="WHIT">                    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">this.tags.COLOR_SCALARS</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>214</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>215</span> </span><span class="WHIT">                        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">trim</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">split</span><span class="PUNC">(</span><span class="STRN">' '</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>216</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">==</span><span class="STRN">""</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>217</span> </span><span class="WHIT">                        </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">n.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>218</span> </span><span class="WHIT">                        </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>219</span> </span><span class="WHIT">                            </span><span class="NAME">this.colors.push</span><span class="PUNC">(</span><span class="NAME">parseFloat</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>220</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>221</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>222</span> </span><span class="WHIT">                    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">this.tags.NORMALS</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>223</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>224</span> </span><span class="WHIT">                        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">trim</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">split</span><span class="PUNC">(</span><span class="STRN">' '</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>225</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">==</span><span class="STRN">""</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>226</span> </span><span class="WHIT">                        </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">n.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>227</span> </span><span class="WHIT">                        </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>228</span> </span><span class="WHIT">                            </span><span class="NAME">this.normals.push</span><span class="PUNC">(</span><span class="NAME">parseFloat</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>229</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>230</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>231</span> </span><span class="WHIT">               </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="COMM">// end try</span><span class="WHIT">
-<span class='line'>232</span> </span><span class="WHIT">            </span><span class="KEYW">catch</span><span class="PUNC">(</span><span class="NAME">err</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>233</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>234</span> </span><span class="WHIT">                </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="STRN">'Error while processing line '</span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">linenumber.toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>235</span> </span><span class="WHIT">                </span><span class="COMM">//console.log(lines) // what is this for??</span><span class="WHIT">
-<span class='line'>236</span> </span><span class="WHIT">                </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="NAME">err</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>237</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>238</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// end foor loop</span><span class="WHIT">
-<span class='line'>239</span> </span><span class="WHIT">       </span><span class="COMM">/*
-<span class='line'>240</span>         try:
-<span class='line'>241</span>             if line.startswith('POINTS'):
-<span class='line'>242</span>                 print(line)
-<span class='line'>243</span>                 location = POINTS
-<span class='line'>244</span>                 continue
-<span class='line'>245</span>             elif line.startswith('LINES'):
-<span class='line'>246</span>                 print(line)
-<span class='line'>247</span>                 location = LINES
-<span class='line'>248</span>                 mode = "LINES"
-<span class='line'>249</span>                 continue
-<span class='line'>250</span>             elif line.startswith('POLYGONS'):
-<span class='line'>251</span>                 print(line)
-<span class='line'>252</span>                 location = POLYGONS
-<span class='line'>253</span>                 continue
-<span class='line'>254</span>             elif line.startswith('POINT_DATA'):
-<span class='line'>255</span>                 location = POINT_DATA
-<span class='line'>256</span>                 continue
-<span class='line'>257</span>             elif line.startswith('NORMALS'):
-<span class='line'>258</span>                 print(line)
-<span class='line'>259</span>                 location = NORMALS
-<span class='line'>260</span>                 continue
-<span class='line'>261</span>             elif line.startswith('CELL_DATA'):
-<span class='line'>262</span>                 print(line)
-<span class='line'>263</span>                 location = CELL_DATA
-<span class='line'>264</span>                 continue
-<span class='line'>265</span>             elif line.startswith('TEXTURE_COORDINATES'):
-<span class='line'>266</span>                 print(line)
-<span class='line'>267</span>                 location = TEXTURE_COORDINATES
-<span class='line'>268</span>                 continue
-<span class='line'>269</span>             elif line.startswith('SCALARS'):
-<span class='line'>270</span>                 print(line)
-<span class='line'>271</span>                 location = SCALARS
-<span class='line'>272</span>                 continue
-<span class='line'>273</span>             elif line.startswith('LOOKUP_TABLE'):
-<span class='line'>274</span>                 print(line)
-<span class='line'>275</span>                 location = LOOKUP_TABLE
-<span class='line'>276</span>                 continue
-<span class='line'>277</span>             elif line.startswith('COLOR_SCALARS'):
-<span class='line'>278</span>                 location = COLOR_SCALARS
-<span class='line'>279</span>                 print(line)
-<span class='line'>280</span>                 continue
-<span class='line'>281</span>             elif location == POINTS:
-<span class='line'>282</span>                 for v in line.split():
-<span class='line'>283</span>                     vertices.append(float(v))
-<span class='line'>284</span>             elif location == LINES:
-<span class='line'>285</span>                 tt = line.split()
-<span class='line'>286</span>                 if len(tt)>0 and tt[0] == '2':
-<span class='line'>287</span>                     indices.append(int(tt[1]))
-<span class='line'>288</span>                     indices.append(int(tt[2]))
-<span class='line'>289</span>             elif location == POLYGONS: #they have to be triangles
-<span class='line'>290</span>                 tt = line.split()
-<span class='line'>291</span>                 if len(tt)>0 and tt[0] != '3':
-<span class='line'>292</span>                     raise AssertionError('Not triangles here')
-<span class='line'>293</span>                 for i in tt[1:len(tt)]:
-<span class='line'>294</span>                     indices.append(int(i))
-<span class='line'>295</span>             elif location == LOOKUP_TABLE:
-<span class='line'>296</span>                 if line.startswith('LOOKUP_TABLE'):
-<span class='line'>297</span>                     continue
-<span class='line'>298</span>                 else:
-<span class='line'>299</span>                     for pd in line.split():
-<span class='line'>300</span>                         scalars.append(float(pd))
-<span class='line'>301</span>             elif location == COLOR_SCALARS:
-<span class='line'>302</span>                 for n in line.split():
-<span class='line'>303</span>                     colors.append(float(n))
-<span class='line'>304</span>             elif location == NORMALS:
-<span class='line'>305</span>                 for n in line.split():
-<span class='line'>306</span>                     normals.append(float(n))
-<span class='line'>307</span>         except:
-<span class='line'>308</span>             print('Error while processing line '+str(linenumber))
-<span class='line'>309</span>             print(line)
-<span class='line'>310</span>             raise
-<span class='line'>311</span>  */</span><span class="WHIT">    
-<span class='line'>312</span> 
-<span class='line'>313</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>314</span> 
-<span class='line'>315</span> 
-<span class='line'>316</span> </span><span class="NAME">vxlVTKReader.prototype._processIndexBlocks</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">filename</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>317</span> </span><span class="COMM">/*# -----------------------------------------------------------------------    
-<span class='line'>318</span> # Divides the calculated indices into blocks
-<span class='line'>319</span> # -----------------------------------------------------------------------
-<span class='line'>320</span> def processIndexBlocks():
-<span class='line'>321</span>   */</span><span class="WHIT">
-<span class='line'>322</span> </span><span class="WHIT">   </span><span class="NAME">this.numBlocks</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>323</span> </span><span class="WHIT">   </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">v_count</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT">  </span><span class="NAME">this.vertices.length</span><span class="PUNC">/</span><span class="NUMB">3</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>324</span> </span><span class="WHIT">   </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n_count</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT">  </span><span class="NAME">this.normals.length</span><span class="PUNC">/</span><span class="NUMB">3</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>325</span> </span><span class="WHIT">   </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">ii_count</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.indices.length</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>326</span> </span><span class="WHIT">   </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i_count</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT">  </span><span class="NAME">ii_count</span><span class="PUNC">/</span><span class="NUMB">3</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>327</span> </span><span class="WHIT">   </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">c_count</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT">  </span><span class="NAME">this.colors.length</span><span class="PUNC">/</span><span class="NUMB">3</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>328</span> </span><span class="WHIT">   </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pd_count</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.scalars.length</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>329</span> </span><span class="WHIT">    
-<span class='line'>330</span>  </span><span class="COMM">/*
-<span class='line'>331</span>     global numBlocks
-<span class='line'>332</span>     v_count = len(vertices)/3
-<span class='line'>333</span>     n_count = len(normals)/3
-<span class='line'>334</span>     ii_count =len(indices)
-<span class='line'>335</span>     i_count = ii_count/3
-<span class='line'>336</span>     c_count = len(colors)/3
-<span class='line'>337</span>     pd_count = len(scalars)
-<span class='line'>338</span>   */</span><span class="WHIT">
-<span class='line'>339</span> </span><span class="WHIT"> 
-<span class='line'>340</span>  </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="STRN">'vertices:\t'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">v_count.toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="STRN">'\nnormals:\t'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">n_count.toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'\nindices:\t'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">ii_count.toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="STRN">'\ntriangles:\t'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">i_count.toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT">
-<span class='line'>341</span> </span><span class="WHIT">             </span><span class="STRN">'\nscalars:\t'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">pd_count.toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'\ncolors:\t'</span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">c_count.toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">+</span><span class="STRN">'\n'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>342</span> </span><span class="WHIT"> 
-<span class='line'>343</span>  </span><span class="COMM">/*
-<span class='line'>344</span>     print('vertices:\t' + str(v_count) +'\nnormals:\t' + str(n_count) + '\nindices:\t' + str(ii_count)+'\ntriangles:\t' + str(i_count) + '\nscalars:\t' + str(pd_count) + '\ncolors:\t'+str(c_count)+'\n')    
-<span class='line'>345</span>     #if (v_err or n_err):
-<span class='line'>346</span>     #    print ('vertex error = ' + str(v_err) +', normal error = ' + str(n_err))
-<span class='line'>347</span>  */</span><span class="WHIT">
-<span class='line'>348</span> </span><span class="WHIT">    </span><span class="NAME">this.numBlocks</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">parseInt</span><span class="PUNC">(</span><span class="NAME">ii_count</span><span class="PUNC">/</span><span class="NAME">this.ARRAY_SIZE</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>349</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">ii_count</span><span class="WHIT"> </span><span class="PUNC">%</span><span class="WHIT"> </span><span class="NAME">this.ARRAY_SIZE</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>350</span> </span><span class="WHIT">        </span><span class="NAME">this.numBlocks</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.numBlocks</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>351</span> </span><span class="WHIT">    </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="STRN">'Number of Blocks: '</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.numBlocks.toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>352</span> </span><span class="WHIT">    
-<span class='line'>353</span>     </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">this.numBlocks</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>354</span> </span><span class="WHIT">        </span><span class="NAME">this._processBlock</span><span class="PUNC">(</span><span class="NAME">i</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">filename</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>355</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>356</span> 
-<span class='line'>357</span> </span><span class="COMM">/*
-<span class='line'>358</span>     numBlocks = ii_count // ARRAY_SIZE
-<span class='line'>359</span>     if(ii_count % ARRAY_SIZE != 0):
-<span class='line'>360</span>         numBlocks = numBlocks + 1
-<span class='line'>361</span>     print( 'Number of Blocks: ' + str(numBlocks))
-<span class='line'>362</span>     
-<span class='line'>363</span>     for i in range(numBlocks):
-<span class='line'>364</span>         #Thread(target=processBlock, args=(vertices, indices, scalars, i)).start()
-<span class='line'>365</span>         processBlock(i,vertices, indices, scalars,colors)*/</span><span class="WHIT">
-<span class='line'>366</span> </span><span class="WHIT">    
-<span class='line'>367</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>368</span> 
-<span class='line'>369</span> </span><span class="NAME">vxlVTKReader.prototype._processBlock</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">blockID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">filename</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>370</span> </span><span class="COMM">/*
-<span class='line'>371</span> # -----------------------------------------------------------------------    
-<span class='line'>372</span> # Selects a block to process
-<span class='line'>373</span> # -----------------------------------------------------------------------    
-<span class='line'>374</span> def processBlock(blockID, pver, pidx, psc, pcol):
-<span class='line'>375</span> */</span><span class="WHIT">
-<span class='line'>376</span> 
-<span class='line'>377</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pver</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.vertices</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>378</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pidx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.indices</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>379</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">psc</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.scalars</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>380</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pcol</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.colors</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>381</span> </span><span class="WHIT">    
-<span class='line'>382</span>     </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">fid</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">blockID</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>383</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">blockname</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>384</span> </span><span class="WHIT">    
-<span class='line'>385</span>     </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.numBlocks</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>386</span> </span><span class="WHIT">        </span><span class="NAME">blockname</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">filename</span><span class="WHIT"> </span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>387</span> </span><span class="WHIT">    </span><span class="KEYW">else</span><span class="WHIT">
-<span class='line'>388</span> </span><span class="WHIT">        </span><span class="NAME">blockname</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">filename</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'_'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">fid</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>389</span> </span><span class="WHIT">        
-<span class='line'>390</span>     </span><span class="COMM">//  _weaveBlock(blockID);</span><span class="WHIT">
-<span class='line'>391</span> </span><span class="WHIT">    </span><span class="NAME">this._writeJSON</span><span class="PUNC">(</span><span class="NAME">filename</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pver</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pidx</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">psc</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pcol</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>392</span> </span><span class="WHIT">    </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="STRN">'Block ['</span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">fid</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="STRN">'] processed,  output: '</span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">blockname</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>393</span> 
-<span class='line'>394</span> </span><span class="COMM">/*
-<span class='line'>395</span> 
-<span class='line'>396</span>      global outputfile
-<span class='line'>397</span>      global numBlocks
-<span class='line'>398</span>      fid = str(blockID + 1)
-<span class='line'>399</span>      if numBlocks == 1:
-<span class='line'>400</span>          filename = outputfile + '.json'
-<span class='line'>401</span>      else:
-<span class='line'>402</span>          filename = outputfile+'_'+fid+'.json'
-<span class='line'>403</span>     
-<span class='line'>404</span>     
-<span class='line'>405</span>      vtx, idx, pdx, clx = weaveBlock(blockID, pver, pidx, psc, pcol)
-<span class='line'>406</span>      writeJSON(filename,vtx, idx, pdx, clx)
-<span class='line'>407</span>      print ('Block [' + fid +'] processed,  output: '+filename)
-<span class='line'>408</span>     
-<span class='line'>409</span>  */</span><span class="WHIT">
-<span class='line'>410</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>411</span> 
-<span class='line'>412</span> </span><span class="NAME">vxlVTKReader.prototype._weaveBlock</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">blockID</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>413</span> </span><span class="COMM">/*    
-<span class='line'>414</span> # -----------------------------------------------------------------------
-<span class='line'>415</span> # Calculates new index array for the block in question
-<span class='line'>416</span> # ver - vertices
-<span class='line'>417</span> # ind - indices
-<span class='line'>418</span> # seg - segment
-<span class='line'>419</span> # -----------------------------------------------------------------------
-<span class='line'>420</span> def weaveBlock(blockID, ver,ind, pod,clr):
-<span class='line'>421</span>     lowerBound  = ARRAY_SIZE*blockID
-<span class='line'>422</span>     upperBound = ARRAY_SIZE*(blockID+1)
-<span class='line'>423</span>     if upperBound > len(ind):
-<span class='line'>424</span>         upperBound = len(ind)
-<span class='line'>425</span>     newindex = dict()
-<span class='line'>426</span>     vtxBlock = []   # new vertex array
-<span class='line'>427</span>     idxBlock = []   # new index array
-<span class='line'>428</span>     pdxBlock = []   # new scalar array
-<span class='line'>429</span>     clrBlock = []   # new color array
-<span class='line'>430</span>     
-<span class='line'>431</span>     hasPointData = len(pod)>0
-<span class='line'>432</span>     hasColorData = len(clr)>0
-<span class='line'>433</span>     
-<span class='line'>434</span>     # Set of indices to be processed
-<span class='line'>435</span>     aux = ind[lowerBound:upperBound]
-<span class='line'>436</span>     taux = len(aux)
-<span class='line'>437</span>     nidx = -1
-<span class='line'>438</span>     #item = 1
-<span class='line'>439</span>     
-<span class='line'>440</span>     print('Weaving block #' + str(blockID+1) + '  ['+str(lowerBound)+','+str(upperBound)+']')
-<span class='line'>441</span>     
-<span class='line'>442</span>     #for each index to be processed
-<span class='line'>443</span>     for i,oidx in enumerate(aux):
-<span class='line'>444</span>         sys.stdout.write('Processing index %d out of %d \r' % (i,taux))
-<span class='line'>445</span>         # if index hasn't been mapped
-<span class='line'>446</span>         if oidx not in newindex.keys():
-<span class='line'>447</span>             nidx = nidx + 1
-<span class='line'>448</span>             # create new index for the old index (incrementally)
-<span class='line'>449</span>             idxBlock.append(nidx)
-<span class='line'>450</span>             # save in the map for posterior searches
-<span class='line'>451</span>             newindex[oidx] = nidx
-<span class='line'>452</span>             # multiply by three to find the right starting point in the vertex array
-<span class='line'>453</span>             index = oidx * 3
-<span class='line'>454</span>             # add the correspondant vertex into the new position in the new vertex array
-<span class='line'>455</span>             vtxBlock.append(ver[index])
-<span class='line'>456</span>             vtxBlock.append(ver[index+1])
-<span class='line'>457</span>             vtxBlock.append(ver[index+2])
-<span class='line'>458</span>             # add the correspondant point data if any
-<span class='line'>459</span>             if hasPointData:
-<span class='line'>460</span>                 pdxBlock.append(pod[oidx])
-<span class='line'>461</span>             
-<span class='line'>462</span>             if hasColorData:
-<span class='line'>463</span>                 clrBlock.append(clr[index])
-<span class='line'>464</span>                 clrBlock.append(clr[index+1])
-<span class='line'>465</span>                 clrBlock.append(clr[index+2])
-<span class='line'>466</span>         else:
-<span class='line'>467</span>             # if the index was mapped then use it in the new index array
-<span class='line'>468</span>             idxBlock.append(newindex[oidx])
-<span class='line'>469</span>     print('')
-<span class='line'>470</span>     del aux
-<span class='line'>471</span>     return vtxBlock, idxBlock, pdxBlock, clrBlock
-<span class='line'>472</span> */</span><span class="WHIT">
-<span class='line'>473</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>474</span> 
-<span class='line'>475</span> </span><span class="NAME">vxlVTKReader.prototype._writeJSON</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">fname</span><span class="PUNC">,</span><span class="NAME">ver</span><span class="PUNC">,</span><span class="NAME">ind</span><span class="PUNC">,</span><span class="NAME">pod</span><span class="PUNC">,</span><span class="NAME">clr</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>476</span> </span><span class="WHIT">  </span><span class="COMM">/*
-<span class='line'>477</span> # -----------------------------------------------------------------------    
-<span class='line'>478</span> # Writes a JSON file segment
-<span class='line'>479</span> # -----------------------------------------------------------------------
-<span class='line'>480</span> def writeJSON(fname,ver,ind, pod, clr):
-<span class='line'>481</span>   */</span><span class="WHIT">
-<span class='line'>482</span> </span><span class="WHIT"> 
-<span class='line'>483</span>      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">jsonPart</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Object</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>484</span> </span><span class="WHIT">     </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"vertices"</span><span class="PUNC">]</span><span class="WHIT">    </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ver.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>485</span> </span><span class="WHIT">     </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"indices"</span><span class="PUNC">]</span><span class="WHIT">     </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ind.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>486</span> </span><span class="WHIT">     
-<span class='line'>487</span>      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">pod.length</span><span class="PUNC">></span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>488</span> </span><span class="WHIT">        </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"scalars"</span><span class="PUNC">]</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">pod.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>489</span> </span><span class="WHIT">     </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>490</span> </span><span class="WHIT">     
-<span class='line'>491</span>      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">clr.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>492</span> </span><span class="WHIT">        </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"colors"</span><span class="PUNC">]</span><span class="WHIT">   </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">clr.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>493</span> </span><span class="WHIT">     </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>494</span> </span><span class="WHIT">     
-<span class='line'>495</span>      </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"mode"</span><span class="PUNC">]</span><span class="WHIT">        </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.mode</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>496</span> </span><span class="WHIT">     
-<span class='line'>497</span>      </span><span class="NAME">this.parts.push</span><span class="PUNC">(</span><span class="NAME">jsonPart</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>498</span> </span><span class="WHIT">       
-<span class='line'>499</span>     
-<span class='line'>500</span>  </span><span class="COMM">/*  
-<span class='line'>501</span>     f = fileReader();
-<span class='line'>502</span>    f = open(fname,'w')
-<span class='line'>503</span>     f.write('{\n')
-<span class='line'>504</span>     # writing vertices    
-<span class='line'>505</span>     f.write('  "vertices" : [')
-<span class='line'>506</span>     for v in ver[0:len(ver)-1]:
-<span class='line'>507</span>         f.write(str(v)+',')
-<span class='line'>508</span>     f.write(str(ver[len(ver)-1])+'],\n')
-<span class='line'>509</span>     
-<span class='line'>510</span>     # writing indices
-<span class='line'>511</span>     f.write('  "indices" : [')
-<span class='line'>512</span>     for i in ind[0:len(ind)-1]:
-<span class='line'>513</span>         f.write(str(i)+',')
-<span class='line'>514</span>     f.write(str(ind[len(ind)-1])+'],\n')
-<span class='line'>515</span>     
-<span class='line'>516</span>     # writing scalars    
-<span class='line'>517</span>     if len(pod) > 0:
-<span class='line'>518</span>         f.write('  "scalars" : [')
-<span class='line'>519</span>         for pd in  pod[0:len(pod)-1]:
-<span class='line'>520</span>             f.write(str(pd)+',')
-<span class='line'>521</span>         f.write(str(pod[len(pod)-1])+'],\n')
-<span class='line'>522</span>         
-<span class='line'>523</span>     # writing colors
-<span class='line'>524</span>     if len(clr) > 0:
-<span class='line'>525</span>         f.write('  "colors" : [')
-<span class='line'>526</span>         for cl in  clr[0:len(clr)-1]:
-<span class='line'>527</span>             f.write(str(cl)+',')
-<span class='line'>528</span>         f.write(str(clr[len(clr)-1])+'],\n')
-<span class='line'>529</span>     
-<span class='line'>530</span>     f.write('  "mode" : "'+mode+'"\n')    
-<span class='line'>531</span>     f.write('}')
-<span class='line'>532</span>     f.close()
-<span class='line'>533</span>   */</span><span class="WHIT">
-<span class='line'>534</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">  
-<span class='line'>535</span> 
-<span class='line'>536</span> </span><span class="COMM">/**
-<span class='line'>537</span>  * Once the reader has finished. This method allows retrieving the parsed parts 
-<span class='line'>538</span>  */</span><span class="WHIT">
-<span class='line'>539</span> </span><span class="NAME">vxlVTKReader.prototype.getParts</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>540</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.parts</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>541</span> </span><span class="PUNC">}</span></pre></body></html>
+<span class='line'> 49</span>     </span><span class="NAME">this.parts</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 50</span> </span><span class="WHIT">    
+<span class='line'> 51</span>     </span><span class="NAME">vxl.go.notifier.publish</span><span class="PUNC">(</span><span class="NAME">vxl.events.READER_DONE</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 52</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 53</span> 
+<span class='line'> 54</span> </span><span class="COMM">/**
+<span class='line'> 55</span>  * Verifies if the HTML5 API is available. 
+<span class='line'> 56</span>  */</span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="NAME">vxlVTKReader.prototype.isSupported</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 58</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">window.File</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">window.FileReader</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">window.FileList</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">window.Blob</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 59</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 60</span> 
+<span class='line'> 61</span> 
+<span class='line'> 62</span> </span><span class="COMM">/**
+<span class='line'> 63</span>  * @param {File} file an HTML5 File object
+<span class='line'> 64</span>  */</span><span class="WHIT">
+<span class='line'> 65</span> </span><span class="NAME">vxlVTKReader.prototype.read</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">file</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 66</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">vtkReader</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 67</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">filename</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">file.name</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="WHIT">    
+<span class='line'> 69</span>     </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">filename.length</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NUMB">4</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NAME">filename.indexOf</span><span class="PUNC">(</span><span class="STRN">'.vtk'</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT">        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="STRN">'vxlVTKReader.read: the file '</span><span class="PUNC">+</span><span class="NAME">file</span><span class="PUNC">+</span><span class="STRN">' is not a VTK file'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 72</span> </span><span class="WHIT">    
+<span class='line'> 73</span>     </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">reader</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">FileReader</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 74</span> </span><span class="WHIT">     
+<span class='line'> 75</span>     </span><span class="NAME">reader.onload</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">event</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 76</span> </span><span class="WHIT">        </span><span class="NAME">document.body.style.cursor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'default'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 77</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">contents</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">event.target.result.trim</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 78</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">lines</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">contents.split</span><span class="PUNC">(</span><span class="REGX">/\r\n|\r|\n/</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 79</span> </span><span class="WHIT">        </span><span class="NAME">vtkReader._parse</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">  
+<span class='line'> 80</span>         </span><span class="NAME">vtkReader._processIndexBlocks</span><span class="PUNC">(</span><span class="NAME">filename</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="WHIT">        </span><span class="NAME">vxl.go.notifier.fire</span><span class="PUNC">(</span><span class="NAME">vxl.events.READER_DONE</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">vtkReader</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 82</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 83</span> </span><span class="WHIT">    
+<span class='line'> 84</span>     </span><span class="NAME">document.body.style.cursor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'wait'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 85</span> </span><span class="WHIT">    </span><span class="NAME">reader.readAsText</span><span class="PUNC">(</span><span class="NAME">file</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 86</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 87</span> 
+<span class='line'> 88</span> </span><span class="COMM">/**
+<span class='line'> 89</span>  * Reads the file line by line and populates the respective arrays
+<span class='line'> 90</span>  */</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="NAME">vxlVTKReader.prototype._parse</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="WHIT">   </span><span class="NAME">this.outputfile</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">''</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="WHIT">   </span><span class="NAME">this.numBlocks</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="WHIT">   </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'NOWHERE'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 95</span> </span><span class="WHIT">   </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">linenumber</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 96</span> </span><span class="WHIT">   </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">linenumber</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">linenumber</span><span class="PUNC">&lt;</span><span class="NAME">lines.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">linenumber</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'> 97</span> </span><span class="WHIT">   </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 98</span> </span><span class="WHIT">    
+<span class='line'> 99</span>        </span><span class="KEYW">try</span><span class="WHIT">
+<span class='line'>100</span> </span><span class="WHIT">            </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>101</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'POINTS'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>102</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>103</span> </span><span class="WHIT">                    </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">                    </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.POINTS</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">                    </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>106</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>107</span> </span><span class="WHIT">                </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'LINES'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>108</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>109</span> </span><span class="WHIT">                    </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>110</span> </span><span class="WHIT">                    </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.LINES</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>111</span> </span><span class="WHIT">                    </span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"LINES"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>112</span> </span><span class="WHIT">                    </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>113</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>114</span> </span><span class="WHIT">                </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'POLYGONS'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>115</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>116</span> </span><span class="WHIT">                    </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="WHIT">                    </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.POLYGONS</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>118</span> </span><span class="WHIT">                    </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>119</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>120</span> </span><span class="WHIT">                </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'POINT_DATA'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>121</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">                   
+<span class='line'>122</span>                     </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.POINT_DATA</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>123</span> </span><span class="WHIT">                    </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>124</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>125</span> </span><span class="WHIT">                </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'NORMALS'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>126</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">      
+<span class='line'>127</span>                     </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">             
+<span class='line'>128</span>                     </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.NORMALS</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">                    </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>130</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>131</span> </span><span class="WHIT">                </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'CELL_DATA'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">      
+<span class='line'>133</span>                     </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">             
+<span class='line'>134</span>                     </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.CELL_DATA</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>135</span> </span><span class="WHIT">                    </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>136</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="WHIT">                </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'TEXTURE_COORDINATES'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>138</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">      
+<span class='line'>139</span>                     </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">             
+<span class='line'>140</span>                     </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.TEXTURE_COORDINATES</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>141</span> </span><span class="WHIT">                    </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>142</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>143</span> </span><span class="WHIT">                </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'SCALARS'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>144</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">      
+<span class='line'>145</span>                     </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">             
+<span class='line'>146</span>                     </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.SCALARS</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>147</span> </span><span class="WHIT">                    </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>148</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>149</span> </span><span class="WHIT">                </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'LOOKUP_TABLE'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>150</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">      
+<span class='line'>151</span>                     </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">             
+<span class='line'>152</span>                     </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.LOOKUP_TABLE</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>153</span> </span><span class="WHIT">                    </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>154</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">   
+<span class='line'>155</span>                 </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'COLOR_SCALARS'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>156</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">      
+<span class='line'>157</span>                     </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">             
+<span class='line'>158</span>                     </span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.tags.COLOR_SCALARS</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>159</span> </span><span class="WHIT">                    </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>160</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">           
+<span class='line'>161</span>                 </span><span class="COMM">// -------------------</span><span class="WHIT">
+<span class='line'>162</span> </span><span class="WHIT">                </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">this.tags.POINTS</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>163</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>164</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">v</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">trim</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">split</span><span class="PUNC">(</span><span class="STRN">' '</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>165</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">v</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>166</span> </span><span class="WHIT">                    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">v.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>167</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>168</span> </span><span class="WHIT">                         </span><span class="NAME">this.vertices.push</span><span class="PUNC">(</span><span class="NAME">parseFloat</span><span class="PUNC">(</span><span class="NAME">v</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>169</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>170</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>171</span> </span><span class="WHIT">                </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">this.tags.LINES</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>172</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>173</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">tt</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">trim</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">split</span><span class="PUNC">(</span><span class="STRN">' '</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>174</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">tt</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>175</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">tt.length</span><span class="PUNC">></span><span class="NUMB">0</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">tt</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">'2'</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>176</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>177</span> </span><span class="WHIT">                        </span><span class="NAME">this.indices.push</span><span class="PUNC">(</span><span class="NAME">parseInt</span><span class="PUNC">(</span><span class="NAME">tt</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>178</span> </span><span class="WHIT">                        </span><span class="NAME">this.indices.push</span><span class="PUNC">(</span><span class="NAME">parseInt</span><span class="PUNC">(</span><span class="NAME">tt</span><span class="PUNC">[</span><span class="NUMB">2</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>179</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>180</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>181</span> </span><span class="WHIT">               </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">this.tags.POLYGONS</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="COMM">//they have to be triangles</span><span class="WHIT">
+<span class='line'>182</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>183</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">tt</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">trim</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">split</span><span class="PUNC">(</span><span class="STRN">' '</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>184</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">tt</span><span class="PUNC">==</span><span class="STRN">""</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT"> 
+<span class='line'>185</span>                     </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">tt.length</span><span class="PUNC">></span><span class="NUMB">0</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">tt</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="STRN">'3'</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>186</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>187</span> </span><span class="WHIT">                        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="STRN">"Not triangles here"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>188</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>189</span> </span><span class="WHIT">                    </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">tt.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>190</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>191</span> </span><span class="WHIT">                        </span><span class="NAME">this.indices.push</span><span class="PUNC">(</span><span class="NAME">parseInt</span><span class="PUNC">(</span><span class="NAME">tt</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>192</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>193</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>194</span> </span><span class="WHIT">                </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">this.tags.LOOKUP_TABLE</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>195</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>196</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'LOOKUP_TABLE'</span><span class="PUNC">)</span><span class="PUNC">==</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>197</span> </span><span class="WHIT">                        </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>198</span> </span><span class="WHIT">                    </span><span class="KEYW">else</span><span class="WHIT">
+<span class='line'>199</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>200</span> </span><span class="WHIT">                        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pd</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">trim</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">split</span><span class="PUNC">(</span><span class="STRN">' '</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>201</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">pd</span><span class="PUNC">==</span><span class="STRN">""</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>202</span> </span><span class="WHIT">                        </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">pd.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>203</span> </span><span class="WHIT">                        </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>204</span> </span><span class="WHIT">                            </span><span class="NAME">this.scalars.push</span><span class="PUNC">(</span><span class="NAME">parseFloat</span><span class="PUNC">(</span><span class="NAME">pd</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>205</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>206</span> </span><span class="WHIT">                   </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>207</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>208</span> </span><span class="WHIT">                </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">this.tags.COLOR_SCALARS</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>209</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>210</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">trim</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">split</span><span class="PUNC">(</span><span class="STRN">' '</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>211</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">==</span><span class="STRN">""</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>212</span> </span><span class="WHIT">                    </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">n.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>213</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>214</span> </span><span class="WHIT">                        </span><span class="NAME">this.colors.push</span><span class="PUNC">(</span><span class="NAME">parseFloat</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>215</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>216</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>217</span> </span><span class="WHIT">                </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.location</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">this.tags.NORMALS</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>218</span> </span><span class="WHIT">                </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>219</span> </span><span class="WHIT">                    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">lines</span><span class="PUNC">[</span><span class="NAME">linenumber</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">trim</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">split</span><span class="PUNC">(</span><span class="STRN">' '</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>220</span> </span><span class="WHIT">                    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">==</span><span class="STRN">""</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">continue</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>221</span> </span><span class="WHIT">                    </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">n.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>222</span> </span><span class="WHIT">                    </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>223</span> </span><span class="WHIT">                        </span><span class="NAME">this.normals.push</span><span class="PUNC">(</span><span class="NAME">parseFloat</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>224</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>225</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>226</span> </span><span class="WHIT">           </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="COMM">// end try</span><span class="WHIT">
+<span class='line'>227</span> </span><span class="WHIT">        </span><span class="KEYW">catch</span><span class="PUNC">(</span><span class="NAME">err</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>228</span> </span><span class="WHIT">            </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>229</span> </span><span class="WHIT">            </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="STRN">'Error while processing line '</span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">linenumber.toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>230</span> </span><span class="WHIT">            </span><span class="COMM">//console.log(lines) // what is this for??</span><span class="WHIT">
+<span class='line'>231</span> </span><span class="WHIT">            </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="NAME">err</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>232</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>233</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="COMM">// end foor loop</span><span class="WHIT">
+<span class='line'>234</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>235</span> 
+<span class='line'>236</span> </span><span class="COMM">/**
+<span class='line'>237</span>  * Divides the calculated indices into blocks
+<span class='line'>238</span>  * @private
+<span class='line'>239</span>  */</span><span class="WHIT">
+<span class='line'>240</span> </span><span class="NAME">vxlVTKReader.prototype._processIndexBlocks</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">filename</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>241</span> </span><span class="WHIT">   </span><span class="NAME">this.numBlocks</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>242</span> </span><span class="WHIT">   </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">v_count</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT">  </span><span class="NAME">this.vertices.length</span><span class="PUNC">/</span><span class="NUMB">3</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>243</span> </span><span class="WHIT">   </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n_count</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT">  </span><span class="NAME">this.normals.length</span><span class="PUNC">/</span><span class="NUMB">3</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>244</span> </span><span class="WHIT">   </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">ii_count</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.indices.length</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>245</span> </span><span class="WHIT">   </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i_count</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT">  </span><span class="NAME">ii_count</span><span class="PUNC">/</span><span class="NUMB">3</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>246</span> </span><span class="WHIT">   </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">c_count</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT">  </span><span class="NAME">this.colors.length</span><span class="PUNC">/</span><span class="NUMB">3</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>247</span> </span><span class="WHIT">   </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pd_count</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.scalars.length</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>248</span> </span><span class="WHIT"> 
+<span class='line'>249</span>    </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="STRN">'vertices:\t'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">v_count.toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="STRN">'\nnormals:\t'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">n_count.toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'\nindices:\t'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">ii_count.toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="STRN">'\ntriangles:\t'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">i_count.toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT">
+<span class='line'>250</span> </span><span class="WHIT">             </span><span class="STRN">'\nscalars:\t'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">pd_count.toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'\ncolors:\t'</span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">c_count.toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">+</span><span class="STRN">'\n'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>251</span> </span><span class="WHIT"> 
+<span class='line'>252</span>     </span><span class="NAME">this.numBlocks</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">parseInt</span><span class="PUNC">(</span><span class="NAME">ii_count</span><span class="PUNC">/</span><span class="NAME">this.ARRAY_SIZE</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>253</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">ii_count</span><span class="WHIT"> </span><span class="PUNC">%</span><span class="WHIT"> </span><span class="NAME">this.ARRAY_SIZE</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>254</span> </span><span class="WHIT">        </span><span class="NAME">this.numBlocks</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.numBlocks</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>255</span> </span><span class="WHIT">    </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="STRN">'Number of Blocks: '</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.numBlocks.toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>256</span> </span><span class="WHIT">    
+<span class='line'>257</span>     </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">this.numBlocks</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>258</span> </span><span class="WHIT">        </span><span class="NAME">this._processBlock</span><span class="PUNC">(</span><span class="NAME">i</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">filename</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>259</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>260</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>261</span> 
+<span class='line'>262</span> </span><span class="COMM">/**
+<span class='line'>263</span>  * Process the selected block of indices
+<span class='line'>264</span>  * @private
+<span class='line'>265</span>  */</span><span class="WHIT">
+<span class='line'>266</span> </span><span class="NAME">vxlVTKReader.prototype._processBlock</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">blockID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">filename</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>267</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pver</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.vertices</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>268</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pidx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.indices</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>269</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">psc</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.scalars</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>270</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pcol</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.colors</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>271</span> </span><span class="WHIT">    
+<span class='line'>272</span>     </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">fid</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">blockID</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>273</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">blockname</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>274</span> </span><span class="WHIT">    
+<span class='line'>275</span>     </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.numBlocks</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>276</span> </span><span class="WHIT">        </span><span class="NAME">blockname</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">filename</span><span class="WHIT"> </span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>277</span> </span><span class="WHIT">    </span><span class="KEYW">else</span><span class="WHIT">
+<span class='line'>278</span> </span><span class="WHIT">        </span><span class="NAME">blockname</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">filename</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'_'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">fid</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>279</span> </span><span class="WHIT">        
+<span class='line'>280</span>     </span><span class="COMM">//  _weaveBlock(blockID);</span><span class="WHIT">
+<span class='line'>281</span> </span><span class="WHIT">    </span><span class="NAME">this._writeJSON</span><span class="PUNC">(</span><span class="NAME">filename</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pver</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pidx</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">psc</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pcol</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>282</span> </span><span class="WHIT">    </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="STRN">'Block ['</span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">fid</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="STRN">'] processed,  output: '</span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">blockname</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>283</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>284</span> 
+<span class='line'>285</span> </span><span class="COMM">/**
+<span class='line'>286</span>  * Calculates the new index array for the block in question
+<span class='line'>287</span>  */</span><span class="WHIT">
+<span class='line'>288</span> </span><span class="NAME">vxlVTKReader.prototype._weaveBlock</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">blockID</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>289</span> </span><span class="COMM">/*    
+<span class='line'>290</span> # -----------------------------------------------------------------------
+<span class='line'>291</span> # Calculates new index array for the block in question
+<span class='line'>292</span> # ver - vertices
+<span class='line'>293</span> # ind - indices
+<span class='line'>294</span> # seg - segment
+<span class='line'>295</span> # -----------------------------------------------------------------------
+<span class='line'>296</span> def weaveBlock(blockID, ver,ind, pod,clr):
+<span class='line'>297</span>     lowerBound  = ARRAY_SIZE*blockID
+<span class='line'>298</span>     upperBound = ARRAY_SIZE*(blockID+1)
+<span class='line'>299</span>     if upperBound > len(ind):
+<span class='line'>300</span>         upperBound = len(ind)
+<span class='line'>301</span>     newindex = dict()
+<span class='line'>302</span>     vtxBlock = []   # new vertex array
+<span class='line'>303</span>     idxBlock = []   # new index array
+<span class='line'>304</span>     pdxBlock = []   # new scalar array
+<span class='line'>305</span>     clrBlock = []   # new color array
+<span class='line'>306</span>     
+<span class='line'>307</span>     hasPointData = len(pod)>0
+<span class='line'>308</span>     hasColorData = len(clr)>0
+<span class='line'>309</span>     
+<span class='line'>310</span>     # Set of indices to be processed
+<span class='line'>311</span>     aux = ind[lowerBound:upperBound]
+<span class='line'>312</span>     taux = len(aux)
+<span class='line'>313</span>     nidx = -1
+<span class='line'>314</span>     #item = 1
+<span class='line'>315</span>     
+<span class='line'>316</span>     print('Weaving block #' + str(blockID+1) + '  ['+str(lowerBound)+','+str(upperBound)+']')
+<span class='line'>317</span>     
+<span class='line'>318</span>     #for each index to be processed
+<span class='line'>319</span>     for i,oidx in enumerate(aux):
+<span class='line'>320</span>         sys.stdout.write('Processing index %d out of %d \r' % (i,taux))
+<span class='line'>321</span>         # if index hasn't been mapped
+<span class='line'>322</span>         if oidx not in newindex.keys():
+<span class='line'>323</span>             nidx = nidx + 1
+<span class='line'>324</span>             # create new index for the old index (incrementally)
+<span class='line'>325</span>             idxBlock.append(nidx)
+<span class='line'>326</span>             # save in the map for posterior searches
+<span class='line'>327</span>             newindex[oidx] = nidx
+<span class='line'>328</span>             # multiply by three to find the right starting point in the vertex array
+<span class='line'>329</span>             index = oidx * 3
+<span class='line'>330</span>             # add the correspondant vertex into the new position in the new vertex array
+<span class='line'>331</span>             vtxBlock.append(ver[index])
+<span class='line'>332</span>             vtxBlock.append(ver[index+1])
+<span class='line'>333</span>             vtxBlock.append(ver[index+2])
+<span class='line'>334</span>             # add the correspondant point data if any
+<span class='line'>335</span>             if hasPointData:
+<span class='line'>336</span>                 pdxBlock.append(pod[oidx])
+<span class='line'>337</span>             
+<span class='line'>338</span>             if hasColorData:
+<span class='line'>339</span>                 clrBlock.append(clr[index])
+<span class='line'>340</span>                 clrBlock.append(clr[index+1])
+<span class='line'>341</span>                 clrBlock.append(clr[index+2])
+<span class='line'>342</span>         else:
+<span class='line'>343</span>             # if the index was mapped then use it in the new index array
+<span class='line'>344</span>             idxBlock.append(newindex[oidx])
+<span class='line'>345</span>     print('')
+<span class='line'>346</span>     del aux
+<span class='line'>347</span>     return vtxBlock, idxBlock, pdxBlock, clrBlock
+<span class='line'>348</span> */</span><span class="WHIT">
+<span class='line'>349</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>350</span> 
+<span class='line'>351</span> </span><span class="COMM">/**
+<span class='line'>352</span>  * Creates the JSON object
+<span class='line'>353</span>  * @private 
+<span class='line'>354</span>  */</span><span class="WHIT">
+<span class='line'>355</span> </span><span class="NAME">vxlVTKReader.prototype._writeJSON</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">fname</span><span class="PUNC">,</span><span class="NAME">ver</span><span class="PUNC">,</span><span class="NAME">ind</span><span class="PUNC">,</span><span class="NAME">pod</span><span class="PUNC">,</span><span class="NAME">clr</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>356</span> </span><span class="WHIT">     </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">jsonPart</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Object</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>357</span> </span><span class="WHIT">     </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"name"</span><span class="PUNC">]</span><span class="WHIT">        </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fname</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>358</span> </span><span class="WHIT">     </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"vertices"</span><span class="PUNC">]</span><span class="WHIT">    </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ver.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>359</span> </span><span class="WHIT">     </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"indices"</span><span class="PUNC">]</span><span class="WHIT">     </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ind.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>360</span> </span><span class="WHIT">     
+<span class='line'>361</span>      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">pod.length</span><span class="PUNC">></span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>362</span> </span><span class="WHIT">        </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"scalars"</span><span class="PUNC">]</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">pod.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>363</span> </span><span class="WHIT">     </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>364</span> </span><span class="WHIT">     
+<span class='line'>365</span>      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">clr.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>366</span> </span><span class="WHIT">        </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"colors"</span><span class="PUNC">]</span><span class="WHIT">   </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">clr.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>367</span> </span><span class="WHIT">     </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>368</span> </span><span class="WHIT">     
+<span class='line'>369</span>      </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"mode"</span><span class="PUNC">]</span><span class="WHIT">        </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.mode</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>370</span> </span><span class="WHIT">     
+<span class='line'>371</span>      </span><span class="NAME">this.parts.push</span><span class="PUNC">(</span><span class="NAME">jsonPart</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>372</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">  
+<span class='line'>373</span> 
+<span class='line'>374</span> </span><span class="COMM">/**
+<span class='line'>375</span>  * Once the reader has finished. This method allows retrieving the parsed parts 
+<span class='line'>376</span>  */</span><span class="WHIT">
+<span class='line'>377</span> </span><span class="NAME">vxlVTKReader.prototype.getParts</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>378</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.parts</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>379</span> </span><span class="PUNC">}</span></pre></body></html>

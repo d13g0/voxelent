@@ -33,7 +33,21 @@ function vxlModelManager(){
 	       e.MODEL_NEW,
 	       e.MODELS_LOADED
 	    ],this);
+	vxl.go.notifier.subscribe(e.READER_DONE, this);
 };
+
+/**
+ * Handles voxelent events to which this model manager is subscribed to
+ * @param {String} event the event that was fired 
+ * @param {Object} source the object that fired the event 
+ */
+vxlModelManager.prototype.handleEvent = function(event,source){
+    var reader = source;
+    var parts = reader.getParts();
+    for (var i = 0; i < parts.length; i+=1){
+        this.add(parts[i],parts[i].name,reader.scene);
+    }
+}
 
 
 /**
