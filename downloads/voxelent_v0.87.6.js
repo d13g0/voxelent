@@ -9250,7 +9250,10 @@ vxl.api = {
   * The axis is always centered in the focal point of the camera
   */
  axisON :  function(){
-	vxl.c.view.scene.toys.axis.setVisible(true);
+    if (vxl.c.scene == undefined){
+       throw ('vxl.api.axisON: There is no current scene');
+    }
+	vxl.c.scene.toys.axis.setVisible(true);
 	vxl.c.camera.refresh();
  },
  
@@ -9258,7 +9261,10 @@ vxl.api = {
   * Hides the axis in the current view
   */
  axisOFF :  function(){
-	vxl.c.view.scene.toys.axis.setVisible(false);
+    if (vxl.c.scene == undefined){
+        throw ('vxl.api.axisOFF: There is no current scene');
+    }
+	vxl.c.scene.toys.axis.setVisible(false);
 	vxl.c.camera.refresh();
  },
  
@@ -9267,7 +9273,10 @@ vxl.api = {
   * @TODO: move the bounding box to the scene object
   */
  boundingBoxON :  function(){
-	vxl.c.view.scene.toys.boundingbox.setVisible(true);
+    if (vxl.c.scene == undefined){
+        throw ('vxl.api.boundingBoxON: There is no current scene');
+    } 
+	vxl.c.scene.toys.boundingbox.setVisible(true);
 	vxl.c.camera.refresh();
  },
  
@@ -9276,17 +9285,41 @@ vxl.api = {
   * @TODO: move the bounding box to the scene object
   */
  boundingBoxOFF:  function(){
-	vxl.c.view.scene.toys.boundingbox.setVisible(false);
+    if (vxl.c.scene == undefined){
+        throw ('vxl.api.boundingBoxOFF: There is no current scene');
+    }
+	vxl.c.scene.toys.boundingbox.setVisible(false);
 	vxl.c.camera.refresh();
  },
  
- /**
-  * @TODO: Reimplement behaviour in the camera
-  */
- toggleSpin :  function(){
-	//TODO: RECODE IT.
-	alert('not implemented');
- },
+/**
+ * Shows the scene's floor. If the dimension and spacing have not been set, then the floor wiill not be visible'
+ * @param{NUmber} dimension the floor dimension (this number will be multiplied by 2 to cover the negative cartesian space)
+ * @param{Number} spacing the spacing tells how often we have grid divisions
+ */
+floorON: function(dimension, spacing){
+    if (vxl.c.scene == undefined){
+        throw ('vxl.api.floorON: There is no current scene');
+    }
+    if (dimension == undefined || spacing == undefined){
+        vxl.c.scene.toys.floor.setVisible(true);
+    }
+    else{
+        vxl.c.scene.toys.floor.setGrid(dimension, spacing);
+    }
+    vxl.c.camera.refresh();   
+},
+
+/**
+ * Hides the floor in the current scene 
+ */
+floorOFF: function(){
+    if (vxl.c.scene == undefined){
+        throw ('vxl.api.floorOFF: There is no current scene');
+    }
+    vxl.c.scene.toys.floor.setVisible(false);
+    vxl.c.camera.refresh();
+},
  
 
 /**

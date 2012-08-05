@@ -1,0 +1,345 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/*-------------------------------------------------------------------------
+<span class='line'>  2</span>     This file is part of Voxelent's Nucleo
+<span class='line'>  3</span> 
+<span class='line'>  4</span>     Nucleo is free software: you can redistribute it and/or modify
+<span class='line'>  5</span>     it under the terms of the GNU General Public License as published by
+<span class='line'>  6</span>     the Free Software Foundation version 3.
+<span class='line'>  7</span> 
+<span class='line'>  8</span>     Nucleo is distributed in the hope that it will be useful,
+<span class='line'>  9</span>     but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class='line'> 10</span>     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class='line'> 11</span>     GNU General Public License for more details.
+<span class='line'> 12</span> 
+<span class='line'> 13</span>     You should have received a copy of the GNU General Public License
+<span class='line'> 14</span>     along with Nucleo.  If not, see &lt;http://www.gnu.org/licenses/>.
+<span class='line'> 15</span> ---------------------------------------------------------------------------*/</span><span class="WHIT"> 
+<span class='line'> 16</span> 
+<span class='line'> 17</span> </span><span class="COMM">/**
+<span class='line'> 18</span>  * Reads a VTK file and creates the respective JSON(s) file(s).
+<span class='line'> 19</span>  * @class
+<span class='line'> 20</span>  * @constructor 
+<span class='line'> 21</span>  */</span><span class="WHIT">
+<span class='line'> 22</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">vxlVTKReader</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 23</span> 
+<span class='line'> 24</span> </span><span class="WHIT">    </span><span class="NAME">this.ARRAY_SIZE</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">65536</span><span class="PUNC">*</span><span class="NUMB">3</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 25</span> </span><span class="WHIT">    </span><span class="NAME">this.vertices</span><span class="WHIT">   </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 26</span> </span><span class="WHIT">    </span><span class="NAME">this.indices</span><span class="WHIT">    </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 27</span> </span><span class="WHIT">    </span><span class="NAME">this.normals</span><span class="WHIT">    </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 28</span> </span><span class="WHIT">    </span><span class="NAME">this.scalars</span><span class="WHIT">    </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 29</span> </span><span class="WHIT">    </span><span class="NAME">this.colors</span><span class="WHIT">     </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 30</span> 
+<span class='line'> 31</span> </span><span class="WHIT">    </span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"SOLID"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 32</span> 
+<span class='line'> 33</span> </span><span class="WHIT">    </span><span class="NAME">this.tags</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 34</span> </span><span class="WHIT">        </span><span class="NAME">NOWHERE</span><span class="WHIT">             </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT">    
+<span class='line'> 35</span>         </span><span class="NAME">POINTS</span><span class="WHIT">              </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 36</span> </span><span class="WHIT">        </span><span class="NAME">LINES</span><span class="WHIT">               </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 37</span> </span><span class="WHIT">        </span><span class="NAME">POLYGONS</span><span class="WHIT">            </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">3</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 38</span> </span><span class="WHIT">        </span><span class="NAME">POINT_DATA</span><span class="WHIT">          </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">4</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 39</span> </span><span class="WHIT">        </span><span class="NAME">NORMALS</span><span class="WHIT">             </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">5</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 40</span> </span><span class="WHIT">        </span><span class="NAME">CELL_DATA</span><span class="WHIT">           </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">6</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 41</span> </span><span class="WHIT">        </span><span class="NAME">TEXTURE_COORDINATES</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">7</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 42</span> </span><span class="WHIT">        </span><span class="NAME">SCALARS</span><span class="WHIT">             </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">8</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 43</span> </span><span class="WHIT">        </span><span class="NAME">LOOKUP_TABLE</span><span class="WHIT">        </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">9</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 44</span> </span><span class="WHIT">        </span><span class="NAME">COLOR_SCALARS</span><span class="WHIT">       </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">10</span><span class="WHIT">
+<span class='line'> 45</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 46</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 47</span> 
+<span class='line'> 48</span> </span><span class="COMM">/**
+<span class='line'> 49</span>  * Verifies if the HTML5 API is available. 
+<span class='line'> 50</span>  */</span><span class="WHIT">
+<span class='line'> 51</span> </span><span class="NAME">vxlVTKReder.prototype.isSupported</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 52</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">window.File</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">window.FileReader</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">window.FileList</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">window.Blob</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 53</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 54</span> 
+<span class='line'> 55</span> 
+<span class='line'> 56</span> </span><span class="COMM">/**
+<span class='line'> 57</span>  * @param {File} file an HTML5 File object
+<span class='line'> 58</span>  */</span><span class="WHIT">
+<span class='line'> 59</span> </span><span class="NAME">vxlVTKReader.prototype.read</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">file</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 60</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">vtkReader</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 61</span> </span><span class="WHIT">    
+<span class='line'> 62</span>     </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">reader</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">FileReader</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 63</span> </span><span class="WHIT">    </span><span class="NAME">reader.onload</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">event</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 64</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">contents</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">event.target.result</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 65</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">lines</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">contents.split</span><span class="PUNC">(</span><span class="REGX">/\r\n|\r|\n/</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 66</span> </span><span class="WHIT">        </span><span class="NAME">vtkReader._parse</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">  
+<span class='line'> 67</span>     </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="WHIT">    
+<span class='line'> 69</span>     </span><span class="NAME">reader.readAsText</span><span class="PUNC">(</span><span class="NAME">file</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 71</span> 
+<span class='line'> 72</span> </span><span class="COMM">/**
+<span class='line'> 73</span>  * Reads the file line by line and populates the respective arrays
+<span class='line'> 74</span>  */</span><span class="WHIT">
+<span class='line'> 75</span> </span><span class="NAME">vxlVTKReader.prototype._parse</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">lines</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 76</span> </span><span class="COMM">/*
+<span class='line'> 77</span>  * outputfile = ''
+<span class='line'> 78</span> numBlocks = 0
+<span class='line'> 79</span> 
+<span class='line'> 80</span> 
+<span class='line'> 81</span>     global mode
+<span class='line'> 82</span>     location = NOWHERE
+<span class='line'> 83</span>     
+<span class='line'> 84</span>     linenumber = 0
+<span class='line'> 85</span>         
+<span class='line'> 86</span>     for line in open(filename, 'r').readlines():
+<span class='line'> 87</span>         linenumber = linenumber + 1
+<span class='line'> 88</span>         try:
+<span class='line'> 89</span>             if line.startswith('POINTS'):
+<span class='line'> 90</span>                 print(line)
+<span class='line'> 91</span>                 location = POINTS
+<span class='line'> 92</span>                 continue
+<span class='line'> 93</span>             elif line.startswith('LINES'):
+<span class='line'> 94</span>                 print(line)
+<span class='line'> 95</span>                 location = LINES
+<span class='line'> 96</span>                 mode = "LINES"
+<span class='line'> 97</span>                 continue
+<span class='line'> 98</span>             elif line.staprocessIndexBlocksrtswith('POLYGONS'):
+<span class='line'> 99</span>                 print(line)
+<span class='line'>100</span>                 location = POLYGONS
+<span class='line'>101</span>                 continue
+<span class='line'>102</span>             elif line.startswith('POINT_DATA'):
+<span class='line'>103</span>                 location = POINT_DATA
+<span class='line'>104</span>                 continue
+<span class='line'>105</span>             elif line.startswith('NORMALS'):
+<span class='line'>106</span>                 print(line)
+<span class='line'>107</span>                 location = NORMALS
+<span class='line'>108</span>                 continue
+<span class='line'>109</span>             elif line.startswith('CELL_DATA'):
+<span class='line'>110</span>                 print(line)
+<span class='line'>111</span>                 location = CELL_DATA
+<span class='line'>112</span>                 continue
+<span class='line'>113</span>             elif line.startswith('TEXTURE_COORDINATES'):
+<span class='line'>114</span>                 print(line)
+<span class='line'>115</span>                 location = TEXTURE_COORDINATES
+<span class='line'>116</span>                 continue
+<span class='line'>117</span>             elif line.startswith('SCALARS'):
+<span class='line'>118</span>                 print(line)
+<span class='line'>119</span>                 location = SCALARS
+<span class='line'>120</span>                 continue
+<span class='line'>121</span>             elif line.startswith('LOOKUP_TABLE'):
+<span class='line'>122</span>                 print(line)
+<span class='line'>123</span>                 location = LOOKUP_TABLE
+<span class='line'>124</span>                 continue
+<span class='line'>125</span>             elif line.startswith('COLOR_SCALARS'):
+<span class='line'>126</span>                 location = COLOR_SCALARS
+<span class='line'>127</span>                 print(line)
+<span class='line'>128</span>                 continue
+<span class='line'>129</span>             elif location == POINTS:
+<span class='line'>130</span>                 for v in line.split():
+<span class='line'>131</span>                     vertices.append(float(v))
+<span class='line'>132</span>             elif location == LINES:
+<span class='line'>133</span>                 tt = line.split()
+<span class='line'>134</span>                 if len(tt)>0 and tt[0] == '2':
+<span class='line'>135</span>                     indices.append(int(tt[1]))
+<span class='line'>136</span>                     indices.append(int(tt[2]))
+<span class='line'>137</span>             elif location == POLYGONS: #they have to be triangles
+<span class='line'>138</span>                 tt = line.split()
+<span class='line'>139</span>                 if len(tt)>0 and tt[0] != '3':
+<span class='line'>140</span>                     raise AssertionError('Not triangles here')
+<span class='line'>141</span>                 for i in tt[1:len(tt)]:
+<span class='line'>142</span>                     indices.append(int(i))
+<span class='line'>143</span>             elif location == LOOKUP_TABLE:
+<span class='line'>144</span>                 if line.startswith('LOOKUP_TABLE'):
+<span class='line'>145</span>                     continue
+<span class='line'>146</span>                 else:
+<span class='line'>147</span>                     for pd in line.split():
+<span class='line'>148</span>                         scalars.append(float(pd))
+<span class='line'>149</span>             elif location == COLOR_SCALARS:
+<span class='line'>150</span>                 for n in line.split():
+<span class='line'>151</span>                     colors.append(float(n))
+<span class='line'>152</span>             elif location == NORMALS:
+<span class='line'>153</span>                 for n in line.split():
+<span class='line'>154</span>                     normals.append(float(n))
+<span class='line'>155</span>         except:
+<span class='line'>156</span>             print('Error while processing line '+str(linenumber))
+<span class='line'>157</span>             print(line)
+<span class='line'>158</span>             raise
+<span class='line'>159</span>  */</span><span class="WHIT">    
+<span class='line'>160</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>161</span> 
+<span class='line'>162</span> 
+<span class='line'>163</span> </span><span class="NAME">vxlVTKReader.prototype._processIndexBlocks</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>164</span> </span><span class="COMM">/*# -----------------------------------------------------------------------    
+<span class='line'>165</span> # Divides the calculated indices into blocks
+<span class='line'>166</span> # -----------------------------------------------------------------------
+<span class='line'>167</span> def processIndexBlocks():
+<span class='line'>168</span>     global numBlocks
+<span class='line'>169</span>     v_count = len(vertices)/3
+<span class='line'>170</span>     n_count = len(normals)/3
+<span class='line'>171</span>     ii_count =len(indices)
+<span class='line'>172</span>     i_count = ii_count/3
+<span class='line'>173</span>     c_count = len(colors)/3
+<span class='line'>174</span>     
+<span class='line'>175</span>     pd_count = len(scalars)
+<span class='line'>176</span>     print('vertices:\t' + str(v_count) +'\nnormals:\t' + str(n_count) + '\nindices:\t' + str(ii_count)+'\ntriangles:\t' + str(i_count) + '\nscalars:\t' + str(pd_count) + '\ncolors:\t'+str(c_count)+'\n')    
+<span class='line'>177</span>     #if (v_err or n_err):
+<span class='line'>178</span>     #    print ('vertex error = ' + str(v_err) +', normal error = ' + str(n_err))
+<span class='line'>179</span>         
+<span class='line'>180</span>     numBlocks = ii_count // ARRAY_SIZE
+<span class='line'>181</span>     if(ii_count % ARRAY_SIZE != 0):
+<span class='line'>182</span>         numBlocks = numBlocks + 1
+<span class='line'>183</span>     print( 'Number of Blocks: ' + str(numBlocks))
+<span class='line'>184</span>     
+<span class='line'>185</span>     for i in range(numBlocks):
+<span class='line'>186</span>         #Thread(target=processBlock, args=(vertices, indices, scalars, i)).start()
+<span class='line'>187</span>         processBlock(i,vertices, indices, scalars,colors)*/</span><span class="WHIT">
+<span class='line'>188</span> </span><span class="WHIT">    
+<span class='line'>189</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>190</span> 
+<span class='line'>191</span> </span><span class="NAME">vxlVTKReader.prototype._processBlock</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">blockID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pver</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pidx</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">psc</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pcol</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>192</span> </span><span class="COMM">/*
+<span class='line'>193</span> # -----------------------------------------------------------------------    
+<span class='line'>194</span> # Selects a block to process
+<span class='line'>195</span> # -----------------------------------------------------------------------    
+<span class='line'>196</span> def processBlock(blockID, pver, pidx, psc, pcol):
+<span class='line'>197</span>      global outputfile
+<span class='line'>198</span>      global numBlocks
+<span class='line'>199</span>      fid = str(blockID + 1)
+<span class='line'>200</span>      if numBlocks == 1:
+<span class='line'>201</span>          filename = outputfile + '.json'
+<span class='line'>202</span>      else:
+<span class='line'>203</span>          filename = outputfile+'_'+fid+'.json'
+<span class='line'>204</span>     
+<span class='line'>205</span>      vtx, idx, pdx, clx = weaveBlock(blockID, pver, pidx, psc, pcol)
+<span class='line'>206</span>      writeJSON(filename,vtx, idx, pdx, clx)
+<span class='line'>207</span>      print ('Block [' + fid +'] processed,  output: '+filename)
+<span class='line'>208</span>     
+<span class='line'>209</span>  */</span><span class="WHIT">
+<span class='line'>210</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>211</span> 
+<span class='line'>212</span> </span><span class="NAME">vxlVTKReader.prototype._weaveBlock</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">blockID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ver</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ind</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pod</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">clr</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>213</span> </span><span class="COMM">/*    
+<span class='line'>214</span> # -----------------------------------------------------------------------
+<span class='line'>215</span> # Calculates new index array for the block in question
+<span class='line'>216</span> # ver - vertices
+<span class='line'>217</span> # ind - indices
+<span class='line'>218</span> # seg - segment
+<span class='line'>219</span> # -----------------------------------------------------------------------
+<span class='line'>220</span> def weaveBlock(blockID, ver,ind, pod,clr):
+<span class='line'>221</span>     lowerBound  = ARRAY_SIZE*blockID
+<span class='line'>222</span>     upperBound = ARRAY_SIZE*(blockID+1)
+<span class='line'>223</span>     if upperBound > len(ind):
+<span class='line'>224</span>         upperBound = len(ind)
+<span class='line'>225</span>     newindex = dict()
+<span class='line'>226</span>     vtxBlock = []   # new vertex array
+<span class='line'>227</span>     idxBlock = []   # new index array
+<span class='line'>228</span>     pdxBlock = []   # new scalar array
+<span class='line'>229</span>     clrBlock = []   # new color array
+<span class='line'>230</span>     
+<span class='line'>231</span>     hasPointData = len(pod)>0
+<span class='line'>232</span>     hasColorData = len(clr)>0
+<span class='line'>233</span>     
+<span class='line'>234</span>     # Set of indices to be processed
+<span class='line'>235</span>     aux = ind[lowerBound:upperBound]
+<span class='line'>236</span>     taux = len(aux)
+<span class='line'>237</span>     nidx = -1
+<span class='line'>238</span>     #item = 1
+<span class='line'>239</span>     
+<span class='line'>240</span>     print('Weaving block #' + str(blockID+1) + '  ['+str(lowerBound)+','+str(upperBound)+']')
+<span class='line'>241</span>     
+<span class='line'>242</span>     #for each index to be processed
+<span class='line'>243</span>     for i,oidx in enumerate(aux):
+<span class='line'>244</span>         sys.stdout.write('Processing index %d out of %d \r' % (i,taux))
+<span class='line'>245</span>         # if index hasn't been mapped
+<span class='line'>246</span>         if oidx not in newindex.keys():
+<span class='line'>247</span>             nidx = nidx + 1
+<span class='line'>248</span>             # create new index for the old index (incrementally)
+<span class='line'>249</span>             idxBlock.append(nidx)
+<span class='line'>250</span>             # save in the map for posterior searches
+<span class='line'>251</span>             newindex[oidx] = nidx
+<span class='line'>252</span>             # multiply by three to find the right starting point in the vertex array
+<span class='line'>253</span>             index = oidx * 3
+<span class='line'>254</span>             # add the correspondant vertex into the new position in the new vertex array
+<span class='line'>255</span>             vtxBlock.append(ver[index])
+<span class='line'>256</span>             vtxBlock.append(ver[index+1])
+<span class='line'>257</span>             vtxBlock.append(ver[index+2])
+<span class='line'>258</span>             # add the correspondant point data if any
+<span class='line'>259</span>             if hasPointData:
+<span class='line'>260</span>                 pdxBlock.append(pod[oidx])
+<span class='line'>261</span>             
+<span class='line'>262</span>             if hasColorData:
+<span class='line'>263</span>                 clrBlock.append(clr[index])
+<span class='line'>264</span>                 clrBlock.append(clr[index+1])
+<span class='line'>265</span>                 clrBlock.append(clr[index+2])
+<span class='line'>266</span>         else:
+<span class='line'>267</span>             # if the index was mapped then use it in the new index array
+<span class='line'>268</span>             idxBlock.append(newindex[oidx])
+<span class='line'>269</span>     print('')
+<span class='line'>270</span>     del aux
+<span class='line'>271</span>     return vtxBlock, idxBlock, pdxBlock, clrBlock
+<span class='line'>272</span> */</span><span class="WHIT">
+<span class='line'>273</span> 
+<span class='line'>274</span> </span><span class="NAME">vxlVTKReader.prototype._writeJSON</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">fname</span><span class="PUNC">,</span><span class="NAME">ver</span><span class="PUNC">,</span><span class="NAME">ind</span><span class="PUNC">,</span><span class="NAME">pod</span><span class="PUNC">,</span><span class="NAME">clr</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>275</span> </span><span class="WHIT">  </span><span class="COMM">/*
+<span class='line'>276</span> # -----------------------------------------------------------------------    
+<span class='line'>277</span> # Writes a JSON file segment
+<span class='line'>278</span> # -----------------------------------------------------------------------
+<span class='line'>279</span> def writeJSON(fname,ver,ind, pod, clr):
+<span class='line'>280</span>     f = open(fname,'w')
+<span class='line'>281</span>     f.write('{\n')
+<span class='line'>282</span>     # writing vertices    
+<span class='line'>283</span>     f.write('  "vertices" : [')
+<span class='line'>284</span>     for v in ver[0:len(ver)-1]:
+<span class='line'>285</span>         f.write(str(v)+',')
+<span class='line'>286</span>     f.write(str(ver[len(ver)-1])+'],\n')
+<span class='line'>287</span>     
+<span class='line'>288</span>     # writing indices
+<span class='line'>289</span>     f.write('  "indices" : [')
+<span class='line'>290</span>     for i in ind[0:len(ind)-1]:
+<span class='line'>291</span>         f.write(str(i)+',')
+<span class='line'>292</span>     f.write(str(ind[len(ind)-1])+'],\n')
+<span class='line'>293</span>     
+<span class='line'>294</span>     # writing scalars    
+<span class='line'>295</span>     if len(pod) > 0:
+<span class='line'>296</span>         f.write('  "scalars" : [')
+<span class='line'>297</span>         for pd in  pod[0:len(pod)-1]:
+<span class='line'>298</span>             f.write(str(pd)+',')
+<span class='line'>299</span>         f.write(str(pod[len(pod)-1])+'],\n')
+<span class='line'>300</span>         
+<span class='line'>301</span>     # writing colors
+<span class='line'>302</span>     if len(clr) > 0:
+<span class='line'>303</span>         f.write('  "colors" : [')
+<span class='line'>304</span>         for cl in  clr[0:len(clr)-1]:
+<span class='line'>305</span>             f.write(str(cl)+',')
+<span class='line'>306</span>         f.write(str(clr[len(clr)-1])+'],\n')
+<span class='line'>307</span>     
+<span class='line'>308</span>     f.write('  "mode" : "'+mode+'"\n')    
+<span class='line'>309</span>     f.write('}')
+<span class='line'>310</span>     f.close()
+<span class='line'>311</span>   */</span><span class="WHIT">
+<span class='line'>312</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">  
+<span class='line'>313</span> 
+<span class='line'>314</span> 
+<span class='line'>315</span> </span><span class="COMM">/*# -----------------------------------------------------------------------    
+<span class='line'>316</span> # Main function
+<span class='line'>317</span> # -----------------------------------------------------------------------    
+<span class='line'>318</span> def main():
+<span class='line'>319</span>     global outputfile
+<span class='line'>320</span>     if len(sys.argv) != 3:
+<span class='line'>321</span>         print ('Usage: python vxl_vtk_importer.py vtkFile.vtk outputFile')
+<span class='line'>322</span>         exit()
+<span class='line'>323</span>     
+<span class='line'>324</span>     outputfile = sys.argv[2]
+<span class='line'>325</span> 
+<span class='line'>326</span>     print('----------------------------------------------------------')
+<span class='line'>327</span>     print(' Processing: ' + sys.argv[1])
+<span class='line'>328</span>     print('----------------------------------------------------------')
+<span class='line'>329</span>     parseVTK(sys.argv[1])
+<span class='line'>330</span>     processIndexBlocks()
+<span class='line'>331</span>     print('----------------------------------------------------------')
+<span class='line'>332</span>     print("                       DONE                               ")
+<span class='line'>333</span>     print('----------------------------------------------------------')
+<span class='line'>334</span> 
+<span class='line'>335</span> if __name__ == '__main__':
+<span class='line'>336</span>     main()
+<span class='line'>337</span>             
+<span class='line'>338</span>   */</span><span class="WHIT">  </span></pre></body></html>
