@@ -43,12 +43,16 @@ function vxlVTKReader(){
         LOOKUP_TABLE        : 9,
         COLOR_SCALARS       : 10
     };
+    
+    this.parts = [];
+    
+    vxl.go.notifier.publish(vxl.events.READER_DONE, this);
 };
 
 /**
  * Verifies if the HTML5 API is available. 
  */
-vxlVTKReder.prototype.isSupported = function(){
+vxlVTKReader.prototype.isSupported = function(){
     return (window.File && window.FileReader && window.FileList && window.Blob);
 };
 
@@ -58,12 +62,15 @@ vxlVTKReder.prototype.isSupported = function(){
  */
 vxlVTKReader.prototype.read = function(file){
     var vtkReader = this;
-    
+    var filename = file.name;
     var reader = new FileReader();
+    
     reader.onload = function(event){
-        var contents = event.target.result;
+        var contents = event.target.result.trim();
         var lines = contents.split(/\r\n|\r|\n/);
         vtkReader._parse(lines);  
+        vtkReader._processIndexBlocks(filename);
+        vxl.go.notifier.fire(vxl.events.READER_DONE, vtkReader);
     };
     
     reader.readAsText(file);
@@ -74,17 +81,162 @@ vxlVTKReader.prototype.read = function(file){
  */
 vxlVTKReader.prototype._parse = function(lines){
 /*
- * outputfile = ''
-numBlocks = 0
-
-
+ *  outputfile = ''
+    numBlocks = 0
     global mode
     location = NOWHERE
-    
     linenumber = 0
-        
+        */
+       
+       this.outputfile = '';
+       this.numBlocks = 0;
+       this.location = 'NOWHERE';
+       var linenumber = 0;
+       
+       
+       /*
     for line in open(filename, 'r').readlines():
         linenumber = linenumber + 1
+        */
+       for(var linenumber=0; linenumber<lines.length; linenumber++)
+       {
+        
+           try
+                {
+                    if (lines[linenumber].indexOf('POINTS') == 0)
+                    {
+                        console.log(lines[linenumber]);
+                        this.location = this.tags.POINTS;
+                        continue;
+                    }
+                    else if (lines[linenumber].indexOf('LINES') == 0)
+                    {
+                        console.log(lines[linenumber]);
+                        this.location = this.tags.LINES;
+                        this.mode = "LINES";
+                        continue;
+                    }
+                    else if (lines[linenumber].indexOf('POLYGONS')==0)
+                    {
+                        console.log(lines[linenumber]);
+                        this.location = this.tags.POLYGONS;
+                        continue;
+                    }
+                    else if (lines[linenumber].indexOf('POINT_DATA')==0)
+                    {                   
+                        this.location = this.tags.POINT_DATA;
+                        continue;
+                    }
+                    else if (lines[linenumber].indexOf('NORMALS')==0)
+                    {      
+                        console.log(lines[linenumber]);             
+                        this.location = this.tags.NORMALS;
+                        continue;
+                    }
+                    else if (lines[linenumber].indexOf('CELL_DATA')==0)
+                    {      
+                        console.log(lines[linenumber]);             
+                        this.location = this.tags.CELL_DATA;
+                        continue;
+                    }
+                    else if (lines[linenumber].indexOf('TEXTURE_COORDINATES')==0)
+                    {      
+                        console.log(lines[linenumber]);             
+                        this.location = this.tags.TEXTURE_COORDINATES;
+                        continue;
+                    }
+                    else if (lines[linenumber].indexOf('SCALARS')==0)
+                    {      
+                        console.log(lines[linenumber]);             
+                        this.location = this.tags.SCALARS;
+                        continue;
+                    }
+                    else if (lines[linenumber].indexOf('LOOKUP_TABLE')==0)
+                    {      
+                        console.log(lines[linenumber]);             
+                        this.location = this.tags.LOOKUP_TABLE;
+                        continue;
+                    }   
+                    else if (lines[linenumber].indexOf('COLOR_SCALARS')==0)
+                    {      
+                        console.log(lines[linenumber]);             
+                        this.location = this.tags.COLOR_SCALARS;
+                        continue;
+                    }           
+                    // -------------------
+                    else if(this.location == this.tags.POINTS)
+                    {
+                        var v = lines[linenumber].trim().split(' ');
+                        if (v == "") continue;
+                        for (var i=0; i<v.length; i++)
+                        {
+                             this.vertices.push(parseFloat(v[i]));
+                        }
+                    }
+                    else if(this.location == this.tags.LINES)
+                    {
+                        var tt = lines[linenumber].trim().split(' ');
+                        if (tt == "") continue;
+                        if(tt.length>0 && tt[0] == '2')
+                        {
+                            this.indices.push(parseInt(tt[1]));
+                            this.indices.push(parseInt(tt[2]));
+                        }
+                    }
+                   else if(this.location == this.tags.POLYGONS) //they have to be triangles
+                    {
+                        var tt = lines[linenumber].trim().split(' ');
+                        if (tt=="") continue; 
+                        if(tt.length>0 && tt[0] != '3')
+                        {
+                            throw "Not triangles here";
+                        }
+                        for(var i= 0; i<tt.length; i++)
+                        {
+                            this.indices.push(parseInt(tt[i]));
+                        }
+                    }
+                    else if(this.location == this.tags.LOOKUP_TABLE)
+                    {
+                        if(lines[linenumber].indexOf('LOOKUP_TABLE')==0)
+                            continue;
+                        else
+                        {
+                            var pd = lines[linenumber].trim().split(' ');
+                            if (pd=="") continue;
+                            for(var i=0; i<pd.length; i++)
+                            {
+                                this.scalars.push(parseFloat(pd[i]));
+                            }
+                       }
+                    }
+                    else if(this.location == this.tags.COLOR_SCALARS)
+                    {
+                        var n = lines[linenumber].trim().split(' ');
+                        if (n=="") continue;
+                        for(var i=0; i<n.length; i++)
+                        {
+                            this.colors.push(parseFloat(n[i]));
+                        }
+                    }
+                    else if(this.location == this.tags.NORMALS)
+                    {
+                        var n = lines[linenumber].trim().split(' ');
+                        if (n=="") continue;
+                        for(var i=0; i<n.length; i++)
+                        {
+                            this.normals.push(parseFloat(n[i]));
+                        }
+                    }
+               } // end try
+            catch(err)
+                {
+                console.log('Error while processing line '+ linenumber.toString());
+                //console.log(lines) // what is this for??
+                throw err;
+                }
+        }; // end foor loop
+       /*
         try:
             if line.startswith('POINTS'):
                 print(line)
@@ -95,7 +247,7 @@ numBlocks = 0
                 location = LINES
                 mode = "LINES"
                 continue
-            elif line.staprocessIndexBlocksrtswith('POLYGONS'):
+            elif line.startswith('POLYGONS'):
                 print(line)
                 location = POLYGONS
                 continue
@@ -157,26 +309,52 @@ numBlocks = 0
             print(line)
             raise
  */    
+
 };
 
 
-vxlVTKReader.prototype._processIndexBlocks = function(){
+vxlVTKReader.prototype._processIndexBlocks = function(filename){
 /*# -----------------------------------------------------------------------    
 # Divides the calculated indices into blocks
 # -----------------------------------------------------------------------
 def processIndexBlocks():
+  */
+   this.numBlocks = 0;
+   var v_count =  this.vertices.length/3;
+   var n_count =  this.normals.length/3;
+   var ii_count = this.indices.length;
+   var i_count =  ii_count/3;
+   var c_count =  this.colors.length/3;
+   var pd_count = this.scalars.length;
+    
+ /*
     global numBlocks
     v_count = len(vertices)/3
     n_count = len(normals)/3
     ii_count =len(indices)
     i_count = ii_count/3
     c_count = len(colors)/3
-    
     pd_count = len(scalars)
+  */
+ 
+ console.log('vertices:\t' + v_count.toString() +'\nnormals:\t' + n_count.toString() + '\nindices:\t' + ii_count.toString() +'\ntriangles:\t' + i_count.toString() +
+             '\nscalars:\t' + pd_count.toString() + '\ncolors:\t'+ c_count.toString()+'\n');
+ 
+ /*
     print('vertices:\t' + str(v_count) +'\nnormals:\t' + str(n_count) + '\nindices:\t' + str(ii_count)+'\ntriangles:\t' + str(i_count) + '\nscalars:\t' + str(pd_count) + '\ncolors:\t'+str(c_count)+'\n')    
     #if (v_err or n_err):
     #    print ('vertex error = ' + str(v_err) +', normal error = ' + str(n_err))
-        
+ */
+    this.numBlocks = parseInt(ii_count/this.ARRAY_SIZE);
+    if (ii_count % this.ARRAY_SIZE != 0)
+        this.numBlocks  = this.numBlocks + 1;
+    console.log( 'Number of Blocks: ' + this.numBlocks.toString());
+    
+    for(var i=0; i<this.numBlocks; i++){
+        this._processBlock(i, filename);
+    }
+
+/*
     numBlocks = ii_count // ARRAY_SIZE
     if(ii_count % ARRAY_SIZE != 0):
         numBlocks = numBlocks + 1
@@ -188,12 +366,33 @@ def processIndexBlocks():
     
 };
 
-vxlVTKReader.prototype._processBlock = function(blockID, pver, pidx, psc, pcol){
+vxlVTKReader.prototype._processBlock = function(blockID, filename){
 /*
 # -----------------------------------------------------------------------    
 # Selects a block to process
 # -----------------------------------------------------------------------    
 def processBlock(blockID, pver, pidx, psc, pcol):
+*/
+
+    var pver = this.vertices;
+    var pidx = this.indices;
+    var psc = this.scalars;
+    var pcol = this.colors;
+    
+    var fid = (blockID + 1).toString();
+    var blockname = "";
+    
+    if (this.numBlocks == 1)
+        blockname = filename ;
+    else
+        blockname = filename + '_' + fid;
+        
+    //  _weaveBlock(blockID);
+    this._writeJSON(filename, pver, pidx, psc, pcol);
+    console.log('Block ['+ fid +'] processed,  output: '+ blockname);
+
+/*
+
      global outputfile
      global numBlocks
      fid = str(blockID + 1)
@@ -202,6 +401,7 @@ def processBlock(blockID, pver, pidx, psc, pcol):
      else:
          filename = outputfile+'_'+fid+'.json'
     
+    
      vtx, idx, pdx, clx = weaveBlock(blockID, pver, pidx, psc, pcol)
      writeJSON(filename,vtx, idx, pdx, clx)
      print ('Block [' + fid +'] processed,  output: '+filename)
@@ -209,7 +409,7 @@ def processBlock(blockID, pver, pidx, psc, pcol):
  */
 };
 
-vxlVTKReader.prototype._weaveBlock = function(blockID, ver, ind, pod, clr){
+vxlVTKReader.prototype._weaveBlock = function(blockID){
 /*    
 # -----------------------------------------------------------------------
 # Calculates new index array for the block in question
@@ -270,6 +470,7 @@ def weaveBlock(blockID, ver,ind, pod,clr):
     del aux
     return vtxBlock, idxBlock, pdxBlock, clrBlock
 */
+};
 
 vxlVTKReader.prototype._writeJSON = function(fname,ver,ind,pod,clr){
   /*
@@ -277,7 +478,28 @@ vxlVTKReader.prototype._writeJSON = function(fname,ver,ind,pod,clr){
 # Writes a JSON file segment
 # -----------------------------------------------------------------------
 def writeJSON(fname,ver,ind, pod, clr):
-    f = open(fname,'w')
+  */
+ 
+     var jsonPart = new Object();
+     jsonPart["vertices"]    = ver.slice(0);
+     jsonPart["indices"]     = ind.slice(0);
+     
+     if (pod.length>0){
+        jsonPart["scalars"]  = pod.slice(0);
+     }
+     
+     if (clr.length >0){
+        jsonPart["colors"]   = clr.slice(0);
+     }
+     
+     jsonPart["mode"]        = this.mode;
+     
+     this.parts.push(jsonPart);
+       
+    
+ /*  
+    f = fileReader();
+   f = open(fname,'w')
     f.write('{\n')
     # writing vertices    
     f.write('  "vertices" : [')
@@ -311,28 +533,9 @@ def writeJSON(fname,ver,ind, pod, clr):
   */
  };  
 
-
-/*# -----------------------------------------------------------------------    
-# Main function
-# -----------------------------------------------------------------------    
-def main():
-    global outputfile
-    if len(sys.argv) != 3:
-        print ('Usage: python vxl_vtk_importer.py vtkFile.vtk outputFile')
-        exit()
-    
-    outputfile = sys.argv[2]
-
-    print('----------------------------------------------------------')
-    print(' Processing: ' + sys.argv[1])
-    print('----------------------------------------------------------')
-    parseVTK(sys.argv[1])
-    processIndexBlocks()
-    print('----------------------------------------------------------')
-    print("                       DONE                               ")
-    print('----------------------------------------------------------')
-
-if __name__ == '__main__':
-    main()
-            
-  */  
+/**
+ * Once the reader has finished. This method allows retrieving the parsed parts 
+ */
+vxlVTKReader.prototype.getParts = function(){
+    return this.parts;
+}

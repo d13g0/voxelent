@@ -176,7 +176,8 @@ events : {
 	ACTOR_CHANGED_COLOR    : 'vxl.events.ACTOR_CHANGED_COLOR',
 	ACTOR_CHANGED_SHADING  : 'vxl.events.ACTOR_CHANGED_SHADING',
 	VIEW_NEW               : 'vxl.events.VIEW_NEW',
-	SCENE_NEW              : 'vxl.events.SCENE_NEW'
+	SCENE_NEW              : 'vxl.events.SCENE_NEW',
+	READER_DONE            : 'vxl.events.READER_DONE'
 },
 
 
