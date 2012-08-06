@@ -95,12 +95,6 @@ vxlNotifier.prototype._addSource = function(event,src){
 	}
 	
 	sourceList[event].push(src);
-	
-	//$(document).bind(event, function(e,event,src,targetList){
-	//	for (var index=0;index<targetList[event].length;index++){
-	//		targetList[event][index].handleEvent(event,src);
-	//	}
-	//});
 };
 
 /**
@@ -134,7 +128,6 @@ vxlNotifier.prototype.fire = function(event, src){
              targets[index].handleEvent(event,src);
         }
 	}
-	processEvent();
 	setTimeout(function(){processEvent()},0)
 };
 

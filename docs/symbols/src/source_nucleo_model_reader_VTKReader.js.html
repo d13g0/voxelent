@@ -271,116 +271,117 @@
 <span class='line'>264</span>  * @private
 <span class='line'>265</span>  */</span><span class="WHIT">
 <span class='line'>266</span> </span><span class="NAME">vxlVTKReader.prototype._processBlock</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">blockID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">filename</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>267</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pver</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.vertices</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>268</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pidx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.indices</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>269</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">psc</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.scalars</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>270</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pcol</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.colors</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>271</span> </span><span class="WHIT">    
-<span class='line'>272</span>     </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">fid</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">blockID</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>273</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">blockname</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>274</span> </span><span class="WHIT">    
-<span class='line'>275</span>     </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.numBlocks</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>276</span> </span><span class="WHIT">        </span><span class="NAME">blockname</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">filename</span><span class="WHIT"> </span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>277</span> </span><span class="WHIT">    </span><span class="KEYW">else</span><span class="WHIT">
-<span class='line'>278</span> </span><span class="WHIT">        </span><span class="NAME">blockname</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">filename</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'_'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">fid</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>279</span> </span><span class="WHIT">        
-<span class='line'>280</span>     </span><span class="COMM">//  _weaveBlock(blockID);</span><span class="WHIT">
-<span class='line'>281</span> </span><span class="WHIT">    </span><span class="NAME">this._writeJSON</span><span class="PUNC">(</span><span class="NAME">filename</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pver</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pidx</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">psc</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pcol</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>282</span> </span><span class="WHIT">    </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="STRN">'Block ['</span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">fid</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="STRN">'] processed,  output: '</span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">blockname</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>283</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>267</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">fid</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">blockID</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">toString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>268</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">blockname</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>269</span> </span><span class="WHIT">    
+<span class='line'>270</span>     </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.numBlocks</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>271</span> </span><span class="WHIT">        </span><span class="NAME">blockname</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">filename</span><span class="WHIT"> </span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>272</span> </span><span class="WHIT">    </span><span class="KEYW">else</span><span class="WHIT">
+<span class='line'>273</span> </span><span class="WHIT">        </span><span class="NAME">blockname</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">filename</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'_'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">fid</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>274</span> </span><span class="WHIT">        
+<span class='line'>275</span>     </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">block</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._weaveBlock</span><span class="PUNC">(</span><span class="NAME">blockID</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>276</span> </span><span class="WHIT">    </span><span class="NAME">this._writeJSON</span><span class="PUNC">(</span><span class="NAME">blockname</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">block</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>277</span> </span><span class="WHIT">    </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="STRN">'Block ['</span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">fid</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="STRN">'] processed,  output: '</span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">blockname</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>278</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>279</span> 
+<span class='line'>280</span> </span><span class="COMM">/**
+<span class='line'>281</span>  * Calculates the new index array for the block in question
+<span class='line'>282</span>  */</span><span class="WHIT">
+<span class='line'>283</span> </span><span class="NAME">vxlVTKReader.prototype._weaveBlock</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">blockID</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'>284</span> 
-<span class='line'>285</span> </span><span class="COMM">/**
-<span class='line'>286</span>  * Calculates the new index array for the block in question
-<span class='line'>287</span>  */</span><span class="WHIT">
-<span class='line'>288</span> </span><span class="NAME">vxlVTKReader.prototype._weaveBlock</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">blockID</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>289</span> </span><span class="COMM">/*    
-<span class='line'>290</span> # -----------------------------------------------------------------------
-<span class='line'>291</span> # Calculates new index array for the block in question
-<span class='line'>292</span> # ver - vertices
-<span class='line'>293</span> # ind - indices
-<span class='line'>294</span> # seg - segment
-<span class='line'>295</span> # -----------------------------------------------------------------------
-<span class='line'>296</span> def weaveBlock(blockID, ver,ind, pod,clr):
-<span class='line'>297</span>     lowerBound  = ARRAY_SIZE*blockID
-<span class='line'>298</span>     upperBound = ARRAY_SIZE*(blockID+1)
-<span class='line'>299</span>     if upperBound > len(ind):
-<span class='line'>300</span>         upperBound = len(ind)
-<span class='line'>301</span>     newindex = dict()
-<span class='line'>302</span>     vtxBlock = []   # new vertex array
-<span class='line'>303</span>     idxBlock = []   # new index array
-<span class='line'>304</span>     pdxBlock = []   # new scalar array
-<span class='line'>305</span>     clrBlock = []   # new color array
-<span class='line'>306</span>     
-<span class='line'>307</span>     hasPointData = len(pod)>0
-<span class='line'>308</span>     hasColorData = len(clr)>0
-<span class='line'>309</span>     
-<span class='line'>310</span>     # Set of indices to be processed
-<span class='line'>311</span>     aux = ind[lowerBound:upperBound]
-<span class='line'>312</span>     taux = len(aux)
-<span class='line'>313</span>     nidx = -1
-<span class='line'>314</span>     #item = 1
-<span class='line'>315</span>     
-<span class='line'>316</span>     print('Weaving block #' + str(blockID+1) + '  ['+str(lowerBound)+','+str(upperBound)+']')
-<span class='line'>317</span>     
-<span class='line'>318</span>     #for each index to be processed
-<span class='line'>319</span>     for i,oidx in enumerate(aux):
-<span class='line'>320</span>         sys.stdout.write('Processing index %d out of %d \r' % (i,taux))
-<span class='line'>321</span>         # if index hasn't been mapped
-<span class='line'>322</span>         if oidx not in newindex.keys():
-<span class='line'>323</span>             nidx = nidx + 1
-<span class='line'>324</span>             # create new index for the old index (incrementally)
-<span class='line'>325</span>             idxBlock.append(nidx)
-<span class='line'>326</span>             # save in the map for posterior searches
-<span class='line'>327</span>             newindex[oidx] = nidx
-<span class='line'>328</span>             # multiply by three to find the right starting point in the vertex array
-<span class='line'>329</span>             index = oidx * 3
-<span class='line'>330</span>             # add the correspondant vertex into the new position in the new vertex array
-<span class='line'>331</span>             vtxBlock.append(ver[index])
-<span class='line'>332</span>             vtxBlock.append(ver[index+1])
-<span class='line'>333</span>             vtxBlock.append(ver[index+2])
-<span class='line'>334</span>             # add the correspondant point data if any
-<span class='line'>335</span>             if hasPointData:
-<span class='line'>336</span>                 pdxBlock.append(pod[oidx])
-<span class='line'>337</span>             
-<span class='line'>338</span>             if hasColorData:
-<span class='line'>339</span>                 clrBlock.append(clr[index])
-<span class='line'>340</span>                 clrBlock.append(clr[index+1])
-<span class='line'>341</span>                 clrBlock.append(clr[index+2])
-<span class='line'>342</span>         else:
-<span class='line'>343</span>             # if the index was mapped then use it in the new index array
-<span class='line'>344</span>             idxBlock.append(newindex[oidx])
-<span class='line'>345</span>     print('')
-<span class='line'>346</span>     del aux
-<span class='line'>347</span>     return vtxBlock, idxBlock, pdxBlock, clrBlock
-<span class='line'>348</span> */</span><span class="WHIT">
-<span class='line'>349</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>350</span> 
-<span class='line'>351</span> </span><span class="COMM">/**
-<span class='line'>352</span>  * Creates the JSON object
-<span class='line'>353</span>  * @private 
-<span class='line'>354</span>  */</span><span class="WHIT">
-<span class='line'>355</span> </span><span class="NAME">vxlVTKReader.prototype._writeJSON</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">fname</span><span class="PUNC">,</span><span class="NAME">ver</span><span class="PUNC">,</span><span class="NAME">ind</span><span class="PUNC">,</span><span class="NAME">pod</span><span class="PUNC">,</span><span class="NAME">clr</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>356</span> </span><span class="WHIT">     </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">jsonPart</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Object</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>357</span> </span><span class="WHIT">     </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"name"</span><span class="PUNC">]</span><span class="WHIT">        </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fname</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>358</span> </span><span class="WHIT">     </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"vertices"</span><span class="PUNC">]</span><span class="WHIT">    </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ver.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>359</span> </span><span class="WHIT">     </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"indices"</span><span class="PUNC">]</span><span class="WHIT">     </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ind.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>360</span> </span><span class="WHIT">     
-<span class='line'>361</span>      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">pod.length</span><span class="PUNC">></span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>362</span> </span><span class="WHIT">        </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"scalars"</span><span class="PUNC">]</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">pod.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>363</span> </span><span class="WHIT">     </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>364</span> </span><span class="WHIT">     
-<span class='line'>365</span>      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">clr.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>366</span> </span><span class="WHIT">        </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"colors"</span><span class="PUNC">]</span><span class="WHIT">   </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">clr.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>367</span> </span><span class="WHIT">     </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>368</span> </span><span class="WHIT">     
-<span class='line'>369</span>      </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"mode"</span><span class="PUNC">]</span><span class="WHIT">        </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.mode</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>370</span> </span><span class="WHIT">     
-<span class='line'>371</span>      </span><span class="NAME">this.parts.push</span><span class="PUNC">(</span><span class="NAME">jsonPart</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>372</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">  
-<span class='line'>373</span> 
-<span class='line'>374</span> </span><span class="COMM">/**
-<span class='line'>375</span>  * Once the reader has finished. This method allows retrieving the parsed parts 
-<span class='line'>376</span>  */</span><span class="WHIT">
-<span class='line'>377</span> </span><span class="NAME">vxlVTKReader.prototype.getParts</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>378</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.parts</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>379</span> </span><span class="PUNC">}</span></pre></body></html>
+<span class='line'>285</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">lowerBound</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.ARRAY_SIZE</span><span class="PUNC">*</span><span class="NAME">blockID</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>286</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">upperBound</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.ARRAY_SIZE</span><span class="PUNC">*</span><span class="PUNC">(</span><span class="NAME">blockID</span><span class="PUNC">+</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>287</span> 
+<span class='line'>288</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">upperBound</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NAME">this.indices.length</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>289</span> </span><span class="WHIT">        </span><span class="NAME">upperBound</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.indices.length</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>290</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>291</span> </span><span class="WHIT">    
+<span class='line'>292</span>     </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">newindex</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>293</span> </span><span class="WHIT">    
+<span class='line'>294</span>     </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">block</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>295</span> </span><span class="WHIT">        </span><span class="NAME">vertices</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">   </span><span class="COMM">//new vertex array</span><span class="WHIT">
+<span class='line'>296</span> </span><span class="WHIT">        </span><span class="NAME">indices</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">   </span><span class="COMM">//new index array</span><span class="WHIT">
+<span class='line'>297</span> </span><span class="WHIT">        </span><span class="NAME">scalars</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">   </span><span class="COMM">//new scalar array</span><span class="WHIT">
+<span class='line'>298</span> </span><span class="WHIT">        </span><span class="NAME">colors</span><span class="WHIT">  </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="WHIT">   </span><span class="COMM">//new color array</span><span class="WHIT">
+<span class='line'>299</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>300</span> </span><span class="WHIT">    
+<span class='line'>301</span>     </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">hasPointData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.scalars.length</span><span class="PUNC">></span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>302</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">hasColorData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.colors.length</span><span class="PUNC">></span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>303</span> </span><span class="WHIT">    
+<span class='line'>304</span>     
+<span class='line'>305</span>     </span><span class="COMM">// Set of indices to be processed</span><span class="WHIT">
+<span class='line'>306</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">aux</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.indices.slice</span><span class="PUNC">(</span><span class="NAME">lowerBound</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">upperBound</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>307</span> </span><span class="WHIT">    
+<span class='line'>308</span>     </span><span class="NAME">taux</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">aux.length</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>309</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">nidx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="NUMB">1</span><span class="WHIT">
+<span class='line'>310</span> </span><span class="WHIT">    
+<span class='line'>311</span>     
+<span class='line'>312</span>     </span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="STRN">'Weaving block #'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">blockID</span><span class="PUNC">+</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'  ['</span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">lowerBound</span><span class="PUNC">+</span><span class="STRN">','</span><span class="PUNC">+</span><span class="NAME">upperBound</span><span class="PUNC">+</span><span class="STRN">']'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>313</span> </span><span class="WHIT">    
+<span class='line'>314</span>     </span><span class="COMM">//for each index to be processed</span><span class="WHIT">
+<span class='line'>315</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">taux</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">+</span><span class="PUNC">=</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT"> 
+<span class='line'>316</span>         </span><span class="COMM">//if index hasn't been mapped</span><span class="WHIT">
+<span class='line'>317</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">oidx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">aux</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>318</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">newindex</span><span class="PUNC">[</span><span class="NAME">oidx</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>319</span> </span><span class="WHIT">            </span><span class="NAME">nidx</span><span class="PUNC">++</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>320</span> </span><span class="WHIT">            </span><span class="COMM">// create new index for the old index (incrementally)</span><span class="WHIT">
+<span class='line'>321</span> </span><span class="WHIT">            </span><span class="NAME">block.indices.push</span><span class="PUNC">(</span><span class="NAME">nidx</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>322</span> </span><span class="WHIT">            </span><span class="COMM">// save in the map for posterior searches</span><span class="WHIT">
+<span class='line'>323</span> </span><span class="WHIT">            </span><span class="NAME">newindex</span><span class="PUNC">[</span><span class="NAME">oidx</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">nidx</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>324</span> </span><span class="WHIT">            </span><span class="COMM">// multiply by three to find the right starting point in the vertex array</span><span class="WHIT">
+<span class='line'>325</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">index</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">oidx</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">3</span><span class="WHIT">
+<span class='line'>326</span> </span><span class="WHIT">            </span><span class="COMM">// add the correspondent vertex into the new position in the new vertex array</span><span class="WHIT">
+<span class='line'>327</span> </span><span class="WHIT">            </span><span class="NAME">block.vertices.push</span><span class="PUNC">(</span><span class="NAME">this.vertices</span><span class="PUNC">[</span><span class="NAME">index</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>328</span> </span><span class="WHIT">            </span><span class="NAME">block.vertices.push</span><span class="PUNC">(</span><span class="NAME">this.vertices</span><span class="PUNC">[</span><span class="NAME">index</span><span class="PUNC">+</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>329</span> </span><span class="WHIT">            </span><span class="NAME">block.vertices.push</span><span class="PUNC">(</span><span class="NAME">this.vertices</span><span class="PUNC">[</span><span class="NAME">index</span><span class="PUNC">+</span><span class="NUMB">2</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>330</span> </span><span class="WHIT">            </span><span class="COMM">// add the correspondent point data if any</span><span class="WHIT">
+<span class='line'>331</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">hasPointData</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>332</span> </span><span class="WHIT">                </span><span class="NAME">block.scalars.push</span><span class="PUNC">(</span><span class="NAME">this.scalars</span><span class="PUNC">[</span><span class="NAME">oidx</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>333</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>334</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">hasColorData</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>335</span> </span><span class="WHIT">                </span><span class="NAME">block.colors.push</span><span class="PUNC">(</span><span class="NAME">this.colors</span><span class="PUNC">[</span><span class="NAME">index</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>336</span> </span><span class="WHIT">                </span><span class="NAME">block.colors.push</span><span class="PUNC">(</span><span class="NAME">this.colors</span><span class="PUNC">[</span><span class="NAME">index</span><span class="PUNC">+</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>337</span> </span><span class="WHIT">                </span><span class="NAME">block.colors.push</span><span class="PUNC">(</span><span class="NAME">this.colors</span><span class="PUNC">[</span><span class="NAME">index</span><span class="PUNC">+</span><span class="NUMB">2</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>338</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>339</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>340</span> </span><span class="WHIT">        </span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>341</span> </span><span class="WHIT">            </span><span class="COMM">// if the index was mapped then use it in the new index array</span><span class="WHIT">
+<span class='line'>342</span> </span><span class="WHIT">            </span><span class="NAME">block.indices.push</span><span class="PUNC">(</span><span class="NAME">newindex</span><span class="PUNC">[</span><span class="NAME">oidx</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>343</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>344</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>345</span> </span><span class="WHIT">    </span><span class="KEYW">delete</span><span class="WHIT"> </span><span class="NAME">aux</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>346</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">block</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>347</span> 
+<span class='line'>348</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>349</span> 
+<span class='line'>350</span> </span><span class="COMM">/**
+<span class='line'>351</span>  * Creates the JSON object
+<span class='line'>352</span>  * @private 
+<span class='line'>353</span>  */</span><span class="WHIT">
+<span class='line'>354</span> </span><span class="NAME">vxlVTKReader.prototype._writeJSON</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">fname</span><span class="PUNC">,</span><span class="NAME">block</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>355</span> </span><span class="WHIT">    
+<span class='line'>356</span>      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">jsonPart</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Object</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>357</span> </span><span class="WHIT">     
+<span class='line'>358</span>      </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"name"</span><span class="PUNC">]</span><span class="WHIT">        </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fname</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>359</span> </span><span class="WHIT">     </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"vertices"</span><span class="PUNC">]</span><span class="WHIT">    </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">block.vertices.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>360</span> </span><span class="WHIT">     </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"indices"</span><span class="PUNC">]</span><span class="WHIT">     </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">block.indices.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>361</span> </span><span class="WHIT">     
+<span class='line'>362</span>      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">block.scalars.length</span><span class="PUNC">></span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>363</span> </span><span class="WHIT">        </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"scalars"</span><span class="PUNC">]</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">block.scalars.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>364</span> </span><span class="WHIT">     </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>365</span> </span><span class="WHIT">     
+<span class='line'>366</span>      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">block.colors.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>367</span> </span><span class="WHIT">        </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"colors"</span><span class="PUNC">]</span><span class="WHIT">   </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">block.colors.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>368</span> </span><span class="WHIT">     </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>369</span> </span><span class="WHIT">     
+<span class='line'>370</span>      </span><span class="NAME">jsonPart</span><span class="PUNC">[</span><span class="STRN">"mode"</span><span class="PUNC">]</span><span class="WHIT">        </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.mode</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>371</span> </span><span class="WHIT">     
+<span class='line'>372</span>      </span><span class="NAME">this.parts.push</span><span class="PUNC">(</span><span class="NAME">jsonPart</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>373</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">  
+<span class='line'>374</span> 
+<span class='line'>375</span> </span><span class="COMM">/**
+<span class='line'>376</span>  * Once the reader has finished. This method allows retrieving the parsed parts 
+<span class='line'>377</span>  */</span><span class="WHIT">
+<span class='line'>378</span> </span><span class="NAME">vxlVTKReader.prototype.getParts</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>379</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.parts</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>380</span> </span><span class="PUNC">}</span></pre></body></html>

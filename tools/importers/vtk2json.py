@@ -185,7 +185,7 @@ def weaveBlock(blockID, ver,ind, pod,clr):
     aux = ind[lowerBound:upperBound]
     taux = len(aux)
     nidx = -1
-    #item = 1
+    
     
     print('Weaving block #' + str(blockID+1) + '  ['+str(lowerBound)+','+str(upperBound)+']')
     
@@ -201,11 +201,11 @@ def weaveBlock(blockID, ver,ind, pod,clr):
             newindex[oidx] = nidx
             # multiply by three to find the right starting point in the vertex array
             index = oidx * 3
-            # add the correspondant vertex into the new position in the new vertex array
+            # add the correspondent vertex into the new position in the new vertex array
             vtxBlock.append(ver[index])
             vtxBlock.append(ver[index+1])
             vtxBlock.append(ver[index+2])
-            # add the correspondant point data if any
+            # add the correspondent point data if any
             if hasPointData:
                 pdxBlock.append(pod[oidx])
             

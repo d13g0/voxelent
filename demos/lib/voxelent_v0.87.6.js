@@ -502,12 +502,6 @@ vxlNotifier.prototype._addSource = function(event,src){
 	}
 	
 	sourceList[event].push(src);
-	
-	//$(document).bind(event, function(e,event,src,targetList){
-	//	for (var index=0;index<targetList[event].length;index++){
-	//		targetList[event][index].handleEvent(event,src);
-	//	}
-	//});
 };
 
 /**
@@ -541,7 +535,6 @@ vxlNotifier.prototype.fire = function(event, src){
              targets[index].handleEvent(event,src);
         }
 	}
-	processEvent();
 	setTimeout(function(){processEvent()},0)
 };
 
@@ -4898,7 +4891,7 @@ vxlTrackerInteractor.prototype.onDragOver = function(event){
             this.dragndrop = true;
         }
         event.dataTransfer.dropEffect = 'copy';
-        this.view.setBackgroundColor(0.8,0.8,0.8);
+        this.view.setBackgroundColor(0,0.514,0.678);
     }
 };
 
@@ -10263,11 +10256,6 @@ vxlVTKReader.prototype._processIndexBlocks = function(filename){
  * @private
  */
 vxlVTKReader.prototype._processBlock = function(blockID, filename){
-    var pver = this.vertices;
-    var pidx = this.indices;
-    var psc = this.scalars;
-    var pcol = this.colors;
-    
     var fid = (blockID + 1).toString();
     var blockname = "";
     
@@ -10276,8 +10264,8 @@ vxlVTKReader.prototype._processBlock = function(blockID, filename){
     else
         blockname = filename + '_' + fid;
         
-    //  _weaveBlock(blockID);
-    this._writeJSON(filename, pver, pidx, psc, pcol);
+    var block  = this._weaveBlock(blockID);
+    this._writeJSON(blockname, block);
     console.log('Block ['+ fid +'] processed,  output: '+ blockname);
 };
 
@@ -10285,84 +10273,90 @@ vxlVTKReader.prototype._processBlock = function(blockID, filename){
  * Calculates the new index array for the block in question
  */
 vxlVTKReader.prototype._weaveBlock = function(blockID){
-/*    
-# -----------------------------------------------------------------------
-# Calculates new index array for the block in question
-# ver - vertices
-# ind - indices
-# seg - segment
-# -----------------------------------------------------------------------
-def weaveBlock(blockID, ver,ind, pod,clr):
-    lowerBound  = ARRAY_SIZE*blockID
-    upperBound = ARRAY_SIZE*(blockID+1)
-    if upperBound > len(ind):
-        upperBound = len(ind)
-    newindex = dict()
-    vtxBlock = []   # new vertex array
-    idxBlock = []   # new index array
-    pdxBlock = []   # new scalar array
-    clrBlock = []   # new color array
+
+    var lowerBound = this.ARRAY_SIZE*blockID;
+    var upperBound = this.ARRAY_SIZE*(blockID+1);
+
+    if (upperBound > this.indices.length){
+        upperBound = this.indices.length;
+    }
     
-    hasPointData = len(pod)>0
-    hasColorData = len(clr)>0
+    var newindex = {};
     
-    # Set of indices to be processed
-    aux = ind[lowerBound:upperBound]
-    taux = len(aux)
-    nidx = -1
-    #item = 1
+    var block = {
+        vertices: [],   //new vertex array
+        indices : [],   //new index array
+        scalars : [],   //new scalar array
+        colors  : []   //new color array
+    };
     
-    print('Weaving block #' + str(blockID+1) + '  ['+str(lowerBound)+','+str(upperBound)+']')
+    var hasPointData = (this.scalars.length>0);
+    var hasColorData = (this.colors.length>0);
     
-    #for each index to be processed
-    for i,oidx in enumerate(aux):
-        sys.stdout.write('Processing index %d out of %d \r' % (i,taux))
-        # if index hasn't been mapped
-        if oidx not in newindex.keys():
-            nidx = nidx + 1
-            # create new index for the old index (incrementally)
-            idxBlock.append(nidx)
-            # save in the map for posterior searches
-            newindex[oidx] = nidx
-            # multiply by three to find the right starting point in the vertex array
-            index = oidx * 3
-            # add the correspondant vertex into the new position in the new vertex array
-            vtxBlock.append(ver[index])
-            vtxBlock.append(ver[index+1])
-            vtxBlock.append(ver[index+2])
-            # add the correspondant point data if any
-            if hasPointData:
-                pdxBlock.append(pod[oidx])
-            
-            if hasColorData:
-                clrBlock.append(clr[index])
-                clrBlock.append(clr[index+1])
-                clrBlock.append(clr[index+2])
-        else:
-            # if the index was mapped then use it in the new index array
-            idxBlock.append(newindex[oidx])
-    print('')
-    del aux
-    return vtxBlock, idxBlock, pdxBlock, clrBlock
-*/
+    
+    // Set of indices to be processed
+    var aux = this.indices.slice(lowerBound, upperBound);
+    
+    taux = aux.length;
+    var nidx = -1
+    
+    
+    console.log('Weaving block #' + (blockID+1) + '  ['+ lowerBound+','+upperBound+']');
+    
+    //for each index to be processed
+    for (var i=0; i<taux; i+=1){ 
+        //if index hasn't been mapped
+        var oidx = aux[i];
+        if (newindex[oidx] == undefined){
+            nidx++;
+            // create new index for the old index (incrementally)
+            block.indices.push(nidx);
+            // save in the map for posterior searches
+            newindex[oidx] = nidx;
+            // multiply by three to find the right starting point in the vertex array
+            var index = oidx * 3
+            // add the correspondent vertex into the new position in the new vertex array
+            block.vertices.push(this.vertices[index]);
+            block.vertices.push(this.vertices[index+1]);
+            block.vertices.push(this.vertices[index+2]);
+            // add the correspondent point data if any
+            if (hasPointData){
+                block.scalars.push(this.scalars[oidx]);
+            }
+            if (hasColorData){
+                block.colors.push(this.colors[index]);
+                block.colors.push(this.colors[index+1]);
+                block.colors.push(this.colors[index+2]);
+            }
+        }
+        else{
+            // if the index was mapped then use it in the new index array
+            block.indices.push(newindex[oidx]);
+        }
+    }
+    delete aux;
+    return block;
+
 };
 
 /**
  * Creates the JSON object
  * @private 
  */
-vxlVTKReader.prototype._writeJSON = function(fname,ver,ind,pod,clr){
+vxlVTKReader.prototype._writeJSON = function(fname,block){
+    
      var jsonPart = new Object();
-     jsonPart["name"]        = fname;
-     jsonPart["vertices"]    = ver.slice(0);
-     jsonPart["indices"]     = ind.slice(0);
      
-     if (pod.length>0){
-        jsonPart["scalars"]  = pod.slice(0);
+     jsonPart["name"]        = fname;
+     jsonPart["vertices"]    = block.vertices.slice(0);
+     jsonPart["indices"]     = block.indices.slice(0);
+     
+     if (block.scalars.length>0){
+        jsonPart["scalars"]  = block.scalars.slice(0);
      }
      
-     if (clr.length >0){
-        jsonPart["colors"]   = clr.slice(0);
+     if (block.colors.length >0){
+        jsonPart["colors"]   = block.colors.slice(0);
      }
      
      jsonPart["mode"]        = this.mode;

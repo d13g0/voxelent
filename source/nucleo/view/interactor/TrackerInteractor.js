@@ -212,7 +212,7 @@ vxlTrackerInteractor.prototype.onDragOver = function(event){
             this.dragndrop = true;
         }
         event.dataTransfer.dropEffect = 'copy';
-        this.view.setBackgroundColor(0.8,0.8,0.8);
+        this.view.setBackgroundColor(0,0.514,0.678);
     }
 };
 
