@@ -182,7 +182,7 @@ vxlView.prototype.reset = function(){
  * @see vxlRenderer#clearColor
  */
 vxlView.prototype.setBackgroundColor = function(r,g,b){
-	this.backgroundColor = vxl.util.createVec3(r,g,b); 
+	this.backgroundColor = vxl.util.createArr3(r,g,b); 
 	this.renderer.clearColor(this.backgroundColor);
 };
 

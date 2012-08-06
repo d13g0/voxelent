@@ -22,7 +22,7 @@ function runVoxApp(){
     vxl.go.notifier.subscribe(vxl.events.MODELS_LOADED, this);
     view = vxl.api.setup('view-1');
     view.setDragAndDrop(true);
-    //view.scene.toys.floor.setGrid(50,2);
+    view.scene.toys.floor.setGrid(50,2);
     var gui = new vxlGUI(view);
     
     var cam = vxl.c.camera;

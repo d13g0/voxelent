@@ -104,7 +104,7 @@ def : {
     * @property {Array} background  A 4-valued array that contains the default background colour for view. The format is [r,g,b,a]
     */
     view			: {
-    					background: [135/256,135/256,135/256,1.0]
+    					background: [135/256,135/256,135/256]
     				},			      
 	/**
     * @namespace Default values for actors
@@ -306,6 +306,26 @@ util : {
         }
         else{
             vec3.set(vec3.createFrom(x,y,z), vvv);
+        }
+        return vvv;
+	},
+	/**
+     * Creates an array from a set of parameters
+     * @param {Array, vec3, Number} x it can be an Array, a vec3 or a number
+     * @param {Number} y if x is a number, this parameter corresponds to the y-component
+     * @param {Number} z if x is a number, this parameter corresponds to the z-component
+     */
+	createArr3: function(x,y,z){
+	    var vvv = []
+        if (x instanceof Array || x instanceof determineMatrixArrayType()){
+            vvv[0] = x[0];
+            vvv[1] = x[1];
+            vvv[2] = x[2];
+        }
+        else{
+            vvv[0] = x;
+            vvv[1] = y;
+            vvv[2] = z;
         }
         return vvv;
 	},
@@ -4827,7 +4847,7 @@ vxlTrackerInteractor.prototype.dolly = function(value){
     this.camera.dolly(value);
 };
 
-/**
+/**    this.dragndrop = false;
  * Internal method used by this tracker to rotate the camera.
  * @param {Number} dx the rotation on the X axis (elevation)
  * @param {Number} dy the rotation on the Y axis (azimuth)
@@ -4856,7 +4876,7 @@ vxlTrackerInteractor.prototype.pan = function(dx,dy){
 	
 	var camera = this.camera;
 	var canvas = camera.view.canvas;
-	var scene = camera.view.scene;
+	var scene = camera.view.scene;    this.dragndrop = false;
 	var dimMax = Math.max(canvas.width, canvas.height);
 	var deltaX = 1 / dimMax;
 	var deltaY = 1 / dimMax;
@@ -4870,13 +4890,27 @@ vxlTrackerInteractor.prototype.pan = function(dx,dy){
 vxlTrackerInteractor.prototype.onDragOver = function(event){
     event.stopPropagation();
     event.preventDefault();
-    event.dataTransfer.dropEffect = 'copy';
+    
+        
+    if (this.view.dragndrop){
+        if (!this.dragndrop){
+            this.bgcolor = this.view.backgroundColor.slice(0);
+            this.dragndrop = true;
+        }
+        event.dataTransfer.dropEffect = 'copy';
+        this.view.setBackgroundColor(0.8,0.8,0.8);
+    }
 };
 
 vxlTrackerInteractor.prototype.onDragLeave = function(event){
     event.stopPropagation();
     event.preventDefault();
-    event.dataTransfer.dropEffect = 'copy';
+
+    if (this.view.dragndrop){
+        event.dataTransfer.dropEffect = 'copy';
+        this.view.setBackgroundColor(this.bgcolor);
+        this.dragndrop = false;
+    }
     
 };
 
@@ -4884,6 +4918,8 @@ vxlTrackerInteractor.prototype.onDrop = function(event){
     event.stopPropagation();
     event.preventDefault();
     if (!this.view.dragndrop) return; //the view is configured to not accept dnd
+    this.dragndrop = false;
+    this.view.setBackgroundColor(this.bgcolor);
     
     var files = event.dataTransfer.files;
     var reader = new vxlVTKReader(this.view.scene);
@@ -8863,7 +8899,7 @@ vxlView.prototype.reset = function(){
  * @see vxlRenderer#clearColor
  */
 vxlView.prototype.setBackgroundColor = function(r,g,b){
-	this.backgroundColor = vxl.util.createVec3(r,g,b); 
+	this.backgroundColor = vxl.util.createArr3(r,g,b); 
 	this.renderer.clearColor(this.backgroundColor);
 };
 
