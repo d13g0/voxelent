@@ -60,7 +60,15 @@ vxlGUI.prototype.createGUI = function(){
     pbdiv.style.display     = 'table-cell';
     pbdiv.style.verticalAlign  = 'middle';
     pbdiv.style.textAlign      = 'center';
+    pbdiv.style.backgroundImage = "url('http://voxelent.com/html/demos/css/img/vox-gui-logo.png')";
+    pbdiv.style.backgroundRepeat = 'no-repeat';
+    pbdiv.style.backgroundPosition = 'center '+Math.round(this.canvas.height()/3);
+    pbdiv.style.borderColor  = '#ccc'
+    pbdiv.style.borderStyle = 'solid';
+    pbdiv.style.borderWidth = '1px';
+    
     this.jqOverlay = $(pbdiv);
+    
     
     
     var pb = document.createElement('div');
@@ -98,13 +106,10 @@ vxlGUI.prototype.initProgressBar = function(mmanager){
 
 
 vxlGUI.prototype.updateProgressBar = function(mmanager){
-                
-        this.loaded = this.count - mmanager.toLoad.length;
-        var percentage = Math.round((1- (mmanager.toLoad.length / this.count)) * 100);
-        this.jqMessage.html('<p>Loading: ' + this.loaded + ' out of '+ this.count+' ('+percentage+'%)</p>');
-        this.jqProgressBar.progressbar({value:percentage});
-
-
+    this.loaded = this.count - mmanager.toLoad.length;
+    var percentage = Math.round((1- (mmanager.toLoad.length / this.count)) * 100);
+    this.jqMessage.html('<p>Loading: ' + this.loaded + ' out of '+ this.count+' ('+percentage+'%)</p>');
+    this.jqProgressBar.progressbar({value:percentage});
 };    
 
 
