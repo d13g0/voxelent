@@ -28,13 +28,17 @@
  */
 function vxlFrameAnimation(map){
 	this.scene             = null;
-	this.timerID           = 0;
+
 	this.actorByFrameMap   = [];
 	this.activeFrame       = 1;
 	this.mark              = 1;
 	this.running           = false;
     this.frameCount        = 0;
     this.renderRate        = 500;
+    
+    this._startDate         = undefined;
+    this._time              = 0;
+    
     this._setup(map);
     if (vxl.c.animation == null) vxl.c.animation = this;
 };
@@ -81,18 +85,51 @@ vxlFrameAnimation.prototype._setup = function(map){
 vxlFrameAnimation.prototype.start = function(rate){
 	if (this.scene == null) throw 'FrameAnimation: the animation is not associated with any scene. Please use scene.setFrameAnimation method';
 
+    this._startDate = new Date().getTime();
+    this._time  = 0;
     this.running = true;
+    
     if (rate != undefined && rate >=0){
     	this.renderRate = rate;
     }
-	this.timerID = setInterval((function(self) {return function() {self.nextFrame();}})(this),this.renderRate);
+    
+    this._timeUp();
+};
+
+
+/**
+ * Implements a self-adjusting timer
+ * @see http://www.sitepoint.com/creating-accurate-timers-in-javascript/
+ * @private 
+ */
+vxlFrameAnimation.prototype._timeUp = function(){
+    if (!this.running) return;
+    
+    this.nextFrame();
+    
+    if (this._time == this.renderRate * 100){  //for long running animations
+        this._time = 0;
+        this._startDate = new Date().getTime();
+    }
+    
+    this._time += this.renderRate;
+
+    var diff = (new Date().getTime() - this._startDate) - this._time;
+    
+    if (diff > this.renderRate) diff = 0; //ignore it
+    
+    setTimeout((function(self){
+        return function(){
+            self._timeUp();
+        }
+    })(this), this.renderRate - diff);
+    
 };
 
 /**
  * Stops the animation loop
  */
 vxlFrameAnimation.prototype.stop = function(){
-	clearInterval(this.timerID);
     this.running = false;
 };
 

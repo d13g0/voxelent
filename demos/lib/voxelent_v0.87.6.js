@@ -4615,6 +4615,10 @@ vxlViewInteractor.prototype.connectView = function(view){
     window.onkeyup = function(ev){
         interactor.onKeyUp(ev);
     };
+    
+    canvas.ondblclick = function(ev){
+        interactor.onDoubleClick(ev);
+    }
 };
 
 
@@ -4673,6 +4677,11 @@ vxlViewInteractor.prototype.onDragLeave     = function(ev){ alert('implement onD
  * @param {Object} ev
  */
 vxlViewInteractor.prototype.onDrop     = function(ev){ alert('implement onDrop');};
+/**
+ * Abstract method to be implemented by the descendants 
+ * @param {Object} ev
+ */
+vxlViewInteractor.prototype.onDoubleClick     = function(ev){ alert('implement onDrop');};
 
 
 
@@ -4718,6 +4727,7 @@ function vxlTrackerInteractor(view,camera){
 	this.button = -1;
 	this.dragging = false;
 	this.dragndrop = false;
+	
 };
 
 /**
@@ -4922,6 +4932,14 @@ vxlTrackerInteractor.prototype.onDrop = function(event){
     else {
         throw 'vxlTrackerInteractor.drop: File API is not supported on this browser';
     }
+};
+
+/**
+ * Calls the current camera longShot method 
+ * @param {Object} event
+ */
+vxlTrackerInteractor.prototype.onDoubleClick = function(event){
+    this.camera.longShot();
 };
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
@@ -6109,13 +6127,17 @@ function vxlRenderer(vw){
 	this.view       	= vw;
 	this.renderRate 	= vxl.def.renderer.rate.NORMAL;
 	this.mode       	= vxl.def.renderer.mode.TIMER;
-    this.timerID    	= 0;
     this.gl         	= this.getWebGLContext();
     this.prg        	= new vxlProgram(this.gl);
     this.transforms 	= new vxlTransforms(vw);
     this.fps            = 0;
     this.currentProgram = undefined;
     this.strategy 		= undefined;
+    
+    this._time          = 0;
+    this._startDate     = 0;
+    this._running       = false;
+    
     this.setProgram(vxl.def.glsl.lambert, vxlBasicStrategy);
     
 }
@@ -6229,9 +6251,15 @@ vxlRenderer.prototype.setMode = function(mode){
  * Starts the renderer
  */
 vxlRenderer.prototype.start = function(){
+    
+    this._running = true;
+    this._startDate = new Date().getTime();
+    this._time  = 0;
+    
 	if(this.mode == vxl.def.renderer.mode.TIMER){
 		vxl.go.console('Renderer: starting rendering for view ['+this.view.name+'] at '+this.renderRate+ 'ms');
-		this.timerID = setInterval((function(self) {return function() {self.render();}})(this),this.renderRate); 
+		this._timeUp();
+		//this.timerID = setInterval((function(self) {return function() {self.render();}})(this),this.renderRate); 
 	}
 	else if(this.mode == vxl.def.renderer.mode.ANIMFRAME){
 	    vxl.go.console('Renderer: starting rendering at the fastest speed',true);
@@ -6240,11 +6268,39 @@ vxlRenderer.prototype.start = function(){
 };
 
 /**
+ * Implements a self adjusting timer
+ * @see http://www.sitepoint.com/creating-accurate-timers-in-javascript/
+ * @private   
+ */
+vxlRenderer.prototype._timeUp = function(){
+    if (!this._running) return;
+    
+    this.render();
+    
+    if (this._time == this.renderRate * 100){  
+        this._time = 0;
+        this._startDate = new Date().getTime();
+    }
+    
+    this._time += this.renderRate;
+
+    var diff = (new Date().getTime() - this._startDate) - this._time;
+    
+    if (diff > this.renderRate) diff = 0; //ignore it
+    
+    setTimeout((function(self){
+        return function(){
+            self._timeUp();
+        }
+    })(this), this.renderRate - diff);
+}
+/**
  * Stops the renderer
  */
 vxlRenderer.prototype.stop = function(){
 	if (this.mode == vxl.def.renderer.mode.TIMER){
-		clearInterval(this.timerID);
+		//clearInterval(this.timerID);
+		this._running = false;
 	}
 	else if (this.mode == vxl.def.renderer.mode.ANIMFRAME){
 		vxl.go.renderman.cancel();
@@ -9819,13 +9875,17 @@ wireframeON :  function(){
  */
 function vxlFrameAnimation(map){
 	this.scene             = null;
-	this.timerID           = 0;
+
 	this.actorByFrameMap   = [];
 	this.activeFrame       = 1;
 	this.mark              = 1;
 	this.running           = false;
     this.frameCount        = 0;
     this.renderRate        = 500;
+    
+    this._startDate         = undefined;
+    this._time              = 0;
+    
     this._setup(map);
     if (vxl.c.animation == null) vxl.c.animation = this;
 };
@@ -9872,18 +9932,51 @@ vxlFrameAnimation.prototype._setup = function(map){
 vxlFrameAnimation.prototype.start = function(rate){
 	if (this.scene == null) throw 'FrameAnimation: the animation is not associated with any scene. Please use scene.setFrameAnimation method';
 
+    this._startDate = new Date().getTime();
+    this._time  = 0;
     this.running = true;
+    
     if (rate != undefined && rate >=0){
     	this.renderRate = rate;
     }
-	this.timerID = setInterval((function(self) {return function() {self.nextFrame();}})(this),this.renderRate);
+    
+    this._timeUp();
+};
+
+
+/**
+ * Implements a self-adjusting timer
+ * @see http://www.sitepoint.com/creating-accurate-timers-in-javascript/
+ * @private 
+ */
+vxlFrameAnimation.prototype._timeUp = function(){
+    if (!this.running) return;
+    
+    this.nextFrame();
+    
+    if (this._time == this.renderRate * 100){  //for long running animations
+        this._time = 0;
+        this._startDate = new Date().getTime();
+    }
+    
+    this._time += this.renderRate;
+
+    var diff = (new Date().getTime() - this._startDate) - this._time;
+    
+    if (diff > this.renderRate) diff = 0; //ignore it
+    
+    setTimeout((function(self){
+        return function(){
+            self._timeUp();
+        }
+    })(this), this.renderRate - diff);
+    
 };
 
 /**
  * Stops the animation loop
  */
 vxlFrameAnimation.prototype.stop = function(){
-	clearInterval(this.timerID);
     this.running = false;
 };
 

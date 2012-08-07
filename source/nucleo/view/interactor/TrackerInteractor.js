@@ -39,6 +39,7 @@ function vxlTrackerInteractor(view,camera){
 	this.button = -1;
 	this.dragging = false;
 	this.dragndrop = false;
+	
 };
 
 /**
@@ -243,4 +244,12 @@ vxlTrackerInteractor.prototype.onDrop = function(event){
     else {
         throw 'vxlTrackerInteractor.drop: File API is not supported on this browser';
     }
+};
+
+/**
+ * Calls the current camera longShot method 
+ * @param {Object} event
+ */
+vxlTrackerInteractor.prototype.onDoubleClick = function(event){
+    this.camera.longShot();
 };

@@ -84,6 +84,10 @@ vxlViewInteractor.prototype.connectView = function(view){
     window.onkeyup = function(ev){
         interactor.onKeyUp(ev);
     };
+    
+    canvas.ondblclick = function(ev){
+        interactor.onDoubleClick(ev);
+    }
 };
 
 
@@ -142,6 +146,11 @@ vxlViewInteractor.prototype.onDragLeave     = function(ev){ alert('implement onD
  * @param {Object} ev
  */
 vxlViewInteractor.prototype.onDrop     = function(ev){ alert('implement onDrop');};
+/**
+ * Abstract method to be implemented by the descendants 
+ * @param {Object} ev
+ */
+vxlViewInteractor.prototype.onDoubleClick     = function(ev){ alert('implement onDrop');};
 
 
 
