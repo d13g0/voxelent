@@ -19,6 +19,7 @@
  * 	communicates with the program) from the scene.
  * 
  *  Any rendering strategy should extend from vxlRenderStrategy or one of its descendants
+ * @param {vxlRenderer} renderer the renderer this strategy belongs to
  */
 function vxlRenderStrategy(renderer){
 	this.renderer = renderer;

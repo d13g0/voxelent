@@ -16,7 +16,14 @@
 
 vxlPickerInteractor.prototype = new vxlTrackerInteractor();
 vxlPickerInteractor.prototype.constructor = vxlPickerInteractor;
-
+/**
+ * @class 
+ * Interactor that implements a picking mechanism. Still in development.
+ * @constructor   
+ * @param {Object} view the view this interactor will observe
+ * @param {Object} camera the camera this interactor will master
+ * @author Diego Cantor
+ */
 function vxlPickerInteractor(view, camera){
 	vxlTrackerInteractor.call(this, view, camera);
 	this.plist 					= [];

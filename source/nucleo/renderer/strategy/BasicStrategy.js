@@ -31,6 +31,7 @@ vxlBasicStrategy.prototype.constructor = vxlBasicStrategy;
  * 
  * A rendering strategy allows decoupling rendering specific code (i.e. code that access and 
  * 	communicates with the program) from the actor.
+ * @author Diego Cantor
  * 
  */
 function vxlBasicStrategy(renderer){
@@ -52,8 +53,7 @@ function vxlBasicStrategy(renderer){
 /**
  * Implements basic allocation of memory. Creates the WebGL buffers for the actor
  * @param {vxlScene} scene the scene to allocate memory for
- * @returns an object that contains the allocated WebGL buffers
- */
+  */
 vxlBasicStrategy.prototype.allocate = function(scene){
     var elements = scene.actors.concat(scene.toys.list);
     var NUM = elements.length;

@@ -38,29 +38,29 @@
 <span class='line'> 31</span>  * 
 <span class='line'> 32</span>  * A rendering strategy allows decoupling rendering specific code (i.e. code that access and 
 <span class='line'> 33</span>  * 	communicates with the program) from the actor.
-<span class='line'> 34</span>  * 
-<span class='line'> 35</span>  */</span><span class="WHIT">
-<span class='line'> 36</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">vxlBasicStrategy</span><span class="PUNC">(</span><span class="NAME">renderer</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 37</span> </span><span class="WHIT">	</span><span class="NAME">vxlRenderStrategy.call</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="NAME">renderer</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 38</span> </span><span class="WHIT">	</span><span class="NAME">this._gl_buffers</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 39</span> </span><span class="WHIT">	
-<span class='line'> 40</span> 	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">renderer</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 41</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">gl</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.renderer.gl</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 42</span> </span><span class="WHIT">	
-<span class='line'> 43</span> 	</span><span class="NAME">gl.enable</span><span class="PUNC">(</span><span class="NAME">gl.BLEND</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 44</span> </span><span class="WHIT">	</span><span class="NAME">gl.blendFunc</span><span class="PUNC">(</span><span class="NAME">gl.SRC_ALPHA</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">gl.ONE_MINUS_SRC_ALPHA</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 45</span> </span><span class="WHIT">	</span><span class="NAME">gl.enable</span><span class="PUNC">(</span><span class="NAME">gl.DEPTH_TEST</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 46</span> </span><span class="WHIT">	</span><span class="NAME">gl.depthFunc</span><span class="PUNC">(</span><span class="NAME">gl.LESS</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 47</span> </span><span class="WHIT">	</span><span class="NAME">gl.clearDepth</span><span class="PUNC">(</span><span class="NUMB">1.0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 48</span> </span><span class="WHIT">	</span><span class="NAME">gl.disable</span><span class="PUNC">(</span><span class="NAME">gl.CULL_FACE</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 49</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">	
-<span class='line'> 50</span> </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 51</span> 
-<span class='line'> 52</span> </span><span class="COMM">/**
-<span class='line'> 53</span>  * Implements basic allocation of memory. Creates the WebGL buffers for the actor
-<span class='line'> 54</span>  * @param {vxlScene} scene the scene to allocate memory for
-<span class='line'> 55</span>  * @returns an object that contains the allocated WebGL buffers
-<span class='line'> 56</span>  */</span><span class="WHIT">
+<span class='line'> 34</span>  * @author Diego Cantor
+<span class='line'> 35</span>  * 
+<span class='line'> 36</span>  */</span><span class="WHIT">
+<span class='line'> 37</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">vxlBasicStrategy</span><span class="PUNC">(</span><span class="NAME">renderer</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 38</span> </span><span class="WHIT">	</span><span class="NAME">vxlRenderStrategy.call</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="NAME">renderer</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 39</span> </span><span class="WHIT">	</span><span class="NAME">this._gl_buffers</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 40</span> </span><span class="WHIT">	
+<span class='line'> 41</span> 	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">renderer</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 42</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">gl</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.renderer.gl</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 43</span> </span><span class="WHIT">	
+<span class='line'> 44</span> 	</span><span class="NAME">gl.enable</span><span class="PUNC">(</span><span class="NAME">gl.BLEND</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 45</span> </span><span class="WHIT">	</span><span class="NAME">gl.blendFunc</span><span class="PUNC">(</span><span class="NAME">gl.SRC_ALPHA</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">gl.ONE_MINUS_SRC_ALPHA</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 46</span> </span><span class="WHIT">	</span><span class="NAME">gl.enable</span><span class="PUNC">(</span><span class="NAME">gl.DEPTH_TEST</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 47</span> </span><span class="WHIT">	</span><span class="NAME">gl.depthFunc</span><span class="PUNC">(</span><span class="NAME">gl.LESS</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 48</span> </span><span class="WHIT">	</span><span class="NAME">gl.clearDepth</span><span class="PUNC">(</span><span class="NUMB">1.0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 49</span> </span><span class="WHIT">	</span><span class="NAME">gl.disable</span><span class="PUNC">(</span><span class="NAME">gl.CULL_FACE</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 50</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">	
+<span class='line'> 51</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 52</span> 
+<span class='line'> 53</span> </span><span class="COMM">/**
+<span class='line'> 54</span>  * Implements basic allocation of memory. Creates the WebGL buffers for the actor
+<span class='line'> 55</span>  * @param {vxlScene} scene the scene to allocate memory for
+<span class='line'> 56</span>   */</span><span class="WHIT">
 <span class='line'> 57</span> </span><span class="NAME">vxlBasicStrategy.prototype.allocate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 58</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">elements</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">scene.actors.concat</span><span class="PUNC">(</span><span class="NAME">scene.toys.list</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 59</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">NUM</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">elements.length</span><span class="PUNC">;</span><span class="WHIT">

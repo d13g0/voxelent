@@ -643,7 +643,7 @@ wireframeON :  function(){
    * your class will only be notified of those events that it has been subscribed to.
    * 
    * @param {String, Array} list the event or events that we are going to subscribe to
-   * @param {context} the object that needs to implement the handleEvent method
+   * @param {Object} context the object that needs to implement the handleEvent method
    * 
    */
   subscribe: function(list, context){

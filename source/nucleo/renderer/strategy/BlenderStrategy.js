@@ -17,7 +17,16 @@
 vxlBlenderStrategy.prototype = new vxlBasicStrategy()
 vxlBlenderStrategy.prototype.constructor = vxlBlenderStrategy;
 
-
+/**
+ * @author Diego Cantor
+ * @class 
+ * Implements the strategy to render Blender scenes that have been exported to the OBJ format and from there
+ * to the Voxelent format.
+ * @extends vxlBasicStrategy
+ * @constructor 
+ * @param {vxlRenderer} renderer the renderer associated to this strategy
+ *  
+ */
 function vxlBlenderStrategy(renderer) {
 	vxlBasicStrategy.call(this,renderer);
 }
@@ -56,6 +65,7 @@ vxlBlenderStrategy.prototype.render = function(scene){
  * @param {vxlActor} the actor 
  * we will update each Model-View matrix of each renderer according to
  * the actor position,scale and rotation.
+ * @private
  */
 vxlBlenderStrategy.prototype._applyActorTransform = function(actor){
     
@@ -79,6 +89,10 @@ vxlBlenderStrategy.prototype._applyActorTransform = function(actor){
     
  };
 
+/**
+ * @private
+ * @param {Object} actor
+ */
 vxlBlenderStrategy.prototype._renderActor = function(actor){
 	
 	if (actor.name == 'bounding box' || actor.name == 'axis' || actor.name =='floor'){

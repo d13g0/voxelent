@@ -153,7 +153,7 @@ vxlScene.prototype.computeBoundingBox = function() {
 
 /**
  * This function creates AND ADD a new actor to this scene
- * @param {vxlModel} the model from which a new actor will be created AND added to this scene
+ * @param {vxlModel} model the model from which a new actor will be created AND added to this scene
  * 
  * If you are looking to create but not adding an actor call new vxlActor(model) instead.
  * 

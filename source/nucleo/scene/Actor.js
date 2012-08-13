@@ -31,21 +31,21 @@
  * should be invoked by setting the third parameter (scope) like this:
  * </p>
  * 
- * <pre>
+ * <pre class="prettyprint">
  * var actor = vxl.c.scene.getActorByName('example.json');
  * actor.setProperty('color',[1.0,0.0,0.0], vxl.def.model)
  * </pre>
  * 
  * <p>If the change should be local (for just that actor)  then you should write:</p>
  * 
- * <pre>
+ * <pre class="prettyprint">
  * var actor = vxl.c.scene.getActorByName('example.json');
  * actor.setProperty('color',[1.0,0.0,0.0], vxl.def.actor)
  * </pre>
  * 
  * <p> Or simply </p>
  *  
- * <pre>
+ * <pre class="prettyprint">
  * var actor = vxl.c.scene.getActorByName('example.json');
  * actor.setProperty('color',[1.0,0.0,0.0])
  * </pre>

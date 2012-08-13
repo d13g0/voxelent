@@ -25,6 +25,7 @@
  * @param map  JSON object where each property name is one frame and each property value
  * is a list of actors 
  * var map = {"frame1":["actor1","actor2"], "frame2":["actor3","actor4"]}
+ * 
  */
 function vxlFrameAnimation(map){
 	this.scene             = null;
@@ -32,12 +33,12 @@ function vxlFrameAnimation(map){
 	this.actorByFrameMap   = [];
 	this.activeFrame       = 1;
 	this.mark              = 1;
-	this.running           = false;
+	this._running          = false;
     this.frameCount        = 0;
     this.renderRate        = 500;
     
-    this._startDate         = undefined;
-    this._time              = 0;
+    this._startDate        = undefined;
+    this._time             = 0;
     
     this._setup(map);
     if (vxl.c.animation == null) vxl.c.animation = this;
@@ -87,7 +88,7 @@ vxlFrameAnimation.prototype.start = function(rate){
 
     this._startDate = new Date().getTime();
     this._time  = 0;
-    this.running = true;
+    this._running = true;
     
     if (rate != undefined && rate >=0){
     	this.renderRate = rate;
@@ -103,7 +104,7 @@ vxlFrameAnimation.prototype.start = function(rate){
  * @private 
  */
 vxlFrameAnimation.prototype._timeUp = function(){
-    if (!this.running) return;
+    if (!this._running) return;
     
     this.nextFrame();
     
@@ -130,7 +131,7 @@ vxlFrameAnimation.prototype._timeUp = function(){
  * Stops the animation loop
  */
 vxlFrameAnimation.prototype.stop = function(){
-    this.running = false;
+    this._running = false;
 };
 
 vxlFrameAnimation.prototype.setFrameRate = function(rate){
