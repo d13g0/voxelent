@@ -45,6 +45,8 @@ We need to create a tutorial about this! It's reall cool!
 16. vxlBakeStrategy and vxlBakeProgram added. Working on improving rendering performance by interleaving buffers
 
 17. Calculation of the bounding box is done BY DEMAND for performance reasons.
+
+18. API docs have been improved
 -------------------------------------------------------------------------------------------
 VERSION 0.87.5 - Mother's Day
 -------------------------------------------------------------------------------------------
