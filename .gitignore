@@ -36,6 +36,5 @@ c4n3l4/
 .pydevproject
 *.pyc
 .settings
-.html~
-.gitignore~
-docs/uml/
+*~
+
