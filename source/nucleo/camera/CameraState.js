@@ -20,7 +20,7 @@
  * camera states for the camera it is associated with during the construction.
  * 
  * 
- * @class 
+ * @class Stores a camera state so it can be retrieved later. This is the base for view landmarks.
  * @constructor this is the constructor doc
  * @param {vxlCamera} camera
  * @author Diego Cantor

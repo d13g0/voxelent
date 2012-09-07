@@ -19,7 +19,7 @@
  * vxlModelManager provides methods for loading remote and local models.
  * 
  * 
- * @class
+ * @class Controls the loading and network transfer of models into memory
  * @constructor
  * @author Diego Cantor
  */

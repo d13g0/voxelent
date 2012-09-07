@@ -20,7 +20,7 @@
 /**
  * Provides frame-to-frame animation
  * 
- * @class
+ * @class Manages a frame-to-frame animation
  * @constructor
  * @param map  JSON object where each property name is one frame and each property value
  * is a list of actors 

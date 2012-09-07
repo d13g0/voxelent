@@ -15,7 +15,7 @@
 ---------------------------------------------------------------------------*/   
 
 /**
- * @class
+ * @class Encapsulates the matrices required to perform 3D rendering
  * @constructor
  * @author Diego Cantor
  */

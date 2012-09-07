@@ -22,7 +22,7 @@ vxlFloor.prototype = new vxlActor();
 vxlFloor.prototype.constructor = vxlFloor;
 
 /**
- * @class
+ * @class Visible grid that sets the floor reference and its extension
  * @constructor
  * @extends vxlActor
  */

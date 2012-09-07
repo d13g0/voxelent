@@ -161,7 +161,7 @@ code {
 
 .summaryTable td.attributes
 {
-	width: 50px;
+	width: 60px;
 	text-align: right;
 	vertical-align: middle;
 }
@@ -172,9 +172,28 @@ code {
 	text-align: right;
 }
 
-.summaryTable td.summary
+div.summary
 {
-	padding:5px;
+	padding:7px;
+	height:50px;
+	width:300px;
+	display: inline-table;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	background-color:#EBEBEF;
+	margin:4px;
+}
+
+div.summary p{
+	color:#666;
+	display: inline-block;
+	margin-bottom: 0px;
+	padding-bottom: 0px;
+	width:270px;
+}
+
+div.summary code{
+	font-size:15px;
 }
 
 td.attributes

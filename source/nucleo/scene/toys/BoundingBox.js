@@ -23,7 +23,7 @@ vxlBoundingBox.prototype = new vxlActor();
 vxlBoundingBox.prototype.constructor = vxlBoundingBox;
 
 /**
- * @class
+ * @class Cuboid that encloses the visible extent of a vxlScene
  * @constructor
  * @extends vxlActor
  */

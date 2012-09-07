@@ -1,13 +1,11 @@
 
-vxl.go.notifier = new vxlNotifier();
-
 /**
  * <p> 
  * Handles asynchronous communication among classes in Voxelent 
  * using a publisher-subscriber mechanism
  * </p>
  * 
- * @class
+ * @class Hub for the publish-subscribe mechanism among Voxelent entities
  * @constructor
  */
 function vxlNotifier(){
@@ -159,7 +157,10 @@ vxlNotifier.prototype.getTargetsFor = function(event){
 	return list; //@TODO: Reevaluate
 };
 
-
+/**
+ *Global notifier object 
+ */
+vxl.go.notifier = new vxlNotifier();
  
 
     

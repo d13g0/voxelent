@@ -18,7 +18,7 @@
 vxlTrackerInteractor.prototype = new vxlViewInteractor();
 vxlTrackerInteractor.prototype.constructor = vxlViewInteractor;
 /**
- * @class
+ * @class Determines the application behaviour originated by mouse and keyboard events. 
  * @constructor
  * Interprets mouse and keyboard events and translate them to camera actions
  * @augments vxlViewInteractor

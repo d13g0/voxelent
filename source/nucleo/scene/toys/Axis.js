@@ -27,7 +27,7 @@ vxlAxis.prototype 				= new vxlActor();
 vxlAxis.prototype.constructor 	= vxlAxis;
 
 /**
- * @class
+ * @class Visible three-dimensional system of coordinates 
  * @constructor
  * @author Diego Cantor
  */

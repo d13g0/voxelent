@@ -16,7 +16,7 @@
 
 /**
  * Reads a VTK file and creates the respective JSON(s) file(s).
- * @class
+ * @class Reads VTK files (ASCII)  and creates JSON objects that can be used as models
  * @constructor 
  */
 function vxlVTKReader(scene){

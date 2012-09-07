@@ -16,6 +16,7 @@
 
 /**
  * @class
+ * @private
  */
 vxl.def.glsl.blender = {
 	

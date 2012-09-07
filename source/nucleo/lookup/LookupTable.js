@@ -1,5 +1,5 @@
 /**
- * @class
+ * @class Contains a mapping between scalars and a color palette
  * @constructor
  */
 function vxlLookupTable(){

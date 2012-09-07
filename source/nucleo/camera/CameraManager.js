@@ -14,7 +14,7 @@
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/  
 /**
- * @class
+ * @class The camera manager is responsible for controlling the cameras associated with a view 
  * @constructor
  * @param {vxlView} vw the view
  * @see vxlCamera

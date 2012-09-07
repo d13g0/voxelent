@@ -80,6 +80,10 @@ def : {
      * @property {String} VERTEX_ATTRIBUTE the vertex attribute Id
      * @property {String} NORMAL_ATTRIBUTE the normal attribute Id
      * @property {String} COLOR_ATTRIBUTE the color attribute Id
+     * @property {JSON} blender The program to render blender scenes
+     * @property {JSON} lambert The program to render scenes without specular reflections
+     * @property {JSON} phong The program to render scenes with specular reflections
+     * @property {JSON} bake The program that interleaves buffers for optimized rendering
      */
 	glsl			: { 
 						VERTEX_SHADER   	: 'VERTEX_SHADER',
@@ -103,21 +107,28 @@ def : {
 								"copper","cortex","cte","french","fs","ge_color","gold","gooch",
 								"hot","hotiron","hsv","jet","nih","nih_fire","nih_ice","pink",
 								"rainramp","spectrum","surface","x_hot","x_rain"],
-      
+                              En
 						main:"default"
 
 				    },
 	/**
     * @namespace Default values for models
-    * @property {Array}  diffuse    A 4-valued array that contains the color for actor's default diffuse property. This array has the format [r,g,b,a]
     */
-	model			: { 
-						diffuse: [0.9,0.0,0.0,1.0],
-						/** @namespace Enumeration with the different loading modes provided by Voxelent
-                          * @property {String} LIVE     Each asset is added to the scene as soon as it is downloaded
-                          * @property {String} LATER    The assets are added to the scene only when ALL of them ahve been downloaded
-                          * @property {String} DETACHED The assets are never added to the scene. The programmer decides when to do this.
-                          */
+	model			: {
+	                   /**
+	                    * Diffuse color used by default when a model does not have color information: [0.8,0.8,0.8,1.0] 
+	                    */ 
+						diffuse: [0.8,0.8,0.8,1.0],
+						/** 
+						 *  Enumeration with the different loading modes provided for models
+						 * <ul>
+                         * <li><code>LIVE</code>: Each asset is added to the scene as soon as it is downloaded</li>
+                         * <li><code>LATER</code>: The assets are added to the scene only when ALL of them have been downloaded</li> 
+                         * <li><code>DETACHED</code>: The assets are never added to the scene. The programmer decides when to do this.</li> 
+                         * </ul> 
+                         * 
+                         * These modes can be used with {@link vxl.api.load} and with {@link vxlScene.setLoadingMode}
+                         */
                          loadingMode     : { LIVE:'LIVE', LATER:'LATER', DETACHED:'DETACHED'}
 					},
     /**
@@ -128,42 +139,89 @@ def : {
     					background: [135/256,135/256,135/256]
     				},			      
 	/**
-    * @namespace Default values for actors
-    * @property {vxl.def.actor.mode}    mode    Actor rendering modes
+    * Contains the constants and default values that can be associated with <code>vxlActor</code>
+    * 
+    * @namespace Default values and constants that can be used with the <code>vxlActor</code> class.
     */
 	actor			: {
-                        /** @namespace Actor Rendering Modes 
-                        * @property {String} SOLID 
-                        * @property {String} WIREFRAME
-                        * @property {String} POINTS
-                        * @property {String} LINES
-                        */
+                        /**
+                         * <p>Defines the visualization modes available for instances of vxlActor</p> 
+                         * <p>The visualization  modes can be:
+                         * <ul>
+                         * <li><code>SOLID</code></li>
+                         * <li><code>WIREFRAME</code></li> 
+                         * <li><code>POINTS</code></li> 
+                         * <li><code>LINES</code></li>
+                         * </ul>
+                         * </p>
+                         * <p> to set the actor mode you should use the <code>{@link vxlActor#setVisualizationMode}</code>
+                         *  For instance, if you want to visualize the wireframe of your actor you can do something like this:
+                         * </p>
+                         *  <pre class='prettyprint'>
+                         *  var actor = vxl.c.scene.getActorByName('example.json'); //from the current scene
+                         *  actor.setVisualizationMode(vxl.def.actor.mode.WIREFRAME)
+                         * </pre>
+                         * @see vxlActor#setVisualizationMode
+                         */
 						mode: {	SOLID:'SOLID', WIREFRAME:'WIREFRAME', POINTS:'POINTS', LINES:'LINES'}
 					},
 	/**
-    * @namespace Default values for cameras
-    * @property {vxl.def.camera.task} task Enumeration of common camera tasks
-    * @property {vxl.def.camera.type} type Camera types available in Voxelent
-    */
+	 * Defines the constants that can be used with <code>vxlCamera</code> 
+	 *
+     * @namespace Default values for cameras
+     */
 	camera          : {
-                        /** @namespace Enumeration of common camera tasks
-                        * @property {Number} NONE
-                        * @property {Number} PAN
-                        * @property {Number} ROTATE
-                        * @property {Number} DOLLY
-                        */
+                        /** 
+                         * 
+                         * Enumeration of common camera tasks
+                         * 
+                         * <p>The camera tasks can be:
+                         * <ul>
+                         * <li><code>NONE</code></li>
+                         * <li><code>PAN</code></li> 
+                         * <li><code>ROTATE</code></li> 
+                         * <li><code>DOLLY</code></li>
+                         * </ul>
+                         * </p>
+                         *  These constants are used internally and you probably would never need to use them.
+                         */
 						task      : {	NONE : 0,	PAN : 1,	ROTATE : 2,	DOLLY : 3	},
-                        /** @namespace Camera types available in Voxelent
-                        * @property {String} ORBITING   Orbiting Camera - Around the World
-                        * @property {String} TRACKING   Tracking Camera - First Person Camera
-                        */
+                        /** 
+                         * Camera types available
+                         * 
+                         * <p>The camera types can be:
+                         * <ul>
+                         * <li><code>ORBITING</code>: Orbiting Camera - Around the World</li>
+                         * <li><code>TRACKING</code>: Tracking Camera - First Person Camera</li> 
+                         * </ul>
+                         * </p>
+                         * 
+                         * <p> These modes can be used with the {@link vxlCamera vxlCamera constructor} or with its {@link vxlCamera#setType setType} method</p>
+                         */
     					type      : { ORBITING: 'ORBITING', TRACKING : 'TRACKING'},
-    					
+    					/**
+    					 * Right vector constant: [1,0,0] 
+    					 */
     					right     : [1,0,0],
+    					/**
+    					 * Up vector constant: [0,1,0] 
+    					 */
     					up        : [0,1,0],
+    					/**
+    					 * Camera axial or normal vector constant: [0,0,1] 
+    					 */
     					normal    : [0,0,1],
+    					/**
+    					 * Default field of view value: 30 
+    					 */
     					fov       : 30,
+    					/**
+    					 * Default value for the near field: 0.1 
+    					 */
     					near      : 0.1,
+    					/**
+    					 * Default value for the far field: 10000 
+    					 */
     					far       : 10000
     					
     					
@@ -217,10 +275,6 @@ events : {
 
 /**
 * @namespace Voxelent Global Objects
-* @property {Boolean}                   debug
-* @property {vxlNotifier}               notifier
-* @propertthaty {vxlModelManager}           modelManager
-* @property {vxlLookupTableManager}     lookupTableManager
 *
 */
 go : {

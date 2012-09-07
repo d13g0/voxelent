@@ -191,11 +191,15 @@ function makeSignature(params) {
 
 /** Find symbol {@link ...} strings in text and turn into html links */
 function resolveLinks(str, from) {
-	str = str.replace(/\{@link ([^} ]+) ?\}/gi,
-		function(match, symbolName) {
-			return new Link().toSymbol(symbolName);
-		}
-	);
-	
-	return str;
+	if (!str) {
+        return '';
+     }
+     return str.replace(
+     /\{@[link|see]+\s+([^}\s]+)\s*([^}]+)?\}/gi,
+     function(match, symbolName, linkText) {
+     if (!linkText) {
+     linkText = symbolName;
+     }
+     return new Link().toSymbol(symbolName).withText(linkText);
+     });
 }

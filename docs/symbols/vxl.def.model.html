@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - vxl.def.model</title>
+		<title>Voxelent Code Docs - vxl.def.model</title>
 		<link rel='stylesheet' type='text/css' href='../style/style.css'/>
 		<link rel="stylesheet" type="text/css" href="../style/prettify.css"/>
 		<script type="text/javascript" src="../style/prettify.js"></script>
@@ -35,7 +35,7 @@
 		<div id="wrap">
         <div id="index">
 			<!-- begin publish.classesIndex -->
-			<div align="center"><a href="../index.html">Class Index</a></div>
+			<div align="center"><h2><a href="../index.html">Class List</a></h2></div>
 <hr />
 <h3>Current Version:  0.87.6</h3>
 <p>Download it <a href='http://voxelent.com/downloads/'>here</a></p>
@@ -44,22 +44,6 @@
 	<li><i><a href="../symbols/_global_.html">_global_</a></i></li>
 	
 	<li><a href="../symbols/Array.html">Array</a></li>
-	
-	<li><a href="../symbols/mat2.html">mat2</a></li>
-	
-	<li><a href="../symbols/mat3.html">mat3</a></li>
-	
-	<li><a href="../symbols/mat4.html">mat4</a></li>
-	
-	<li><a href="../symbols/MatrixArray.html">MatrixArray</a></li>
-	
-	<li><a href="../symbols/quat4.html">quat4</a></li>
-	
-	<li><a href="../symbols/vec2.html">vec2</a></li>
-	
-	<li><a href="../symbols/vec3.html">vec3</a></li>
-	
-	<li><a href="../symbols/vec4.html">vec4</a></li>
 	
 	<li><a href="../symbols/vxl.html">vxl</a></li>
 	
@@ -71,29 +55,13 @@
 	
 	<li><a href="../symbols/vxl.def.actor.html">vxl.def.actor</a></li>
 	
-	<li><a href="../symbols/vxl.def.actor.mode.html">vxl.def.actor.mode</a></li>
-	
 	<li><a href="../symbols/vxl.def.camera.html">vxl.def.camera</a></li>
 	
-	<li><a href="../symbols/vxl.def.camera.task.html">vxl.def.camera.task</a></li>
-	
-	<li><a href="../symbols/vxl.def.camera.type.html">vxl.def.camera.type</a></li>
-	
 	<li><a href="../symbols/vxl.def.glsl.html">vxl.def.glsl</a></li>
-	
-	<li><a href="../symbols/vxl.def.glsl.bake.html">vxl.def.glsl.bake</a></li>
-	
-	<li><a href="../symbols/vxl.def.glsl.blender.html">vxl.def.glsl.blender</a></li>
-	
-	<li><a href="../symbols/vxl.def.glsl.lambert.html">vxl.def.glsl.lambert</a></li>
-	
-	<li><a href="../symbols/vxl.def.glsl.phong.html">vxl.def.glsl.phong</a></li>
 	
 	<li><a href="../symbols/vxl.def.lut.html">vxl.def.lut</a></li>
 	
 	<li><a href="../symbols/vxl.def.model.html">vxl.def.model</a></li>
-	
-	<li><a href="../symbols/vxl.def.model.loadingMode.html">vxl.def.model.loadingMode</a></li>
 	
 	<li><a href="../symbols/vxl.def.renderer.html">vxl.def.renderer</a></li>
 	
@@ -209,11 +177,26 @@
 				<table class="summaryTable" summary="A summary of the fields documented in the class vxl.def.model.">
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">
+							    <div class="fixedFont">
+							    &lt;static&gt;&nbsp;</div></td>
 															
 							<td class="nameDescription">
 								<div class="fixedFont">
-								<b><a href="../symbols/vxl.def.model.html#diffuse">diffuse</a></b>
+								vxl.def.model.<b><a href="../symbols/vxl.def.model.html#.diffuse">diffuse</a></b>
+								</div>
+
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">
+							    &lt;static&gt;&nbsp;</div></td>
+															
+							<td class="nameDescription">
+								<div class="fixedFont">
+								vxl.def.model.<b><a href="../symbols/vxl.def.model.html#.loadingMode">loadingMode</a></b>
 								</div>
 
 							</td>
@@ -270,16 +253,40 @@
 				</h2>
 				
 					<div class='methodDetail'>
-					<a name="diffuse"> </a>
+					<a name=".diffuse"> </a>
 					<div class="title">
-					<div class="fixedFont">
+					<div class="fixedFont">&lt;static&gt; 
 
-					<span class="light">{<a href="../symbols/Array.html">Array</a>}</span>
-					<b>diffuse</b>
+					
+					<span class="light">vxl.def.model.</span><b>diffuse</b>
 					</div>
 					</div>
 					<div class="description">
-						A 4-valued array that contains the color for actor's default diffuse property. This array has the format [r,g,b,a]
+						Diffuse color used by default when a model does not have color information: [0.8,0.8,0.8,1.0]
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+
+					</div>
+				
+					<div class='methodDetail'>
+					<a name=".loadingMode"> </a>
+					<div class="title">
+					<div class="fixedFont">&lt;static&gt; 
+
+					
+					<span class="light">vxl.def.model.</span><b>loadingMode</b>
+					</div>
+					</div>
+					<div class="description">
+						Enumeration with the different loading modes provided for models<ul><li><code>LIVE</code>: Each asset is added to the scene as soon as it is downloaded</li><li><code>LATER</code>: The assets are added to the scene only when ALL of them have been downloaded</li> <li><code>DETACHED</code>: The assets are never added to the scene. The programmer decides when to do this.</li> </ul> These modes can be used with <a href="../symbols/vxl.api.html#.load">vxl.api.load</a> and with vxlScene.setLoadingMode
 						
 						
 					</div>
@@ -308,14 +315,13 @@
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Aug 13 2012 17:58:27 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Sep 07 2012 18:43:00 GMT-0400 (EDT)
 		</div>
         </div>
         </div>
         <div id="footer">
 <div style="padding:30px;"></div>
 <div class="col-width clearfix footer-inner">
-<div class="footer-logo"><img src="http://voxelent.com/dev/_style/img/voxelent_footer.png" /> </div>
 <div style="padding:12px;"></div>
 Copyright &copy;2012 Voxelent Inc., Privacy Statement Terms and Conditions.
 	<div class="shadow"></div>

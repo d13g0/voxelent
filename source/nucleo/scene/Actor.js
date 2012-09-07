@@ -49,7 +49,7 @@
  * var actor = vxl.c.scene.getActorByName('example.json');
  * actor.setProperty('color',[1.0,0.0,0.0])
  * </pre>
- * @class
+ * @class Actors represent models (assets) in a Scene
  * @constructor
  */
 function vxlActor(model){
@@ -280,8 +280,8 @@ vxlActor.prototype.setShading = function(flag){
  * in the model. This method is used by the renderer. There are some cases where actors have local changes
  * that are not reflected in the model. In these cases the renderer should pick the actor property
  * over the model property
- * @param{String} property the property name
- * @returns{Object} the property or undefined if the property is not found 
+ * @param {String} property the property name
+ * @returns {Object} the property or undefined if the property is not found 
  */
 vxlActor.prototype.getProperty = function(property){
 	if (this.hasOwnProperty(property)) {
@@ -329,7 +329,7 @@ vxlActor.prototype.setVisualizationMode = function(mode){
 /**
 * Sets the lookup table for this actor.
 * This method will only succeed if the model that this actor represents has scalars 
-* @param {String} lutID the lookup table id. @see{vxl.def.lut.list} for currently supported ids.
+* @param {String} lutID the lookup table id. See {@link vxl.def.lut.list} for currently supported ids.
 * @param {Number} min lowest value for interpolation
 * @param {Number} max highest value for interpolation
 */
@@ -350,7 +350,7 @@ vxlActor.prototype.flipNormals = function(){
 
 /**
 * Sets the visibility of the actor
-* @param flag true or false
+* @param {boolean} flag true or false
 */
 vxlActor.prototype.setVisible = function(flag){
     this.visible = flag;
@@ -358,6 +358,7 @@ vxlActor.prototype.setVisible = function(flag){
 
 /**
 * Is visible?
+* @returns {boolean} true if the object is visible
 */
 vxlActor.prototype.isVisible = function(){
     return this.visible;

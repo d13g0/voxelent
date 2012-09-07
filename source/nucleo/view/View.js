@@ -21,7 +21,7 @@
 * HTML5 canvas that otherwise would need to be written over and over for each application
 * if you were writing a WebGL app from scratch.
 * Luckily this is not the case. You have the awesome vxlView who takes care of all these little details for you.
-* @class
+* @class the class that manages what it is rendered the HTML5 canvas on the web page 
 * @constructor
 * @param {String} canvasID id of the canvas in the DOM tree. That's all we need to setup a vxlView for you
 * @param {vxlScene} scene if this view is sharing a scene, this parameter corresponds to the scene being shared.

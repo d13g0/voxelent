@@ -15,8 +15,8 @@
 ---------------------------------------------------------------------------*/ 
 
 /**
- * Models are totally independend of views and of the rendering process
- * @class
+ * Models are totally independent of views and of the rendering process
+ * @class Represents a geometric object. A model is represented by an actor in a scene.
  * @constructor
  * @param {String} name the name for this model
  * @param {Object} JSON_OBJECT the JSON Object that defines this model (Optional)

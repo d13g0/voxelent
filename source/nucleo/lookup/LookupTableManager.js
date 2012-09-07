@@ -2,7 +2,7 @@
  * Manages the lookup table files. The constructor will try to load all
  * the lookup tables defined in vxl.def.luts at once.
  * 
- * @class
+ * @class Manages the lookup tables
  * @constructor
  */
 function vxlLookupTableManager(){

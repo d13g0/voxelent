@@ -1,7 +1,8 @@
 /* Pretty printing styles. Used with prettify.js. */
 /* Vim sunburst theme by David Leibovic */
 
-pre { display: block; background-color: #000; font-size:12px; }
+pre { display: block; background-color: #000; font-size:12px; 
+}
 pre .nocode { background-color: #000; color: #000 }
 pre .str, code .str { color: #65B042; } /* string  - green */
 pre .kwd, code .kwd { color: #E28964; } /* keyword - dark pink */
@@ -30,6 +31,7 @@ pre.prettyprint {
 	margin: 1em auto;
 	padding: 1em;
 	white-space: pre-wrap;
+	font-family: "Courier New",Courier,monospace;
 }
 
 /* Specify class=linenums on a pre to get line numbering */

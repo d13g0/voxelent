@@ -30,7 +30,7 @@
  * A vxlCamera object requires a vxlView to be created. Having said that, a vxlView can be associated with 
  * multiple cameras.
  * 
- * @class
+ * @class Like a real camera it moves around the 3D scene displaying the current point of view in the browser
  * @constructor Creates a vxlCamera. 
  * @param {vxlView} vw
  * @param {Object} t the type of camera 
