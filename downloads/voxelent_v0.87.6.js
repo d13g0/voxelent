@@ -80,6 +80,10 @@ def : {
      * @property {String} VERTEX_ATTRIBUTE the vertex attribute Id
      * @property {String} NORMAL_ATTRIBUTE the normal attribute Id
      * @property {String} COLOR_ATTRIBUTE the color attribute Id
+     * @property {JSON} blender The program to render blender scenes
+     * @property {JSON} lambert The program to render scenes without specular reflections
+     * @property {JSON} phong The program to render scenes with specular reflections
+     * @property {JSON} bake The program that interleaves buffers for optimized rendering
      */
 	glsl			: { 
 						VERTEX_SHADER   	: 'VERTEX_SHADER',
@@ -103,21 +107,28 @@ def : {
 								"copper","cortex","cte","french","fs","ge_color","gold","gooch",
 								"hot","hotiron","hsv","jet","nih","nih_fire","nih_ice","pink",
 								"rainramp","spectrum","surface","x_hot","x_rain"],
-      
+                              
 						main:"default"
 
 				    },
 	/**
     * @namespace Default values for models
-    * @property {Array}  diffuse    A 4-valued array that contains the color for actor's default diffuse property. This array has the format [r,g,b,a]
     */
-	model			: { 
-						diffuse: [0.9,0.0,0.0,1.0],
-						/** @namespace Enumeration with the different loading modes provided by Voxelent
-                          * @property {String} LIVE     Each asset is added to the scene as soon as it is downloaded
-                          * @property {String} LATER    The assets are added to the scene only when ALL of them ahve been downloaded
-                          * @property {String} DETACHED The assets are never added to the scene. The programmer decides when to do this.
-                          */
+	model			: {
+	                   /**
+	                    * Diffuse color used by default when a model does not have color information: [0.8,0.8,0.8,1.0] 
+	                    */ 
+						diffuse: [0.8,0.8,0.8,1.0],
+						/** 
+						 *  Enumeration with the different loading modes provided for models
+						 * <ul>
+                         * <li><code>LIVE</code>: Each asset is added to the scene as soon as it is downloaded</li>
+                         * <li><code>LATER</code>: The assets are added to the scene only when ALL of them have been downloaded</li> 
+                         * <li><code>DETACHED</code>: The assets are never added to the scene. The programmer decides when to do this.</li> 
+                         * </ul> 
+                         * 
+                         * These modes can be used with {@link vxl.api.load} and with {@link vxlScene.setLoadingMode}
+                         */
                          loadingMode     : { LIVE:'LIVE', LATER:'LATER', DETACHED:'DETACHED'}
 					},
     /**
@@ -128,42 +139,89 @@ def : {
     					background: [135/256,135/256,135/256]
     				},			      
 	/**
-    * @namespace Default values for actors
-    * @property {vxl.def.actor.mode}    mode    Actor rendering modes
+    * Contains the constants and default values that can be associated with <code>vxlActor</code>
+    * 
+    * @namespace Default values and constants that can be used with the <code>vxlActor</code> class.
     */
 	actor			: {
-                        /** @namespace Actor Rendering Modes 
-                        * @property {String} SOLID 
-                        * @property {String} WIREFRAME
-                        * @property {String} POINTS
-                        * @property {String} LINES
-                        */
+                        /**
+                         * <p>Defines the visualization modes available for instances of vxlActor</p> 
+                         * <p>The visualization  modes can be:
+                         * <ul>
+                         * <li><code>SOLID</code></li>
+                         * <li><code>WIREFRAME</code></li> 
+                         * <li><code>POINTS</code></li> 
+                         * <li><code>LINES</code></li>
+                         * </ul>
+                         * </p>
+                         * <p> to set the actor mode you should use the <code>{@link vxlActor#setVisualizationMode}</code>
+                         *  For instance, if you want to visualize the wireframe of your actor you can do something like this:
+                         * </p>
+                         *  <pre class='prettyprint'>
+                         *  var actor = vxl.c.scene.getActorByName('example.json'); //from the current scene
+                         *  actor.setVisualizationMode(vxl.def.actor.mode.WIREFRAME)
+                         * </pre>
+                         * @see vxlActor#setVisualizationMode
+                         */
 						mode: {	SOLID:'SOLID', WIREFRAME:'WIREFRAME', POINTS:'POINTS', LINES:'LINES'}
 					},
 	/**
-    * @namespace Default values for cameras
-    * @property {vxl.def.camera.task} task Enumeration of common camera tasks
-    * @property {vxl.def.camera.type} type Camera types available in Voxelent
-    */
+	 * Defines the constants that can be used with <code>vxlCamera</code> 
+	 *
+     * @namespace Default values for cameras
+     */
 	camera          : {
-                        /** @namespace Enumeration of common camera tasks
-                        * @property {Number} NONE
-                        * @property {Number} PAN
-                        * @property {Number} ROTATE
-                        * @property {Number} DOLLY
-                        */
+                        /** 
+                         * 
+                         * Enumeration of common camera tasks
+                         * 
+                         * <p>The camera tasks can be:
+                         * <ul>
+                         * <li><code>NONE</code></li>
+                         * <li><code>PAN</code></li> 
+                         * <li><code>ROTATE</code></li> 
+                         * <li><code>DOLLY</code></li>
+                         * </ul>
+                         * </p>
+                         *  These constants are used internally and you probably would never need to use them.
+                         */
 						task      : {	NONE : 0,	PAN : 1,	ROTATE : 2,	DOLLY : 3	},
-                        /** @namespace Camera types available in Voxelent
-                        * @property {String} ORBITING   Orbiting Camera - Around the World
-                        * @property {String} TRACKING   Tracking Camera - First Person Camera
-                        */
+                        /** 
+                         * Camera types available
+                         * 
+                         * <p>The camera types can be:
+                         * <ul>
+                         * <li><code>ORBITING</code>: Orbiting Camera - Around the World</li>
+                         * <li><code>TRACKING</code>: Tracking Camera - First Person Camera</li> 
+                         * </ul>
+                         * </p>
+                         * 
+                         * <p> These modes can be used with the {@link vxlCamera vxlCamera constructor} or with its {@link vxlCamera#setType setType} method</p>
+                         */
     					type      : { ORBITING: 'ORBITING', TRACKING : 'TRACKING'},
-    					
+    					/**
+    					 * Right vector constant: [1,0,0] 
+    					 */
     					right     : [1,0,0],
+    					/**
+    					 * Up vector constant: [0,1,0] 
+    					 */
     					up        : [0,1,0],
+    					/**
+    					 * Camera axial or normal vector constant: [0,0,1] 
+    					 */
     					normal    : [0,0,1],
+    					/**
+    					 * Default field of view value: 30 
+    					 */
     					fov       : 30,
+    					/**
+    					 * Default value for the near field: 0.1 
+    					 */
     					near      : 0.1,
+    					/**
+    					 * Default value for the far field: 10000 
+    					 */
     					far       : 10000
     					
     					
@@ -217,10 +275,6 @@ events : {
 
 /**
 * @namespace Voxelent Global Objects
-* @property {Boolean}                   debug
-* @property {vxlNotifier}               notifier
-* @propertthaty {vxlModelManager}           modelManager
-* @property {vxlLookupTableManager}     lookupTableManager
 *
 */
 go : {
@@ -440,15 +494,13 @@ window.cancelRequestAnimFrame = ( function() {
 //$(window).bind('focus', vxl.go.renderman.normal);
 //$(window).bind('blur', vxl.go.renderman.slow);
 
-vxl.go.notifier = new vxlNotifier();
-
 /**
  * <p> 
  * Handles asynchronous communication among classes in Voxelent 
  * using a publisher-subscriber mechanism
  * </p>
  * 
- * @class
+ * @class Hub for the publish-subscribe mechanism among Voxelent entities
  * @constructor
  */
 function vxlNotifier(){
@@ -600,7 +652,10 @@ vxlNotifier.prototype.getTargetsFor = function(event){
 	return list; //@TODO: Reevaluate
 };
 
-
+/**
+ *Global notifier object 
+ */
+vxl.go.notifier = new vxlNotifier();
  
 
     
@@ -3905,7 +3960,7 @@ vxlNotifier.prototype.getTargetsFor = function(event){
  * camera states for the camera it is associated with during the construction.
  * 
  * 
- * @class 
+ * @class Stores a camera state so it can be retrieved later. This is the base for view landmarks.
  * @constructor this is the constructor doc
  * @param {vxlCamera} camera
  * @author Diego Cantor
@@ -3982,7 +4037,7 @@ vxlCameraState.prototype.retrieve = function() {
  * A vxlCamera object requires a vxlView to be created. Having said that, a vxlView can be associated with 
  * multiple cameras.
  * 
- * @class
+ * @class Like a real camera it moves around the 3D scene displaying the current point of view in the browser
  * @constructor Creates a vxlCamera. 
  * @param {vxlView} vw
  * @param {Object} t the type of camera 
@@ -4483,7 +4538,7 @@ vxlCamera.prototype._updatePosition = function(){
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/  
 /**
- * @class
+ * @class The camera manager is responsible for controlling the cameras associated with a view 
  * @constructor
  * @param {vxlView} vw the view
  * @see vxlCamera
@@ -4740,7 +4795,7 @@ vxlViewInteractor.prototype.onDoubleClick     = function(ev){ alert('implement o
 vxlTrackerInteractor.prototype = new vxlViewInteractor();
 vxlTrackerInteractor.prototype.constructor = vxlViewInteractor;
 /**
- * @class
+ * @class Determines the application behaviour originated by mouse and keyboard events. 
  * @constructor
  * Interprets mouse and keyboard events and translate them to camera actions
  * @augments vxlViewInteractor
@@ -5191,7 +5246,7 @@ vxlPickerInteractor.prototype.onKeyUp = function(ev){
 ---------------------------------------------------------------------------*/   
 
 /**
- * @class
+ * @class Encapsulates the matrices required to perform 3D rendering
  * @constructor
  * @author Diego Cantor
  */
@@ -5285,6 +5340,7 @@ vxlTransforms.prototype.pop = function(){
 
 /**
  * @class
+ * @private
  */
 vxl.def.glsl.lambert = {
 	
@@ -5386,6 +5442,7 @@ vxl.def.glsl.lambert = {
 ---------------------------------------------------------------------------*/  
 /**
  * @class
+ * @private
  */
 vxl.def.glsl.phong = {
 
@@ -5398,9 +5455,10 @@ vxl.def.glsl.phong = {
     ],
     
     UNIFORMS : [
-    "uMVMatrix",
-    "uPMatrix",
-    "uNMatrix",
+    "mModelView",
+    "mNormal",
+    "mPerspective",
+    "mModelViewPerspective",
     "uShininess",
     "uPointSize",
     "uLightDirection",
@@ -5419,23 +5477,24 @@ vxl.def.glsl.phong = {
     "attribute vec3 aVertexNormal;",
     "attribute vec3 aVertexColor;",
     "uniform float uPointSize;",
-    "uniform mat4 uMVMatrix;",
-    "uniform mat4 uPMatrix;",
-    "uniform mat4 uNMatrix;",
+    "uniform mat4 mModelView;",
+    "uniform mat4 mPerspective;",
+    "uniform mat4 mModelViewPerspective;",
+    "uniform mat4 mNormal;",
     "uniform bool uUseVertexColors;",
     "varying vec3 vNormal;",
     "varying vec3 vEyeVec;",
     "varying vec4 vFinalColor;",
     
     "void main(void) {",
-    "  gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);",
+    "  gl_Position = mPerspective * mModelView * vec4(aVertexPosition, 1.0);",
     "  gl_PointSize = uPointSize;",
     "   if(uUseVertexColors) {",
     "       vFinalColor = vec4(aVertexColor,1.0);",
     "       return;",  
     "   }",
-    "   vec4 vertex = uMVMatrix * vec4(aVertexPosition, 1.0);",
-    "   vNormal = vec3(uNMatrix * vec4(aVertexNormal, 1.0));",
+    "   vec4 vertex = mModelView * vec4(aVertexPosition, 1.0);",
+    "   vNormal = vec3(mNormal * vec4(aVertexNormal, 1.0));",
     "   vEyeVec = -vec3(vertex.xyz);",
     "}"].join('\n'),
 
@@ -5518,6 +5577,7 @@ vxl.def.glsl.phong = {
 
 /**
  * @class
+ * @private
  */
 vxl.def.glsl.blender = {
 	
@@ -5656,6 +5716,7 @@ vxl.def.glsl.blender = {
 ---------------------------------------------------------------------------*/   
 
 /**
+ * @private
  * @class
  */
 vxl.def.glsl.bake = {
@@ -6179,7 +6240,7 @@ function vxlRenderer(vw){
     this._startDate     = 0;
     this._running       = false;
     
-    this.setProgram(vxl.def.glsl.lambert, vxlBasicStrategy);
+    this.setProgram(vxl.def.glsl.lambert, vxlLambertStrategy);
     
 }
 
@@ -6263,7 +6324,7 @@ vxlRenderer.prototype.setStrategy = function(strat){
         this.strategy = new strat(this);
     }
     else if (this.strategy == undefined){
-        this.strategy = new vxlBasicStrategy(this);
+        this.strategy = new vxlLambertStrategy(this);
     }
 }
 
@@ -6427,8 +6488,8 @@ vxlRenderer.prototype.render = function(){
 ---------------------------------------------------------------------------*/ 
 
 /**
- * Models are totally independend of views and of the rendering process
- * @class
+ * Models are totally independent of views and of the rendering process
+ * @class Represents a geometric object. A model is represented by an actor in a scene.
  * @constructor
  * @param {String} name the name for this model
  * @param {Object} JSON_OBJECT the JSON Object that defines this model (Optional)
@@ -6674,7 +6735,7 @@ vxlModel.prototype.computeBoundingBox = function(){
  * var actor = vxl.c.scene.getActorByName('example.json');
  * actor.setProperty('color',[1.0,0.0,0.0])
  * </pre>
- * @class
+ * @class Actors represent models (assets) in a Scene
  * @constructor
  */
 function vxlActor(model){
@@ -6905,8 +6966,8 @@ vxlActor.prototype.setShading = function(flag){
  * in the model. This method is used by the renderer. There are some cases where actors have local changes
  * that are not reflected in the model. In these cases the renderer should pick the actor property
  * over the model property
- * @param{String} property the property name
- * @returns{Object} the property or undefined if the property is not found 
+ * @param {String} property the property name
+ * @returns {Object} the property or undefined if the property is not found 
  */
 vxlActor.prototype.getProperty = function(property){
 	if (this.hasOwnProperty(property)) {
@@ -6954,7 +7015,7 @@ vxlActor.prototype.setVisualizationMode = function(mode){
 /**
 * Sets the lookup table for this actor.
 * This method will only succeed if the model that this actor represents has scalars 
-* @param {String} lutID the lookup table id. @see{vxl.def.lut.list} for currently supported ids.
+* @param {String} lutID the lookup table id. See {@link vxl.def.lut.list} for currently supported ids.
 * @param {Number} min lowest value for interpolation
 * @param {Number} max highest value for interpolation
 */
@@ -6975,7 +7036,7 @@ vxlActor.prototype.flipNormals = function(){
 
 /**
 * Sets the visibility of the actor
-* @param flag true or false
+* @param {boolean} flag true or false
 */
 vxlActor.prototype.setVisible = function(flag){
     this.visible = flag;
@@ -6983,6 +7044,7 @@ vxlActor.prototype.setVisible = function(flag){
 
 /**
 * Is visible?
+* @returns {boolean} true if the object is visible
 */
 vxlActor.prototype.isVisible = function(){
     return this.visible;
@@ -7100,10 +7162,8 @@ vxlBasicStrategy.prototype.constructor = vxlBasicStrategy;
 /**
  * @constructor
  * @class
- * Implements a basic rendering strategy that works with the following programs:
+ * Implements a basic rendering strategy 
  * 
- * vxl.def.glsl.lambert
- * vxl.def.glsl.phong
  * 
  * A vxlBasicStrategy object is selected by default as the strategy that an actor
  * will use for rendering.
@@ -7155,27 +7215,8 @@ vxlBasicStrategy.prototype.deallocate = function(scene){
  * @param {vxlScene} scene the scene to render
  */
 vxlBasicStrategy.prototype.render = function(scene){
-
-    //Updates the perspective matrix and passes it to the program
-    var r       = this.renderer;
-    var trx     = r.transforms
-    var prg     = r.prg;
-    var glsl    = vxl.def.glsl;
-    
-    trx.calculatePerspective();
-    trx.calculateModelView();
-    prg.setUniform(glsl.PERSPECTIVE_MATRIX, trx.pMatrix);
-    
-    var elements = scene.actors.concat(scene.toys.list);
-    var NUM = elements.length;
-    
-    if (scene.frameAnimation != undefined){
-        scene.frameAnimation.update();
-    }
-
-    for(var i = 0; i < NUM; i+=1){
-        this._renderActor(elements[i]);
-    }
+ //The descendants will
+ alert('vxlBasicStrategy.render: abstract render method invoked');    
 };
 
 
@@ -7261,9 +7302,369 @@ vxlBasicStrategy.prototype._applyActorTransform = function(actor){
     
     
  };
+/*-------------------------------------------------------------------------
+    This file is part of Voxelent's Nucleo
+
+    Nucleo is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation version 3.
+
+    Nucleo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------------------------------------------*/ 
+
+//Inheritance stuff
+vxlLambertStrategy.prototype = new vxlBasicStrategy(undefined)
+vxlLambertStrategy.prototype.constructor = vxlLambertStrategy;
+
+/**
+ * 
+ * Implements a rendering strategy that works with the vxl.def.glsl.lambert program. 
+ * A rendering strategy allows decoupling rendering specific code (i.e. code that access and 
+ * communicates with the program) from the actor.
+ * @constructor
+ * @class a vxlLambertStrategy object is selected by default as the strategy that an actor
+ * will use for rendering.
+ * 
+ * @extends vxlBasicStrategy
+ * @author Diego Cantor
+ * 
+ */
+function vxlLambertStrategy(renderer){
+	vxlBasicStrategy.call(this,renderer);
+}
 
 
-vxlBasicStrategy.prototype._renderActor = function(actor){
+/**
+ * Renders the actors one by one
+ * @param {vxlScene} scene the scene to render
+ */
+vxlLambertStrategy.prototype.render = function(scene){
+
+    //Updates the perspective matrix and passes it to the program
+    var r       = this.renderer;
+    var trx     = r.transforms
+    var prg     = r.prg;
+    var glsl    = vxl.def.glsl;
+    
+    trx.calculatePerspective();
+    trx.calculateModelView();
+    prg.setUniform(glsl.PERSPECTIVE_MATRIX, trx.pMatrix);
+    
+    var elements = scene.actors.concat(scene.toys.list);
+    var NUM = elements.length;
+    
+    if (scene.frameAnimation != undefined){
+        scene.frameAnimation.update();
+    }
+
+    for(var i = 0; i < NUM; i+=1){
+        this._renderActor(elements[i]);
+    }
+};
+
+
+
+
+vxlLambertStrategy.prototype._renderActor = function(actor){
+
+    if (!actor.visible) return; //Quick and simple
+    
+	var model 	= actor.model;
+    var buffers = this._gl_buffers[actor.UID]; 
+    var r  		= this.renderer;
+	var gl 		= r.gl;
+	var prg 	= r.prg;
+	var trx 	= r.transforms;
+	var glsl    = vxl.def.glsl;
+	
+	this._applyActorTransform(actor);
+	
+	var diffuse = [actor.color[0], actor.color[1], actor.color[2],1.0];
+	
+	if (actor.opacity < 1.0){
+		diffuse[3] = actor.opacity;
+	}
+	else {
+		diffuse[3] = 1.0;
+	}
+	
+	prg.setUniform("uMaterialDiffuse",diffuse);
+	prg.setUniform("uUseVertexColors", false);
+    
+    prg.disableAttribute(glsl.COLOR_ATTRIBUTE);
+	prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
+	prg.enableAttribute(glsl.VERTEX_ATTRIBUTE);
+	
+	try{
+		
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
+		prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+	}
+    catch(err){
+        alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
+		throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
+    }
+    	
+	if (actor.colors){	
+		try{
+			prg.setUniform("uUseVertexColors", true);
+			gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.colors.slice(0)), gl.STATIC_DRAW);
+			
+			prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
+			prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+		}
+		catch(err){
+        	alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+			throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+   		}
+    }
+    
+    if(model.normals){
+	    try{
+			gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals.slice(0)), gl.STATIC_DRAW);
+			
+			prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
+			prg.setAttributePointer(glsl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
+		}
+	    catch(err){
+	        alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
+			throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
+	    }
+	}
+    prg.setUniform("uUseShading",actor.shading);
+    
+    try{
+		if (actor.mode == vxl.def.actor.mode.SOLID){
+			prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+			gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
+		}
+		else if (actor.mode == vxl.def.actor.mode.WIREFRAME){
+			if (actor.name == 'floor'){
+			     prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
+			}
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
+			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
+			gl.drawElements(gl.LINES, model.wireframe.length, gl.UNSIGNED_SHORT,0);
+		}
+		else if (actor.mode == vxl.def.actor.mode.POINTS){
+			prg.setUniform("uUseShading", true);
+			prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
+			gl.drawArrays(gl.POINTS,0, this.model.vertices.length/3);
+		}
+		else if (actor.mode == vxl.def.actor.mode.LINES){
+			prg.setUniform("uUseShading", false);
+			prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+			gl.drawElements(gl.LINES, actor.model.indices.length, gl.UNSIGNED_SHORT,0);
+		}
+		else{
+            alert('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+this.mode+' is not valid.');
+			throw('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+this.mode+' is not valid.');
+			
+		}
+		//Cleaning up
+		 gl.bindBuffer(gl.ARRAY_BUFFER, null);
+	     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    }
+	catch(err){
+		alert('Error rendering actor ['+actor.name+']. Error =' +err.description);
+		throw('Error rendering actor ['+actor.name+']. Error =' +err.description);
+	}
+};
+
+/*-------------------------------------------------------------------------
+    This file is part of Voxelent's Nucleo
+
+    Nucleo is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation version 3.
+
+    Nucleo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------------------------------------------*/ 
+
+//Inheritance stuff
+vxlPhongStrategy.prototype = new vxlRenderStrategy(undefined)
+vxlPhongStrategy.prototype.constructor = vxlPhongStrategy;
+
+/**
+ * Implements a rendering strategy that works with the vxl.def.glsl.phong program. 
+ * A rendering strategy allows decoupling rendering specific code (i.e. code that access and 
+ * communicates with the program) from the actor.
+ * @constructor
+ * @class  Implements a rendering strategy that works with the vxl.def.glsl.phong program
+ * 
+ * 
+ * @extends vxlBasicStrategy 
+ * @author Diego Cantor
+ * 
+ */
+function vxlPhongStrategy(renderer){
+	vxlRenderStrategy.call(this,renderer);
+	this._gl_buffers  = {};
+	
+	if (renderer){
+	var gl = this.renderer.gl;
+	
+	gl.enable(gl.BLEND);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	gl.enable(gl.DEPTH_TEST);
+	gl.depthFunc(gl.LESS);
+	gl.clearDepth(1.0);
+	gl.disable(gl.CULL_FACE);
+    }	
+}
+
+/**
+ * Implements basic allocation of memory. Creates the WebGL buffers for the actor
+ * @param {vxlScene} scene the scene to allocate memory for
+  */
+vxlPhongStrategy.prototype.allocate = function(scene){
+    var elements = scene.actors.concat(scene.toys.list);
+    var NUM = elements.length;
+    
+    for(var i = 0; i < NUM; i+=1){
+        this._allocateActor(elements[i]);
+    }
+};
+
+/**
+ * @param {vxlScene} scene the scene to deallocate memory from
+ */
+vxlPhongStrategy.prototype.deallocate = function(scene){
+    //DO NOTHING. THE DESCENDANTS WILL.
+}
+
+
+/**
+ * Renders the actors one by one
+ * @param {vxlScene} scene the scene to render
+ */
+vxlPhongStrategy.prototype.render = function(scene){
+
+    //Updates the perspective matrix and passes it to the program
+    var r       = this.renderer;
+    var trx     = r.transforms
+    var prg     = r.prg;
+    var glsl    = vxl.def.glsl;
+    
+    trx.calculatePerspective();
+    trx.calculateModelView();
+    prg.setUniform(glsl.PERSPECTIVE_MATRIX, trx.pMatrix);
+    
+    var elements = scene.actors.concat(scene.toys.list);
+    var NUM = elements.length;
+    
+    if (scene.frameAnimation != undefined){
+        scene.frameAnimation.update();
+    }
+
+    for(var i = 0; i < NUM; i+=1){
+        this._renderActor(elements[i]);
+    }
+};
+
+
+
+/**
+ * Receives one actor and returns the GL buffers
+ */
+vxlPhongStrategy.prototype._allocateActor = function(actor){
+   
+    if (this._gl_buffers[actor.UID] != undefined) return; // the actor has already been allocated
+   	
+	var gl = this.renderer.gl;
+	var model = actor.model;
+    var buffers = {};
+	
+	//Vertex Buffer
+	buffers.vertex = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices), gl.STATIC_DRAW);
+	
+	//Index Buffer
+	if (model.indices != undefined){
+		buffers.index = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices), gl.STATIC_DRAW);
+	}
+	
+	//Normals Buffer
+	if (model.normals){
+		buffers.normal = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals), gl.STATIC_DRAW);
+	}
+	
+	//Color Buffer for scalars
+	if (model.scalars != undefined || model.colors != undefined){
+		buffers.color = gl.createBuffer(); //we don't BIND values or use the buffers until the lut is loaded and available
+	}
+	
+	//Wireframe Buffer 
+	if (model.wireframe != undefined){
+		buffers.wireframe = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
+	}
+	
+	//Cleaning up
+	gl.bindBuffer(gl.ARRAY_BUFFER, null);
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	
+	this._gl_buffers[actor.UID] = buffers; 
+};
+
+/**
+ * Passes the matrices to the shading program
+ * @param {vxlActor} the actor 
+ * we will update each Model-View matrix of each renderer according to
+ * the actor position,scale and rotation.
+ */
+vxlPhongStrategy.prototype._applyActorTransform = function(actor){
+    
+    var r		= this.renderer;
+    var trx 	= r.transforms
+    var	prg 	= r.prg;
+    var glsl 	= vxl.def.glsl;
+
+    trx.push();
+        
+        
+		mat4.translate	(trx.mvMatrix, actor.position);
+		mat4.scale      (trx.mvMatrix, actor.scale);
+		//@TODO: IMPLEMENT ACTOR ROTATIONS
+	    
+	    prg.setUniform(glsl.MODEL_VIEW_MATRIX,	r.transforms.mvMatrix);
+
+	    trx.calculateModelViewPerspective();
+        prg.setUniform(glsl.MVP_MATRIX, r.transforms.mvpMatrix);
+    trx.pop();
+    
+    trx.calculateNormal(); 
+    prg.setUniform(glsl.NORMAL_MATRIX, r.transforms.nMatrix);
+    
+    
+    
+ };
+
+
+vxlPhongStrategy.prototype._renderActor = function(actor){
 
     if (!actor.visible) return; //Quick and simple
     
@@ -7394,10 +7795,12 @@ vxlBlenderStrategy.prototype = new vxlBasicStrategy()
 vxlBlenderStrategy.prototype.constructor = vxlBlenderStrategy;
 
 /**
- * @author Diego Cantor
- * @class 
  * Implements the strategy to render Blender scenes that have been exported to the OBJ format and from there
  * to the Voxelent format.
+ * @author Diego Cantor
+ * @class
+ * Implements the strategy to render Blender scenes that have been exported to the OBJ format and from there
+ * to the Voxelent format. 
  * @extends vxlBasicStrategy
  * @constructor 
  * @param {vxlRenderer} renderer the renderer associated to this strategy
@@ -8411,7 +8814,7 @@ vxlSceneToys.prototype.update = function(){
 };
 
 /**
- * @class
+ * @class Contains a mapping between scalars and a color palette
  * @constructor
  */
 function vxlLookupTable(){
@@ -8498,7 +8901,7 @@ vxlLookupTable.prototype.getColors = function(s,min,max){
  * Manages the lookup table files. The constructor will try to load all
  * the lookup tables defined in vxl.def.luts at once.
  * 
- * @class
+ * @class Manages the lookup tables
  * @constructor
  */
 function vxlLookupTableManager(){
@@ -8627,7 +9030,7 @@ vxlBoundingBox.prototype = new vxlActor();
 vxlBoundingBox.prototype.constructor = vxlBoundingBox;
 
 /**
- * @class
+ * @class Cuboid that encloses the visible extent of a vxlScene
  * @constructor
  * @extends vxlActor
  */
@@ -8692,7 +9095,7 @@ vxlAxis.prototype 				= new vxlActor();
 vxlAxis.prototype.constructor 	= vxlAxis;
 
 /**
- * @class
+ * @class Visible three-dimensional system of coordinates 
  * @constructor
  * @author Diego Cantor
  */
@@ -8767,7 +9170,7 @@ vxlFloor.prototype = new vxlActor();
 vxlFloor.prototype.constructor = vxlFloor;
 
 /**
- * @class
+ * @class Visible grid that sets the floor reference and its extension
  * @constructor
  * @extends vxlActor
  */
@@ -8843,7 +9246,7 @@ vxlFloor.prototype.setGrid =function(dimension, spacing){
 * HTML5 canvas that otherwise would need to be written over and over for each application
 * if you were writing a WebGL app from scratch.
 * Luckily this is not the case. You have the awesome vxlView who takes care of all these little details for you.
-* @class
+* @class the class that manages what it is rendered the HTML5 canvas on the web page 
 * @constructor
 * @param {String} canvasID id of the canvas in the DOM tree. That's all we need to setup a vxlView for you
 * @param {vxlScene} scene if this view is sharing a scene, this parameter corresponds to the scene being shared.
@@ -9065,7 +9468,7 @@ vxlView.prototype.setDragAndDrop = function(flag){
  * vxlModelManager provides methods for loading remote and local models.
  * 
  * 
- * @class
+ * @class Controls the loading and network transfer of models into memory
  * @constructor
  * @author Diego Cantor
  */
@@ -9923,7 +10326,7 @@ wireframeON :  function(){
 /**
  * Provides frame-to-frame animation
  * 
- * @class
+ * @class Manages a frame-to-frame animation
  * @constructor
  * @param map  JSON object where each property name is one frame and each property value
  * is a list of actors 
@@ -10158,7 +10561,7 @@ vxlFrameAnimation.prototype.setFrame = function (f){
 
 /**
  * Reads a VTK file and creates the respective JSON(s) file(s).
- * @class
+ * @class Reads VTK files (ASCII)  and creates JSON objects that can be used as models
  * @constructor 
  */
 function vxlVTKReader(scene){

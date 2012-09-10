@@ -18,10 +18,12 @@ vxlBlenderStrategy.prototype = new vxlBasicStrategy()
 vxlBlenderStrategy.prototype.constructor = vxlBlenderStrategy;
 
 /**
- * @author Diego Cantor
- * @class 
  * Implements the strategy to render Blender scenes that have been exported to the OBJ format and from there
  * to the Voxelent format.
+ * @author Diego Cantor
+ * @class
+ * Implements the strategy to render Blender scenes that have been exported to the OBJ format and from there
+ * to the Voxelent format. 
  * @extends vxlBasicStrategy
  * @constructor 
  * @param {vxlRenderer} renderer the renderer associated to this strategy

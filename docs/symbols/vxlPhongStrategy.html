@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>Voxelent Code Docs - Array</title>
+		<title>Voxelent Code Docs - vxlPhongStrategy</title>
 		<link rel='stylesheet' type='text/css' href='../style/style.css'/>
 		<link rel="stylesheet" type="text/css" href="../style/prettify.css"/>
 		<script type="text/javascript" src="../style/prettify.js"></script>
@@ -142,20 +142,37 @@
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Built-In Namespace  <code>Array</code>
+				Class  <code>vxlPhongStrategy</code>
 			</h1>
 
 <!-- ============================== class summary ========================== -->
 			<p class="description">
 				
+				<br />Extends
+					<a href="../symbols/vxlBasicStrategy.html">vxlBasicStrategy</a>.<br />
 				
 
-				
+				Implements a rendering strategy that works with the vxl.def.glsl.phong program
 
+				
+					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_renderer_strategy_PhongStrategy.js.html">PhongStrategy.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->
+			
+			
+				<h2>Class Summary</h2>
+				<table class="summaryTable"><tr>
+				<td class="attributes">&nbsp;</td>
+				<td class="nameDescription" >
+					<div class="fixedFont">
+						<b><a href="../symbols/vxlPhongStrategy.html#constructor">vxlPhongStrategy</a></b>(renderer)
+					</div>
+					<div class="description">Implements a rendering strategy that works with the vxl.def.glsl.phong program.</div>
+				</td>
+				</tr>
+				</table>
 			
 
 <!-- ============================== properties summary ===================== -->
@@ -166,7 +183,7 @@
 				
 				
 				<h2>Method Summary</h2>
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class Array.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class vxlPhongStrategy.">
 					
 						<tr>
 							<td class="attributes">
@@ -183,8 +200,8 @@
 								
 								
 								
-								<b><a href="../symbols/Array.html#max">max</a></b>
-								()
+								<b><a href="../symbols/vxlPhongStrategy.html#allocate">allocate</a></b>
+								(scene)
 								</div>
 							</td>
 							
@@ -205,8 +222,30 @@
 								
 								
 								
-								<b><a href="../symbols/Array.html#min">min</a></b>
-								()
+								<b><a href="../symbols/vxlPhongStrategy.html#deallocate">deallocate</a></b>
+								(scene)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlPhongStrategy.html#render">render</a></b>
+								(scene)
 								</div>
 							</td>
 							
@@ -217,11 +256,65 @@
 				
 
 				
+				<dl class="inheritsList">
+				
+				</dl>
+				
 			
 <!-- ============================== events summary ======================== -->
 			
 
 <!-- ============================== constructor details ==================== -->
+			
+			<div class="details"><a name="constructor"> </a>
+				<h2>
+					Class Detail
+				</h2>
+				<div class='methodDetail'>
+				<div class="title">
+				<div class="fixedFont">
+						<b>vxlPhongStrategy</b>(renderer)
+				</div>
+				</div>
+
+				<div class="description">
+					Implements a rendering strategy that works with the vxl.def.glsl.phong program. 
+A rendering strategy allows decoupling rendering specific code (i.e. code that access and 
+communicates with the program) from the actor.
+					<br /><i>Author: </i>Diego Cantor.
+				</div>
+
+				
+
+
+					
+						<p class="heading">Parameters:</p>
+						<table class='paramTable'>
+						
+							<tr>
+							<td>
+								
+							</td>
+							<td>	
+								 <code>renderer</code>
+							</td>
+							<td>
+								<p>
+								
+								</p>
+							</td>
+								
+						
+						</table>
+					
+					
+					
+					
+					
+					
+					
+				</div>
+			</div>
 			
 
 <!-- ============================== field details ========================== -->
@@ -234,7 +327,7 @@
 				</h2>
 				
 				<div class='methodDetail'>
-					<a name="max"> </a>
+					<a name="allocate"> </a>
 					<div class="title">
 					<div class="fixedFont">
 
@@ -244,20 +337,34 @@
 					
 					
 					
-					  <b>max</b>()
+					  <b>allocate</b>(scene)
 					</div>
 					</div>
 					<div class="description">
-						
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/source_nucleo_vxl_VXL.js.html">VXL.js</a>.
+						Implements basic allocation of memory. Creates the WebGL buffers for the actor
 						
 						
 					</div>
 
 					
 
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{<a href="../symbols/vxlScene.html">vxlScene</a>}</span> 
+								</td>
+								<td>
+									<code>scene</code>
+								</td>	
+								<td><p>the scene to allocate memory for
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
 						
 						
 						
@@ -268,7 +375,7 @@
 				</div>	
 				
 				<div class='methodDetail'>
-					<a name="min"> </a>
+					<a name="deallocate"> </a>
 					<div class="title">
 					<div class="fixedFont">
 
@@ -278,20 +385,82 @@
 					
 					
 					
-					  <b>min</b>()
+					  <b>deallocate</b>(scene)
 					</div>
 					</div>
 					<div class="description">
 						
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/source_nucleo_vxl_VXL.js.html">VXL.js</a>.
 						
 						
 					</div>
 
 					
 
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{<a href="../symbols/vxlScene.html">vxlScene</a>}</span> 
+								</td>
+								<td>
+									<code>scene</code>
+								</td>	
+								<td><p>the scene to deallocate memory from
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="render"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>render</b>(scene)
+					</div>
+					</div>
+					<div class="description">
+						Renders the actors one by one
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{<a href="../symbols/vxlScene.html">vxlScene</a>}</span> 
+								</td>
+								<td>
+									<code>scene</code>
+								</td>	
+								<td><p>the scene to render
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
 						
 						
 						
@@ -313,7 +482,7 @@
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Sep 10 2012 15:09:12 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Sep 10 2012 15:09:13 GMT-0400 (EDT)
 		</div>
         </div>
         </div>

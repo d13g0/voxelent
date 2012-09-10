@@ -107,7 +107,7 @@ def : {
 								"copper","cortex","cte","french","fs","ge_color","gold","gooch",
 								"hot","hotiron","hsv","jet","nih","nih_fire","nih_ice","pink",
 								"rainramp","spectrum","surface","x_hot","x_rain"],
-                              En
+                              
 						main:"default"
 
 				    },

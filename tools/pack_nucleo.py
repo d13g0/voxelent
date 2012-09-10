@@ -40,6 +40,8 @@ def pack(VOX_VERSION_NUMBER):
              'Actor', 
              'RenderStrategy',
              'BasicStrategy',
+             'LambertStrategy',
+             'PhongStrategy',
              'BlenderStrategy',
              'BakeStrategy',
              'Scene', 

@@ -41,7 +41,7 @@ function vxlRenderer(vw){
     this._startDate     = 0;
     this._running       = false;
     
-    this.setProgram(vxl.def.glsl.lambert, vxlBasicStrategy);
+    this.setProgram(vxl.def.glsl.lambert, vxlLambertStrategy);
     
 }
 
@@ -125,7 +125,7 @@ vxlRenderer.prototype.setStrategy = function(strat){
         this.strategy = new strat(this);
     }
     else if (this.strategy == undefined){
-        this.strategy = new vxlBasicStrategy(this);
+        this.strategy = new vxlLambertStrategy(this);
     }
 }
 
