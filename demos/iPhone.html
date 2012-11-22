@@ -1,0 +1,242 @@
+<html>
+<head>
+<meta name='Diego Cantor' content='Voxelent: The best WebGL platform yet'>
+<meta name='copyright' content='&copy; 2011'>
+<meta name='robots' content='all'>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name='keywords' content='webgl, webgl platform, medical imaging, webgl api'>
+
+<title>Voxelent - Cube Lookup Table Demo</title>
+
+<link rel='stylesheet' type='text/css' href='css/jquery-ui-bs/theme.css'/>
+<link rel="stylesheet" type="text/css" href="css/colorpicker.css" />
+<link rel="stylesheet"   type="text/css" href="css/jquery-bubble-popup-v3.css" />
+
+<script src="lib/jquery.js" type="text/javascript"> </script>
+<script src="lib/jquery-ui.js" type="text/javascript"> </script>
+<script type='text/javascript' src='lib/voxelent_v0.87.6.js'> </script>
+<script type='text/javascript' src='lib/vox-gui_v0.1.js'> </script>
+<script type='text/javascript' src='lib/jquery-bubble-popup-v3.min.js'></script>
+<script type='text/javascript' src='lib/colorpicker.js'></script>
+
+
+
+<script type='text/javascript'>
+   var view;
+    
+    function runVoxApp(){
+        
+        vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
+        
+        
+        view = vxl.api.setup('view-1');
+        vxl.api.setProgram(view, vxl.def.glsl.phong , vxlPhongStrategy);
+        
+        list = ['part1.json','part2.json','part3.json','part4.json','part5.json','part6.json','part7.json']
+        vxl.api.load(list,'assets/models/texture/phone');
+      	view.setBackgroundColor(0.2, 0.2, 0.2);
+        view.start();
+        view.cameraman.getActiveCamera().setPosition(0,0,8);
+        vxl.api.setUniform('uLightDirection',[0.0,0.0,-1.0])
+        $('#toggleView').click();
+        
+    }
+    
+    function handleEvent(event){
+        //var cube = vxl.api.getActorByName('earth.json');
+        //cube.setPosition(1,0,-3);
+        vxl.c.camera.longShot();
+         $('#overlay-div').fadeIn(3000);
+    }
+
+
+</script>
+
+<script type="text/javascript">
+  //Google Analytics Script 
+  var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-26954785-1']); _gaq.push(['_trackPageview']);  (function() {  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);   })();
+</script>
+
+<style type="text/css">
+
+
+
+.overlay {
+    background: rgba(90,90,90,0.9);
+    padding: 10px;
+    width: auto;
+    height: 80px;
+    position: fixed;
+    bottom: 0px;
+	left: 0px;
+	right: 0px;
+	font-size:12px;
+	font-family: Arial,Helvetica;
+	color: white;
+	display: none;
+	text-align: center ; 
+	margin-left: 0px;
+	margin-right: 0px;;
+	border-radius: 0px;
+	box-shadow: 3px 3px 3px #888;
+}
+
+.overlay select{
+   background: #5A5A5A;
+   color: #BCBCBC;
+   width: 100px;
+   padding: 5px;
+   font-size: 13px;
+   height: 30px;
+   border: 0px;
+}
+
+.overlay #view-1-fps{
+    display:none;
+}
+
+html, body {
+  width:  100%;
+  height: 100%;
+  margin: 0px;
+}
+
+</style> 
+</head>
+<body onload='runVoxApp()' style="background-color: #333;" >
+	<div style="position:absolute;"><img src="css/img/voxelent_white.png"/></div>
+	<canvas id = 'view-1'>
+		<p>
+			Your browser does not support WebGL :-(
+		</p>
+	</canvas>        
+	
+	<div id = 'overlay-div' class='overlay'>
+		<a href=#><div  id='toggleView' style="float:right;"><img id='viewBtn'  src="css/icons/hide.png"  style="width:25px; height:25px"></img></div></a>
+		<p></p><div /> 
+		<br />
+		<a href=# ><div id='toggleAnimation'style="display:inline-block"><img id='animationBtn' src="css/icons/play.png"  style="width:40%; height:40%"></img></div></a>
+		<a href=# onclick='alert("You can change the pattern by selecting this icon");'><div id='togglePattern' style="display:inline-block"><img src="css/icons/texture.png"  style="width:40%; height:40%"></img></div></a>
+		<a href=#><div  id='topView' style="display:inline-block"><img src="css/icons/top.png"  style="width:40%; height:40%"></img></div></a>
+		<a href=# ><div id='sideView' style="display:inline-block"><img src="css/icons/side.png"  style="width:40%; height:40%"></img></div></a>
+		<a href=#><div  id='frontView' style="display:inline-block"><img src="css/icons/front.png"  style="width:40%; height:40%"></img></div></a>
+		<a href='mailto:vbot@voxelent.com'><div  id='email' style="display:inline-block"><img src="css/icons/email.png"  style="width:40%; height:40%"></img></div></a>
+		<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			<div id="myColorSelector" class="colorSelector" style="display:inline-block;" >
+							<div style="background-color: rgb(120, 150, 12); margin-bottom: 1px;" ></div>
+			</div>
+			
+		
+	</div>
+	
+
+
+
+
+    
+<script>
+
+$('#toggleAnimation').CreateBubblePopup({position: 'top', innerHtml: 'Start/Stop Animation!', themePath: 'css/jquerybubblepopup-themes/'});
+$('#togglePattern').CreateBubblePopup({position: 'top', innerHtml: 'Change Pattern', themePath: 'css/jquerybubblepopup-themes/'});
+$('#topView').CreateBubblePopup({position: 'top', innerHtml: 'Switch to Top View', themePath: 'css/jquerybubblepopup-themes/'});
+$('#sideView').CreateBubblePopup({position: 'top', innerHtml: 'Switch to Side View', themePath: 'css/jquerybubblepopup-themes/'});
+$('#frontView').CreateBubblePopup({position: 'top', innerHtml: 'Switch to Front View', themePath: 'css/jquerybubblepopup-themes/'});
+$('#email').CreateBubblePopup({position: 'top', innerHtml: 'Drop us a line', themePath: 'css/jquerybubblepopup-themes/'});
+$('#myColorSelector').CreateBubblePopup({position: 'top', innerHtml: 'Select Color', themePath: 'css/jquerybubblepopup-themes/'});
+
+$('#myColorSelector').ColorPicker({ 
+    onSubmit: function(hsb, hex, rgb, el) { 
+   $(el).val(hex); 
+   $(el).ColorPickerHide(); 
+    
+ }, 
+ color: '#B606AE', 
+    onShow: function (colpkr) { 
+        $(colpkr).fadeIn(500); 
+        return false; 
+    }, 
+    onHide: function (colpkr) { 
+        $(colpkr).fadeOut(500); 
+        return false; 
+    }
+	, 
+   onChange: function (hsb, hex, rgb) { 
+//        sphereColor = hex; 
+        $('#myColorSelector div').css('backgroundColor', '#' + hex); 
+        var c = [rgb.r/256,rgb.g/256,rgb.b/256]; 
+        var actor = vxl.api.getActorByName('part1.json');
+        actor.setColor(c);
+    }
+     
+ /*
+   onBeforeShow: function (colpkr) { 
+        $(colpkr).ColorPickerSetColor(sphereColor); 
+    } 
+*/
+	
+ });
+
+$('#toggleAnimation').click(
+    function(){
+        if ($('#animationBtn').attr('src')=="css/icons/pause.png"){
+            clearInterval(timer);
+			// change image
+			
+            $('#animationBtn').attr("src", "css/icons/play.png");
+			//$(this).css("display", "inline-block");
+        }
+        else {
+            timer = setInterval(animate,30);
+             $('#animationBtn').attr("src", "css/icons/pause.png");
+        }
+    }
+);
+
+$('#topView').click(
+    function(){
+		vxl.c.camera.longShot();
+		vxl.c.camera.setElevation(-90);
+	}
+);
+
+$('#sideView').click(
+    function(){
+	vxl.c.camera.longShot();
+	vxl.c.camera.setAzimuth(-90);
+	}
+);
+
+$('#frontView').click(
+    function(){
+	vxl.c.camera.longShot()	
+	}
+);
+
+$('#toggleView').click(
+    function(){
+        if ($('#viewBtn').attr('src')=="css/icons/hide.png"){
+			$('#overlay-div').animate({height: '15px'});
+            $('#viewBtn').attr("src", "css/icons/show.png");
+        }
+        else {
+			$('#overlay-div').animate({height: '80px'});
+             $('#viewBtn').attr("src", "css/icons/hide.png");
+        }
+    }
+);
+
+var fpsshown = false;
+$(document).keydown(function(event){
+   if (event.keyCode == 70){
+       if(fpsshown){
+            $('#view-1-fps').hide();
+       }
+       else{
+           $('#view-1-fps').show();
+       }
+       fpsshown = !fpsshown;
+   } 
+});
+</script>    
+</body>			
+</html>
