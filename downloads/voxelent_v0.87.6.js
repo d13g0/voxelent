@@ -94,7 +94,8 @@ def : {
 						MVP_MATRIX          : 'mModelViewPerspective',
 						VERTEX_ATTRIBUTE    : 'aVertexPosition',
 						NORMAL_ATTRIBUTE    : 'aVertexNormal',
-						COLOR_ATTRIBUTE     : 'aVertexColor'
+						COLOR_ATTRIBUTE     : 'aVertexColor',
+						TEXCOORD_ATTRIBUTE  : 'aVertexTextureCoords'
 					},
     /** 
      * @namespace Lookup Table Definitions 
@@ -148,6 +149,7 @@ def : {
                          * <p>Defines the visualization modes available for instances of vxlActor</p> 
                          * <p>The visualization  modes can be:
                          * <ul>
+                         * <li><code>TEXTURED</code>: Used when the model associated with this actor has a texture</li>
                          * <li><code>SOLID</code></li>
                          * <li><code>WIREFRAME</code></li> 
                          * <li><code>POINTS</code></li> 
@@ -163,7 +165,7 @@ def : {
                          * </pre>
                          * @see vxlActor#setVisualizationMode
                          */
-						mode: {	SOLID:'SOLID', WIREFRAME:'WIREFRAME', POINTS:'POINTS', LINES:'LINES'}
+						mode: {	TEXTURED:'TEXTURED', SOLID:'SOLID', WIREFRAME:'WIREFRAME', POINTS:'POINTS', LINES:'LINES'}
 					},
 	/**
 	 * Defines the constants that can be used with <code>vxlCamera</code> 
@@ -235,7 +237,22 @@ def : {
 	renderer 		: {
 			        mode: { TIMER:'TIMER', ANIMFRAME:'ANIFRAME'}, //EXPERIMENTAL NOT WAY TO CANCEL YET },
 			        rate : { SLOW: 10000,  NORMAL: 500 }
-					}
+	},
+					
+	/**
+	 * @namespace Constants to handle textures 
+	 * @property {vxl.def.texture.filter} filter The different filters applicable to textures
+	 */
+	texture : {
+	    filter:{
+    	    NEAREST:'NEAREST',
+    	    LINEAR:'LINEAR',
+    	    NEAREST_MIPMAP_NEAREST:'NEAREST_MIPMAP_NEAREST',
+    	    LINEAR_MIPMAP_NEAREST:'LINEAR_MIPMAP_NEAREST',
+    	    NEAREST_MIPMAP_LINEAR:'NEAREST_MIPMAP_LINEAR',
+    	    LINEAR_MIPMAP_LINEAR:'LINEAR_MIPMAP_LINEAR'
+	    }
+	}
 },
 
 /**
@@ -436,6 +453,20 @@ util : {
         }
       }
       return ret;
+    },
+    
+    getPath : function(path){
+        if (path ==undefined || path == null) {
+            return "";
+        }
+        else if (path.length - 1 == path.lastIndexOf('/')){
+            return path;
+        }
+        else if (path.lastIndexOf('.') > path.lastIndexOf('/')){
+            return path.substring(0, path.lastIndexOf('/')+1)
+        }
+        else   
+            return path + '/';
     }
 }
 
@@ -5349,7 +5380,8 @@ vxl.def.glsl.lambert = {
 	ATTRIBUTES : [
 	"aVertexPosition", 
 	"aVertexColor", 
-	"aVertexNormal"],
+	"aVertexNormal",
+	"aVertexTextureCoords"],
 	
 	UNIFORMS : [
 	"mModelView",
@@ -5363,7 +5395,9 @@ vxl.def.glsl.lambert = {
 	"uMaterialDiffuse",
 	"uUseVertexColors",
 	"uUseShading",
-	"uUseLightTranslation"],
+	"uUseTextures",
+	"uUseLightTranslation",
+	"uSampler"],
 	
 	
     VERTEX_SHADER : [
@@ -5371,6 +5405,7 @@ vxl.def.glsl.lambert = {
     "attribute vec3 aVertexPosition;",
 	"attribute vec3 aVertexNormal;",
 	"attribute vec3 aVertexColor;",
+	"attribute vec2 aVertexTextureCoords;",
     "uniform float uPointSize;",
 	"uniform mat4 mModelView;",
 	"uniform mat4 mPerspective;",
@@ -5383,7 +5418,9 @@ vxl.def.glsl.lambert = {
 	"uniform bool uUseShading;",
     "uniform bool uUseVertexColors;",
     "uniform bool uUseLightTranslation;",
+    "uniform bool uUseTextures;",
 	"varying vec4 vFinalColor;",
+    "varying vec2 vTextureCoords;",
     
     "void main(void) {",
     "	gl_Position = mModelViewPerspective * vec4(aVertexPosition, 1.0);",
@@ -5404,6 +5441,9 @@ vxl.def.glsl.lambert = {
     "		vFinalColor = Ia + Id;",
 	"		vFinalColor.a = uMaterialDiffuse.a;",
 	"	}" ,
+	"   if (uUseTextures){" ,
+	"       vTextureCoords = aVertexTextureCoords;",
+    "   }",
 	"}"].join('\n'),
     
     FRAGMENT_SHADER : [
@@ -5411,10 +5451,18 @@ vxl.def.glsl.lambert = {
     "precision highp float;",
     "#endif",
 
-    "varying vec4  vFinalColor;",
+    "varying vec4      vFinalColor;",
+    "varying vec2      vTextureCoords;",
+    "uniform bool      uUseTextures;",
+    "uniform sampler2D uSampler;",
 
     "void main(void)  {",
+    "   if (uUseTextures){",
+    "       gl_FragColor = texture2D(uSampler, vTextureCoords);",
+    "   }",
+    "   else{",
     "		gl_FragColor = vFinalColor;",
+    "   }",
     "}"].join('\n'),
     
     DEFAULTS : {
@@ -5452,6 +5500,7 @@ vxl.def.glsl.phong = {
     "aVertexPosition",
     "aVertexNormal",
     "aVertexColor",
+    "aVertexTextureCoords"
     ],
     
     UNIFORMS : [
@@ -5470,12 +5519,15 @@ vxl.def.glsl.phong = {
     "uMaterialSpecular",
 	"uUseVertexColors",
 	"uUseShading",
-    "uUseLightTranslation"],
+    "uUseLightTranslation",
+    "uUseTextures",
+    "uSampler"],
     
     VERTEX_SHADER: [
     "attribute vec3 aVertexPosition;",
     "attribute vec3 aVertexNormal;",
     "attribute vec3 aVertexColor;",
+    "attribute vec2 aVertexTextureCoords;",
     "uniform float uPointSize;",
     "uniform mat4 mModelView;",
     "uniform mat4 mPerspective;",
@@ -5485,6 +5537,8 @@ vxl.def.glsl.phong = {
     "varying vec3 vNormal;",
     "varying vec3 vEyeVec;",
     "varying vec4 vFinalColor;",
+    "varying vec2 vTextureCoords;",
+    "uniform bool uUseTextures;",
     
     "void main(void) {",
     "  gl_Position = mPerspective * mModelView * vec4(aVertexPosition, 1.0);",
@@ -5496,6 +5550,9 @@ vxl.def.glsl.phong = {
     "   vec4 vertex = mModelView * vec4(aVertexPosition, 1.0);",
     "   vNormal = vec3(mNormal * vec4(aVertexNormal, 1.0));",
     "   vEyeVec = -vec3(vertex.xyz);",
+    "   if (uUseTextures){" ,
+    "       vTextureCoords = aVertexTextureCoords;",
+    "   }",
     "}"].join('\n'),
 
     FRAGMENT_SHADER : [
@@ -5519,9 +5576,14 @@ vxl.def.glsl.phong = {
     "varying vec3 vNormal;",
     "varying vec3 vEyeVec;",
     "varying vec4 vFinalColor;",
+    
+    "varying vec2      vTextureCoords;",
+    "uniform bool      uUseTextures;",
+    "uniform sampler2D uSampler;",
+    
     "void main(void)",
     "{",
-    
+     "  vec4 finalColor = vec4(0.0);",
      "  vec3 L = normalize(uLightDirection);",
      "  vec3 N = normalize(vNormal);",
      "  float lambertTerm = dot(N,-L);",
@@ -5541,12 +5603,16 @@ vxl.def.glsl.phong = {
      "          float specular = pow( max(dot(R, E), 0.0), uShininess);",
      "          Is = uLightSpecular * uMaterialSpecular * specular;",
      "      }",
-     "      gl_FragColor = Ia + Id + Is;",
-     "      gl_FragColor.a = uMaterialDiffuse.a;",
+     "      finalColor = Ia + Id + Is;",
+     "      finalColor.a = uMaterialDiffuse.a;",
      "  } ",
      "  else {",
-     "      gl_FragColor = varMaterialDiffuse; ",	
+     "      finalColor = varMaterialDiffuse; ",	
      "  }",
+     "   if (uUseTextures){",
+     "       finalColor =  texture2D(uSampler, vec2(vTextureCoords.s, vTextureCoords.t));",
+     "   }",
+     "   gl_FragColor = finalColor;",
      "}"].join('\n'),
 
     DEFAULTS : {
@@ -6161,7 +6227,7 @@ vxlProgram.prototype._setPolymorphicUniform = function(uniformID, locationID,val
     	return;
     }
     
-    else if (glslType == 'int'){
+    else if (glslType == 'int' || glslType == 'sampler2D'){
         gl.uniform1i(locationID,value);
         return;
     }
@@ -6273,14 +6339,28 @@ vxlRenderer.prototype.getWebGLContext = function(){
 		return;
 	}
 	else {
-		var _gl = WEB_GL_CONTEXT;
-		_gl.enable(_gl.DEPTH_TEST);
-		_gl.enable(_gl.BLEND);
-		_gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
-		_gl.depthFunc(_gl.LESS);
+		this._initializeGLContext(WEB_GL_CONTEXT);
+		
 	}
     return WEB_GL_CONTEXT;
 };
+
+/**
+ * Initializes the WebGL context
+ *
+ * @private 
+ */
+vxlRenderer.prototype._initializeGLContext = function(gl){
+    gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.depthFunc(gl.LESS);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+}
+
+
+
+
 
 /**
  * Tries to add a new program definition to this renderer
@@ -6497,7 +6577,7 @@ vxlRenderer.prototype.render = function(){
  * @author Diego Cantor
  */
 function vxlModel(name, JSON_OBJECT){
-	this.name = name;
+	this.name       = name;
 	this.indices 	= null;
 	this.vertices 	= null;
 	this.scalars 	= null;
@@ -6507,8 +6587,9 @@ function vxlModel(name, JSON_OBJECT){
 	this.centre 	= null;
 	this.bb     	= null;
 	this.mode       = null;
-	//@TODO implement textures
-    
+	this.image      = null;
+	this.uri        = null;
+	    
     if (JSON_OBJECT != undefined){
         this.load(this.name, JSON_OBJECT);
     }
@@ -6550,13 +6631,15 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
 	}
 	
 	if (this.mode == undefined){
-		this.mode == vxl.def.actor.mode.SOLID;
+		this.mode = vxl.def.actor.mode.SOLID;
 	}
+	
+	if (this.texture != undefined){
+	    this.mode = vxl.def.actor.mode.TEXTURED;
+	}
+	
 	this.computeBoundingBox();
 };
-
-
-
 
 /**
  * Calculates the normals for this model in case that the JSON object does not include them
@@ -6755,6 +6838,7 @@ function vxlActor(model){
   this._renderers   = [];
   this._gl_buffers  = [];
   this.shading      = true;
+  this.texture      = undefined;
   
   this.scene        = undefined;
 
@@ -6765,9 +6849,15 @@ function vxlActor(model){
   	//In the newest versions of Voxelent JSON format, the diffuse property has been replaced with color property.
   	this.color      = model.color!=undefined?model.color:(model.diffuse!=undefined?model.diffuse:undefined); 
   	this.bb 	    = model.bb.slice(0);
-  	this.mode       = model.mode==undefined?vxl.def.actor.mode.SOLID:model.mode;
+  	this.mode       = model.mode;
   	this.centre     = vec3.set(model.centre, vec3.create());
   }
+  
+  if (this.mode == vxl.def.actor.mode.TEXTURED){
+      this.setTexture(this.model.path + this.model.texture);
+  }
+  
+  
   
   var e = vxl.events;
   vxl.go.notifier.publish(
@@ -6906,6 +6996,13 @@ vxlActor.prototype.setOpacity = function(o){
 	else throw 'The opacity value is not valid';
 };
 
+/**
+ * Associates a new texture with this actor
+ * @param {String} uri the location of the texture to load 
+ */
+vxlActor.prototype.setTexture = function(uri){
+    this.texture = new vxlTexture(uri);    
+}
 
 /**
  * If the property exists, then it updates it
@@ -6935,6 +7032,11 @@ vxlActor.prototype.setProperty = function(property, value, scope){
     if (property == 'shading'){
         this.setShading(value);
         return;
+    }
+    
+    if (property == 'texture'){
+        this.setTexture(value);
+        return
     }
     
     if (scope == vxl.def.actor || scope == undefined || scope == null){
@@ -7176,6 +7278,7 @@ vxlBasicStrategy.prototype.constructor = vxlBasicStrategy;
 function vxlBasicStrategy(renderer){
 	vxlRenderStrategy.call(this,renderer);
 	this._gl_buffers  = {};
+	this._gl_textures = {};
 	
 	if (renderer){
 	var gl = this.renderer.gl;
@@ -7261,6 +7364,21 @@ vxlBasicStrategy.prototype._allocateActor = function(actor){
 		buffers.wireframe = gl.createBuffer();
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
+	}
+	
+	//Texture Coords Buffer
+	if (model.texture){
+	    buffers.texcoords = gl.createBuffer();
+	    
+	    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texcoords);
+	    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.texcoords), gl.STATIC_DRAW);
+        
+        this._gl_textures[actor.UID] = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this._gl_textures[actor.UID]);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, actor.texture.image);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        
+        gl.bindTexture(gl.TEXTURE_2D, null);
 	}
 	
 	//Cleaning up
@@ -7376,7 +7494,8 @@ vxlLambertStrategy.prototype._renderActor = function(actor){
     if (!actor.visible) return; //Quick and simple
     
 	var model 	= actor.model;
-    var buffers = this._gl_buffers[actor.UID]; 
+    var buffers = this._gl_buffers[actor.UID];
+    var texture = this._gl_textures[actor.UID]; 
     var r  		= this.renderer;
 	var gl 		= r.gl;
 	var prg 	= r.prg;
@@ -7396,6 +7515,14 @@ vxlLambertStrategy.prototype._renderActor = function(actor){
 	
 	prg.setUniform("uMaterialDiffuse",diffuse);
 	prg.setUniform("uUseVertexColors", false);
+	if (actor.mode == vxl.def.actor.mode.TEXTURED){
+	    prg.setUniform("uUseTextures", true);
+	    prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+	}
+	else{
+	    prg.setUniform("uUseTextures", false);
+	    prg.disableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+	}
     
     prg.disableAttribute(glsl.COLOR_ATTRIBUTE);
 	prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
@@ -7440,6 +7567,23 @@ vxlLambertStrategy.prototype._renderActor = function(actor){
 			throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
 	    }
 	}
+	
+	if (model.texcoords && actor.mode == vxl.def.actor.mode.TEXTURED){
+	    try{
+	        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texcoords);
+	        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.texcoords), gl.STATIC_DRAW);
+	        
+	        prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+	        prg.setAttributePointer(glsl.TEXCOORD_ATTRIBUTE, 2, gl.FLOAT,false, 0,0);
+	        
+	        
+	    }
+	    catch(err){
+            alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the texture buffer. Error =' +err.description);
+            throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the texture buffer. Error =' +err.description);
+        }
+	}
+	
     prg.setUniform("uUseShading",actor.shading);
     
     try{
@@ -7448,6 +7592,20 @@ vxlLambertStrategy.prototype._renderActor = function(actor){
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
 			gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
 		}
+		else if (actor.mode == vxl.def.actor.mode.TEXTURED){
+            prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+            
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, actor.texture.getMagFilter(gl));
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, actor.texture.getMinFilter(gl));
+            prg.setUniform("uSampler", 0);
+            
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+            gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
+        }
 		else if (actor.mode == vxl.def.actor.mode.WIREFRAME){
 			if (actor.name == 'floor'){
 			     prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
@@ -7468,8 +7626,8 @@ vxlLambertStrategy.prototype._renderActor = function(actor){
 			gl.drawElements(gl.LINES, actor.model.indices.length, gl.UNSIGNED_SHORT,0);
 		}
 		else{
-            alert('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+this.mode+' is not valid.');
-			throw('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+this.mode+' is not valid.');
+            alert('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+actor.mode+' is not valid.');
+			throw('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+actor.mode+' is not valid.');
 			
 		}
 		//Cleaning up
@@ -7499,7 +7657,7 @@ vxlLambertStrategy.prototype._renderActor = function(actor){
 ---------------------------------------------------------------------------*/ 
 
 //Inheritance stuff
-vxlPhongStrategy.prototype = new vxlRenderStrategy(undefined)
+vxlPhongStrategy.prototype = new vxlBasicStrategy(undefined)
 vxlPhongStrategy.prototype.constructor = vxlPhongStrategy;
 
 /**
@@ -7515,7 +7673,7 @@ vxlPhongStrategy.prototype.constructor = vxlPhongStrategy;
  * 
  */
 function vxlPhongStrategy(renderer){
-	vxlRenderStrategy.call(this,renderer);
+	vxlBasicStrategy.call(this,renderer);
 	this._gl_buffers  = {};
 	
 	if (renderer){
@@ -7528,26 +7686,6 @@ function vxlPhongStrategy(renderer){
 	gl.clearDepth(1.0);
 	gl.disable(gl.CULL_FACE);
     }	
-}
-
-/**
- * Implements basic allocation of memory. Creates the WebGL buffers for the actor
- * @param {vxlScene} scene the scene to allocate memory for
-  */
-vxlPhongStrategy.prototype.allocate = function(scene){
-    var elements = scene.actors.concat(scene.toys.list);
-    var NUM = elements.length;
-    
-    for(var i = 0; i < NUM; i+=1){
-        this._allocateActor(elements[i]);
-    }
-};
-
-/**
- * @param {vxlScene} scene the scene to deallocate memory from
- */
-vxlPhongStrategy.prototype.deallocate = function(scene){
-    //DO NOTHING. THE DESCENDANTS WILL.
 }
 
 
@@ -7580,96 +7718,13 @@ vxlPhongStrategy.prototype.render = function(scene){
 };
 
 
-
-/**
- * Receives one actor and returns the GL buffers
- */
-vxlPhongStrategy.prototype._allocateActor = function(actor){
-   
-    if (this._gl_buffers[actor.UID] != undefined) return; // the actor has already been allocated
-   	
-	var gl = this.renderer.gl;
-	var model = actor.model;
-    var buffers = {};
-	
-	//Vertex Buffer
-	buffers.vertex = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices), gl.STATIC_DRAW);
-	
-	//Index Buffer
-	if (model.indices != undefined){
-		buffers.index = gl.createBuffer();
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices), gl.STATIC_DRAW);
-	}
-	
-	//Normals Buffer
-	if (model.normals){
-		buffers.normal = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals), gl.STATIC_DRAW);
-	}
-	
-	//Color Buffer for scalars
-	if (model.scalars != undefined || model.colors != undefined){
-		buffers.color = gl.createBuffer(); //we don't BIND values or use the buffers until the lut is loaded and available
-	}
-	
-	//Wireframe Buffer 
-	if (model.wireframe != undefined){
-		buffers.wireframe = gl.createBuffer();
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
-	}
-	
-	//Cleaning up
-	gl.bindBuffer(gl.ARRAY_BUFFER, null);
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-	
-	this._gl_buffers[actor.UID] = buffers; 
-};
-
-/**
- * Passes the matrices to the shading program
- * @param {vxlActor} the actor 
- * we will update each Model-View matrix of each renderer according to
- * the actor position,scale and rotation.
- */
-vxlPhongStrategy.prototype._applyActorTransform = function(actor){
-    
-    var r		= this.renderer;
-    var trx 	= r.transforms
-    var	prg 	= r.prg;
-    var glsl 	= vxl.def.glsl;
-
-    trx.push();
-        
-        
-		mat4.translate	(trx.mvMatrix, actor.position);
-		mat4.scale      (trx.mvMatrix, actor.scale);
-		//@TODO: IMPLEMENT ACTOR ROTATIONS
-	    
-	    prg.setUniform(glsl.MODEL_VIEW_MATRIX,	r.transforms.mvMatrix);
-
-	    trx.calculateModelViewPerspective();
-        prg.setUniform(glsl.MVP_MATRIX, r.transforms.mvpMatrix);
-    trx.pop();
-    
-    trx.calculateNormal(); 
-    prg.setUniform(glsl.NORMAL_MATRIX, r.transforms.nMatrix);
-    
-    
-    
- };
-
-
 vxlPhongStrategy.prototype._renderActor = function(actor){
 
     if (!actor.visible) return; //Quick and simple
     
 	var model 	= actor.model;
     var buffers = this._gl_buffers[actor.UID]; 
+    var texture = this._gl_textures[actor.UID]; 
     var r  		= this.renderer;
 	var gl 		= r.gl;
 	var prg 	= r.prg;
@@ -7689,7 +7744,14 @@ vxlPhongStrategy.prototype._renderActor = function(actor){
 	
 	prg.setUniform("uMaterialDiffuse",diffuse);
 	prg.setUniform("uUseVertexColors", false);
-    
+    if (actor.mode == vxl.def.actor.mode.TEXTURED){
+        prg.setUniform("uUseTextures", true);
+        prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+    }
+    else{
+        prg.setUniform("uUseTextures", false);
+        prg.disableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+    }
     prg.disableAttribute(glsl.COLOR_ATTRIBUTE);
 	prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
 	prg.enableAttribute(glsl.VERTEX_ATTRIBUTE);
@@ -7733,6 +7795,23 @@ vxlPhongStrategy.prototype._renderActor = function(actor){
 			throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
 	    }
 	}
+	
+	if (model.texcoords && actor.mode == vxl.def.actor.mode.TEXTURED){
+        try{
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texcoords);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.texcoords), gl.STATIC_DRAW);
+            
+            prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+            prg.setAttributePointer(glsl.TEXCOORD_ATTRIBUTE, 2, gl.FLOAT,false, 0,0);
+            
+            
+        }
+        catch(err){
+            alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the texture buffer. Error =' +err.description);
+            throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the texture buffer. Error =' +err.description);
+        }
+    }
+    
     prg.setUniform("uUseShading",actor.shading);
     
     try{
@@ -7741,6 +7820,20 @@ vxlPhongStrategy.prototype._renderActor = function(actor){
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
 			gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
 		}
+		else if (actor.mode == vxl.def.actor.mode.TEXTURED){
+            prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+            
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, actor.texture.getMagFilter(gl));
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, actor.texture.getMinFilter(gl));
+            prg.setUniform("uSampler", 0);
+            
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+            gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
+        }
 		else if (actor.mode == vxl.def.actor.mode.WIREFRAME){
 			if (actor.name == 'floor'){
 			     prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
@@ -7761,8 +7854,8 @@ vxlPhongStrategy.prototype._renderActor = function(actor){
 			gl.drawElements(gl.LINES, actor.model.indices.length, gl.UNSIGNED_SHORT,0);
 		}
 		else{
-            alert('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+this.mode+' is not valid.');
-			throw('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+this.mode+' is not valid.');
+            alert('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+actor.mode+' is not valid.');
+			throw('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+actor.mode+' is not valid.');
 			
 		}
 		//Cleaning up
@@ -9516,6 +9609,8 @@ vxlModelManager.prototype.load = function(filename, scene) {
 	
 	var successHandler = function(manager,name,scene){
 		return function(json, textStatus){
+		    json.uri = filename;
+		    json.path = vxl.util.getPath(filename)
 			manager.add(json,name,scene);
 		}
 	};
@@ -9835,9 +9930,9 @@ vxl.api = {
   * This allows background loading.
   * 
   * @param {String|Array} arguments the name of the asset or the list of models (each element being the file name).
+  * @param {String} path the path that will be concatenated to the list of files (optional).
   * @param {vxl.def.model.loadingMode} mode the loading mode
   * @param {vxlScene} scene the scene in case we do not want to load these models in the current one
-  * @param {String} path the path that will be concatenated to the list of files (optional).
   * 
   * @see {vxl#def#asset#loadingMode}
   * @see {vxlAssetManager}
@@ -9846,23 +9941,15 @@ vxl.api = {
   */
  load :  function(arguments,path,mode,scene){
  	
- 	function getPath(path){
- 		if (path ==undefined || path == null) {
- 			return "";
- 		}
- 		else if (path.length - 1 == path.lastIndexOf('/')){
- 			return path;
- 		}
- 		else return path + '/';
- 	}
- 	
  	var scene = scene==null?vxl.c.scene:scene;
  	var models = [];
+ 	
+ 	var p = vxl.util.getPath(path);
+ 	
  	if (typeof(arguments) == 'string' || arguments instanceof String){
- 		models.push(getPath(path)  + arguments);
+ 		models.push(p  + arguments);
  	}
  	else if (arguments instanceof Array){
- 		p = getPath(path);
  		for(var i=0; i<arguments.length;i++){
 			models.push(p + arguments[i]);
 		}
@@ -10922,4 +11009,94 @@ vxlVTKReader.prototype._writeJSON = function(fname,block){
  */
 vxlVTKReader.prototype.getParts = function(){
     return this.parts;
-}
+}/*-------------------------------------------------------------------------
+    This file is part of Voxelent's Nucleo
+
+    Nucleo is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation version 3.
+
+    Nucleo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------------------------------------------*/ 
+
+/**
+ * Creates an empty texture object
+ * @param {String} uri texture location
+ */
+function vxlTexture(uri){
+    var self = this;
+
+    this.image = new Image();
+    this.image.onload = function(){
+        self._handleLoadedImage();
+    }
+    
+    this.uri = uri;
+    if (this.uri != undefined){
+        this.load(this.uri);
+    }
+    
+    this.mag = vxl.def.texture.filter.LINEAR;
+    this.min = vxl.def.texture.filter.LINEAR_MIPMAP_LINEAR;     
+};
+
+/**
+ * Loads an image and it associates it to this texture object
+ * @param {Object} uri the location of the image to load into this texture object
+ */
+vxlTexture.prototype.load = function(uri){
+   this.image.src = uri;
+};
+
+/**
+ * @private
+ */
+vxlTexture.prototype._handleLoadedImage = function(){
+    /*var gl = this.gl;
+    gl.bindTexture(gl.TEXTURE_2D, this.tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.image);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+
+    gl.bindTexture(gl.TEXTURE_2D, null);*/   
+};
+
+/**
+ * Returns the appropriate gl constant that identifies the current magnification
+ * filter applied to this texture
+ * @param {Object} gl the gl context
+ */
+vxlTexture.prototype.getMagFilter = function(gl){
+    
+  var tf = vxl.def.texture.filter;  
+  switch(this.mag){
+      case tf.LINEAR: return gl.LINEAR; break;
+      case tf.NEAREST: return gl.NEAREST; break;
+      default: return gl.NEAREST; 
+  }
+};
+
+/**
+ * Returns the appropriate gl constant that identifies the current minification filter
+ * applied to this texture
+ * @param {Object} gl the gl context 
+ */
+vxlTexture.prototype.getMinFilter = function(gl){
+    var tf = vxl.def.texture.filter;
+    switch(this.min){
+      case tf.LINEAR: return gl.LINEAR; break;
+      case tf.NEAREST: return gl.NEAREST; break;
+      case tf.LINEAR_MIPMAP_LINEAR : return gl.LINEAR_MIPMAP_LINEAR; break;
+      case tf.LINEAR_MIPMAP_NEAREST: return gl.LINEAR_MIPMAP_NEAREST; break;
+      case tf.NEAREST_MIPMAP_LINEAR: return gl.NEAREST_MIPMAP_LINEAR; break;
+      case tf.NEAREST_MIPMAP_NEAREST: return gl.NEAREST_MIPMAP_NEAREST; break;
+      default: return gl.NEAREST; 
+  }
+};
+

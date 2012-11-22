@@ -67,6 +67,8 @@ vxlModelManager.prototype.load = function(filename, scene) {
 	
 	var successHandler = function(manager,name,scene){
 		return function(json, textStatus){
+		    json.uri = filename;
+		    json.path = vxl.util.getPath(filename)
 			manager.add(json,name,scene);
 		}
 	};

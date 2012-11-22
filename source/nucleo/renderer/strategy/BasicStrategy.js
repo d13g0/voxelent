@@ -35,6 +35,7 @@ vxlBasicStrategy.prototype.constructor = vxlBasicStrategy;
 function vxlBasicStrategy(renderer){
 	vxlRenderStrategy.call(this,renderer);
 	this._gl_buffers  = {};
+	this._gl_textures = {};
 	
 	if (renderer){
 	var gl = this.renderer.gl;
@@ -120,6 +121,21 @@ vxlBasicStrategy.prototype._allocateActor = function(actor){
 		buffers.wireframe = gl.createBuffer();
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
+	}
+	
+	//Texture Coords Buffer
+	if (model.texture){
+	    buffers.texcoords = gl.createBuffer();
+	    
+	    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texcoords);
+	    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.texcoords), gl.STATIC_DRAW);
+        
+        this._gl_textures[actor.UID] = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this._gl_textures[actor.UID]);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, actor.texture.image);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        
+        gl.bindTexture(gl.TEXTURE_2D, null);
 	}
 	
 	//Cleaning up

@@ -69,6 +69,7 @@ function vxlActor(model){
   this._renderers   = [];
   this._gl_buffers  = [];
   this.shading      = true;
+  this.texture      = undefined;
   
   this.scene        = undefined;
 
@@ -79,9 +80,15 @@ function vxlActor(model){
   	//In the newest versions of Voxelent JSON format, the diffuse property has been replaced with color property.
   	this.color      = model.color!=undefined?model.color:(model.diffuse!=undefined?model.diffuse:undefined); 
   	this.bb 	    = model.bb.slice(0);
-  	this.mode       = model.mode==undefined?vxl.def.actor.mode.SOLID:model.mode;
+  	this.mode       = model.mode;
   	this.centre     = vec3.set(model.centre, vec3.create());
   }
+  
+  if (this.mode == vxl.def.actor.mode.TEXTURED){
+      this.setTexture(this.model.path + this.model.texture);
+  }
+  
+  
   
   var e = vxl.events;
   vxl.go.notifier.publish(
@@ -220,6 +227,13 @@ vxlActor.prototype.setOpacity = function(o){
 	else throw 'The opacity value is not valid';
 };
 
+/**
+ * Associates a new texture with this actor
+ * @param {String} uri the location of the texture to load 
+ */
+vxlActor.prototype.setTexture = function(uri){
+    this.texture = new vxlTexture(uri);    
+}
 
 /**
  * If the property exists, then it updates it
@@ -249,6 +263,11 @@ vxlActor.prototype.setProperty = function(property, value, scope){
     if (property == 'shading'){
         this.setShading(value);
         return;
+    }
+    
+    if (property == 'texture'){
+        this.setTexture(value);
+        return
     }
     
     if (scope == vxl.def.actor || scope == undefined || scope == null){

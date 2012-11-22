@@ -72,7 +72,8 @@ vxlLambertStrategy.prototype._renderActor = function(actor){
     if (!actor.visible) return; //Quick and simple
     
 	var model 	= actor.model;
-    var buffers = this._gl_buffers[actor.UID]; 
+    var buffers = this._gl_buffers[actor.UID];
+    var texture = this._gl_textures[actor.UID]; 
     var r  		= this.renderer;
 	var gl 		= r.gl;
 	var prg 	= r.prg;
@@ -92,6 +93,14 @@ vxlLambertStrategy.prototype._renderActor = function(actor){
 	
 	prg.setUniform("uMaterialDiffuse",diffuse);
 	prg.setUniform("uUseVertexColors", false);
+	if (actor.mode == vxl.def.actor.mode.TEXTURED){
+	    prg.setUniform("uUseTextures", true);
+	    prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+	}
+	else{
+	    prg.setUniform("uUseTextures", false);
+	    prg.disableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+	}
     
     prg.disableAttribute(glsl.COLOR_ATTRIBUTE);
 	prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
@@ -136,6 +145,23 @@ vxlLambertStrategy.prototype._renderActor = function(actor){
 			throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
 	    }
 	}
+	
+	if (model.texcoords && actor.mode == vxl.def.actor.mode.TEXTURED){
+	    try{
+	        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texcoords);
+	        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.texcoords), gl.STATIC_DRAW);
+	        
+	        prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+	        prg.setAttributePointer(glsl.TEXCOORD_ATTRIBUTE, 2, gl.FLOAT,false, 0,0);
+	        
+	        
+	    }
+	    catch(err){
+            alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the texture buffer. Error =' +err.description);
+            throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the texture buffer. Error =' +err.description);
+        }
+	}
+	
     prg.setUniform("uUseShading",actor.shading);
     
     try{
@@ -144,6 +170,20 @@ vxlLambertStrategy.prototype._renderActor = function(actor){
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
 			gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
 		}
+		else if (actor.mode == vxl.def.actor.mode.TEXTURED){
+            prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+            
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, actor.texture.getMagFilter(gl));
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, actor.texture.getMinFilter(gl));
+            prg.setUniform("uSampler", 0);
+            
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+            gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
+        }
 		else if (actor.mode == vxl.def.actor.mode.WIREFRAME){
 			if (actor.name == 'floor'){
 			     prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
@@ -164,8 +204,8 @@ vxlLambertStrategy.prototype._renderActor = function(actor){
 			gl.drawElements(gl.LINES, actor.model.indices.length, gl.UNSIGNED_SHORT,0);
 		}
 		else{
-            alert('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+this.mode+' is not valid.');
-			throw('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+this.mode+' is not valid.');
+            alert('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+actor.mode+' is not valid.');
+			throw('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+actor.mode+' is not valid.');
 			
 		}
 		//Cleaning up

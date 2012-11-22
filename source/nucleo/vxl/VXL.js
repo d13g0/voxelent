@@ -94,7 +94,8 @@ def : {
 						MVP_MATRIX          : 'mModelViewPerspective',
 						VERTEX_ATTRIBUTE    : 'aVertexPosition',
 						NORMAL_ATTRIBUTE    : 'aVertexNormal',
-						COLOR_ATTRIBUTE     : 'aVertexColor'
+						COLOR_ATTRIBUTE     : 'aVertexColor',
+						TEXCOORD_ATTRIBUTE  : 'aVertexTextureCoords'
 					},
     /** 
      * @namespace Lookup Table Definitions 
@@ -148,6 +149,7 @@ def : {
                          * <p>Defines the visualization modes available for instances of vxlActor</p> 
                          * <p>The visualization  modes can be:
                          * <ul>
+                         * <li><code>TEXTURED</code>: Used when the model associated with this actor has a texture</li>
                          * <li><code>SOLID</code></li>
                          * <li><code>WIREFRAME</code></li> 
                          * <li><code>POINTS</code></li> 
@@ -163,7 +165,7 @@ def : {
                          * </pre>
                          * @see vxlActor#setVisualizationMode
                          */
-						mode: {	SOLID:'SOLID', WIREFRAME:'WIREFRAME', POINTS:'POINTS', LINES:'LINES'}
+						mode: {	TEXTURED:'TEXTURED', SOLID:'SOLID', WIREFRAME:'WIREFRAME', POINTS:'POINTS', LINES:'LINES'}
 					},
 	/**
 	 * Defines the constants that can be used with <code>vxlCamera</code> 
@@ -235,7 +237,22 @@ def : {
 	renderer 		: {
 			        mode: { TIMER:'TIMER', ANIMFRAME:'ANIFRAME'}, //EXPERIMENTAL NOT WAY TO CANCEL YET },
 			        rate : { SLOW: 10000,  NORMAL: 500 }
-					}
+	},
+					
+	/**
+	 * @namespace Constants to handle textures 
+	 * @property {vxl.def.texture.filter} filter The different filters applicable to textures
+	 */
+	texture : {
+	    filter:{
+    	    NEAREST:'NEAREST',
+    	    LINEAR:'LINEAR',
+    	    NEAREST_MIPMAP_NEAREST:'NEAREST_MIPMAP_NEAREST',
+    	    LINEAR_MIPMAP_NEAREST:'LINEAR_MIPMAP_NEAREST',
+    	    NEAREST_MIPMAP_LINEAR:'NEAREST_MIPMAP_LINEAR',
+    	    LINEAR_MIPMAP_LINEAR:'LINEAR_MIPMAP_LINEAR'
+	    }
+	}
 },
 
 /**
@@ -436,6 +453,20 @@ util : {
         }
       }
       return ret;
+    },
+    
+    getPath : function(path){
+        if (path ==undefined || path == null) {
+            return "";
+        }
+        else if (path.length - 1 == path.lastIndexOf('/')){
+            return path;
+        }
+        else if (path.lastIndexOf('.') > path.lastIndexOf('/')){
+            return path.substring(0, path.lastIndexOf('/')+1)
+        }
+        else   
+            return path + '/';
     }
 }
 

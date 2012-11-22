@@ -55,7 +55,8 @@ def pack(VOX_VERSION_NUMBER):
              'ModelManager', 
              'API', 
              'FrameAnimation',
-             'VTKReader' 
+             'VTKReader',
+             'Texture' 
     ]
     
     

@@ -182,9 +182,9 @@ vxl.api = {
   * This allows background loading.
   * 
   * @param {String|Array} arguments the name of the asset or the list of models (each element being the file name).
+  * @param {String} path the path that will be concatenated to the list of files (optional).
   * @param {vxl.def.model.loadingMode} mode the loading mode
   * @param {vxlScene} scene the scene in case we do not want to load these models in the current one
-  * @param {String} path the path that will be concatenated to the list of files (optional).
   * 
   * @see {vxl#def#asset#loadingMode}
   * @see {vxlAssetManager}
@@ -193,23 +193,15 @@ vxl.api = {
   */
  load :  function(arguments,path,mode,scene){
  	
- 	function getPath(path){
- 		if (path ==undefined || path == null) {
- 			return "";
- 		}
- 		else if (path.length - 1 == path.lastIndexOf('/')){
- 			return path;
- 		}
- 		else return path + '/';
- 	}
- 	
  	var scene = scene==null?vxl.c.scene:scene;
  	var models = [];
+ 	
+ 	var p = vxl.util.getPath(path);
+ 	
  	if (typeof(arguments) == 'string' || arguments instanceof String){
- 		models.push(getPath(path)  + arguments);
+ 		models.push(p  + arguments);
  	}
  	else if (arguments instanceof Array){
- 		p = getPath(path);
  		for(var i=0; i<arguments.length;i++){
 			models.push(p + arguments[i]);
 		}

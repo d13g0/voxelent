@@ -15,7 +15,7 @@
 ---------------------------------------------------------------------------*/ 
 
 //Inheritance stuff
-vxlPhongStrategy.prototype = new vxlRenderStrategy(undefined)
+vxlPhongStrategy.prototype = new vxlBasicStrategy(undefined)
 vxlPhongStrategy.prototype.constructor = vxlPhongStrategy;
 
 /**
@@ -31,7 +31,7 @@ vxlPhongStrategy.prototype.constructor = vxlPhongStrategy;
  * 
  */
 function vxlPhongStrategy(renderer){
-	vxlRenderStrategy.call(this,renderer);
+	vxlBasicStrategy.call(this,renderer);
 	this._gl_buffers  = {};
 	
 	if (renderer){
@@ -44,26 +44,6 @@ function vxlPhongStrategy(renderer){
 	gl.clearDepth(1.0);
 	gl.disable(gl.CULL_FACE);
     }	
-}
-
-/**
- * Implements basic allocation of memory. Creates the WebGL buffers for the actor
- * @param {vxlScene} scene the scene to allocate memory for
-  */
-vxlPhongStrategy.prototype.allocate = function(scene){
-    var elements = scene.actors.concat(scene.toys.list);
-    var NUM = elements.length;
-    
-    for(var i = 0; i < NUM; i+=1){
-        this._allocateActor(elements[i]);
-    }
-};
-
-/**
- * @param {vxlScene} scene the scene to deallocate memory from
- */
-vxlPhongStrategy.prototype.deallocate = function(scene){
-    //DO NOTHING. THE DESCENDANTS WILL.
 }
 
 
@@ -96,96 +76,13 @@ vxlPhongStrategy.prototype.render = function(scene){
 };
 
 
-
-/**
- * Receives one actor and returns the GL buffers
- */
-vxlPhongStrategy.prototype._allocateActor = function(actor){
-   
-    if (this._gl_buffers[actor.UID] != undefined) return; // the actor has already been allocated
-   	
-	var gl = this.renderer.gl;
-	var model = actor.model;
-    var buffers = {};
-	
-	//Vertex Buffer
-	buffers.vertex = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices), gl.STATIC_DRAW);
-	
-	//Index Buffer
-	if (model.indices != undefined){
-		buffers.index = gl.createBuffer();
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices), gl.STATIC_DRAW);
-	}
-	
-	//Normals Buffer
-	if (model.normals){
-		buffers.normal = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals), gl.STATIC_DRAW);
-	}
-	
-	//Color Buffer for scalars
-	if (model.scalars != undefined || model.colors != undefined){
-		buffers.color = gl.createBuffer(); //we don't BIND values or use the buffers until the lut is loaded and available
-	}
-	
-	//Wireframe Buffer 
-	if (model.wireframe != undefined){
-		buffers.wireframe = gl.createBuffer();
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
-	}
-	
-	//Cleaning up
-	gl.bindBuffer(gl.ARRAY_BUFFER, null);
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-	
-	this._gl_buffers[actor.UID] = buffers; 
-};
-
-/**
- * Passes the matrices to the shading program
- * @param {vxlActor} the actor 
- * we will update each Model-View matrix of each renderer according to
- * the actor position,scale and rotation.
- */
-vxlPhongStrategy.prototype._applyActorTransform = function(actor){
-    
-    var r		= this.renderer;
-    var trx 	= r.transforms
-    var	prg 	= r.prg;
-    var glsl 	= vxl.def.glsl;
-
-    trx.push();
-        
-        
-		mat4.translate	(trx.mvMatrix, actor.position);
-		mat4.scale      (trx.mvMatrix, actor.scale);
-		//@TODO: IMPLEMENT ACTOR ROTATIONS
-	    
-	    prg.setUniform(glsl.MODEL_VIEW_MATRIX,	r.transforms.mvMatrix);
-
-	    trx.calculateModelViewPerspective();
-        prg.setUniform(glsl.MVP_MATRIX, r.transforms.mvpMatrix);
-    trx.pop();
-    
-    trx.calculateNormal(); 
-    prg.setUniform(glsl.NORMAL_MATRIX, r.transforms.nMatrix);
-    
-    
-    
- };
-
-
 vxlPhongStrategy.prototype._renderActor = function(actor){
 
     if (!actor.visible) return; //Quick and simple
     
 	var model 	= actor.model;
     var buffers = this._gl_buffers[actor.UID]; 
+    var texture = this._gl_textures[actor.UID]; 
     var r  		= this.renderer;
 	var gl 		= r.gl;
 	var prg 	= r.prg;
@@ -205,7 +102,14 @@ vxlPhongStrategy.prototype._renderActor = function(actor){
 	
 	prg.setUniform("uMaterialDiffuse",diffuse);
 	prg.setUniform("uUseVertexColors", false);
-    
+    if (actor.mode == vxl.def.actor.mode.TEXTURED){
+        prg.setUniform("uUseTextures", true);
+        prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+    }
+    else{
+        prg.setUniform("uUseTextures", false);
+        prg.disableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+    }
     prg.disableAttribute(glsl.COLOR_ATTRIBUTE);
 	prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
 	prg.enableAttribute(glsl.VERTEX_ATTRIBUTE);
@@ -249,6 +153,23 @@ vxlPhongStrategy.prototype._renderActor = function(actor){
 			throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
 	    }
 	}
+	
+	if (model.texcoords && actor.mode == vxl.def.actor.mode.TEXTURED){
+        try{
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texcoords);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.texcoords), gl.STATIC_DRAW);
+            
+            prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+            prg.setAttributePointer(glsl.TEXCOORD_ATTRIBUTE, 2, gl.FLOAT,false, 0,0);
+            
+            
+        }
+        catch(err){
+            alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the texture buffer. Error =' +err.description);
+            throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the texture buffer. Error =' +err.description);
+        }
+    }
+    
     prg.setUniform("uUseShading",actor.shading);
     
     try{
@@ -257,6 +178,20 @@ vxlPhongStrategy.prototype._renderActor = function(actor){
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
 			gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
 		}
+		else if (actor.mode == vxl.def.actor.mode.TEXTURED){
+            prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+            
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, actor.texture.getMagFilter(gl));
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, actor.texture.getMinFilter(gl));
+            prg.setUniform("uSampler", 0);
+            
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+            gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
+        }
 		else if (actor.mode == vxl.def.actor.mode.WIREFRAME){
 			if (actor.name == 'floor'){
 			     prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
@@ -277,8 +212,8 @@ vxlPhongStrategy.prototype._renderActor = function(actor){
 			gl.drawElements(gl.LINES, actor.model.indices.length, gl.UNSIGNED_SHORT,0);
 		}
 		else{
-            alert('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+this.mode+' is not valid.');
-			throw('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+this.mode+' is not valid.');
+            alert('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+actor.mode+' is not valid.');
+			throw('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+actor.mode+' is not valid.');
 			
 		}
 		//Cleaning up

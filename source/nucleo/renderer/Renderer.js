@@ -74,14 +74,28 @@ vxlRenderer.prototype.getWebGLContext = function(){
 		return;
 	}
 	else {
-		var _gl = WEB_GL_CONTEXT;
-		_gl.enable(_gl.DEPTH_TEST);
-		_gl.enable(_gl.BLEND);
-		_gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
-		_gl.depthFunc(_gl.LESS);
+		this._initializeGLContext(WEB_GL_CONTEXT);
+		
 	}
     return WEB_GL_CONTEXT;
 };
+
+/**
+ * Initializes the WebGL context
+ *
+ * @private 
+ */
+vxlRenderer.prototype._initializeGLContext = function(gl){
+    gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.depthFunc(gl.LESS);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+}
+
+
+
+
 
 /**
  * Tries to add a new program definition to this renderer

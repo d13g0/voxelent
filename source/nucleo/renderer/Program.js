@@ -363,7 +363,7 @@ vxlProgram.prototype._setPolymorphicUniform = function(uniformID, locationID,val
     	return;
     }
     
-    else if (glslType == 'int'){
+    else if (glslType == 'int' || glslType == 'sampler2D'){
         gl.uniform1i(locationID,value);
         return;
     }

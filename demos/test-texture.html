@@ -1,0 +1,95 @@
+<html>
+<head>
+<meta name='Diego Cantor' content='Voxelent: The best WebGL platform yet'>
+<meta name='copyright' content='&copy; 2011'>
+<meta name='robots' content='all'>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name='keywords' content='webgl, webgl platform, medical imaging, webgl api'>
+
+<title>Voxelent - Test Texture Mapping</title>
+
+<script src="lib/jquery.js" type="text/javascript"></script>
+<script src="lib/jquery-ui.js" type="text/javascript"> </script>
+<link rel='stylesheet' type='text/css' href='css/jquery-ui-bs/theme.css'/>
+<script type='text/javascript' src='lib/voxelent_v0.87.6.js'></script>
+
+
+<style type="text/css">
+.overlay {
+    background: rgba(100,100,100,1.0);
+    padding: 5px;
+    width: 150px;
+    height: 100px;
+    position: absolute;
+    top: 100px;
+    right: 15px;
+    font-size:12px;
+    font-family: Arial,Helvetica;
+    color: white;
+}
+</style>
+
+<script type='text/javascript'>
+    var view;
+    
+    function runVoxApp(){
+        
+        vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
+        
+        
+        view = vxl.api.setup('view-1');
+        vxl.api.setProgram(view, vxl.def.glsl.phong , vxlPhongStrategy);
+        
+        list = ['part1.json','part2.json','part3.json','part4.json','part5.json','part6.json','part7.json']
+        vxl.api.load(list,'assets/models/texture/phone');
+        view.start();
+        view.cameraman.getActiveCamera().setPosition(0,0,8);
+        vxl.api.setUniform('uLightDirection',[0.0,0.0,-1.0])
+        
+    }
+    
+    function handleEvent(event){
+        //var cube = vxl.api.getActorByName('earth.json');
+        //cube.setPosition(1,0,-3);
+        vxl.c.camera.longShot();
+    }
+</script>
+
+<script type="text/javascript">
+  //Google Analytics Script 
+  //var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-26954785-1']); _gaq.push(['_trackPageview']);  (function() {  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);   })();
+</script>
+
+</head>
+<body onload='runVoxApp()'>
+    <div><img src="css/img/voxelent.png" /></div>
+    <div>
+    <canvas id = 'view-1' width='1200' height='600'>
+        <p>
+            Your browser does not support WebGL :-(
+        </p>
+    </canvas>
+    </div>
+    <div id='options' class='overlay'>
+        <p>Switch programs:</p>
+          <button id='btnPhong' class='ui-button-success'>Phong</button>
+        <button id='btnLambert' class='ui-button-success'>Lambert</button>
+    </div>
+    </div>
+    
+    <script>
+    $('#btnPhong').button().click(
+      function(){
+          vxl.api.setProgram(view, vxl.def.glsl.phong, vxlPhongStrategy);
+          vxl.api.setUniform('uLightDirection',[0.0,0.0,-1.0])
+      }  
+    );
+    
+    $('#btnLambert').button().click(
+      function(){
+          vxl.api.setProgram(view, vxl.def.glsl.lambert, vxlLambertStrategy);
+      }  
+    );
+    </script>
+</body>         
+</html>

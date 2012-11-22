@@ -25,6 +25,7 @@ vxl.def.glsl.phong = {
     "aVertexPosition",
     "aVertexNormal",
     "aVertexColor",
+    "aVertexTextureCoords"
     ],
     
     UNIFORMS : [
@@ -43,12 +44,15 @@ vxl.def.glsl.phong = {
     "uMaterialSpecular",
 	"uUseVertexColors",
 	"uUseShading",
-    "uUseLightTranslation"],
+    "uUseLightTranslation",
+    "uUseTextures",
+    "uSampler"],
     
     VERTEX_SHADER: [
     "attribute vec3 aVertexPosition;",
     "attribute vec3 aVertexNormal;",
     "attribute vec3 aVertexColor;",
+    "attribute vec2 aVertexTextureCoords;",
     "uniform float uPointSize;",
     "uniform mat4 mModelView;",
     "uniform mat4 mPerspective;",
@@ -58,6 +62,8 @@ vxl.def.glsl.phong = {
     "varying vec3 vNormal;",
     "varying vec3 vEyeVec;",
     "varying vec4 vFinalColor;",
+    "varying vec2 vTextureCoords;",
+    "uniform bool uUseTextures;",
     
     "void main(void) {",
     "  gl_Position = mPerspective * mModelView * vec4(aVertexPosition, 1.0);",
@@ -69,6 +75,9 @@ vxl.def.glsl.phong = {
     "   vec4 vertex = mModelView * vec4(aVertexPosition, 1.0);",
     "   vNormal = vec3(mNormal * vec4(aVertexNormal, 1.0));",
     "   vEyeVec = -vec3(vertex.xyz);",
+    "   if (uUseTextures){" ,
+    "       vTextureCoords = aVertexTextureCoords;",
+    "   }",
     "}"].join('\n'),
 
     FRAGMENT_SHADER : [
@@ -92,9 +101,14 @@ vxl.def.glsl.phong = {
     "varying vec3 vNormal;",
     "varying vec3 vEyeVec;",
     "varying vec4 vFinalColor;",
+    
+    "varying vec2      vTextureCoords;",
+    "uniform bool      uUseTextures;",
+    "uniform sampler2D uSampler;",
+    
     "void main(void)",
     "{",
-    
+     "  vec4 finalColor = vec4(0.0);",
      "  vec3 L = normalize(uLightDirection);",
      "  vec3 N = normalize(vNormal);",
      "  float lambertTerm = dot(N,-L);",
@@ -114,12 +128,16 @@ vxl.def.glsl.phong = {
      "          float specular = pow( max(dot(R, E), 0.0), uShininess);",
      "          Is = uLightSpecular * uMaterialSpecular * specular;",
      "      }",
-     "      gl_FragColor = Ia + Id + Is;",
-     "      gl_FragColor.a = uMaterialDiffuse.a;",
+     "      finalColor = Ia + Id + Is;",
+     "      finalColor.a = uMaterialDiffuse.a;",
      "  } ",
      "  else {",
-     "      gl_FragColor = varMaterialDiffuse; ",	
+     "      finalColor = varMaterialDiffuse; ",	
      "  }",
+     "   if (uUseTextures){",
+     "       finalColor =  texture2D(uSampler, vec2(vTextureCoords.s, vTextureCoords.t));",
+     "   }",
+     "   gl_FragColor = finalColor;",
      "}"].join('\n'),
 
     DEFAULTS : {

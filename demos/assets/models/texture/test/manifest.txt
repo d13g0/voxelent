@@ -1,0 +1,6 @@
+original OBJ file: test.obj
+part1.json > alias: Cube_Cube.002_
+part2.json > alias: object2_Cube.001_red
+part3.json > alias: object2_Cube.001_yellow
+part4.json > alias: object1_Cube_blue
+part5.json > alias: object1_Cube_blue_voxelent.png

@@ -25,7 +25,8 @@ vxl.def.glsl.lambert = {
 	ATTRIBUTES : [
 	"aVertexPosition", 
 	"aVertexColor", 
-	"aVertexNormal"],
+	"aVertexNormal",
+	"aVertexTextureCoords"],
 	
 	UNIFORMS : [
 	"mModelView",
@@ -39,7 +40,9 @@ vxl.def.glsl.lambert = {
 	"uMaterialDiffuse",
 	"uUseVertexColors",
 	"uUseShading",
-	"uUseLightTranslation"],
+	"uUseTextures",
+	"uUseLightTranslation",
+	"uSampler"],
 	
 	
     VERTEX_SHADER : [
@@ -47,6 +50,7 @@ vxl.def.glsl.lambert = {
     "attribute vec3 aVertexPosition;",
 	"attribute vec3 aVertexNormal;",
 	"attribute vec3 aVertexColor;",
+	"attribute vec2 aVertexTextureCoords;",
     "uniform float uPointSize;",
 	"uniform mat4 mModelView;",
 	"uniform mat4 mPerspective;",
@@ -59,7 +63,9 @@ vxl.def.glsl.lambert = {
 	"uniform bool uUseShading;",
     "uniform bool uUseVertexColors;",
     "uniform bool uUseLightTranslation;",
+    "uniform bool uUseTextures;",
 	"varying vec4 vFinalColor;",
+    "varying vec2 vTextureCoords;",
     
     "void main(void) {",
     "	gl_Position = mModelViewPerspective * vec4(aVertexPosition, 1.0);",
@@ -80,6 +86,9 @@ vxl.def.glsl.lambert = {
     "		vFinalColor = Ia + Id;",
 	"		vFinalColor.a = uMaterialDiffuse.a;",
 	"	}" ,
+	"   if (uUseTextures){" ,
+	"       vTextureCoords = aVertexTextureCoords;",
+    "   }",
 	"}"].join('\n'),
     
     FRAGMENT_SHADER : [
@@ -87,10 +96,18 @@ vxl.def.glsl.lambert = {
     "precision highp float;",
     "#endif",
 
-    "varying vec4  vFinalColor;",
+    "varying vec4      vFinalColor;",
+    "varying vec2      vTextureCoords;",
+    "uniform bool      uUseTextures;",
+    "uniform sampler2D uSampler;",
 
     "void main(void)  {",
+    "   if (uUseTextures){",
+    "       gl_FragColor = texture2D(uSampler, vTextureCoords);",
+    "   }",
+    "   else{",
     "		gl_FragColor = vFinalColor;",
+    "   }",
     "}"].join('\n'),
     
     DEFAULTS : {

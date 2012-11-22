@@ -24,7 +24,7 @@
  * @author Diego Cantor
  */
 function vxlModel(name, JSON_OBJECT){
-	this.name = name;
+	this.name       = name;
 	this.indices 	= null;
 	this.vertices 	= null;
 	this.scalars 	= null;
@@ -34,8 +34,9 @@ function vxlModel(name, JSON_OBJECT){
 	this.centre 	= null;
 	this.bb     	= null;
 	this.mode       = null;
-	//@TODO implement textures
-    
+	this.image      = null;
+	this.uri        = null;
+	    
     if (JSON_OBJECT != undefined){
         this.load(this.name, JSON_OBJECT);
     }
@@ -77,13 +78,15 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
 	}
 	
 	if (this.mode == undefined){
-		this.mode == vxl.def.actor.mode.SOLID;
+		this.mode = vxl.def.actor.mode.SOLID;
 	}
+	
+	if (this.texture != undefined){
+	    this.mode = vxl.def.actor.mode.TEXTURED;
+	}
+	
 	this.computeBoundingBox();
 };
-
-
-
 
 /**
  * Calculates the normals for this model in case that the JSON object does not include them
