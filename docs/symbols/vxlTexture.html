@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>Voxelent Code Docs - vxl</title>
+		<title>Voxelent Code Docs - vxlTexture</title>
 		<link rel='stylesheet' type='text/css' href='../style/style.css'/>
 		<link rel="stylesheet" type="text/css" href="../style/prettify.css"/>
 		<script type="text/javascript" src="../style/prettify.js"></script>
@@ -146,7 +146,7 @@
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Namespace  <code>vxl</code>
+				Class  <code>vxlTexture</code>
 			</h1>
 
 <!-- ============================== class summary ========================== -->
@@ -154,24 +154,25 @@
 				
 				
 
-				Voxelent Main Namespace
+				A vxlTexture is a representation of a raster image in Voxelent.
 
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_vxl_VXL.js.html">VXL.js</a>.
+					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_scene_Texture.js.html">Texture.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->
 			
 			
-				<h2>Namespace Summary</h2>
+				<h2>Class Summary</h2>
 				<table class="summaryTable"><tr>
 				<td class="attributes">&nbsp;</td>
 				<td class="nameDescription" >
 					<div class="fixedFont">
-						<b><a href="../symbols/vxl.html#constructor">vxl</a></b>
+						<b><a href="../symbols/vxlTexture.html#constructor">vxlTexture</a></b>(uri)
 					</div>
-					<div class="description"><p>Contains all the constants and default variables used by Voxelent.</div>
+					<div class="description"><p>
+A vxlTexture is a representation of a raster image in Voxelent.</div>
 				</td>
 				</tr>
 				</table>
@@ -179,74 +180,78 @@
 
 <!-- ============================== properties summary ===================== -->
 			
+
+<!-- ============================== methods summary ======================== -->
+			
 				
 				
-				<h2>Field Summary</h2>
-				<table class="summaryTable" summary="A summary of the fields documented in the class vxl.">
+				<h2>Method Summary</h2>
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class vxlTexture.">
 					
 						<tr>
 							<td class="attributes">
-							    <div class="fixedFont">
-							    &nbsp;</div></td>
-															
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								<b><a href="../symbols/vxl.html#c">c</a></b>
+								
+								
+								
+								<b><a href="../symbols/vxlTexture.html#getMagFilter">getMagFilter</a></b>
+								(gl)
 								</div>
-
 							</td>
+							
 						</tr>
 					
 						<tr>
 							<td class="attributes">
-							    <div class="fixedFont">
-							    &nbsp;</div></td>
-															
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								<b><a href="../symbols/vxl.html#def">def</a></b>
+								
+								
+								
+								<b><a href="../symbols/vxlTexture.html#getMinFilter">getMinFilter</a></b>
+								(gl)
 								</div>
-
 							</td>
+							
 						</tr>
 					
 						<tr>
 							<td class="attributes">
-							    <div class="fixedFont">
-							    &nbsp;</div></td>
-															
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								<b><a href="../symbols/vxl.html#events">events</a></b>
+								
+								
+								
+								<b><a href="../symbols/vxlTexture.html#load">load</a></b>
+								(uri)
 								</div>
-
 							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">
-							    &nbsp;</div></td>
-															
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/vxl.html#go">go</a></b>
-								</div>
-
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">
-							    &nbsp;</div></td>
-															
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/vxl.html#version">version</a></b>
-								</div>
-
-							</td>
+							
 						</tr>
 					
 					</tbody>
@@ -255,9 +260,6 @@
 
 				
 			
-
-<!-- ============================== methods summary ======================== -->
-			
 <!-- ============================== events summary ======================== -->
 			
 
@@ -265,23 +267,76 @@
 			
 			<div class="details"><a name="constructor"> </a>
 				<h2>
-					Namespace Detail
+					Class Detail
 				</h2>
 				<div class='methodDetail'>
 				<div class="title">
 				<div class="fixedFont">
-						<b>vxl</b>
+						<b>vxlTexture</b>(uri)
 				</div>
 				</div>
 
 				<div class="description">
-					<p>Contains all the constants and default variables used by Voxelent.</p> <p> These properties aregrouped into sub namespaces. The <code>vxl.c</code> namespace covers all the 'current' objects such as the <i>current view</i> and the <i>current scene</i>.</p><p>The <code>vxl.def</code> namespace contains all the definitions and default values for voxelent's global parameters</p> <p>The <code>vxl.events</code> namespace contains all the events used in Voxelent</p><p>The <code>vxl.go</code> namespace contains all the 'global' objects. These are objects thatcan be accessed from any context in a Voxelent program</p><p>The <code>vxl.version</code> namespace simply informs the version of the current Voxelent platform</p>
+					<p>
+A vxlTexture is a representation of a raster image in Voxelent. Textures can be loaded providing a
+URI
+</p>
+<p> 
+To set the magnification and minification filters for a texture please refer to the constants
+defined in <code>vxl.def.texture.filter</code>. A vxlTexture object uses the <code>min</code> and
+<code>mag</code> properties to set these filters. For example: </p>
+
+<pre class="prettyprint">
+var texture = new vxlTexture('iphone_screen.png');
+texture.min = vxl.def.texture.filter.LINEAR;
+texture.mag = vxl.def.texture.filter.NEAREST;
+</pre>
+
+<p>The maginfication and minification filters by default are:
+vxl.def.texture.filter.LINEAR and vxl.def.texture.filter.LINEAR_MIPMAP_LINEAR respectively    
+</p>
+
+<p>Under normal circumstances you will not need to create a vxlTexture. An actor representing a model with texture
+information in it will create a vxlTexture automatically. In this case you can access the available vxlTexture object from the actor like this:</p>
+ 
+<pre class="prettyprint">
+var actor = vxl.c.scene.getActorByName('iphone_screen.json');
+actor.texture.min = [set the filter here using the constants defined in vxl.def.texture.filter]
+actor.texture.mag = [set the filter here using the constants defined in vxl.def.texture.filter]
+</pre>
+
+<p>If you want to replace the texture object with a new raster image, you can write something like this:</p>
+
+<pre class="prettyprint">
+var actor = vxl.c.scene.getActorByName('iphone_screen.json');
+var wallpaper = new vxlTexture('new_wallpaper.png');
+actor.setTexture(wallpaper);
+</pre>
 					
 				</div>
 
 				
 
 
+					
+						<p class="heading">Parameters:</p>
+						<table class='paramTable'>
+						
+							<tr>
+							<td>
+								<span class="light fixedFont">{String}</span> 
+							</td>
+							<td>	
+								 <code>uri</code>
+							</td>
+							<td>
+								<p>texture location
+								
+								</p>
+							</td>
+								
+						
+						</table>
 					
 					
 					
@@ -295,133 +350,159 @@
 
 <!-- ============================== field details ========================== -->
 			
-				<h2>
-					Field Detail
-				</h2>
-				
-					<div class='methodDetail'>
-					<a name="c"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					<span class="light">{<a href="../symbols/vxl.c.html">vxl.c</a>}</span>
-					<b>c</b>
-					</div>
-					</div>
-					<div class="description">
-						current objects
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-
-					</div>
-				
-					<div class='methodDetail'>
-					<a name="def"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					<span class="light">{<a href="../symbols/vxl.def.html">vxl.def</a>}</span>
-					<b>def</b>
-					</div>
-					</div>
-					<div class="description">
-						definition objects
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-
-					</div>
-				
-					<div class='methodDetail'>
-					<a name="events"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					<span class="light">{<a href="../symbols/vxl.events.html">vxl.events</a>}</span>
-					<b>events</b>
-					</div>
-					</div>
-					<div class="description">
-						events generated by voxelent
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-
-					</div>
-				
-					<div class='methodDetail'>
-					<a name="go"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					<span class="light">{<a href="../symbols/vxl.go.html">vxl.go</a>}</span>
-					<b>go</b>
-					</div>
-					</div>
-					<div class="description">
-						global objects
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-
-					</div>
-				
-					<div class='methodDetail'>
-					<a name="version"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					<span class="light">{<a href="../symbols/vxl.version.html">vxl.version</a>}</span>
-					<b>version</b>
-					</div>
-					</div>
-					<div class="description">
-						version
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-
-					</div>
-				
-			
 
 <!-- ============================== method details ========================= -->
+			
+				<h2>
+					Method Detail
+				</h2>
+				
+				<div class='methodDetail'>
+					<a name="getMagFilter"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>getMagFilter</b>(gl)
+					</div>
+					</div>
+					<div class="description">
+						Returns the appropriate gl constant that identifies the current magnification
+filter applied to this texture
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{Object}</span> 
+								</td>
+								<td>
+									<code>gl</code>
+								</td>	
+								<td><p>the gl context
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="getMinFilter"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>getMinFilter</b>(gl)
+					</div>
+					</div>
+					<div class="description">
+						Returns the appropriate gl constant that identifies the current minification filter
+applied to this texture
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{Object}</span> 
+								</td>
+								<td>
+									<code>gl</code>
+								</td>	
+								<td><p>the gl context
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="load"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>load</b>(uri)
+					</div>
+					</div>
+					<div class="description">
+						Loads an image and it associates it to this texture object
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{Object}</span> 
+								</td>
+								<td>
+									<code>uri</code>
+								</td>	
+								<td><p>the location of the image to load into this texture object
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
 			
 
 <!-- ============================== event details ========================= -->

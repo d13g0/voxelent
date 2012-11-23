@@ -42,7 +42,9 @@
     function handleEvent(event){
         vxl.c.camera.longShot();
         var body = vxl.api.getActorByName('part1.json');
+        var back = vxl.api.getActorByName('part4.json');
         body.setColor([54/256,145/256,194/256]);
+        back.setColor([54/256,145/256,194/256]);
          $('#overlay-div').fadeIn(1);
     }
     
@@ -107,7 +109,7 @@ html, body {
 </style> 
 </head>
 <body onload='runVoxApp()' style="background-color: #333;" >
-	<div style="position:absolute;"><a href='http://voxelent.com'><img src="css/img/voxelent_dark.png"/></a></div>
+	<div style="position:absolute; z-index:4"><a href='http://voxelent.com'><img src="css/img/voxelent_dark.png"/></a></div>
 	<canvas id = 'view-1'>
 		<p>
 			Your browser does not support WebGL :-(
@@ -160,6 +162,8 @@ $('#myColorSelector').ColorPicker({
         $('#myColorSelector div').css('backgroundColor', '#' + hex); 
         var c = [rgb.r/256,rgb.g/256,rgb.b/256]; 
         var actor = vxl.api.getActorByName('part1.json');
+        actor.setColor(c);
+        actor = vxl.api.getActorByName('part4.json');
         actor.setColor(c);
     },
      

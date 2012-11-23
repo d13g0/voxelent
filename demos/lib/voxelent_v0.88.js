@@ -11098,8 +11098,45 @@ vxlVTKReader.prototype.getParts = function(){
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/ 
 
+
 /**
- * Creates an empty texture object
+ * <p>
+ * A vxlTexture is a representation of a raster image in Voxelent. Textures can be loaded providing a
+ * URI
+ * </p>
+ * <p> 
+ * To set the magnification and minification filters for a texture please refer to the constants
+ * defined in <code>vxl.def.texture.filter</code>. A vxlTexture object uses the <code>min</code> and
+ * <code>mag</code> properties to set these filters. For example: </p>
+ * 
+ * <pre class="prettyprint">
+ * var texture = new vxlTexture('iphone_screen.png');
+ * texture.min = vxl.def.texture.filter.LINEAR;
+ * texture.mag = vxl.def.texture.filter.NEAREST;
+ * </pre>
+ * 
+ * <p>The maginfication and minification filters by default are:
+ * vxl.def.texture.filter.LINEAR and vxl.def.texture.filter.LINEAR_MIPMAP_LINEAR respectively    
+ * </p>
+ * 
+ * <p>Under normal circumstances you will not need to create a vxlTexture. An actor representing a model with texture
+ * information in it will create a vxlTexture automatically. In this case you can access the available vxlTexture object from the actor like this:</p>
+ *  
+ * <pre class="prettyprint">
+ * var actor = vxl.c.scene.getActorByName('iphone_screen.json');
+ * actor.texture.min = [set the filter here using the constants defined in vxl.def.texture.filter]
+ * actor.texture.mag = [set the filter here using the constants defined in vxl.def.texture.filter]
+ * </pre>
+ * 
+ * <p>If you want to replace the texture object with a new raster image, you can write something like this:</p>
+ * 
+ * <pre class="prettyprint">
+ * var actor = vxl.c.scene.getActorByName('iphone_screen.json');
+ * var wallpaper = new vxlTexture('new_wallpaper.png');
+ * actor.setTexture(wallpaper);
+ * </pre>
+ * @class A vxlTexture is a representation of a raster image in Voxelent. 
+ * @constructor
  * @param {String} uri texture location
  */
 function vxlTexture(uri){
