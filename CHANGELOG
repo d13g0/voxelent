@@ -1,4 +1,21 @@
 -------------------------------------------------------------------------------------------
+VERSION 0.88 - Casablanca premiers in NYC
+-------------------------------------------------------------------------------------------
+1. Texture mapping has been implemented
+
+2. The vxlActor and vxlModel classes have been updated to handle textures
+
+3. There is a new class: vxlTexture to handle the texture loading and selecting the texture filters
+
+4. The obj2json.py has been updated to handle textures
+
+5. The texture file (png, jpg image) should have dimensions (width, height) that are power of 2 and
+it should be in the same directory as the json file. 
+
+6. Fullscreen implemented. Click on the view so it acquires the focus then 
+press f (fullscreen) or x (exit fullscreen)
+
+-------------------------------------------------------------------------------------------
 VERSION 0.87.6 - Spilberg's JAWS
 -------------------------------------------------------------------------------------------
 1. Lookup tables are loaded BY DEMAND instead of loading them all when Voxelent loads.

@@ -1,0 +1,42 @@
+<html>
+<head>
+	 <title> WebGL Beginner's Guide - Checking the WebGL Context </title>
+	 <style type="text/css">
+	 canvas {border: 2px dotted blue;}
+	 </style>
+	 
+	 <script>
+		var gl = null;
+		
+		function getGLContext(){
+			var canvas = document.getElementById("canvas-element-id");
+			if (canvas == null){
+				alert("there is no canvas on this page");
+				return;
+			}
+				
+			var names = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
+	
+            for (var i = 0; i < names.length; ++i) {
+                try {
+                    gl = canvas.getContext(names[i]);
+                } 
+                catch(e) {}
+                if (gl) break;
+            }
+
+			if (gl == null){
+				alert("WebGL is not available");
+			}
+			else{
+				alert("Hooray! You got a WebGL context");
+			}
+		}
+	 </script>
+</head>
+<body onLoad="getGLContext()">
+<canvas id="canvas-element-id" width="800" height="600">
+Your browser does not support the HTML5 canvas element.
+</canvas>
+</body>
+</html>

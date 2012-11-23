@@ -37,6 +37,9 @@ function vxlView(canvasID, scene){
 		alert('View: the canvas ' + canvasID+ ' does not exist.');
 		throw('View: the canvas ' + canvasID+ ' does not exist.');
 	}
+	else{
+	    this._wrapDiv();
+	}
 	
     //View dimensions
 	this.width = this.canvas.width;
@@ -115,6 +118,31 @@ vxlView.prototype.clear = function(){
 };
 
 /**
+ * It creates a div around the canvas to handle resizing appropiately
+ * @private 
+ */
+vxlView.prototype._wrapDiv = function(){
+    
+    $(this.canvas).css({
+        position: 'absolute',
+        height: 'auto',
+        bottom: 0,
+        top: 0,
+        left: 0,
+        right: 0,
+        margin: "5px"
+    });
+    
+    $(this.canvas).wrap('<div id='+this.name+'-wrapper />');
+    $('#'+this.name+'-wrapper').css({
+       width:'100%',
+       height:'100%' 
+    });
+    
+    this.canvas.focus();
+}
+
+/**
  * Resizes the canvas so it fits its parent node in the DOM tree
  */
 vxlView.prototype.resize = function(){
@@ -146,7 +174,50 @@ vxlView.prototype.setAutoResize = function(flag){
     else{
         $(window).unbind('resize');
     }
-}
+};
+
+
+/**
+ * Run non standard code (mozilla, webkit) 
+ *@private 
+ */
+vxlView.prototype._runPrefixMethod = function(obj,method){
+    
+    var pfx = ["webkit", "moz", "ms", "o", ""];
+    var p = 0, m, t;
+
+    while (p < pfx.length && !obj[m]) {
+        m = method;
+        if (pfx[p] == "") {
+            m = m.substr(0,1).toLowerCase() + m.substr(1);
+        }
+        m = pfx[p] + m;
+        t = typeof obj[m];
+        if (t != "undefined") {
+            pfx = [pfx[p]];
+            return (t == "function" ? obj[m]() : obj[m]);
+        }
+        p++;
+    }
+};
+
+/**
+ * Handles HTML5 Full screen for this view 
+ * @param {Boolean} flag set flag to true if fullscreen is wanted. Set it to false to exit fullscreen.
+ */
+vxlView.prototype.fullscreen = function(flag){
+    if (flag == true){
+        this._runPrefixMethod(this.canvas, "RequestFullScreen");
+    }
+    else{
+        if (this._runPrefixMethod(document,"FullScreen") || 
+            this._runPrefixMethod(document,"isFullScreen")){
+            this._runPrefixMethod(document,"CancelFullScreen");
+        }    
+    }
+
+};
+
 
 /**
  * Starts the view

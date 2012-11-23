@@ -1,0 +1,292 @@
+<html>
+
+<head>
+<title>WebGL Beginner's Guide - Chapter 2 - State Machine</title>
+<meta http-equiv='content-type' content='text/html; charset=ISO-8859-1'>
+
+<!-- CSS Styles //-->
+<link href='css/style.css' 		type='text/css' rel='stylesheet'>
+<link href='css/desert.css' 	type='text/css' rel='stylesheet'/>
+<link href='css/smoothness/jquery-ui-1.8.13.custom.css' type='text/css' rel='stylesheet' />
+
+<!-- JavaScript Libraries //-->
+<script type='text/javascript' src='js/gl-matrix-min.js'></script>
+<script type='text/javascript' src='js/jquery-1.5.1.min.js'></script>
+<script type='text/javascript' src='js/jquery-ui-1.8.13.custom.min.js'></script> 
+<script type='text/javascript' src='js/prettify.js'></script>
+<script type='text/javascript' src='js/utils.js'></script>
+<script type='text/javascript' src='js/codeview.js'></script>
+
+<!-- Fragment Shader //-->
+<script id='shader-fs' type='x-shader/x-fragment'>
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+
+    void main(void) {
+        gl_FragColor = vec4(0.5, 0.9, 0.2, 1.0); //Green
+    }
+</script>
+
+<!-- Vertex Shader //-->
+<script id='shader-vs' type='x-shader/x-vertex'>
+    attribute vec3 aVertexPosition;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+
+    void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        gl_PointSize = 3.0;
+    }
+</script>
+
+<script id='code-js' type='text/javascript'>
+var gl = null; // WebGL context
+var prg = null; // The program (shaders)
+var c_width = 0; // Variable to store the width of the canvas
+var c_height = 0; // Variable to store the height of the canvas
+
+var coneVertexBuffer = null; //The vertex buffer for the cone
+var coneIndexBuffer = null; // The index buffer for the cone
+
+var indices = [];
+var vertices = [];
+
+var vbo_name    = "undefined";
+var vbo_size    = 0;
+var vbo_usage   = 0;
+
+var ibo_name    = "undefined";
+var ibo_size    = 0;
+var ibo_usage   = 0;
+
+var is_vertices_vbo = "";
+var is_coneVertexBuffer_vbo = "";
+
+var mvMatrix = mat4.create(); // The Model-View matrix
+var pMatrix = mat4.create(); // The projection matrix
+
+
+/**
+* The program contains a series of instructions that tell the Graphic Processing Unit (GPU)
+* what to do with every vertex and fragment that we pass it. (more about this on chapter 3)
+* The vertex shader and the fragment shader together are called the program.
+*/
+function initProgram() {
+    var fgShader = utils.getShader(gl, 'shader-fs');
+    var vxShader = utils.getShader(gl, 'shader-vs');
+
+    prg = gl.createProgram();
+    gl.attachShader(prg, vxShader);
+    gl.attachShader(prg, fgShader);
+    gl.linkProgram(prg);
+
+    if (!gl.getProgramParameter(prg, gl.LINK_STATUS)) {
+        alert('Could not initialise shaders');
+    }
+
+    gl.useProgram(prg);
+
+    prg.vertexPositionAttribute = gl.getAttribLocation(prg, 'aVertexPosition');
+    prg.pMatrixUniform = gl.getUniformLocation(prg, 'uPMatrix');
+    prg.mvMatrixUniform = gl.getUniformLocation(prg, 'uMVMatrix');
+}		
+
+/**
+* Creates the buffers that contain the geometry of the cone
+*/
+function initBuffers() {
+
+    vertices =[1.5, 0, 0, 
+    -1.5, 1, 0, 
+    -1.5, 0.809017,	0.587785,
+    -1.5, 0.309017,	0.951057, 
+    -1.5, -0.309017, 0.951057, 
+    -1.5, -0.809017, 0.587785,
+    -1.5, -1, -4.10207e-010, 
+    -1.5, -0.809017, -0.587785,
+    -1.5, -0.309017, -0.951057, 
+    -1.5, 0.309017,	-0.951057, 
+    -1.5, 0.809017,	-0.587785];
+
+    indices = [0, 1, 2,
+    0, 2, 3,
+    0, 3, 4,
+    0, 4, 5,
+    0, 5, 6,
+    0, 6, 7,
+    0, 7, 8,
+    0, 8, 9,
+    0, 9, 10,
+    0, 10, 1];
+
+    coneVertexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, coneVertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    
+    coneIndexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, coneIndexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+    
+    if(coneVertexBuffer == gl.getParameter(gl.ARRAY_BUFFER_BINDING)){
+        vbo_name = "coneVertexBuffer";
+    }
+    if(coneIndexBuffer == gl.getParameter(gl.ELEMENT_ARRAY_BUFFER_BINDING)){
+        ibo_name = "coneIndexBuffer";
+    }
+    
+    vbo_size   = gl.getBufferParameter(gl.ARRAY_BUFFER, gl.BUFFER_SIZE);
+    vbo_usage  = gl.getBufferParameter(gl.ARRAY_BUFFER, gl.BUFFER_USAGE);
+    
+    ibo_size   = gl.getBufferParameter(gl.ELEMENT_ARRAY_BUFFER, gl.BUFFER_SIZE);
+    ibo_usage  = gl.getBufferParameter(gl.ELEMENT_ARRAY_BUFFER, gl.BUFFER_USAGE);
+    
+       
+    //Unbind current VBO and current IBO. Good Practice!
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ARRAY_BUFFER,null);
+    
+    //We can call isBuffer at any point (even if there is no buffer bound), because isBuffer only checks on the type of the object 
+    //i.e. Is the object a WebGL buffer or not.
+    try{
+        if (gl.isBuffer(vertices)){
+            is_vertices_vbo = "Yes"
+        }
+        else{
+            is_vertices_vbo = "Invalid"; //isBuffer returns false if the buffer invalidated flag is set
+        }
+    }
+    catch(e){
+        is_vertices_vbo = "No";
+    }
+    if (gl.isBuffer(coneVertexBuffer)){
+        is_coneVertexBuffer_vbo = "Yes"
+    }
+    else{
+        is_coneVertexBuffer_vbo = "No";
+    }
+}
+/**
+* JQuery code to update GUI
+*/
+function updateInfo(){
+    $('#t_vbo_name').html(vbo_name);
+    $('#t_ibo_name').html(ibo_name);
+    $('#t_vbo_size').html(vbo_size);
+    $('#t_vbo_usage').html(vbo_usage);
+    $('#t_ibo_size').html(ibo_size);
+    $('#t_ibo_usage').html(ibo_usage);
+    $('#s_is_vertices_vbo').html(is_vertices_vbo);
+    $('#s_is_coneVertexBuffer_vbo').html(is_coneVertexBuffer_vbo);
+}
+
+/**
+* Draws the scene
+*/
+function drawScene(){
+
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.enable(gl.DEPTH_TEST);
+
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.viewport(0,0,c_width, c_height);
+
+    mat4.perspective(45, c_width / c_height, 0.1, 10000.0, pMatrix);
+    mat4.identity(mvMatrix);	
+    mat4.translate(mvMatrix, [0.0, 0.0, -5.0]);
+
+    gl.uniformMatrix4fv(prg.pMatrixUniform, false, pMatrix);
+    gl.uniformMatrix4fv(prg.mvMatrixUniform, false, mvMatrix);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, coneVertexBuffer);
+    gl.vertexAttribPointer(prg.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(prg.vertexPositionAttribute);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, coneIndexBuffer);
+    gl.drawElements(gl.LINE_LOOP, indices.length, gl.UNSIGNED_SHORT,0);
+}
+
+/**
+* Render Loop
+*/
+function renderLoop() {
+    requestAnimFrame(renderLoop);
+    drawScene();
+}
+
+/**
+* Executes the WebGL application
+* This function is invoked on the onLoad event of the web page. 
+*/
+function runWebGLApp(){
+    //Obtains a WebGL context
+    gl = utils.getGLContext('canvas-element-id');
+    //Initializes the program (shaders). More about this on chapter 3!
+    initProgram();
+    //Initializes the buffers that we are going to use to draw the cone (vertex buffer and index buffer)
+    initBuffers();
+    //Update this web page with information about buffers
+    updateInfo();
+    //Renders the scene!
+    renderLoop();
+}
+</script>
+</head>
+
+
+<body onLoad='runWebGLApp()'>
+<div id='top'>
+    <h1>WebGL Beginner's Guide - Chapter 2 - State Machine</h1>
+    <h2>Getting information from WebGL with getParameter and getBufferParameter</h2>
+    <div id='logo-packt'><img src='packt.gif'/></div>
+    <p>This example shows how to recover information about the current VBO and IBO.</p>
+</div>
+
+<div id='contents'>
+    <div id='canvasContainer'>
+        <canvas id='canvas-element-id' width='480' height='400'>
+            Your browser does not support the HTML5 canvas element.
+        </canvas>
+    </div>
+</div>
+
+<div id='bottom'>
+    <table width="100%" "">
+    <tr><td>
+    <table class="border">
+        <colgroup>
+        <col class="col1">
+        <col >
+        <col >
+        <col >
+        </colgroup>
+        <tr>
+            <th>Buffer</th>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Usage</th>
+        </tr>
+        <tr>
+            <td>VBO:</td>
+            <td id="t_vbo_name"></td>
+            <td id="t_vbo_size"></td>
+            <td id="t_vbo_usage"></td>
+        </tr>
+        <tr>
+            <td>IBO:</td>
+            <td id="t_ibo_name"></td>
+            <td id="t_ibo_size"></td>
+            <td id="t_ibo_usage"></td>
+        </tr>
+    </table>
+    </td>
+    <td>
+    <p>Is vertices a VBO? <strong id="s_is_vertices_vbo"></strong></p>
+    <p>Is coneVertexBuffer a VBO? <strong id="s_is_coneVertexBuffer_vbo"></strong></p>
+    </td></tr>
+    </table>
+</div>
+<script>cview.run();</script>
+</body>
+</html>

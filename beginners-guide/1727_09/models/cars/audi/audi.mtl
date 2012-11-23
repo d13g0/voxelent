@@ -1,0 +1,283 @@
+# Blender MTL File: 'audi.blend'
+# Material Count: 26
+newmtl Aloi_rim
+Ns 370.588235
+Ka 0.003096 0.003096 0.003096
+Kd 0.359176 0.359176 0.359176
+Ks 0.600000 0.600000 0.600000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Texturen/Nature/building_probe.hdr
+
+
+newmtl Blue_glass
+Ns 498.039216
+Ka 0.003096 0.003096 0.003096
+Kd 5.000000 5.000000 7.000000
+Ks 0.805085 0.805085 0.805085
+Ni 1.000000
+d 1.000000
+illum 2
+
+
+newmtl Break
+Ns 296.078431
+Ka 0.003096 0.003096 0.003096
+Kd 0.453868 0.000000 0.000000
+Ks 0.215278 0.215278 0.215278
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/odin/Documents/WebGLBook/Code/1727_09/models/cars/other_models/vehicle/hennessey_final/textures/brembo-big-brake-kit-logo.jpg
+
+
+newmtl Break_wheel
+Ns 96.078431
+Ka 0.003096 0.003096 0.003096
+Kd 0.640000 0.629981 0.537027
+Ks 0.102210 0.102210 0.102210
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd audi.blend/Texturen/Bremsscheibe.png
+map_Bump audi.blend/Texturen/Bremsscheibe.png
+
+
+newmtl Chrome
+Ns 435.294118
+Ka 0.003096 0.003096 0.003096
+Kd 0.640000 0.640000 0.640000
+Ks 1.000000 1.000000 1.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Texturen/Nature/building_probe.hdr
+
+
+newmtl Chrome_rips
+Ns 435.294118
+Ka 0.003096 0.003096 0.003096
+Kd 0.640000 0.640000 0.640000
+Ks 1.000000 1.000000 1.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Texturen/Nature/building_probe.hdr
+map_Bump audi.blend/Texturen/caro_riffel.png
+
+
+newmtl Kupfer
+Ns 96.078431
+Ka 0.003096 0.003096 0.003096
+Kd 0.125229 0.125229 0.125229
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+
+
+newmtl Lack
+Ns 488.235294
+Ka 0.003096 0.003096 0.003096
+Kd 0.618664 0.454583 0.129663
+Ks 0.163998 0.163998 0.163998
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/odin/Documents/WebGLBook/Code/1727_09/models/cars/other_models/vehicle/textures/uffizi_probe.hdr
+
+
+newmtl Leder
+Ns 145.098039
+Ka 0.003096 0.003096 0.003096
+Kd 1.000000 0.991494 0.974042
+Ks 0.100000 0.100000 0.100000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Bump Audi_A4_Limosine/Texturen/leder_granat_42486_racing.jpg
+
+
+newmtl Leder_dark
+Ns 145.098039
+Ka 0.003096 0.003096 0.003096
+Kd 0.127998 0.126910 0.124676
+Ks 0.100000 0.100000 0.100000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Bump Audi_A4_Limosine/Texturen/leder_granat_42486_racing.jpg
+
+
+newmtl Light_blink
+Ns 96.078431
+Ka 0.003096 0.003096 0.003096
+Kd 0.519998 0.259999 0.009432
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+
+
+newmtl Light_red
+Ns 96.078431
+Ka 0.003096 0.003096 0.003096
+Kd 3.000000 0.200000 0.200000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+
+
+newmtl Matt_silver
+Ns 243.137255
+Ka 0.003096 0.003096 0.003096
+Kd 0.999997 0.999997 0.999997
+Ks 0.353000 0.353000 0.353000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Texturen/Nature/building_probe.hdr
+
+
+newmtl NR_Schild
+Ns 258.823529
+Ka 0.003096 0.003096 0.003096
+Kd 0.473326 0.473326 0.473326
+Ks 0.164546 0.164546 0.164546
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd d:/Blender/Blender_Projects/Projects/Audi_R8/Texturen/Model_by_sn.png
+
+
+newmtl Plastic
+Ns 43.137255
+Ka 0.003096 0.003096 0.003096
+Kd 0.154667 0.154667 0.154667
+Ks 0.172000 0.172000 0.172000
+Ni 1.000000
+d 1.000000
+illum 2
+
+
+newmtl Plastic_text
+Ns 43.137255
+Ka 0.003096 0.003096 0.003096
+Kd 0.154667 0.154667 0.154667
+Ks 0.172000 0.172000 0.172000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd audi.blend/Texturen/Texte.png
+map_Bump audi.blend/Texturen/Texte.png
+
+
+newmtl Red_glass
+Ns 43.137255
+Ka 0.003096 0.003096 0.003096
+Kd 0.803714 0.000000 0.000000
+Ks 0.149330 0.015795 0.021501
+Ni 1.000000
+d 0.770000
+illum 2
+
+
+newmtl Stoff
+Ns 56.862745
+Ka 0.003096 0.003096 0.003096
+Kd 1.000000 1.000000 0.851852
+Ks 0.133333 0.129293 0.121212
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd architektur/Texturen/raufaser_002.jpg
+map_Bump architektur/Texturen/raufaser_002.jpg
+
+
+newmtl Tachow
+Ns 96.078431
+Ka 0.003096 0.003096 0.003096
+Kd 0.800000 0.800000 0.800000
+Ks 0.116667 0.116667 0.116667
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd audi.blend/Texturen/Tachometer.png
+map_Bump audi.blend/Texturen/Tachometer.png
+
+
+newmtl Tire
+Ns 56.862745
+Ka 0.003096 0.003096 0.003096
+Kd 0.020739 0.020737 0.020737
+Ks 0.100000 0.100000 0.100000
+Ni 1.000000
+d 1.000000
+illum 2
+
+
+newmtl carbon
+Ns 194.117647
+Ka 0.003096 0.003096 0.003096
+Kd 0.640000 0.640000 0.640000
+Ks 0.110000 0.110000 0.110000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd audi.blend/DTM_Audi_A4/texturen/divers/Carbon.png
+
+
+newmtl glass
+Ns 488.235294
+Ka 0.003096 0.003096 0.003096
+Kd 0.287979 0.299978 0.287979
+Ks 0.761484 0.761484 0.761484
+Ni 1.000000
+d 0.220000
+illum 2
+
+
+newmtl gum
+Ns 47.058824
+Ka 0.003096 0.003096 0.003096
+Kd 0.033620 0.033620 0.033620
+Ks 0.020000 0.020000 0.020000
+Ni 1.000000
+d 1.000000
+illum 2
+
+
+newmtl guss
+Ns 145.098039
+Ka 0.003096 0.003096 0.003096
+Kd 0.683971 0.683971 0.683971
+Ks 0.066667 0.066667 0.066667
+Ni 1.000000
+d 1.000000
+illum 2
+
+
+newmtl navigation
+Ns 43.137255
+Ka 0.003096 0.003096 0.003096
+Kd 0.154667 0.154667 0.154667
+Ks 0.172000 0.172000 0.172000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd audi.blend/Texturen/sintel02.png
+
+
+newmtl stoff_gray
+Ns 56.862745
+Ka 0.003096 0.003096 0.003096
+Kd 0.142133 0.142133 0.142133
+Ks 0.086060 0.086060 0.086060
+Ni 1.000000
+d 1.000000
+illum 2
+map_Bump architektur/Texturen/raufaser_002.jpg
+
+

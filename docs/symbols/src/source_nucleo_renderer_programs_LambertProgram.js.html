@@ -32,80 +32,97 @@
 <span class='line'> 25</span> </span><span class="WHIT">	</span><span class="NAME">ATTRIBUTES</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="WHIT">
 <span class='line'> 26</span> </span><span class="WHIT">	</span><span class="STRN">"aVertexPosition"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="WHIT">
 <span class='line'> 27</span> </span><span class="WHIT">	</span><span class="STRN">"aVertexColor"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'> 28</span> </span><span class="WHIT">	</span><span class="STRN">"aVertexNormal"</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 29</span> </span><span class="WHIT">	</span><span class="WHIT">
-<span class='line'> 30</span> </span><span class="WHIT">	</span><span class="NAME">UNIFORMS</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="WHIT">
-<span class='line'> 31</span> </span><span class="WHIT">	</span><span class="STRN">"mModelView"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 32</span> </span><span class="WHIT">	</span><span class="STRN">"mNormal"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 33</span> </span><span class="WHIT">	</span><span class="STRN">"mPerspective"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 34</span> </span><span class="WHIT">	</span><span class="STRN">"mModelViewPerspective"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 35</span> </span><span class="WHIT">	</span><span class="STRN">"uPointSize"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 36</span> </span><span class="WHIT">	</span><span class="STRN">"uLightDirection"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 37</span> </span><span class="WHIT">	</span><span class="STRN">"uLightAmbient"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 38</span> </span><span class="WHIT">	</span><span class="STRN">"uLightDiffuse"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 39</span> </span><span class="WHIT">	</span><span class="STRN">"uMaterialDiffuse"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 40</span> </span><span class="WHIT">	</span><span class="STRN">"uUseVertexColors"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 41</span> </span><span class="WHIT">	</span><span class="STRN">"uUseShading"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 42</span> </span><span class="WHIT">	</span><span class="STRN">"uUseLightTranslation"</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 43</span> </span><span class="WHIT">	</span><span class="WHIT">
-<span class='line'> 44</span> </span><span class="WHIT">	</span><span class="WHIT">
-<span class='line'> 45</span> </span><span class="WHIT">    </span><span class="NAME">VERTEX_SHADER</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="WHIT">
-<span class='line'> 46</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'> 47</span> </span><span class="WHIT">    </span><span class="STRN">"attribute vec3 aVertexPosition;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 48</span> </span><span class="WHIT">	</span><span class="STRN">"attribute vec3 aVertexNormal;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 49</span> </span><span class="WHIT">	</span><span class="STRN">"attribute vec3 aVertexColor;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 50</span> </span><span class="WHIT">    </span><span class="STRN">"uniform float uPointSize;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 51</span> </span><span class="WHIT">	</span><span class="STRN">"uniform mat4 mModelView;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 52</span> </span><span class="WHIT">	</span><span class="STRN">"uniform mat4 mPerspective;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 53</span> </span><span class="WHIT">	</span><span class="STRN">"uniform mat4 mModelViewPerspective;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 54</span> </span><span class="WHIT">	</span><span class="STRN">"uniform mat4 mNormal;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 55</span> </span><span class="WHIT">	</span><span class="STRN">"uniform vec3 uLightDirection;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 56</span> </span><span class="WHIT">	</span><span class="STRN">"uniform vec4 uLightAmbient;"</span><span class="PUNC">,</span><span class="WHIT">  </span><span class="WHIT">
-<span class='line'> 57</span> </span><span class="WHIT">	</span><span class="STRN">"uniform vec4 uLightDiffuse;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 58</span> </span><span class="WHIT">	</span><span class="STRN">"uniform vec4 uMaterialDiffuse;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 59</span> </span><span class="WHIT">	</span><span class="STRN">"uniform bool uUseShading;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 60</span> </span><span class="WHIT">    </span><span class="STRN">"uniform bool uUseVertexColors;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 61</span> </span><span class="WHIT">    </span><span class="STRN">"uniform bool uUseLightTranslation;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 62</span> </span><span class="WHIT">	</span><span class="STRN">"varying vec4 vFinalColor;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 63</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'> 64</span> </span><span class="WHIT">    </span><span class="STRN">"void main(void) {"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 65</span> </span><span class="WHIT">    </span><span class="STRN">"	gl_Position = mModelViewPerspective * vec4(aVertexPosition, 1.0);"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 66</span> </span><span class="WHIT">    </span><span class="STRN">"	gl_PointSize = uPointSize;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 67</span> </span><span class="WHIT">    </span><span class="STRN">"	if (uUseVertexColors) {"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 68</span> </span><span class="WHIT">    </span><span class="STRN">"		vFinalColor = vec4(aVertexColor,1.0);"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 69</span> </span><span class="WHIT">    </span><span class="STRN">"	}"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 70</span> </span><span class="WHIT">    </span><span class="STRN">"   else {"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 71</span> </span><span class="WHIT">    </span><span class="STRN">"       vFinalColor = uMaterialDiffuse;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 72</span> </span><span class="WHIT">    </span><span class="STRN">"   }"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 73</span> </span><span class="WHIT">    </span><span class="STRN">"	if (uUseShading){"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 74</span> </span><span class="WHIT">    </span><span class="STRN">"		vec3 N = vec3(mNormal * vec4(aVertexNormal, 1.0));"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 75</span> </span><span class="WHIT">	</span><span class="STRN">"		vec3 L = normalize(uLightDirection);"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 76</span> </span><span class="WHIT">	</span><span class="STRN">"		if (uUseLightTranslation){ L = vec3(mNormal * vec4(L,1.0));}"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 77</span> </span><span class="WHIT">	</span><span class="STRN">"		float lambertTerm = max(dot(N,-L),0.4);"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 78</span> </span><span class="WHIT">	</span><span class="STRN">"		vec4 Ia = uLightAmbient;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 79</span> </span><span class="WHIT">	</span><span class="STRN">"		vec4 Id = vFinalColor * uLightDiffuse * lambertTerm;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 80</span> </span><span class="WHIT">    </span><span class="STRN">"		vFinalColor = Ia + Id;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 81</span> </span><span class="WHIT">	</span><span class="STRN">"		vFinalColor.a = uMaterialDiffuse.a;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 82</span> </span><span class="WHIT">	</span><span class="STRN">"	}"</span><span class="WHIT"> </span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 83</span> </span><span class="WHIT">	</span><span class="STRN">"}"</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">join</span><span class="PUNC">(</span><span class="STRN">'\n'</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 84</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'> 85</span> </span><span class="WHIT">    </span><span class="NAME">FRAGMENT_SHADER</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="WHIT">
-<span class='line'> 86</span> </span><span class="WHIT">    </span><span class="STRN">"#ifdef GL_ES"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 87</span> </span><span class="WHIT">    </span><span class="STRN">"precision highp float;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 88</span> </span><span class="WHIT">    </span><span class="STRN">"#endif"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 89</span> 
-<span class='line'> 90</span> </span><span class="WHIT">    </span><span class="STRN">"varying vec4  vFinalColor;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 91</span> 
-<span class='line'> 92</span> </span><span class="WHIT">    </span><span class="STRN">"void main(void)  {"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 93</span> </span><span class="WHIT">    </span><span class="STRN">"		gl_FragColor = vFinalColor;"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 94</span> </span><span class="WHIT">    </span><span class="STRN">"}"</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">join</span><span class="PUNC">(</span><span class="STRN">'\n'</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 95</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'> 96</span> </span><span class="WHIT">    </span><span class="NAME">DEFAULTS</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 97</span> </span><span class="WHIT">        </span><span class="STRN">"uLightDirection"</span><span class="WHIT"> 	</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NUMB">0.0</span><span class="PUNC">,</span><span class="NUMB">0.0</span><span class="PUNC">,</span><span class="PUNC">-</span><span class="NUMB">1.0</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 98</span> </span><span class="WHIT">        </span><span class="STRN">"uLightAmbient"</span><span class="WHIT">   	</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NUMB">0.0</span><span class="PUNC">,</span><span class="NUMB">0.0</span><span class="PUNC">,</span><span class="NUMB">0.0</span><span class="PUNC">,</span><span class="NUMB">1.0</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 99</span> </span><span class="WHIT">        </span><span class="STRN">"uLightDiffuse"</span><span class="WHIT">   	</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NUMB">1.0</span><span class="PUNC">,</span><span class="NUMB">1.0</span><span class="PUNC">,</span><span class="NUMB">1.0</span><span class="PUNC">,</span><span class="NUMB">1.0</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>100</span> </span><span class="WHIT">        </span><span class="STRN">"uMaterialDiffuse"</span><span class="WHIT"> 	</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NUMB">0.9</span><span class="PUNC">,</span><span class="NUMB">0.9</span><span class="PUNC">,</span><span class="NUMB">0.9</span><span class="PUNC">,</span><span class="NUMB">1.0</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>101</span> </span><span class="WHIT">        </span><span class="STRN">"uPointSize"</span><span class="WHIT">		</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">1.0</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>102</span> </span><span class="WHIT">        </span><span class="STRN">"uUseLightTranslation"</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="WHIT">
-<span class='line'>103</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>104</span> </span><span class="PUNC">}</span><span class="PUNC">;</span></pre></body></html>
+<span class='line'> 28</span> </span><span class="WHIT">	</span><span class="STRN">"aVertexNormal"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 29</span> </span><span class="WHIT">	</span><span class="STRN">"aVertexTextureCoords"</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 30</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'> 31</span> </span><span class="WHIT">	</span><span class="NAME">UNIFORMS</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="WHIT">
+<span class='line'> 32</span> </span><span class="WHIT">	</span><span class="STRN">"mModelView"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 33</span> </span><span class="WHIT">	</span><span class="STRN">"mNormal"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 34</span> </span><span class="WHIT">	</span><span class="STRN">"mPerspective"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 35</span> </span><span class="WHIT">	</span><span class="STRN">"mModelViewPerspective"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 36</span> </span><span class="WHIT">	</span><span class="STRN">"uPointSize"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 37</span> </span><span class="WHIT">	</span><span class="STRN">"uLightDirection"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 38</span> </span><span class="WHIT">	</span><span class="STRN">"uLightAmbient"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 39</span> </span><span class="WHIT">	</span><span class="STRN">"uLightDiffuse"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 40</span> </span><span class="WHIT">	</span><span class="STRN">"uMaterialDiffuse"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 41</span> </span><span class="WHIT">	</span><span class="STRN">"uUseVertexColors"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 42</span> </span><span class="WHIT">	</span><span class="STRN">"uUseShading"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 43</span> </span><span class="WHIT">	</span><span class="STRN">"uUseTextures"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 44</span> </span><span class="WHIT">	</span><span class="STRN">"uUseLightTranslation"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 45</span> </span><span class="WHIT">	</span><span class="STRN">"uSampler"</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 46</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'> 47</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'> 48</span> </span><span class="WHIT">    </span><span class="NAME">VERTEX_SHADER</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="WHIT">
+<span class='line'> 49</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'> 50</span> </span><span class="WHIT">    </span><span class="STRN">"attribute vec3 aVertexPosition;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 51</span> </span><span class="WHIT">	</span><span class="STRN">"attribute vec3 aVertexNormal;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 52</span> </span><span class="WHIT">	</span><span class="STRN">"attribute vec3 aVertexColor;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 53</span> </span><span class="WHIT">	</span><span class="STRN">"attribute vec2 aVertexTextureCoords;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 54</span> </span><span class="WHIT">    </span><span class="STRN">"uniform float uPointSize;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 55</span> </span><span class="WHIT">	</span><span class="STRN">"uniform mat4 mModelView;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 56</span> </span><span class="WHIT">	</span><span class="STRN">"uniform mat4 mPerspective;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="WHIT">	</span><span class="STRN">"uniform mat4 mModelViewPerspective;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 58</span> </span><span class="WHIT">	</span><span class="STRN">"uniform mat4 mNormal;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 59</span> </span><span class="WHIT">	</span><span class="STRN">"uniform vec3 uLightDirection;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 60</span> </span><span class="WHIT">	</span><span class="STRN">"uniform vec4 uLightAmbient;"</span><span class="PUNC">,</span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'> 61</span> </span><span class="WHIT">	</span><span class="STRN">"uniform vec4 uLightDiffuse;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 62</span> </span><span class="WHIT">	</span><span class="STRN">"uniform vec4 uMaterialDiffuse;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 63</span> </span><span class="WHIT">	</span><span class="STRN">"uniform bool uUseShading;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 64</span> </span><span class="WHIT">    </span><span class="STRN">"uniform bool uUseVertexColors;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 65</span> </span><span class="WHIT">    </span><span class="STRN">"uniform bool uUseLightTranslation;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 66</span> </span><span class="WHIT">    </span><span class="STRN">"uniform bool uUseTextures;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 67</span> </span><span class="WHIT">	</span><span class="STRN">"varying vec4 vFinalColor;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="WHIT">    </span><span class="STRN">"varying vec2 vTextureCoords;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 69</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT">    </span><span class="STRN">"void main(void) {"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">    </span><span class="STRN">"	gl_Position = mModelViewPerspective * vec4(aVertexPosition, 1.0);"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 72</span> </span><span class="WHIT">    </span><span class="STRN">"	gl_PointSize = uPointSize;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 73</span> </span><span class="WHIT">    </span><span class="STRN">"	if (uUseVertexColors) {"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 74</span> </span><span class="WHIT">    </span><span class="STRN">"		vFinalColor = vec4(aVertexColor,1.0);"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 75</span> </span><span class="WHIT">    </span><span class="STRN">"	}"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 76</span> </span><span class="WHIT">    </span><span class="STRN">"   else {"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 77</span> </span><span class="WHIT">    </span><span class="STRN">"       vFinalColor = uMaterialDiffuse;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 78</span> </span><span class="WHIT">    </span><span class="STRN">"   }"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 79</span> </span><span class="WHIT">    </span><span class="STRN">"	if (uUseShading){"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="WHIT">    </span><span class="STRN">"		vec3 N = vec3(mNormal * vec4(aVertexNormal, 1.0));"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="WHIT">	</span><span class="STRN">"		vec3 L = normalize(uLightDirection);"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 82</span> </span><span class="WHIT">	</span><span class="STRN">"		if (uUseLightTranslation){ L = vec3(mNormal * vec4(L,1.0));}"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 83</span> </span><span class="WHIT">	</span><span class="STRN">"		float lambertTerm = max(dot(N,-L),0.4);"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 84</span> </span><span class="WHIT">	</span><span class="STRN">"		vec4 Ia = uLightAmbient;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 85</span> </span><span class="WHIT">	</span><span class="STRN">"		vec4 Id = vFinalColor * uLightDiffuse * lambertTerm;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 86</span> </span><span class="WHIT">    </span><span class="STRN">"		vFinalColor = Ia + Id;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 87</span> </span><span class="WHIT">	</span><span class="STRN">"		vFinalColor.a = uMaterialDiffuse.a;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 88</span> </span><span class="WHIT">	</span><span class="STRN">"	}"</span><span class="WHIT"> </span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 89</span> </span><span class="WHIT">	</span><span class="STRN">"   if (uUseTextures){"</span><span class="WHIT"> </span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 90</span> </span><span class="WHIT">	</span><span class="STRN">"       vTextureCoords = aVertexTextureCoords;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="WHIT">    </span><span class="STRN">"   }"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="WHIT">	</span><span class="STRN">"}"</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">join</span><span class="PUNC">(</span><span class="STRN">'\n'</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="WHIT">    </span><span class="NAME">FRAGMENT_SHADER</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="WHIT">
+<span class='line'> 95</span> </span><span class="WHIT">    </span><span class="STRN">"#ifdef GL_ES"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 96</span> </span><span class="WHIT">    </span><span class="STRN">"precision highp float;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 97</span> </span><span class="WHIT">    </span><span class="STRN">"#endif"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 98</span> 
+<span class='line'> 99</span> </span><span class="WHIT">    </span><span class="STRN">"varying vec4      vFinalColor;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>100</span> </span><span class="WHIT">    </span><span class="STRN">"varying vec2      vTextureCoords;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>101</span> </span><span class="WHIT">    </span><span class="STRN">"uniform bool      uUseTextures;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>102</span> </span><span class="WHIT">    </span><span class="STRN">"uniform sampler2D uSampler;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>103</span> 
+<span class='line'>104</span> </span><span class="WHIT">    </span><span class="STRN">"void main(void)  {"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">    </span><span class="STRN">"   if (uUseTextures){"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>106</span> </span><span class="WHIT">    </span><span class="STRN">"       gl_FragColor = texture2D(uSampler, vTextureCoords);"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>107</span> </span><span class="WHIT">    </span><span class="STRN">"   }"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>108</span> </span><span class="WHIT">    </span><span class="STRN">"   else{"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>109</span> </span><span class="WHIT">    </span><span class="STRN">"		gl_FragColor = vFinalColor;"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>110</span> </span><span class="WHIT">    </span><span class="STRN">"   }"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>111</span> </span><span class="WHIT">    </span><span class="STRN">"}"</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">join</span><span class="PUNC">(</span><span class="STRN">'\n'</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>112</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>113</span> </span><span class="WHIT">    </span><span class="NAME">DEFAULTS</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>114</span> </span><span class="WHIT">        </span><span class="STRN">"uLightDirection"</span><span class="WHIT"> 	</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NUMB">0.0</span><span class="PUNC">,</span><span class="NUMB">0.0</span><span class="PUNC">,</span><span class="PUNC">-</span><span class="NUMB">1.0</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>115</span> </span><span class="WHIT">        </span><span class="STRN">"uLightAmbient"</span><span class="WHIT">   	</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NUMB">0.0</span><span class="PUNC">,</span><span class="NUMB">0.0</span><span class="PUNC">,</span><span class="NUMB">0.0</span><span class="PUNC">,</span><span class="NUMB">1.0</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>116</span> </span><span class="WHIT">        </span><span class="STRN">"uLightDiffuse"</span><span class="WHIT">   	</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NUMB">1.0</span><span class="PUNC">,</span><span class="NUMB">1.0</span><span class="PUNC">,</span><span class="NUMB">1.0</span><span class="PUNC">,</span><span class="NUMB">1.0</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="WHIT">        </span><span class="STRN">"uMaterialDiffuse"</span><span class="WHIT"> 	</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NUMB">0.9</span><span class="PUNC">,</span><span class="NUMB">0.9</span><span class="PUNC">,</span><span class="NUMB">0.9</span><span class="PUNC">,</span><span class="NUMB">1.0</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>118</span> </span><span class="WHIT">        </span><span class="STRN">"uPointSize"</span><span class="WHIT">		</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">1.0</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>119</span> </span><span class="WHIT">        </span><span class="STRN">"uUseLightTranslation"</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="WHIT">
+<span class='line'>120</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>121</span> </span><span class="PUNC">}</span><span class="PUNC">;</span></pre></body></html>

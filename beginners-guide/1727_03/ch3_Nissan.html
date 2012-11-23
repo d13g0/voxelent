@@ -1,0 +1,446 @@
+<html>
+
+<head>
+<title>WebGL Beginner's Guide - Chapter 3 - Nissan GTS with Shading</title>
+
+<!-- CSS Styles //-->
+<link href='css/style.css' 		type='text/css' rel='stylesheet'>
+<link href='css/desert.css' 	type='text/css' rel='stylesheet'/>
+<link href='css/colorpicker.css' 	type='text/css' rel='stylesheet'/>
+<link href='css/smoothness/jquery-ui-1.8.13.custom.css' type='text/css' rel='stylesheet' />
+
+<!-- JavaScript Libraries //-->
+<script type='text/javascript' src='js/gl-matrix-min.js'></script>
+<script type='text/javascript' src='js/jquery-1.5.1.min.js'></script>
+<script type='text/javascript' src='js/jquery-ui-1.8.13.custom.min.js'></script> 
+<script type='text/javascript' src='js/prettify.js'></script>
+<script type='text/javascript' src='js/utils.js'></script>
+<script type='text/javascript' src='js/colorpicker.js'></script>
+<script type='text/javascript' src='js/codeview.js'></script>
+
+
+<script id="shader-vs" type="x-shader/x-vertex">
+attribute vec3 aVertexPosition;
+attribute vec3 aVertexNormal;
+
+uniform mat4 uMVMatrix; 
+uniform mat4 uPMatrix; 
+uniform mat4 uNMatrix; 
+
+uniform vec3 uLightPosition;
+
+varying vec3 vNormal;
+varying vec3 vLightRay;
+varying  vec3 vEyeVec;
+
+void main(void) {
+
+	vec4 vertex = uMVMatrix * vec4(aVertexPosition, 1.0);
+    
+    vNormal = vec3(uNMatrix * vec4(aVertexNormal, 1.0));
+    
+    vec4 light = vec4(uLightPosition,1.0);
+	
+    vLightRay = vertex.xyz - light.xyz;
+	
+    vEyeVec = -vec3(vertex.xyz);
+    
+    gl_Position = uPMatrix * vertex;
+	
+}
+</script>
+
+<script id="shader-fs" type="x-shader/x-fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+
+uniform float uShininess;       // 
+uniform vec3 uLightAmbient;     //ambient color
+uniform vec3 uMaterialDiffuse;      //diffuse color
+uniform vec3 uMaterialSpecular;       //specular color
+
+varying vec3 vNormal;
+varying  vec3 vLightRay;
+varying  vec3 vEyeVec;
+
+void main(void)
+{
+	vec3 L = normalize(vLightRay);
+	vec3 N = normalize(vNormal);
+	
+	
+	float lambertTerm = dot(N,-L);
+	
+	vec3 finalColor = uLightAmbient;
+	
+	if(lambertTerm > 0.0)
+	{
+		finalColor += uMaterialDiffuse * lambertTerm;	
+		
+		vec3 E = normalize(vEyeVec);
+		vec3 R = reflect(L, N);
+		float specular = pow( max(dot(R, E), 0.0), uShininess);
+		finalColor += uMaterialSpecular * specular;
+	}
+	
+	gl_FragColor = vec4(finalColor, 1.0);
+
+}
+</script>
+
+<script id="code-js" type="text/javascript">
+    
+var gl = null; // WebGL context
+var prg = null; // The program (shaders)
+var c_width = 0; // Variable to store the width of the canvas
+var c_height = 0; // Variable to store the height of the canvas
+
+var clearColor = [0.1,0.1,0.1,1.0];
+var distance = -2000;
+
+var part = [];    //PARTS LOADED
+var vbo = [];
+var ibo = [];
+var nbo = [];
+
+
+var mvMatrix = mat4.create(); // The Model-View matrix
+var pMatrix = mat4.create(); // The projection matrix
+var nMatrix = mat4.create(); // The normal matrix
+
+var animateFlag = false;
+var angle = 0;
+
+    
+/*
+* The program contains a series of instructions that tell the Graphic Processing Unit (GPU)
+* what to do with every vertex and fragment that we pass it. (more about this on chapter 3)
+* The vertex shader and the fragment shader together are called the program.
+*/
+function initProgram() {
+    var fgShader = utils.getShader(gl, "shader-fs");
+    var vxShader = utils.getShader(gl, "shader-vs");
+
+    prg = gl.createProgram();
+    gl.attachShader(prg, vxShader);
+    gl.attachShader(prg, fgShader);
+    gl.linkProgram(prg);
+
+    if (!gl.getProgramParameter(prg, gl.LINK_STATUS)) {
+        alert("Could not initialise shaders");
+    }
+
+    gl.useProgram(prg);
+
+    prg.aVertexPosition     = gl.getAttribLocation(prg, "aVertexPosition");
+    prg.uPMatrix            = gl.getUniformLocation(prg, "uPMatrix");
+    prg.uMVMatrix           = gl.getUniformLocation(prg, "uMVMatrix");
+    prg.aVertexNormal       = gl.getAttribLocation(prg, "aVertexNormal");
+    
+    prg.uNMatrix            = gl.getUniformLocation(prg,"uNMatrix");
+    prg.uLightAmbient       = gl.getUniformLocation(prg,"uLightAmbient");
+    prg.uLightPosition      = gl.getUniformLocation(prg,"uLightPosition");
+    prg.uMaterialSpecular      = gl.getUniformLocation(prg,"uMaterialSpecular");
+    prg.uMaterialDiffuse    = gl.getUniformLocation(prg,"uMaterialDiffuse");
+    
+    prg.uShininess          = gl.getUniformLocation(prg,"uShininess");
+}	
+
+function initLights(){
+    gl.uniform3f(prg.uLightPosition, 31000, 14000, 24000);
+    gl.uniform3f(prg.uLightAmbient,0.1,0.1,0.1);
+	gl.uniform3f(prg.uMaterialSpecular, 0.5,0.5,0.5);	
+	gl.uniform3f(prg.uMaterialDiffuse, 0.8,0.8,0.8);
+    gl.uniform1f(prg.uShininess, 24.0);
+}	
+    
+/**
+* Creates an AJAX request to load a model asynchronously
+*/
+function loadModel(){
+  for(var i = 1; i < 179; i++){
+        var filename = 'models/nissan_gts/pr'+i+'.json';
+        loadPart(filename);
+   }
+ 
+ 
+}
+
+function loadPart(filename){
+    var request = new XMLHttpRequest();
+    console.info('Requesting ' + filename);
+    request.open("GET",filename);
+    
+    request.onreadystatechange = function() {
+      if (request.readyState == 4) {
+        if(request.status == 404) {
+            console.info(filename + ' does not exist');
+         }
+        else {
+            handleLoadedPart(filename,JSON.parse(request.responseText));
+        }
+      }
+    }
+    request.send();
+}
+
+/**
+* Creates the buffers that contain the geometry of the model
+*/
+function handleLoadedPart(filename,payload) {
+    
+    console.info(filename + ' has been retrieved from the server');
+    
+    var vertexBufferObject = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferObject);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(payload.vertices), gl.STATIC_DRAW);
+    
+           
+    var normalBufferObject = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, normalBufferObject);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(utils.calculateNormals(payload.vertices, payload.indices)), gl.STATIC_DRAW);
+    
+    var indexBufferObject = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBufferObject);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(payload.indices), gl.STATIC_DRAW);
+        
+    
+    vbo.push(vertexBufferObject);
+    ibo.push(indexBufferObject);
+    nbo.push(normalBufferObject);
+    
+    
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ARRAY_BUFFER,null);
+    
+    part.push(payload);
+}
+
+/**
+* Draws the scene
+*/
+function drawScene(){
+    
+    gl.clearColor(clearColor[0],clearColor[1],clearColor[2],clearColor[3]);
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LEQUAL);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.viewport(0,0,c_width, c_height);
+    
+    mat4.perspective(45, c_width / c_height, 100, 10000.0, pMatrix);
+    mat4.identity(mvMatrix);
+    mat4.translate(mvMatrix, [0.0, -200.0, distance]); //Sets the camera to a reasonable distance to view the part
+    mat4.rotate(mvMatrix, 17 * Math.PI /180, [1,0,0]);
+    mat4.rotate(mvMatrix, angle * Math.PI / 180, [0, 1, 0]);
+    
+    gl.uniformMatrix4fv(prg.uPMatrix, false, pMatrix);
+    gl.uniformMatrix4fv(prg.uMVMatrix, false, mvMatrix);
+    
+    mat4.set(mvMatrix, nMatrix);
+    mat4.inverse(nMatrix);
+    mat4.transpose(nMatrix);
+    
+    gl.uniformMatrix4fv(prg.uNMatrix, false, nMatrix);
+    
+    
+    
+    
+    for(var i = 0; i < part.length; i++){
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbo[i]);
+        gl.vertexAttribPointer(prg.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(prg.aVertexPosition);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, nbo[i]);
+        gl.vertexAttribPointer(prg.aVertexNormal, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(prg.aVertexNormal);
+    
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo[i]);
+        gl.drawElements(gl.TRIANGLES, part[i].indices.length, gl.UNSIGNED_SHORT,0);
+    }
+    
+}
+
+
+
+
+var lastTime = 0;
+
+/**
+* Updates the angle of rotation by a little bit each time
+*/
+function animate() {
+    var timeNow = new Date().getTime();
+    if (lastTime != 0) {
+        var elapsed = timeNow - lastTime;
+        if (animateFlag) angle += (90 * elapsed) / 10000.0;
+    }
+    lastTime = timeNow;
+}
+
+/**
+* Render Loop
+*/
+function renderLoop() {
+    utils.requestAnimFrame(renderLoop);
+    drawScene();
+    animate();
+}
+/**
+* Executes the WebGL application
+* This function is invoked on the onLoad event of the webpage. 
+*/
+function runWebGLApp(){
+    //Obtains a WebGL context
+    gl = utils.getGLContext('canvas-element-id');
+    //Initializes the program (shaders). More about this on chapter 3!
+    initProgram();
+    //Init Lights!
+    initLights();
+    //Initializes the buffers that we are going to use to draw the part (vertex buffer and index buffer)
+    loadModel();
+    //Draws the part!
+    renderLoop();
+}
+</script>
+</head>
+
+<body onLoad='runWebGLApp()'>
+<div id='top'>
+<h1>WebGL Beginner's Guide - Chapter 3</h1>
+<h2>Nissan GTS - Phong Lighting Model</h2>
+<div id='logo-packt'><img src='packt.gif'/></div>
+<p></p>
+</div>
+
+<div id='contents'>
+<div id='canvasContainer'>
+<canvas id='canvas-element-id' width='480' height='400'>
+Your browser does not support the HTML5 canvas element.
+</canvas>
+</div>
+</div>
+
+<div id='bottom'>
+<table style='padding=0px'>
+<tr>
+<td>X:</td><td id='slider-x-value' width='30px'>31</td><td width='150px'><div id='slider-x'/></td>
+<td>Shininess:</td><td id='slider-shininess-value'>40</td><td width='150px'><div id='slider-shininess'/></td>
+<td>Car Color (material diffuse property):</td><td><div id='colorSelectorCar' class='colorSelector'><div style='background-color:rgb(204,204,204)'></div></div></td>
+</tr>
+<tr>
+<td>Y:</td><td id='slider-y-value'  width='30px'>99</td><td width='150px'><div id='slider-y'/></td>
+<td>Distance:</td><td id='slider-distance-value'>200</td><td width='150px'><div id='slider-distance'/></td>
+<td>Background Color (gl.clearColor):</td><td colspan='2'><div id='colorSelectorBg' class='colorSelector'><div style='background-color:rgb(28,28,28)'></div></div></td> 
+</tr>
+<tr>
+<td>Z:</td> <td id='slider-z-value'  width='30px'>24</td><td width='150px'><div id='slider-z'/></td>
+<td><label id='lblanimate' for='animate-btn'>Animate</label><input id='animate-btn' type='checkbox'/></td>
+</tr>
+</table>
+</div>
+<script>cview.run(cview.MODE_VIEW);</script>
+<script> 
+
+$('#slider-shininess').slider({value:24, min:1, max:200, step:1, slide:updateShininess});
+$('#slider-distance').slider({value:200, min:40, max:250, step:1, slide:updateDistance});
+$('#slider-x').slider({value:31, min:-200, max:200, step:1, slide:updateLight, change:updateLight});
+$('#slider-y').slider({value:14, min:-200, max:200, step:1, slide:updateLight, change:updateLight});
+$('#slider-z').slider({value:24, min:-200, max:200, step:1, slide:updateLight, change:updateLight});
+
+
+$('#animate-btn').button();
+$('#animate-btn').click(
+function(){
+    if ($('#animate-btn:checked').val()==null){
+        animateFlag = false;
+    }
+    else{
+        animateFlag = true;
+    }
+});
+function updateShininess(){
+    var v = $('#slider-shininess').slider("value");
+    gl.uniform1f(prg.uShininess, v);
+    $('#slider-shininess-value').html(v);
+}
+
+
+
+function updateLight(){
+    var x = $('#slider-x').slider("value");
+    var y = $('#slider-y').slider("value");
+    var z = $('#slider-z').slider("value");
+    gl.uniform3fv(prg.uLightPosition, [x*1000,y*1000,z*1000]);
+    $('#slider-x-value').html(x);
+    $('#slider-y-value').html(y);
+    $('#slider-z-value').html(z);
+}
+
+
+function updateDistance(){
+    var d = $('#slider-distance').slider("value");
+    distance = -d * 10;
+    $('#slider-distance-value').html(d);
+}
+
+function updateClearColor(r,g,b){
+    clearColor = [r,g,b,1.0];
+}
+
+function updateObjectColor(r,g,b){
+    gl.uniform3fv(prg.uMaterialDiffuse,[r,g,b]); 
+}
+
+$('#colorSelectorCar').ColorPicker({
+onSubmit: function(hsb, hex, rgb, el) {
+        $(el).val(hex);
+        $(el).ColorPickerHide();
+
+    },
+color: '#00ff00',
+onShow: function (colpkr) {
+        $(colpkr).fadeIn(500);
+        return false;
+    },
+onHide: function (colpkr) {
+        $(colpkr).fadeOut(500);
+        return false;
+    },
+onChange: function (hsb, hex, rgb) {
+        $('#colorSelectorCar div').css('backgroundColor', '#' + hex);
+        updateObjectColor(rgb.r/256,rgb.g/256,rgb.b/256);
+    },
+    
+onBeforeShow: function (colpkr) {
+        $(colpkr).ColorPickerSetColor('rgb(0.5,0.8,0.1)');
+    }
+})
+
+$('#colorSelectorBg').ColorPicker({
+    onSubmit: function(hsb, hex, rgb, el) {
+   $(el).val(hex);
+   $(el).ColorPickerHide();
+   
+ },
+ color: '#00ff00',
+    onShow: function (colpkr) {
+        $(colpkr).fadeIn(500);
+        return false;
+    },
+    onHide: function (colpkr) {
+        $(colpkr).fadeOut(500);
+        return false;
+    },
+    onChange: function (hsb, hex, rgb) {
+        $('#colorSelectorBg div').css('backgroundColor', '#' + hex);
+        updateClearColor(rgb.r/256,rgb.g/256,rgb.b/256);
+    },
+    
+    onBeforeShow: function (colpkr) {
+   $(colpkr).ColorPickerSetColor('rgb(0.5,0.8,0.1)');
+  }
+ }) 
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+#header
+{
+	height: 80px;
+	background-color: #fff;
+	margin-bottom: 10px;
+}
+
+#nav
+{
+	float: left;
+	width: 29%;
+	height: 80%;
+	background-color: #fff;
+	margin-bottom: 1px;
+}
+
+#content
+{
+	float: right;
+	margin-left: 1%;
+	width: 70%;
+	height: 80%;
+	background-color: #ccc;
+	margin-bottom: 1px;
+}
+
+

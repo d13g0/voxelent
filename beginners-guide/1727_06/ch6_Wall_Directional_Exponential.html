@@ -1,0 +1,457 @@
+<html>
+
+<head>
+<title>WebGL Beginner's Guide - Chapter 6 - Using Colors on Lights</title>
+<meta http-equiv='content-type' content='text/html; charset=ISO-8859-1'>
+
+<!-- CSS Styles //-->
+<link href='css/styles.css'   type='text/css' rel='stylesheet'>
+<link href='css/prettify_desert.css'  type='text/css' rel='stylesheet'/>
+<link href='css/colorpicker.css'  type='text/css' rel='stylesheet'/>
+
+<link href='css/smoothness/jquery-ui-1.8.13.custom.css' type='text/css' rel='stylesheet' />
+<!-- GUI Libraries //-->
+<script type='text/javascript' src='js/gui/jquery-1.5.1.min.js'></script>
+<script type='text/javascript' src='js/gui/jquery-ui-1.8.13.custom.min.js'></script> 
+<script type='text/javascript' src='js/gui/colorpicker.js'></script>
+<script type='text/javascript' src='js/gui/prettify.js'></script>
+<script type='text/javascript' src='js/gui/codeview.js'></script>
+<!-- MATH Libraries //-->
+<script type='text/javascript' src='js/math/gl-matrix-min.js'></script>
+<!-- WEBGL Libraries //-->
+<script type='text/javascript' src='js/webgl/Globals.js'></script>
+<script type='text/javascript' src='js/webgl/Utils.js'></script>
+<script type='text/javascript' src='js/webgl/Program.js'></script>
+<script type='text/javascript' src='js/webgl/Scene.js'></script>
+<script type='text/javascript' src='js/webgl/Axis.js'></script>
+<script type='text/javascript' src='js/webgl/Floor.js'></script>
+<script type='text/javascript' src='js/webgl/Camera.js'></script>
+<script type='text/javascript' src='js/webgl/CameraInteractor.js'></script>
+<script type='text/javascript' src='js/webgl/SceneTransforms.js'></script>
+<script type='text/javascript' src='js/webgl/Lights.js'></script>
+<script type='text/javascript' src='js/webgl/WebGLApp.js'></script>
+
+
+
+<script id="shader-vs" type="x-shader/x-vertex">
+//geometry
+attribute vec3 aVertexPosition;
+attribute vec3 aVertexNormal;
+attribute vec4 aVertexColor;
+//matrices
+uniform mat4 uMVMatrix;
+uniform mat4 uPMatrix;
+uniform mat4 uNMatrix;
+//lights
+const int numLights = 3;
+uniform vec3 uLightPosition[numLights];
+uniform vec3 uLightDirection[numLights];
+//varyings
+varying vec3 vNormal[numLights];
+varying vec3 vLightRay[numLights];
+
+
+void main(void) {
+
+ //Transformed vertex position
+ vec4 vertex = uMVMatrix * vec4(aVertexPosition, 1.0);
+ 
+ //Transformed normal position
+ vec3 normal = vec3(uNMatrix * vec4(aVertexNormal, 1.0));
+
+ //Calculate normals and light rays
+ for(int i = 0; i < numLights; i++){
+	vec4 positionLight = uMVMatrix * vec4(uLightPosition[i],1.0);
+	vec3 directionLight = vec3(uNMatrix * vec4(uLightDirection[i], 1.0));
+	vNormal[i] = normal - directionLight;
+    vLightRay[i] = vertex.xyz-positionLight.xyz;
+  }
+ 
+ //Final vertex position
+ gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+
+}	
+</script>
+
+<script id="shader-fs" type="x-shader/x-fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+
+//geometry
+uniform vec4 uMaterialAmbient;
+uniform vec4 uMaterialDiffuse;  
+uniform bool uWireframe;
+uniform bool uLightSource;
+//lights
+const int numLights = 3;
+uniform float uCutOff; 
+uniform vec4 uLightAmbient;
+uniform vec3 uLightDirection[numLights];
+uniform vec4 uLightDiffuse[numLights];
+//varyings
+varying vec3 vNormal[numLights];
+varying vec3 vLightRay[numLights];
+
+void main(void)
+{
+	if(uWireframe || uLightSource){
+		gl_FragColor = uMaterialDiffuse;
+	}
+	else{
+		//Ambient Term  
+		vec4 Ia = uLightAmbient * uMaterialAmbient;
+		vec4 finalColor = vec4(0.0,0.0,0.0,1.0);
+		
+		vec3 L = vec3(0.0);
+		vec3 N = vec3(0.0);
+		float lambertTerm = 0.0;
+		
+		for(int i = 0; i < numLights; i++){
+
+			L = normalize(vLightRay[i]);
+			N = normalize(vNormal[i]);
+			
+			lambertTerm	= dot(N,-L);
+
+			finalColor += uLightDiffuse[i] * uMaterialDiffuse * pow(lambertTerm, 10.0 * uCutOff);//Add diffuse component, one per light
+		}
+
+    	//Final color
+        //finalColor  += Ia;
+        finalColor.a = 1.0;				//Add ambient component: one for all					
+    	gl_FragColor = finalColor;		//The alpha value in this example will be 1.0
+    }
+}
+</script>
+
+<script id='code-js' type="text/javascript">
+
+var camera = null;
+var interactor = null;
+var transforms = null;
+
+function configure(){
+    gl.clearColor(0.3,0.3,0.3, 1.0);
+    gl.clearDepth(1.0);
+	gl.enable(gl.DEPTH_TEST);
+	gl.depthFunc(gl.LEQUAL);
+
+    //Creates and sets up the camera location
+    camera = new Camera(CAMERA_ORBITING_TYPE);
+    camera.goHome([0,5,30]);
+    camera.setFocus([0.0,0.0,0.0]);
+	camera.setElevation(-3);
+    camera.hookRenderer = draw;
+    
+    //Creates and sets up the mouse and keyboard interactor
+    interactor = new CameraInteractor(camera, document.getElementById('canvas-element-id'));
+    
+    //Scene Transforms
+    transforms = new SceneTransforms(camera);
+   
+    //init transforms
+    transforms.init();
+	
+	//init lights
+	var red = new Light('red');
+	red.setPosition([0, 7, 3]);
+	red.setDiffuse([1.0,0.0,0.0,1.0]);
+	red.setProperty('direction',[0,-2,-0.1]);
+	Lights.add(red);
+	
+	var green = new Light('green');
+	green.setPosition([4, 3, 3]);
+	green.setDiffuse([0.0,1.0,0.0,1.0]);
+	green.setProperty('direction',[-0.5,1,-0.1]);
+	Lights.add(green);
+	
+	var blue = new Light('blue');
+	blue.setPosition([-4,3, 3]);
+	blue.setDiffuse([0.0,0.0,1.0,1.0]);
+	blue.setProperty('direction',[0.5,1,-0.1]);
+	Lights.add(blue);
+	
+	//init program
+	attributeList = ["aVertexPosition",
+					"aVertexNormal",
+					"aVertexColor"];
+
+	uniformList = [	"uPMatrix", 
+					"uMVMatrix", 
+					"uNMatrix",
+					"uWireframe",
+					"uMaterialDiffuse",
+					"uMaterialAmbient",
+					"uLightAmbient",
+					"uLightDiffuse",
+				    "uLightDirection",
+					"uLightPosition",
+					"uLightSource",
+					"uCutOff"
+					];
+	
+	
+	Program.load(attributeList, uniformList);
+	gl.uniform4fv(Program.uLightAmbient ,  [1.0,1.0,1.0,1.0]);
+	gl.uniform3fv(Program.uLightPosition,    Lights.getArray('position'));
+	gl.uniform3fv(Program.uLightDirection,   Lights.getArray('direction'));
+	gl.uniform4fv(Program.uLightDiffuse,	 Lights.getArray('diffuse'));
+	gl.uniform1f(Program.uCutOff, 0.55);
+}
+
+
+/**
+* Loads the scene
+*/
+function load(){
+  
+    Floor.build(80,2);
+    Scene.addObject(Floor);
+    Scene.loadObject('models/geometry/wall.json','wall');
+	Scene.loadObject('models/geometry/smallsph.json','light1');
+	Scene.loadObject('models/geometry/smallsph.json','light2');
+	Scene.loadObject('models/geometry/smallsph.json','light3');
+}
+
+
+/**
+* invoked on every rendering cycle
+*/
+function draw() {
+    gl.viewport(0, 0, c_width, c_height);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    transforms.updatePerspective();
+    
+    try{
+        gl.uniform3fv(Program.uLightPosition, Lights.getArray('position'));
+        
+        for (var i = 0; i < Scene.objects.length; i++){
+            
+            var object = Scene.objects[i];
+			
+			transforms.calculateModelView();           
+            transforms.push();
+			
+			gl.uniform1i(Program.uLightSource,false);
+			
+			if (object.alias == 'light1'){
+                mat4.translate(transforms.mvMatrix,Lights.get('red').position);
+				object.diffuse = Lights.get('red').diffuse;
+				gl.uniform1i(Program.uLightSource,true);
+                
+            }
+			
+			if (object.alias == 'light2'){
+				mat4.translate(transforms.mvMatrix, Lights.get('green').position);
+				object.diffuse = Lights.get('green').diffuse;
+				gl.uniform1i(Program.uLightSource,true);
+			}
+			
+			if (object.alias == 'light3'){
+				mat4.translate(transforms.mvMatrix, Lights.get('blue').position);
+				object.diffuse = Lights.get('blue').diffuse;
+				gl.uniform1i(Program.uLightSource,true);
+			}
+			
+            transforms.setMatrixUniforms();
+            transforms.pop();
+   
+            //Setting uniforms
+            gl.uniform4fv(Program.uMaterialDiffuse, object.diffuse);
+            gl.uniform4fv(Program.uMaterialAmbient, object.ambient);
+            gl.uniform1i(Program.uWireframe,object.wireframe);
+            
+            //Setting attributes
+            gl.enableVertexAttribArray(Program.aVertexPosition);
+            gl.disableVertexAttribArray(Program.aVertexNormal);
+            gl.disableVertexAttribArray(Program.aVertexColor);
+            
+            gl.bindBuffer(gl.ARRAY_BUFFER, object.vbo);
+            gl.vertexAttribPointer(Program.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(Program.aVertexPosition);
+            
+			if(!object.wireframe){
+				gl.bindBuffer(gl.ARRAY_BUFFER, object.nbo);
+				gl.vertexAttribPointer(Program.aVertexNormal, 3, gl.FLOAT, false, 0, 0);
+				gl.enableVertexAttribArray(Program.aVertexNormal);
+            }
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, object.ibo);
+			
+			if (object.wireframe){
+                gl.drawElements(gl.LINES, object.indices.length, gl.UNSIGNED_SHORT,0);
+            }
+            else{
+                gl.drawElements(gl.TRIANGLES, object.indices.length, gl.UNSIGNED_SHORT,0);
+            }
+			
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+            
+        }
+    }
+    catch(err){
+        alert(err);
+        console.error(err.description);
+    }
+}
+
+
+/**
+* Entry point. This function is invoked when the page is loaded
+*/
+var app = null;
+function runWebGLApp() {
+    app = new WebGLApp("canvas-element-id")
+    app.configureGLHook = configure;
+    app.loadSceneHook   = load;
+    app.drawSceneHook   = draw;
+    app.run();
+}
+</script>
+</head>
+
+<body onLoad='runWebGLApp()'>
+<div id='top'>
+<h1>WebGL Beginner's Guide - Chapter 6</h1>
+<h2>Hero - Using Colors in Directional Lights</h2>
+<div id='logo-packt'><img src='packt.gif'/></div>
+<p></p>
+</div>
+
+<div id='contents'>
+<div id='canvasContainer'>
+<canvas id='canvas-element-id' width='480' height='400'>
+Your browser does not support the HTML5 canvas element.
+</canvas>
+</div>
+</div>
+
+<div id='bottom'>
+<table style='padding=0px'>
+<tr>
+	<td>
+	<table>
+		<tr>
+			<td> Light #1:</td><td><div id='colorSelectorLightOne' class='colorSelector'><div style='background-color:rgb(255,0,0)'></div></div></td>
+			<td>X:</td><td id='slider-x1-value' width='30px'>0.0</td><td width='150px'><div id='slider-x1'/></td>
+			<td>Y:</td><td id='slider-y1-value' width='30px'>7.0</td><td width='150px'><div id='slider-y1'/></td>
+			<td>Z:</td><td id='slider-z1-value' width='30px'>3.0</td><td width='150px'><div id='slider-z1'/></td>
+		</tr>
+		<tr>
+			<td> Light #2:</td><td><div id='colorSelectorLightTwo' class='colorSelector'><div style='background-color:rgb(0,255,0)'></div></div></td>
+			<td>X:</td><td id='slider-x2-value' width='30px'>2.5</td><td width='150px'><div id='slider-x2'/></td>
+			<td>Y:</td><td id='slider-y2-value' width='30px'>3.0</td><td width='150px'><div id='slider-y2'/></td>
+			<td>Z:</td><td id='slider-z2-value' width='30px'>3.0</td><td width='150px'><div id='slider-z2'/></td>
+		</tr>
+		<tr>
+			<td> Light #3:</td><td><div id='colorSelectorLightThree' class='colorSelector'><div style='background-color:rgb(0,0,255)'></div></div></td>
+			<td>X:</td><td id='slider-x3-value' width='30px'>-2.5</td><td width='150px'><div id='slider-x3'/></td>
+			<td>Y:</td><td id='slider-y3-value' width='30px'>3.0</td><td width='150px'><div id='slider-y3'/></td>
+			<td>Z:</td><td id='slider-z3-value' width='30px'>3.0</td><td width='150px'><div id='slider-z3'/></td>
+		</tr>
+	</table>
+	</td>
+</tr>	
+<tr>
+    <td> 
+    <table cellspacing=4px style='vertical-align:top'>
+		<tr>
+			<td>Light Cone CutOff:</td><td id='slider-cutoff-value'>0.55</td><td width='150px'><div id='slider-cutoff'/></td>
+		</tr>
+        <tr>
+            <td align='center'>
+            <div id='opt-type' >
+                    <input type='radio' id='opt-tracking' name='typecam' /><label for='opt-tracking'>Tracking</label>
+                    <input type='radio' id='opt-orbiting' name='typecam' checked='checked'/><label for='opt-orbiting'>Orbiting</label>
+            </div>
+            </td>
+            <td align='center'>
+				<button id='btnGoHome'>Go Home</button>
+            </td>
+        </tr>
+    </table>
+    </td>
+</tr>
+</table>
+</div>
+<script> 
+
+
+$('#slider-x1').slider({value:0.0, min:-15, max:15, step:0.1, slide:function(){updateLightPosition(1)}, 	change:function(){updateLightPosition(1)}});
+$('#slider-y1').slider({value:7.0, min:-15, max:15, step:0.1, slide:function(){updateLightPosition(1)}, 	change:function(){updateLightPosition(1)}});
+$('#slider-z1').slider({value:3.0, min:-15, max:15, step:0.1, slide:function(){updateLightPosition(1)}, 	change:function(){updateLightPosition(1)}});
+
+$('#slider-x2').slider({value:2.5, min:-15, max:15, step:0.1, slide:function(){updateLightPosition(2)}, 	change:function(){updateLightPosition(2)}});
+$('#slider-y2').slider({value:3.0, min:-15, max:15, step:0.1, slide:function(){updateLightPosition(2)}, 	change:function(){updateLightPosition(2)}});
+$('#slider-z2').slider({value:3.0, min:-15, max:15, step:0.1, slide:function(){updateLightPosition(2)}, 	change:function(){updateLightPosition(2)}});
+
+$('#slider-x3').slider({value:-2.5, min:-15, max:15, step:0.1, slide:function(){updateLightPosition(3)}, 	change:function(){updateLightPosition(3)}});
+$('#slider-y3').slider({value:3.0,  min:-15, max:15, step:0.1, slide:function(){updateLightPosition(3)}, 	change:function(){updateLightPosition(3)}});
+$('#slider-z3').slider({value:3.0,  min:-15, max:15, step:0.1, slide:function(){updateLightPosition(3)}, 	change:function(){updateLightPosition(3)}});
+
+$('#slider-cutoff').slider({value:0.55, min:0.0, max:1, step:0.05, slide:updateCutOff});
+
+function updateCutOff(){
+    var v = $('#slider-cutoff').slider("value");
+    gl.uniform1f(Program.uCutOff, v);
+    $('#slider-cutoff-value').html(v);
+	draw();
+}
+
+
+
+function updateLightPosition(a){
+    var x = $('#slider-x'+a).slider("value");
+    var y = $('#slider-y'+a).slider("value");
+    var z = $('#slider-z'+a).slider("value");
+    
+    $('#slider-x'+a+'-value').html(x);
+    $('#slider-y'+a+'-value').html(y);
+    $('#slider-z'+a+'-value').html(z);
+    
+    switch (a){
+    	case 1: Lights.get(0).position = [x,y,z]; break;
+    	case 2: Lights.get(1).position = [x,y,z]; break;
+    	case 3: Lights.get(2).position = [x,y,z]; break;
+    }
+    
+	draw();
+}
+
+
+$('#opt-type').buttonset();
+$('#btnGoHome').button();
+
+
+
+$('#opt-tracking').click(function(){
+    camera.goHome();
+    console.info('CameraType = Tracking');
+    camera.setType(CAMERA_TRACKING_TYPE);
+    
+    app.refresh();
+});
+
+$('#opt-orbiting').click(function(){
+    camera.goHome();
+    console.info('CameraType = Orbiting');
+    camera.setType(CAMERA_ORBITING_TYPE);
+    app.refresh();
+});
+
+
+
+
+$('#btnGoHome').click(
+    function(){
+        camera.goHome();
+        app.refresh();
+});
+
+
+
+</script>
+<script>cview.run(cview.MODE_VIEW,false,470);</script>
+</body>
+</html>

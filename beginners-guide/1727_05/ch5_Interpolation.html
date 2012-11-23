@@ -1,0 +1,755 @@
+<html>
+
+<head>
+<title>WebGL Beginner's Guide - Chapter 5 - Interpolation and Sprites</title>
+<meta http-equiv='content-type' content='text/html; charset=ISO-8859-1'>
+
+<!-- CSS Styles //-->
+<link href='css/styles.css'   type='text/css' rel='stylesheet'>
+<link href='css/prettify_desert.css'  type='text/css' rel='stylesheet'/>
+<link href='css/colorpicker.css'  type='text/css' rel='stylesheet'/>
+<link href='css/smoothness/jquery-ui-1.8.13.custom.css' type='text/css' rel='stylesheet' />
+<!-- GUI Libraries //-->
+<script type='text/javascript' src='js/gui/jquery-1.5.1.min.js'></script>
+<script type='text/javascript' src='js/gui/jquery-ui-1.8.13.custom.min.js'></script> 
+<script type='text/javascript' src='js/gui/colorpicker.js'></script>
+<script type='text/javascript' src='js/gui/prettify.js'></script>
+<script type='text/javascript' src='js/gui/codeview.js'></script>
+<!-- MATH Libraries //-->
+<script type='text/javascript' src='js/math/gl-matrix-min.js'></script>
+<!-- WEBGL Libraries //-->
+<script type='text/javascript' src='js/webgl/Globals.js'></script>
+<script type='text/javascript' src='js/webgl/Utils.js'></script>
+<script type='text/javascript' src='js/webgl/Program.js'></script>
+<script type='text/javascript' src='js/webgl/Scene.js'></script>
+<script type='text/javascript' src='js/webgl/Axis.js'></script>
+<script type='text/javascript' src='js/webgl/Floor.js'></script>
+<script type='text/javascript' src='js/webgl/Camera.js'></script>
+<script type='text/javascript' src='js/webgl/CameraInteractor.js'></script>
+<script type='text/javascript' src='js/webgl/SceneTransforms.js'></script>
+<script type='text/javascript' src='js/webgl/WebGLApp.js'></script>
+
+
+
+<script id="shader-vs" type="x-shader/x-vertex">
+
+attribute vec3 aVertexPosition;
+attribute vec3 aVertexNormal;
+attribute vec4 aVertexColor;
+
+uniform mat4 uMVMatrix;
+uniform mat4 uPMatrix;
+uniform mat4 uNMatrix;
+uniform vec3 uLightPosition;
+uniform vec4 uMaterialDiffuse;
+uniform bool uWireframe;
+uniform bool uPerVertexColor;
+uniform bool uUpdateLight;
+
+varying vec3 vNormal;
+varying vec3 vLightRay;
+varying vec3 vEyeVec;
+varying vec4 vFinalColor;
+
+void main(void) {
+	
+  if (uWireframe) {
+        if (uPerVertexColor){
+            vFinalColor = aVertexColor;
+        }
+        else{
+            vFinalColor = uMaterialDiffuse;
+        }
+    }
+
+
+ //Transformed vertex position
+ vec4 vertex = uMVMatrix * vec4(aVertexPosition, 1.0);
+ 
+ //Transformed normal position
+ vNormal = vec3(uNMatrix * vec4(aVertexNormal, 1.0));
+
+ //Transformed light position
+ vec4 light = vec4(uLightPosition,1.0);
+ 
+ if(uUpdateLight){
+     light = uMVMatrix * vec4(uLightPosition,1.0);
+  }
+	
+ //Light position
+ vLightRay = vertex.xyz-light.xyz;
+ 
+ //Vector Eye
+ vEyeVec = -vec3(vertex.xyz);
+ 
+ //Final vertex position
+ gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+
+}	
+</script>
+
+<script id="shader-fs" type="x-shader/x-fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+
+uniform bool uWireframe;
+uniform vec4 uLightAmbient;
+uniform vec4 uLightDiffuse;
+uniform vec4 uLightSpecular;
+uniform vec4 uMaterialAmbient;
+uniform vec4 uMaterialDiffuse;
+uniform vec4 uMaterialSpecular;
+uniform float uShininess;       
+
+varying vec3 vNormal;
+varying vec3 vLightRay;
+varying vec3 vEyeVec;
+varying vec4 vFinalColor;
+
+void main(void)
+{
+	if(uWireframe){
+		gl_FragColor = vFinalColor;
+	}
+	else{
+    	vec3 L = normalize(vLightRay);
+    	vec3 N = normalize(vNormal);
+
+    	//Lambert's cosine law
+    	float lambertTerm = dot(N,-L);
+    
+    	//Ambient Term  
+    	vec4 Ia = uLightAmbient * uMaterialAmbient;
+
+    	//Diffuse Term
+    	vec4 Id = vec4(0.0,0.0,0.0,1.0);
+
+    	//Specular Term
+    	vec4 Is = vec4(0.0,0.0,0.0,1.0);
+
+    	if(lambertTerm > 0.0)
+    	{
+        	Id = uLightDiffuse * uMaterialDiffuse * lambertTerm; 
+        	vec3 E = normalize(vEyeVec);
+        	vec3 R = reflect(L, N);
+        	float specular = pow( max(dot(R, E), 0.0), uShininess);
+        	Is = uLightSpecular * uMaterialSpecular * specular;
+    	}
+
+    	//Final color
+    	vec4 finalColor = Ia + Id + Is;
+    	finalColor.a = 1.0;
+    	gl_FragColor = finalColor;
+    }
+
+}
+</script>
+
+<script id='code-js' type="text/javascript">
+
+var camera = null;
+var interactor = null;
+var transforms = null;
+
+var sceneTime = 0.0;
+
+var CONTROL_POINTS = [[-25,0,20],[-40,0,-10],[0,0,10],[25,0,-5],[40,0,-20]];
+var ISTEPS = 1000;
+var DIM_X = 80;
+var DIM_Z = 80;
+
+
+
+var I_LINEAR = 0;
+var I_POLYNOMIAL = 1;
+var I_BSPLINE = 2;
+
+var INTERPOLATION_TYPE = I_LINEAR;
+
+var position = [];
+var ANIMATION_TIMER = -1;
+
+function close(c1, c0,r){
+    return (Math.sqrt((c1[0]-c0[0])*(c1[0]-c0[0])+(c1[1]-c0[1])*(c1[1]-c0[1])+(c1[2]-c0[2])*(c1[2]-c0[2])) <= r);
+}
+
+function doLinearInterpolation(){
+    position = [];
+    var start = CONTROL_POINTS[0];
+    var end = CONTROL_POINTS[CONTROL_POINTS.length-1];
+    
+    var X0 = start[0];
+    var Y0 = start[1];
+    var Z0 = start[2];
+    
+    var X1 = end[0];
+    var Y1 = end[1];
+    var Z1 = end[2];
+    
+    for (var is = 0; is < ISTEPS; is++){
+        var s = is/ISTEPS;
+        position.push([X0*(1-s)+X1*s,Y0*(1-s)+Y1*s,Z0*(1-s)+Z1*s]);
+    }
+}
+
+function doLagrangeInterpolation(){
+    position = [];
+    
+    var N = CONTROL_POINTS.length;
+    var dT = ISTEPS/(N-1);
+    
+    var D = [];
+
+    for (var i=0; i < N; i++){
+        D[i] = 1;
+        for(var j = 0; j< N; j++){
+            if (i==j) continue;
+            D[i] *= dT*(i - j);
+        }
+    }
+    
+    var Lk = function(x,axis){
+        var R = [];
+        var S = 0;
+        for(var i=0; i<N; i++){
+            R[i] = 1;
+            for(var j=0; j<N; j++){
+                if (i==j) continue;
+                R[i] *= (x-j*dT);
+            }
+            R[i] /= D[i];
+            S += (R[i] *CONTROL_POINTS[i][axis]);
+        }
+        
+        return S;
+    }
+    
+    for (var k = 0; k < ISTEPS; k++){
+        position.push([Lk(k,0),Lk(k,1),Lk(k,2)]);
+    }
+}
+
+function doBSplineInterpolation(){
+    
+    position = [];
+    
+    var N = CONTROL_POINTS.length - 1;
+    var P = 3;  //Degree
+    var U = []; //Knot Vector
+    var M = N + P + 1; //number of elements in the knot vector
+    var deltaKnot = 1/(M-(2*P));
+    
+    //Creating the knot vector (clamped):
+    //http://web.mit.edu/hyperbook/Patrikalakis-Maekawa-Cho/node17.html
+    for (var i = 0; i <= P; i++){
+        U.push(0);
+    }
+    
+    var v = deltaKnot;
+    for (var i = P+1; i< M-P+1; i++){
+        U.push(v);
+        v += deltaKnot;
+    }
+    
+    for (var i = M-P+1; i<= M; i++){
+        U.push(1);
+    }
+	
+	
+        
+    // Bo function
+	function No(u,i){
+        if (U[i] <= u && u < U[i+1]){
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    };
+    
+	// Bp function
+    function Np(u,i,p){
+        var A = 0;
+        var B = 0;
+        if (p-1 == 0) { 
+            A = No(u,i);
+            B = No(u, i+1);
+        } else { 
+            A = Np(u,i,p-1);
+            B = Np(u,i+1, p-1);
+        }
+        
+		var coeffA = 0;
+		var coeffB = 0;
+		if ( U[i+p] - U[i] != 0 ) 	  {coeffA = (u - U[i])/(U[i+p] -U[i]);}
+		if ( U[i+p+1] - U[i+1] != 0 ) {coeffB = (U[i+p+1] - u)/(U[i+p+1] - U[i+1]);}
+	    return coeffA*A + coeffB*B;
+    };
+    
+    function C(t){
+        var result = [];
+        for (var j = 0; j <3; j++){         //iterate over axes
+            var sum = 0;
+            for (var i = 0; i <= N; i++){    //iterate over control points
+                sum += CONTROL_POINTS[i][j] * Np(t,i,P);
+            }
+            result[j] = sum;
+        }
+        return result;
+    };
+    
+	
+	var dT = 1/ISTEPS;
+	var t = 0;
+    do{
+        position.push(C(t));
+		t += dT;
+    } while(t<1.0);
+	position.push(C(1.0));
+	
+
+}
+
+function interpolate(){
+   if (INTERPOLATION_TYPE == I_LINEAR){
+        doLinearInterpolation();
+    }
+    else if (INTERPOLATION_TYPE == I_POLYNOMIAL){
+        doLagrangeInterpolation();
+    }
+    else if (INTERPOLATION_TYPE == I_BSPLINE){
+        doBSplineInterpolation();
+    }
+}
+
+function configure(){
+    gl.clearColor(0.3,0.3,0.3, 1.0);
+    gl.clearDepth(100.0);
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LEQUAL);
+    
+    //Creates and sets up the camera location
+    camera = new Camera(CAMERA_ORBITING_TYPE);
+    camera.goHome([0,2,DIM_Z]);
+    camera.setElevation(-20);
+    camera.hookRenderer = draw;
+    
+    //Creates and sets up the mouse and keyboard interactor
+    interactor = new CameraInteractor(camera, document.getElementById('canvas-element-id'));
+    
+    //Scene Transforms
+    transforms = new SceneTransforms(camera);
+   
+    //init transforms
+    transforms.init();
+    
+    doLinearInterpolation();
+}
+
+
+/**
+* Loads the scene
+*/
+function load(){
+  
+    Floor.build(DIM_Z,2);
+    Axis.build(DIM_Z);
+    Scene.addObject(Floor);
+    //Scene.addObject(Axis);
+    Scene.loadObject('models/geometry/ball.json','ball'        ,{'diffuse':[0.5,0.9,0.3,1.0]});
+    Scene.loadObject('models/geometry/flag.json','flagInicio'  ,{'diffuse':[0.1,0.3,0.9,1.0]});
+    Scene.loadObject('models/geometry/flag.json','flagFin'     ,{'diffuse':[0.9,0.3,0.1,1.0]});
+    Scene.loadObject('models/geometry/flag.json','flagControl1',{'diffuse':[0.4,0.4,0.4,1.0]});
+    Scene.loadObject('models/geometry/flag.json','flagControl2',{'diffuse':[0.4,0.4,0.4,1.0]});
+    Scene.loadObject('models/geometry/flag.json','flagControl3',{'diffuse':[0.4,0.4,0.4,1.0]});
+}
+
+
+/**
+* invoked on every rendering cycle
+*/
+function draw() {
+    gl.viewport(0, 0, c_width, c_height);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    transforms.updatePerspective();
+    
+    try{
+        gl.uniform1i(prg.uUpdateLight,updateLightPosition);
+        
+        for (var i = 0; i < Scene.objects.length; i++){
+            
+            var object = Scene.objects[i];
+			
+			transforms.calculateModelView();           
+            transforms.push();
+                if (object.alias == 'ball'){
+                    if (position[sceneTime] != undefined){
+                        mat4.translate(transforms.mvMatrix,position[sceneTime]);
+                    }
+                }
+                else if (object.alias == 'flagInicio'){
+                    mat4.translate(transforms.mvMatrix, CONTROL_POINTS[0]);
+                }
+                else if (object.alias == 'flagFin'){
+                    mat4.translate(transforms.mvMatrix, CONTROL_POINTS[4]);
+                }
+                
+                else if (object.alias == 'flagControl1'){
+                    if (INTERPOLATION_TYPE != I_LINEAR){
+                        mat4.translate(transforms.mvMatrix, CONTROL_POINTS[1]);
+                        if (close(CONTROL_POINTS[1], position[sceneTime],3)){
+                            object.diffuse = [0.92,0.92,0.4,1.0];
+                        }
+                        else {
+                            object.diffuse = [0.4,0.4,0.4,1.0];
+                        }
+                    }
+                    else{
+                        transforms.pop();
+                        continue;
+                    }
+                }
+                else if (object.alias == 'flagControl2'){
+                    if (INTERPOLATION_TYPE != I_LINEAR){
+                        mat4.translate(transforms.mvMatrix, CONTROL_POINTS[2]);
+                        if (close(CONTROL_POINTS[2], position[sceneTime],3)){
+                            object.diffuse = [0.92,0.92,0.4,1.0];
+                        }
+                        else {
+                            object.diffuse = [0.4,0.4,0.4,1.0];
+                        }
+                    }
+                    else{
+                        transforms.pop();
+                        continue;
+                    }
+                }
+                else if (object.alias == 'flagControl3'){
+                    if (INTERPOLATION_TYPE != I_LINEAR){
+                        mat4.translate(transforms.mvMatrix, CONTROL_POINTS[3]);
+                        if (close(CONTROL_POINTS[3], position[sceneTime],3)){
+                           object.diffuse = [0.92,0.92,0.4,1.0];
+                        }
+                        else {
+                            object.diffuse = [0.4,0.4,0.4,1.0];
+                        }
+                    }
+                    else{
+                        transforms.pop();
+                        continue;
+                    }
+                }
+            
+            transforms.setMatrixUniforms();
+            transforms.pop();
+            
+            //Setting uniforms
+            gl.uniform4fv(prg.uMaterialDiffuse, object.diffuse);
+            gl.uniform4fv(prg.uMaterialSpecular, object.specular);
+            gl.uniform4fv(prg.uMaterialAmbient, object.ambient);
+            
+            gl.uniform1i(prg.uWireframe,object.wireframe);
+            gl.uniform1i(prg.uPerVertexColor, object.perVertexColor);
+            
+            //Setting attributes
+            gl.enableVertexAttribArray(prg.aVertexPosition);
+            gl.disableVertexAttribArray(prg.aVertexNormal);
+            gl.disableVertexAttribArray(prg.aVertexColor);
+            
+            gl.bindBuffer(gl.ARRAY_BUFFER, object.vbo);
+            gl.vertexAttribPointer(prg.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(prg.aVertexPosition);
+            
+            if(!object.wireframe){
+                gl.bindBuffer(gl.ARRAY_BUFFER, object.nbo);
+                gl.vertexAttribPointer(prg.aVertexNormal, 3, gl.FLOAT, false, 0, 0);
+                gl.enableVertexAttribArray(prg.aVertexNormal);
+            }
+            
+            if (object.perVertexColor){
+                gl.bindBuffer(gl.ARRAY_BUFFER, object.cbo);
+                gl.vertexAttribPointer(prg.aVertexColor,4,gl.FLOAT, false, 0,0);
+                gl.enableVertexAttribArray(prg.aVertexColor);
+            }
+            
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, object.ibo);
+            
+            if (object.wireframe){
+                gl.drawElements(gl.LINES, object.indices.length, gl.UNSIGNED_SHORT,0);
+            }
+            else{
+                gl.drawElements(gl.TRIANGLES, object.indices.length, gl.UNSIGNED_SHORT,0);
+            }
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+            
+        }
+    }
+    catch(err){
+        alert(err);
+        console.error(err.description);
+    }
+}
+
+
+function animate(){
+    sceneTime += 1;
+    if (sceneTime == ISTEPS) sceneTime = 0;
+	draw();
+}
+
+function resetAnimation(){
+    sceneTime = 0;
+    position.length = 0;
+}
+
+function startAnimation(){
+	ANIMATION_TIMER = setInterval(animate,30/1000);
+}
+
+function stopAnimation(){
+    clearInterval(ANIMATION_TIMER);
+}
+
+
+/**
+* Entry point. This function is invoked when the page is loaded
+*/
+var app = null;
+function runWebGLApp() {
+    app = new WebGLApp("canvas-element-id")
+    app.configureGLHook = configure;
+    app.loadSceneHook   = load;
+    app.drawSceneHook   = draw;
+    app.run();
+    
+    startAnimation();
+
+}
+</script>
+</head>
+
+<body onLoad='runWebGLApp()'>
+<div id='top'>
+<h1>WebGL Beginner's Guide - Chapter 5</h1>
+<h2>Interpolation and Sprites</h2>
+<div id='logo-packt'><img src='packt.gif'/></div>
+<p></p>
+</div>
+
+<div id='contents'>
+<div id='canvasContainer'>
+<canvas id='canvas-element-id' width='480' height='400'>
+Your browser does not support the HTML5 canvas element.
+</canvas>
+</div>
+</div>
+
+<div id='bottom'>
+<table style='padding=0px'>
+<tr>
+    <td>
+    <table>
+        <tr>    
+            <td>
+            <div id='interpolation-type'>
+            <input type='radio' id='opt-linear'    name='interpolation' checked='checked'/><label for='opt-linear'>Linear</label>
+            <input type='radio' id='opt-lagrange'  name='interpolation'/><label for='opt-lagrange'>Polynomial</label>
+            <input type='radio' id='opt-b-spline'  name='interpolation'/><label for='opt-b-spline'>B-Spline</label>
+            </div>
+            </td>
+            <td align='center'>
+            <div id='opt-type' >
+                    <input type='radio' id='opt-tracking' name='typecam' /><label for='opt-tracking'>Tracking</label>
+                    <input type='radio' id='opt-orbiting' name='typecam' checked='checked'/><label for='opt-orbiting'>Orbiting</label>
+            </div>
+            </td>
+            <td align='center'>
+            <button id='btnGoHome'>Go Home</button>
+            <input type="checkbox" id="chkUpdateLight" /><label for="chkUpdateLight">Fixed Light Source</label>
+            </td>
+        </tr>
+     </table>
+     </td>
+ <tr>
+    <td>
+    <table>
+     <tr>     
+        <td>
+            <table id='tbl-ct0' bgcolor='#B8CCE4'>
+            <tr><td colspan='2'/><td style='text-align:center'>Start Point</td></tr>
+            <tr><td>X:</td><td id='sl-ct0-x-value'>0.0</td><td width='150px'><div id='sl-ct0-x'/></td></tr>
+            <tr><td>Z:</td><td id='sl-ct0-z-value'>0.0</td><td width='150px'><div id='sl-ct0-z'/></td></tr>
+            </table>
+        </td>
+        <td>
+            <table id='tbl-ct1' bgcolor='#DDD9C4'>
+            <tr><td colspan='2'/><td style='text-align:center'>Control Point 1</td></tr>
+            <tr><td>X:</td><td id='sl-ct1-x-value'>0.0</td><td width='150px'><div id='sl-ct1-x'/></td></tr>
+            <tr><td>Z:</td><td id='sl-ct1-z-value'>0.0</td><td width='150px'><div id='sl-ct1-z'/></td></tr>
+            </table>
+        </td>
+         <td>
+            <table id='tbl-ct2' bgcolor='#DDD9C4'>
+            <tr><td colspan='2'/><td style='text-align:center'>Control Point 2</td></tr>
+            <tr><td>X:</td><td id='sl-ct2-x-value'>0.0</td><td width='150px'><div id='sl-ct2-x'/></td></tr>
+            <tr><td>Z:</td><td id='sl-ct2-z-value'>0.0</td><td width='150px'><div id='sl-ct2-z'/></td></tr>
+            </table>
+        </td>
+         <td>
+            <table id='tbl-ct3' bgcolor='#DDD9C4'>
+            <tr><td colspan='2'/><td style='text-align:center'>Control Point 3</td></tr>
+            <tr><td>X:</td><td id='sl-ct3-x-value'>0.0</td><td width='150px'><div id='sl-ct3-x'/></td></tr>
+            <tr><td>Z:</td><td id='sl-ct3-z-value'>0.0</td><td width='150px'><div id='sl-ct3-z'/></td></tr>
+            </table>
+        </td>
+        <td>
+            <table id='tbl-ct4' bgcolor='#E6B8B7'>
+            <tr><td colspan='2'/><td style='text-align:center'>End Point</td></tr>
+            <tr><td>X:</td><td id='sl-ct4-x-value'>0.0</td><td width='150px'><div id='sl-ct4-x'/></td></tr>
+            <tr><td>Z:</td><td id='sl-ct4-z-value'>0.0</td><td width='150px'><div id='sl-ct4-z'/></td></tr>
+            </table>
+        </td>
+    </tr>
+    </table>
+    </td> 
+</tr>
+<tr>
+    <td>
+    <table>
+        <tr>
+            <td>Interpolation Steps</td><td id='sl-int-steps-value'>0.0</td><td width ='150px'><div id='sl-int-steps'/></td>
+        </tr>
+        <tr>
+            
+
+        </tr>
+    </table>
+    </td>
+</tr>    
+</table>
+</div>
+<script> 
+$('#btnGoHome').button();
+$('#chkUpdateLight').button();
+$('#opt-type').buttonset();
+$('#interpolation-type').buttonset();
+
+initializeSliderValues();
+$('#sl-ct0-x').slider( {value:CONTROL_POINTS[0][0], min:-DIM_X, max:DIM_X, step:1, slide:function(){updateControlPoint(0,0,'#sl-ct0-x');}});
+$('#sl-ct0-z').slider( {value:CONTROL_POINTS[0][2], min:-DIM_Z, max:DIM_Z, step:1, slide:function(){updateControlPoint(0,2,'#sl-ct0-z');}});
+$('#sl-ct1-x').slider( {value:CONTROL_POINTS[1][0], min:-DIM_X, max:DIM_X, step:1, slide:function(){updateControlPoint(1,0,'#sl-ct1-x');}});
+$('#sl-ct1-z').slider( {value:CONTROL_POINTS[1][2], min:-DIM_Z, max:DIM_Z, step:1, slide:function(){updateControlPoint(1,2,'#sl-ct1-z');}});
+$('#sl-ct2-x').slider( {value:CONTROL_POINTS[2][0], min:-DIM_X, max:DIM_X, step:1, slide:function(){updateControlPoint(2,0,'#sl-ct2-x');}});
+$('#sl-ct2-z').slider( {value:CONTROL_POINTS[2][2], min:-DIM_Z, max:DIM_Z, step:1, slide:function(){updateControlPoint(2,2,'#sl-ct2-z');}});
+$('#sl-ct3-x').slider( {value:CONTROL_POINTS[3][0], min:-DIM_X, max:DIM_X, step:1, slide:function(){updateControlPoint(3,0,'#sl-ct3-x');}});
+$('#sl-ct3-z').slider( {value:CONTROL_POINTS[3][2], min:-DIM_Z, max:DIM_Z, step:1, slide:function(){updateControlPoint(3,2,'#sl-ct3-z');}});
+$('#sl-ct4-x').slider( {value:CONTROL_POINTS[4][0], min:-DIM_X, max:DIM_X, step:1, slide:function(){updateControlPoint(4,0,'#sl-ct4-x');}});
+$('#sl-ct4-z').slider( {value:CONTROL_POINTS[4][2], min:-DIM_Z, max:DIM_Z, step:1, slide:function(){updateControlPoint(4,2,'#sl-ct4-z');}});
+$('#sl-int-steps').slider( {value:ISTEPS, min:500, max:1500, step:1, slide:function(){updateSteps();}});
+
+$('#tbl-ct1').hide();
+$('#tbl-ct2').hide();
+$('#tbl-ct3').hide();
+
+
+
+function initializeSliderValues(){
+    for(var i=0;i<CONTROL_POINTS.length;i++){
+        $('#sl-ct'+i+'-x-value').html(CONTROL_POINTS[i][0]);
+        $('#sl-ct'+i+'-z-value').html(CONTROL_POINTS[i][2]);
+    }
+    $('#sl-int-steps-value').html(ISTEPS);
+}
+
+
+
+function updateControlPoint(index,axis,selector){
+    var value = $(selector).slider("value");
+    CONTROL_POINTS[index][axis] = value;
+    $(selector+'-value').html(value);
+    interpolate();
+    app.refresh();
+}
+
+function updateSteps(){
+    var value = $('#sl-int-steps').slider("value");
+    $('#sl-int-steps-value').html(value);
+    ISTEPS = value;
+    interpolate();
+    app.refresh();
+}
+
+$('#opt-linear').click(
+    function(){
+       $('#tbl-ct1, #tbl-ct2, #tbl-ct3').fadeOut(600);
+	   resetAnimation();
+       INTERPOLATION_TYPE = I_LINEAR;
+       CONTROL_POINTS = [[-25,0,20],[-40,0,-10],[0,0,10],[25,0,-5],[40,0,-20]];
+       ISTEPS = 1000;
+       initializeSliderValues();
+       interpolate();
+});
+
+$('#opt-lagrange').click(
+    function(){
+        $('#tbl-ct1, #tbl-ct2, #tbl-ct3').fadeIn(300);
+		resetAnimation();
+        INTERPOLATION_TYPE = I_POLYNOMIAL;
+        CONTROL_POINTS = [[21,0,23],[-3,0,-10],[-21,0,-53],[50,0,-31],[-24,0,2]];
+        ISTEPS = 1355;
+        initializeSliderValues();
+        interpolate();
+});
+
+$('#opt-b-spline').click(
+    function(){
+	   
+       $('#tbl-ct1, #tbl-ct2, #tbl-ct3').fadeIn(300);
+	   resetAnimation();
+       INTERPOLATION_TYPE = I_BSPLINE;
+       CONTROL_POINTS = [[-21,0,23],[32,0,-10],[0,0,-53],[-32,0,-10],[21,0,23]];
+       ISTEPS = 1000;
+       initializeSliderValues();
+       interpolate();
+});
+ 
+
+$('#chkUpdateLight').click(toggleLight);
+
+$('#opt-tracking').click(function(){
+    camera.goHome();
+    console.info('CameraType = Tracking');
+    camera.setType(CAMERA_TRACKING_TYPE);
+    app.refresh();
+});
+
+$('#opt-orbiting').click(function(){
+    camera.goHome
+    camera.setElevation(-20);
+    console.info('CameraType = Orbiting');
+    camera.setType(CAMERA_ORBITING_TYPE);
+    app.refresh();
+});
+
+
+var updateLightPosition = false;
+
+function toggleLight(){
+    updateLightPosition = !updateLightPosition;
+}
+
+$('#btnGoHome').click(
+    function(){
+        camera.goHome();
+        camera.setElevation(-20);
+        app.refresh();
+});
+
+
+
+</script>
+<script>cview.run(cview.MODE_VIEW,false,400);</script>
+</body>
+</html>

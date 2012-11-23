@@ -1,0 +1,676 @@
+<html>
+
+<head>
+<title>WebGL Beginner's Guide - Chapter 1 - WebGL Car</title>
+<meta http-equiv='content-type' content='text/html; charset=ISO-8859-1'>
+<link href='css/styles.css'   type='text/css' rel='stylesheet'>
+<link href='css/cars.css' type='text/css' rel='stylesheet' />
+<link href='css/smoothness/jquery-ui-1.8.13.custom.css' type='text/css' rel='stylesheet' />
+<link href='css/colorpicker.css'  type='text/css' rel='stylesheet'/>
+<!-- GUI Libraries //-->
+<script type='text/javascript' src='js/gui/jquery-1.5.1.min.js'></script>
+<script type='text/javascript' src='js/gui/jquery-ui-1.8.13.custom.min.js'></script> 
+<script type='text/javascript' src='js/gui/colorpicker.js'></script>
+<!-- MATH Libraries //-->
+<script type='text/javascript' src='js/math/gl-matrix-min.js'></script>
+<!-- WEBGL Libraries //-->
+<script type='text/javascript' src='js/webgl/Globals.js'></script>
+<script type='text/javascript' src='js/webgl/Utils.js'></script>
+<script type='text/javascript' src='js/webgl/Program.js'></script>
+<script type='text/javascript' src='js/webgl/Scene.js'></script>
+<script type='text/javascript' src='js/webgl/Axis.js'></script>
+<script type='text/javascript' src='js/webgl/Floor.js'></script>
+<script type='text/javascript' src='js/webgl/Camera.js'></script>
+<script type='text/javascript' src='js/webgl/CameraInteractor.js'></script>
+<script type='text/javascript' src='js/webgl/SceneTransforms.js'></script>
+<script type='text/javascript' src='js/webgl/Texture.js'></script>
+<script type='text/javascript' src='js/webgl/Lights.js'></script>
+<script type='text/javascript' src='js/webgl/WebGLApp.js'></script>
+<script type='text/javascript' src='js/webgl/Picker.js'></script>
+
+<script id="shader-vs" type="x-shader/x-vertex">
+
+const int NUM_LIGHTS = 4;
+
+attribute vec3 aVertexPosition;
+attribute vec3 aVertexNormal;
+attribute vec4 aVertexColor;
+
+uniform mat4 uMVMatrix;
+uniform mat4 uPMatrix;
+uniform mat4 uNMatrix;
+
+uniform bool uTranslateLights;
+uniform vec3 uLightPosition[NUM_LIGHTS];
+
+varying vec3 vNormal;
+varying vec3 vLightRay[NUM_LIGHTS];
+varying vec3 vEye[NUM_LIGHTS];
+
+void main(void) {
+
+     vec4 c = aVertexColor;
+     vec4 vertex = uMVMatrix * vec4(aVertexPosition, 1.0);
+     vNormal = vec3(uNMatrix * vec4(aVertexNormal, 1.0));
+     vec4 lightPosition = vec4(0.0);
+     
+     if (uTranslateLights){
+         for(int i=0; i < NUM_LIGHTS; i++){
+           lightPosition =   uMVMatrix * vec4(uLightPosition[i], 1.0);
+           vLightRay[i] = vertex.xyz - lightPosition.xyz;
+           vEye[i] = -vec3(vertex.xyz);
+         }
+     }    
+     else {
+        for(int i=0; i < NUM_LIGHTS; i++){
+          lightPosition = vec4(uLightPosition[i], 1.0);
+          vLightRay[i] = vertex.xyz - lightPosition.xyz;
+          vEye[i] = -vec3(vertex.xyz);
+        }
+    }
+    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+}	
+</script>
+
+<script id="shader-fs" type="x-shader/x-fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+
+
+//Light uniforms
+const int NUM_LIGHTS = 4;
+uniform vec3  uLa[NUM_LIGHTS];   //ambient
+uniform vec3  uLd[NUM_LIGHTS];   //diffuse
+uniform vec3  uLs[NUM_LIGHTS];   //specular
+uniform vec3 uLightPosition[NUM_LIGHTS];
+
+//Material uniforms
+uniform vec3  uKa;   //ambient
+uniform vec3  uKd;   //diffuse
+uniform vec3  uKs;   //specular
+uniform float uNs;   //specular coefficient
+uniform float d;     //Opacity
+uniform int   illum; //Illumination mode
+
+
+uniform bool  uWireframe;
+
+
+varying vec3 vNormal;
+varying vec3 vLightRay[NUM_LIGHTS];
+varying vec3 vEye[NUM_LIGHTS];
+
+float calculateAttenuation(in vec3 ray){
+    float dist = length(ray);
+    return (1.0 / (0.1 * dist));
+}
+
+void main(void) {
+    if (uWireframe || illum == 0){
+        gl_FragColor = vec4(uKd,d);
+        return;
+    }
+    
+   vec3 COLOR = vec3(0.0,0.0,0.0);
+   vec3 N =  normalize(vNormal);
+   vec3 L =  vec3(0.0,0.0,0.0);
+   vec3 E =  vec3(0.0,0.0,0.0);
+   vec3 R =  vec3(0.0,0.0,0.0);
+   vec3 deltaRay = vec3(0.0);
+   const int  lsize = 2;
+   const float step = 0.25;
+   const float inv_total = 1.0/((float(lsize*lsize) + 1.0)*(float(lsize*lsize) + 1.0));  //how many deltaRays
+   
+   float dx = 0.0;
+   float dz = 0.0;
+   float LT = 0.0;
+   
+   if (illum == 1){
+        for(int i = 0; i < NUM_LIGHTS; i++){	
+            L = normalize(vLightRay[i]);	
+            N = normalize(vNormal);	
+            COLOR += (uLa[i] * uKa) + (uLd[i] * uKd * clamp(dot(N, -L),0.0,1.0));
+        }   
+        gl_FragColor =  vec4(COLOR,d);
+        return;
+   }
+   
+   if (illum == 2){
+        for(int i = 0; i < NUM_LIGHTS; i++){
+
+            E = normalize(vEye[i]);
+            L = normalize(vLightRay[i]);
+            R = reflect(L, N);
+            COLOR += (uLa[i] * uKa);
+            COLOR += (uLd[i] * uKd * clamp(dot(N,-L),0.0,1.0));// * calculateAttenuation(vLightRay[i]));
+            COLOR += (uLs[i] * uKs * pow( max(dot(R, E), 0.0), uNs) * 4.0);
+        }
+        gl_FragColor =  vec4(COLOR,d);
+        return;
+   }
+}
+</script>
+
+<script type="text/javascript">
+
+var camera = null,
+light1 = null,
+light2 = null,
+light3 = null,
+light4 = null,
+transforms = null,
+
+cameraHome = [0.0,10,150],
+cameraAzimuth = 25,
+cameraElevation = -11,
+carSurface = undefined,
+floorVisible = false,
+translateLights = false;
+
+
+
+function configure(){
+    gl.clearColor(0.2,0.2,0.2, 1.0);
+    gl.clearDepth(1.0);
+    
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LEQUAL);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); 
+
+    
+  
+    //Creates and sets up the camera location
+    camera = new Camera(CAMERA_ORBITING_TYPE);
+    camera.goHome(cameraHome);
+    camera.setFocus([0.0,0.0,0.0]);
+	camera.setAzimuth(cameraAzimuth);
+	camera.setElevation(cameraElevation);
+    camera.hookRenderer = render;
+    
+    //Creates and sets up the mouse and keyboard interactor
+    var interactor = new CameraInteractor(camera, document.getElementById('the-canvas'));
+    
+    //Scene Transforms
+    transforms = new SceneTransforms(camera);
+   
+    //init transforms
+    transforms.init();
+
+    light1 = new Light('far-left');
+	light1.setPosition([-25,25,-25]);
+	light1.setDiffuse([0.5,0.5,0.5]);
+    light1.setAmbient([0.0,0.0,0.0]);
+    light1.setSpecular([0.4,0.4,0.4]);
+	
+	light2 = new Light('far-right');
+	light2.setPosition([25,25,-25]);
+	light2.setDiffuse([0.5,0.5,0.5]);
+    light2.setAmbient([0.0,0.0,0.0]);
+    light2.setSpecular([0.4,0.4,0.4]);
+	
+	light3 = new Light('near-left');
+	light3.setPosition([-25,25,25]);
+	light3.setDiffuse([0.5,0.5,0.5]);
+    light3.setAmbient([0.0,0.0,0.0]);
+    light3.setSpecular([0.4,0.4,0.4]);
+    
+    light4 = new Light('near-right');
+    light4.setPosition([25,25,25]);
+    light4.setDiffuse([0.5,0.5,0.5]);
+    light4.setAmbient([0.0,0.0,0.0]);
+    light4.setSpecular([0.4,0.4,0.4]);
+    
+    
+	Lights.add(light1);
+	Lights.add(light2);
+    Lights.add(light3);	
+	Lights.add(light4);	
+    
+    //init Program
+	var attributeList = ["aVertexPosition",
+					"aVertexNormal",
+					"aVertexColor"];
+
+	var uniformList = [	"uPMatrix", 
+					"uMVMatrix", 
+					"uNMatrix",
+                    "uLightPosition",
+                    "uWireframe",
+                    "uLa",
+                    "uLd",
+                    "uLs",
+                    "uKa",
+                    "uKd",
+                    "uKs",
+                    "uNs",
+                    "d",
+                    "illum",
+                    "uTranslateLights"
+					];
+					
+	Program.load(attributeList, uniformList);
+	
+	
+    gl.uniform3fv(Program.uLightPosition, Lights.getArray('position'));
+    gl.uniform3fv(Program.uLa ,     Lights.getArray('ambient'));
+    gl.uniform3fv(Program.uLd,      Lights.getArray('diffuse'));
+    gl.uniform3fv(Program.uLs,      Lights.getArray('specular'));
+    
+    gl.uniform3fv(Program.uKa ,     [1.0,1.0,1.0]);
+    gl.uniform3fv(Program.uKd ,     [1.0,1.0,1.0]);
+    gl.uniform3fv(Program.uKs ,     [1.0,1.0,1.0]);
+    
+    gl.uniform1f(Program.uNs, 1.0);
+    gl.uniform1i(Program.uTranslateLights, translateLights);
+
+}
+
+function loadNissan(){
+    Scene.objects = [];
+    Scene.addObject(Floor);
+    for(var i = 1; i <= 178; i+=1){
+        Scene.loadObject('models/nissan/part'+i+'.json');
+
+    }
+}
+
+
+function load(){
+    Floor.build(80,2);
+    Floor.Ka = [1,1,1];
+    Floor.Kd = [0.6,0.6,0.6]
+    Floor.Ks = [1,1,1];
+    Floor.Ni = 1;
+    Floor.Ns = 1;
+    Floor.d = 1.0;
+    Floor.illum = 1;
+   
+    Floor.visible = floorVisible;
+    
+    Scene.addObject(Floor);
+    loadNissan();
+}
+
+function render(){
+    gl.viewport(0, 0, c_width, c_height);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    
+
+    transforms.updatePerspective();
+    
+    try{
+        
+        for (var i = 0; i < Scene.objects.length; i++){
+            
+            var object = Scene.objects[i];
+			if (object.visible != undefined && !object.visible) continue;
+			transforms.calculateModelView();           
+            transforms.push();
+            transforms.setMatrixUniforms();
+            transforms.pop();
+            
+            
+   
+            gl.enableVertexAttribArray(Program.aVertexPosition);
+            gl.disableVertexAttribArray(Program.aVertexNormal);
+            gl.disableVertexAttribArray(Program.aVertexColor);
+            
+            gl.uniform1i(Program.uWireframe, false);
+            gl.uniform3fv(Program.uKa, object.Ka);
+            gl.uniform3fv(Program.uKd, object.Kd);
+            gl.uniform3fv(Program.uKs, object.Ks);
+            gl.uniform1f(Program.uNs, object.Ns);
+            gl.uniform1f(Program.d, object.d);
+            gl.uniform1i(Program.illum, object.illum);
+            
+                    
+            
+            gl.bindBuffer(gl.ARRAY_BUFFER, object.vbo);
+            gl.vertexAttribPointer(Program.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(Program.aVertexPosition);
+            
+			if(!object.wireframe){
+				gl.bindBuffer(gl.ARRAY_BUFFER, object.nbo);
+				gl.vertexAttribPointer(Program.aVertexNormal, 3, gl.FLOAT, false, 0, 0);
+				gl.enableVertexAttribArray(Program.aVertexNormal);
+            }
+            else{
+                gl.uniform1i(Program.uWireframe, true);
+            }
+			
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, object.ibo);
+			
+			if (object.wireframe){
+                gl.drawElements(gl.LINES, object.indices.length, gl.UNSIGNED_SHORT,0);
+            }
+            else{
+                gl.drawElements(gl.TRIANGLES, object.indices.length, gl.UNSIGNED_SHORT,0);
+            }
+			
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+
+        }
+    }
+    catch(err){
+        alert(err);
+        console.error(err.description);
+    }
+}
+
+function resizeCanvas(){
+    c_width = $('#content').width();
+    c_height = $('#content').height();
+    $('#the-canvas').attr('width',c_width);
+    $('#the-canvas').attr('height',c_height);
+}
+
+$(window).resize(function(){resizeCanvas();});
+
+var app;
+function runShowRoom(){
+    app = new WebGLApp("the-canvas");
+    app.configureGLHook = configure;
+    app.loadSceneHook   = load;
+    app.drawSceneHook   = render;
+    app.run(); 
+}
+</script>
+</head>
+
+<body onLoad='runShowRoom()'>
+<div id="header">
+    <h1>WebGL Beginner's Guide - Chapter 1 - WebGL Car Scene</h1>
+    <h2>Customize your Car</h2>
+    <div id='logo-packt'><img src='packt.gif'/></div>
+</div>
+
+<div id="nav">
+  
+    <table width='100%' cellspacing ='0'>
+    <tr>
+       <td>Car Color:</td>
+       <td colspan=2><div id='carColor' class='colorSelector'><div style='background-color:rgb(255,255,255)'></div></div></td>
+    </tr>
+    <tr>
+        <td>Car Shininness:</td>
+        <td width='130px'><div id='slider-shininess'/></td>
+        <td id='slider-shininess-value' width='60px'>  0</td>
+   	</tr>
+    </table>
+    
+    <hr/>
+    
+    <table width='100%'>
+        <tr>
+            <td><h3>Lights</h3></td>
+        </tr>
+		<tr>
+            <td>
+                <table style='text-align:center'>
+                <tr>
+                    <td></td><td>Ambient</td><td></td>
+                    <td>Diffuse</td><td></td>
+                    <td>Specular</td><td></td>
+                </tr>    
+                <tr>
+                    <td style='text-align:right' width='160px'>far-left: </td>
+                    <td width='150px'><div id='slider-la1'/></td><td id='slider-la1-value' width='20px'>0.0</td>
+                    <td width='150px'><div id='slider-ld1'/></td><td id='slider-ld1-value' width='20px'>0.4</td>
+                    <td width='150px'><div id='slider-ls1'/></td><td id='slider-ls1-value' width='20px'>0.8</td>
+                </tr>
+                <tr>
+                    <td style='text-align:right' width='160px'>far-right: </td>
+                    <td width='150px'><div id='slider-la2'/></td><td id='slider-la2-value' width='20px'>0.0</td>
+                    <td width='150px'><div id='slider-ld2'/></td><td id='slider-ld2-value' width='20px'>0.4</td>
+                    <td width='150px'><div id='slider-ls2'/></td><td id='slider-ls2-value' width='20px'>0.8</td>
+                </tr>
+                <tr>
+                    <td style='text-align:right' width='160px'>near-left: </td>
+                    <td width='150px'><div id='slider-la3'/></td><td id='slider-la3-value' width='20px'>0.0</td>
+                    <td width='150px'><div id='slider-ld3'/></td><td id='slider-ld3-value' width='20px'>0.4</td>
+                    <td width='150px'><div id='slider-ls3'/></td><td id='slider-ls3-value' width='20px'>0.8</td>
+                </tr>
+                <tr>
+                    <td style='text-align:right' width='160px'>near-right: </td>
+                    <td width='150px'><div id='slider-la4'/></td><td id='slider-la4-value' width='20px'>0.0</td>
+                    <td width='150px'><div id='slider-ld4'/></td><td id='slider-ld4-value' width='20px'>0.4</td>
+                    <td width='150px'><div id='slider-ls4'/></td><td id='slider-ls4-value' width='20px'>0.8</td>
+                </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td align='right'><input type="checkbox" id="translate-lights"/> Translate Lights<br /></td>
+        </tr>    
+    </table>
+    <hr/>
+    <table width='100%'>
+        <tr>
+            <td><h3>Camera</h3></td>
+        </tr>
+        <tr>
+        <td align='center'>
+        <div id='opt-pose' >
+            <input type='radio' id='opt-home'  name='posecam' /><label for='opt-home'>Home</label>
+            <input type='radio' id='opt-above' name='posecam' /><label for='opt-above'>Above</label>
+            <input type='radio' id='opt-front' name='posecam' /><label for='opt-front'>Front</label>
+            <input type='radio' id='opt-back'  name='posecam' /><label for='opt-back'>Back</label>
+            <input type='radio' id='opt-left'  name='posecam' /><label for='opt-left'>Left</label>
+            <input type='radio' id='opt-right' name='posecam' /><label for='opt-right'>Right</label>
+            
+         </div>
+         </td>
+         </tr>
+         <tr>
+            <td align='center'>Zoom: Alt + Drag <input type="checkbox" id="show-floor"/>Floor Visible<br /></td>
+         </tr>          
+    </table>        
+
+    
+</div>
+
+<div id="content">
+    <canvas id='the-canvas'></canvas>
+</div>
+
+<script type='text/javascript'>resizeCanvas();</script>
+<script type='text/javascript'>
+    $('#opt-pose').buttonset();
+    $('#slider-shininess').slider({value:0.0, min:0.0, max:1.0, step:0.1, slide:function(event, ui){updateShininessSelectedCar(ui)}, change:function(event,ui){updateShininessSelectedCar(ui)}});
+    $('#slider-la1').slider({value:0.0, min:0.0, max:1.0, step:0.1, slide:function(){updateLightProperty(1, 'a')}, change:function(){updateLightProperty(1,'a')}});
+    $('#slider-ld1').slider({value:0.5, min:0.0, max:1.0, step:0.1, slide:function(){updateLightProperty(1, 'd')}, change:function(){updateLightProperty(1,'d')}});
+    $('#slider-ls1').slider({value:0.4, min:0.0, max:1.0, step:0.1, slide:function(){updateLightProperty(1, 's')}, change:function(){updateLightProperty(1,'s')}});
+    $('#slider-la2').slider({value:0.0, min:0.0, max:1.0, step:0.1, slide:function(){updateLightProperty(2, 'a')}, change:function(){updateLightProperty(2,'a')}});
+    $('#slider-ld2').slider({value:0.5, min:0.0, max:1.0, step:0.1, slide:function(){updateLightProperty(2, 'd')}, change:function(){updateLightProperty(2,'d')}});
+    $('#slider-ls2').slider({value:0.4, min:0.0, max:1.0, step:0.1, slide:function(){updateLightProperty(2, 's')}, change:function(){updateLightProperty(2,'s')}});
+    $('#slider-la3').slider({value:0.0, min:0.0, max:1.0, step:0.1, slide:function(){updateLightProperty(3, 'a')}, change:function(){updateLightProperty(3,'a')}});
+    $('#slider-ld3').slider({value:0.5, min:0.0, max:1.0, step:0.1, slide:function(){updateLightProperty(3, 'd')}, change:function(){updateLightProperty(3,'d')}});
+    $('#slider-ls3').slider({value:0.4, min:0.0, max:1.0, step:0.1, slide:function(){updateLightProperty(3, 's')}, change:function(){updateLightProperty(3,'s')}});
+    $('#slider-la4').slider({value:0.0, min:0.0, max:1.0, step:0.1, slide:function(){updateLightProperty(4, 'a')}, change:function(){updateLightProperty(4,'a')}});
+    $('#slider-ld4').slider({value:0.5, min:0.0, max:1.0, step:0.1, slide:function(){updateLightProperty(4, 'd')}, change:function(){updateLightProperty(4,'d')}});
+    $('#slider-ls4').slider({value:0.4, min:0.0, max:1.0, step:0.1, slide:function(){updateLightProperty(4, 's')}, change:function(){updateLightProperty(4,'s')}});
+
+
+  
+$('#show-floor').change(function(){
+	    floorVisible = !floorVisible;
+        Floor.visible = floorVisible;
+});
+
+$('#translate-lights').change(function(){
+    translateLights = !translateLights;
+    gl.uniform1i(Program.uTranslateLights, translateLights);
+});
+
+function updateShininessSelectedCar(shine){
+
+    $('#slider-shininess-value').html(shine.value);
+    
+
+    for(var i = 0, N = Scene.objects.length; i < N; i+=1){
+        for(var j =0; j <3; j+=1){
+        Scene.objects[i].Ks[j] = shine.value;
+        }
+    }
+    app.refresh();
+   
+}
+
+function updateLightProperty(index,property){
+    var v = $('#slider-l'+property+''+index).slider("value");
+    $('#slider-l'+property+''+index+'-value').html(v);
+    var light = undefined;
+    switch(index){
+                case 1: light = light1; break;
+                case 2: light = light2; break;
+                case 3: light = light3; break;
+                case 4: light = light4; break;
+    }
+    
+    switch(property){
+                case 'a':light.setAmbient([v,v,v]);
+                         gl.uniform3fv(Program.uLa, Lights.getArray('ambient'));
+                         break;
+                case 'd':light.setDiffuse([v,v,v]);
+                         gl.uniform3fv(Program.uLd, Lights.getArray('diffuse'));
+                         break;
+                case 's':light.setSpecular([v,v,v]);
+                         gl.uniform3fv(Program.uLs, Lights.getArray('specular'));
+                         break;
+    }
+
+    render();
+}
+
+function updateColorSelectedCar(color){
+    var parts = [];
+    
+    for(var i=0, N = Scene.objects.length; i < N; i+=1){
+        if (Scene.objects[i].alias.indexOf('_paint') != -1){
+            parts.push(Scene.objects[i]);
+        }
+    }
+   
+
+    for(var i = 0, N = parts.length; i < N; i+=1){
+        parts[i].Kd = color;
+    }
+    app.refresh();
+};
+
+var carColorHex = '#ffffff';
+$('#carColor').ColorPicker({
+    onSubmit: function(hsb, hex, rgb, el) {
+            $(el).val(hex);
+            $(el).ColorPickerHide();
+            
+    },
+    color: '#00ff00',
+    onShow: function (colpkr) {
+        $(colpkr).fadeIn(500);
+        return false;
+    },
+    onHide: function (colpkr) {
+        $(colpkr).fadeOut(500);
+        return false;
+    },
+    onChange: function (hsb, hex, rgb) {
+        carColorHex = hex;
+        $('#carColor div').css('backgroundColor', '#' + hex);
+        updateColorSelectedCar([rgb.r/256,rgb.g/256,rgb.b/256]);
+    },
+    
+    onBeforeShow: function (colpkr) {
+            $(colpkr).ColorPickerSetColor(carColor);
+        }
+    });
+
+
+var timer_anim_camera = undefined;
+var goal_camera_azimuth = 0;
+var goal_camera_elevation = 0;
+var goal_camera_home = cameraHome;
+
+
+
+$('#opt-home').click(function(){
+    if(timer_anim_camera) { clearInterval(timer_anim_camera); }
+    goal_camera_azimuth = cameraAzimuth;
+    goal_camera_elevation = cameraElevation;
+    timer_anim_camera = setInterval(animCamera, 5);
+});
+
+$('#opt-above').click(function(){
+    if(timer_anim_camera) { clearInterval(timer_anim_camera); }
+    goal_camera_azimuth = 0;
+    goal_camera_elevation = -90;
+    timer_anim_camera = setInterval(animCamera, 5);
+});
+
+$('#opt-front').click(function(){
+    if(timer_anim_camera) { clearInterval(timer_anim_camera); }
+    goal_camera_azimuth = 0;
+    goal_camera_elevation = -10;
+    timer_anim_camera = setInterval(animCamera, 5);
+});
+
+$('#opt-back').click(function(){
+    if(timer_anim_camera) { clearInterval(timer_anim_camera); }
+    goal_camera_azimuth = 180;
+    goal_camera_elevation = -10;
+    timer_anim_camera = setInterval(animCamera, 5);
+});
+
+$('#opt-left').click(function(){
+    if(timer_anim_camera) { clearInterval(timer_anim_camera); }
+    goal_camera_azimuth = -90;
+    goal_camera_elevation = 0;
+    timer_anim_camera = setInterval(animCamera, 5);
+});
+
+$('#opt-right').click(function(){
+    if(timer_anim_camera) { clearInterval(timer_anim_camera); }
+    goal_camera_azimuth = 90;
+    goal_camera_elevation = 0;
+    timer_anim_camera = setInterval(animCamera, 5);
+});
+
+
+
+function animCamera(){
+
+    var ca = goal_camera_azimuth-camera.azimuth;
+    var ce = goal_camera_elevation-camera.elevation;
+    var deltaPos = vec3.create([goal_camera_home[0]-camera.position[0], 
+                    goal_camera_home[1]-camera.position[1], 
+                    goal_camera_home[2]-camera.position[2]]);
+                    
+    
+    if (Math.abs(ca) < 0.5 && 
+        Math.abs(ce) < 0.5 && 
+        Math.abs(deltaPos[0]  < 0.1) &&
+        Math.abs(deltaPos[1]  < 0.1) &&
+        Math.abs(deltaPos[2]  < 0.1))
+    {
+        camera.setAzimuth(goal_camera_azimuth);
+        camera.setElevation(goal_camera_elevation);
+        camera.setPosition(goal_camera_home);
+        clearInterval(timer_anim_camera);
+    }
+    else{
+        camera.setAzimuth  (camera.azimuth   + ca/100);
+        camera.setElevation(camera.elevation + ce/100);
+        vec3.scale(deltaPos, 1/100);
+        vec3.add(camera.position,deltaPos,deltaPos);
+        camera.setPosition(deltaPos);
+        render();
+    }
+}    
+
+
+</script>
+</body>
+</html>

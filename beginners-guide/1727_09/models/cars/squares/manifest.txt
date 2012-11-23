@@ -1,0 +1,5 @@
+original OBJ file: squares/squares.obj
+part1.json > alias: objectBlue_meshBlue_red
+part2.json > alias: objectBlue_meshBlue_blue
+part3.json > alias: objectRed_meshRed_red
+part4.json > alias: objectRed_meshRed_blue

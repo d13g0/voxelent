@@ -1,0 +1,379 @@
+<html>
+
+<head>
+<title>WebGL Beginner's Guide - Chapter 4 - Model-View Matrix: Rotation</title>
+<meta http-equiv='content-type' content='text/html; charset=ISO-8859-1'>
+
+<!-- CSS Styles //-->
+<link href='css/styles.css'   type='text/css' rel='stylesheet'>
+<link href='css/prettify_desert.css'  type='text/css' rel='stylesheet'/>
+<link href='css/colorpicker.css'  type='text/css' rel='stylesheet'/>
+<link href='css/smoothness/jquery-ui-1.8.13.custom.css' type='text/css' rel='stylesheet' />
+<!-- GUI Libraries //-->
+<script type='text/javascript' src='js/gui/jquery-1.5.1.min.js'></script>
+<script type='text/javascript' src='js/gui/jquery-ui-1.8.13.custom.min.js'></script> 
+<script type='text/javascript' src='js/gui/colorpicker.js'></script>
+<script type='text/javascript' src='js/gui/prettify.js'></script>
+<script type='text/javascript' src='js/gui/codeview.js'></script>
+<!-- MATH Libraries //-->
+<script type='text/javascript' src='js/math/gl-matrix-min.js'></script>
+<!-- WEBGL Libraries //-->
+<script type='text/javascript' src='js/webgl/Globals.js'></script>
+<script type='text/javascript' src='js/webgl/Utils.js'></script>
+<script type='text/javascript' src='js/webgl/Program.js'></script>
+<script type='text/javascript' src='js/webgl/Scene.js'></script>
+<script type='text/javascript' src='js/webgl/Axis.js'></script>
+<script type='text/javascript' src='js/webgl/Floor.js'></script>
+<script type='text/javascript' src='js/webgl/WebGLApp.js'></script>
+
+
+
+<script id="shader-vs" type="x-shader/x-vertex">
+attribute vec3 aVertexPosition;
+attribute vec3 aVertexNormal;
+attribute vec4 aVertexColor;
+uniform mat4 uMVMatrix;
+uniform mat4 uPMatrix;
+uniform mat4 uNMatrix;
+uniform vec3 uLightPosition; 
+uniform vec4 uLightAmbient;  
+uniform vec4 uLightDiffuse;  
+uniform vec4 uMaterialDiffuse;
+uniform bool uWireframe;
+uniform bool uPerVertexColor;
+varying vec4 vFinalColor;
+
+void main(void) {
+    if (uWireframe) {
+        if (uPerVertexColor){
+            vFinalColor = aVertexColor;
+        }
+        else{
+            vFinalColor = uMaterialDiffuse;
+        }
+    }
+    else{
+        vec3 N = vec3(uNMatrix * vec4(aVertexNormal, 0.0));  // This is a vector w = 0;
+        vec3 L = normalize(-uLightPosition);                 // Given a light position, use the inverse is the direction (to the center of the world)
+        //L = vec3(uNMatrix*vec4(L,0.0));   // vector light direction
+
+        float lambertTerm = dot(N,-L);
+        if (lambertTerm <= 0.0) lambertTerm = 0.01;
+        vec4 Ia = uLightAmbient;
+        vec4 Id = uMaterialDiffuse * uLightDiffuse * lambertTerm;
+        vFinalColor = Ia + Id;
+        vFinalColor.a = 1.0; //alpha channel
+    }
+    
+    //Transformed vertex position
+    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition,1.0); // vertex w=1
+}
+</script>
+
+<script id="shader-fs" type="x-shader/x-fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+
+varying vec4  vFinalColor;
+
+void main(void)  {
+ gl_FragColor = vFinalColor;
+}
+</script>
+
+<script id='code-js' type="text/javascript">
+/**
+*   Defines the initial values for the transformation matrices
+*/
+function initTransforms(){
+    //Initialize Model-View matrix
+    mat4.identity(mvMatrix);
+    mat4.translate(mvMatrix, home);
+    displayMatrix(mvMatrix);
+    
+    //Initialize Camera matrix as the inverse of the Model-View Matrix
+    mat4.identity(cMatrix);
+    mat4.inverse(mvMatrix,cMatrix);
+    
+    //Initialize Perspective matrix
+    mat4.identity(pMatrix);
+    
+    //Initialize Normal matrix
+    mat4.identity(nMatrix);
+    mat4.set(mvMatrix, nMatrix);
+    mat4.inverse(nMatrix);
+    mat4.transpose(nMatrix);
+
+    coords = COORDS_WORLD;
+}
+
+/**
+*   Updates the Model-View matrix if there is any translation or change in 
+*   coordinate system (world->camera or camera->world). Updates the Normal matrix according to the translation.
+*   Please notice that the normal matrix will ALWAYS operate in world coordinates.
+*   Called once per rendering cycle.
+*/
+function updateTransforms(){
+    
+    mat4.perspective(30, c_width / c_height, 0.1, 1000.0, pMatrix);  // We can resize the screen at any point so the perspective matrix should be updated always.
+    if (coords == COORDS_WORLD){
+        mat4.identity(mvMatrix);
+        mat4.translate(mvMatrix, position); //home for rotations
+        mat4.rotateX(mvMatrix,rotation[0]*Math.PI/180);
+        mat4.rotateY(mvMatrix,rotation[1]*Math.PI/180);
+        mat4.rotateZ(mvMatrix,rotation[2]*Math.PI/180);
+    }
+    else{
+        mat4.identity(cMatrix);
+        mat4.rotateX(cMatrix,rotation[0]*Math.PI/180);
+        mat4.rotateY(cMatrix,rotation[1]*Math.PI/180);
+        mat4.rotateZ(cMatrix,rotation[2]*Math.PI/180);
+        mat4.translate(cMatrix,position);
+    }
+}
+
+/**
+* Maps the matrices to shader matrix uniforms
+*
+* Called once per rendering cycle. 
+*/
+function setMatrixUniforms(){
+
+    if (coords == COORDS_WORLD){
+            mat4.inverse(mvMatrix,cMatrix);     //Obtain Camera Matrix from Model-View Matrix
+            displayMatrix(mvMatrix);
+            gl.uniformMatrix4fv(prg.uMVMatrix, false, mvMatrix);
+    }
+    else{
+         mat4.inverse(cMatrix, mvMatrix);      //Obtain Model-View matrix from Camera Matrix
+         displayMatrix(cMatrix);
+         
+     }
+     
+     gl.uniformMatrix4fv(prg.uPMatrix, false, pMatrix);    //Maps the Perspective matrix to the uniform prg.uPMatrix
+     gl.uniformMatrix4fv(prg.uMVMatrix, false, mvMatrix);  //Maps the Model-View matrix to the uniform prg.uMVMatrix
+     mat4.transpose(cMatrix, nMatrix);                     //Calculates the Normal matrix 
+     gl.uniformMatrix4fv(prg.uNMatrix, false, nMatrix);    //Maps the Normal matrix to the uniform prg.uNMatrix
+}
+
+/**
+*  Configures the gl context
+*/
+function configure(){
+    gl.clearColor(0.3,0.3,0.3, 1.0);
+    gl.clearDepth(100.0);
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LESS);
+    initTransforms();
+}
+
+
+/**
+* Loads the scene
+*/
+function load(){
+    
+    Floor.build(80,2);
+    Axis.build(82);
+    Scene.addObject(Floor);
+    Scene.addObject(Axis);
+    Scene.loadObject('models/geometry/cone.json','cone');
+}
+
+
+/**
+* invoked on every rendering cycle
+*/
+function draw() {
+    gl.viewport(0, 0, c_width, c_height);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        
+    try{
+        
+        updateTransforms();   
+        setMatrixUniforms(); 
+        
+        for (var i = 0; i < Scene.objects.length; i++){
+            
+            var object = Scene.objects[i];
+            
+            //Setting uniforms
+            gl.uniform4fv(prg.uMaterialDiffuse, object.diffuse);
+            gl.uniform1i(prg.uWireframe,object.wireframe);
+            gl.uniform1i(prg.uPerVertexColor, object.perVertexColor);
+            
+            //Setting attributes
+            gl.enableVertexAttribArray(prg.aVertexPosition);
+            gl.disableVertexAttribArray(prg.aVertexNormal);
+            gl.disableVertexAttribArray(prg.aVertexColor);
+            
+            gl.bindBuffer(gl.ARRAY_BUFFER, object.vbo);
+            gl.vertexAttribPointer(prg.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(prg.aVertexPosition);
+            
+            if(!object.wireframe){
+                gl.bindBuffer(gl.ARRAY_BUFFER, object.nbo);
+                gl.vertexAttribPointer(prg.aVertexNormal, 3, gl.FLOAT, false, 0, 0);
+                gl.enableVertexAttribArray(prg.aVertexNormal);
+            }
+            
+            if (object.perVertexColor){
+                gl.bindBuffer(gl.ARRAY_BUFFER, object.cbo);
+                gl.vertexAttribPointer(prg.aVertexColor,4,gl.FLOAT, false, 0,0);
+                gl.enableVertexAttribArray(prg.aVertexColor);
+            }
+            
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, object.ibo);
+            
+            if (object.wireframe){
+                gl.drawElements(gl.LINES, object.indices.length, gl.UNSIGNED_SHORT,0);
+            }
+            else{
+                gl.drawElements(gl.TRIANGLES, object.indices.length, gl.UNSIGNED_SHORT,0);
+            }
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+            
+        }
+    }
+    catch(err){
+        alert(err);
+        console.error(err.description);
+    }
+}
+
+
+/**
+* Entry point. This function is invoked when the page is loaded
+*/
+var app = null;
+function runWebGLApp() {
+    app = new WebGLApp("canvas-element-id")
+    app.configureGLHook = configure;
+    app.loadSceneHook   = load;
+    app.drawSceneHook   = draw;
+    app.run();
+
+}
+</script>
+</head>
+
+<body onLoad='runWebGLApp()'>
+<div id='top'>
+<h1>WebGL Beginner's Guide - Chapter 4</h1>
+<h2>Model-View Matrix: Rotation</h2>
+<div id='logo-packt'><img src='packt.gif'/></div>
+<p></p>
+</div>
+
+<div id='contents'>
+<div id='canvasContainer'>
+<canvas id='canvas-element-id' width='480' height='400'>
+Your browser does not support the HTML5 canvas element.
+</canvas>
+</div>
+</div>
+
+<div id='bottom'>
+<table>
+<tr>
+<td style='vertical-align:top'> 
+<table style='padding=4px'>
+<tr>
+<td>X:</td><td id='slider-x-value'>0.0</td><td>degrees</td><td width='150px'><div id='slider-x'/></td>
+</tr>
+<tr>
+<td>Y:</td><td id='slider-y-value'>0.0</td><td style+'text-align='center'>degrees</td><td width='150px'><div id='slider-y'/></td>
+</tr>
+<tr>
+<td>Z:</td> <td id='slider-z-value'>0.0</td><td align='center'>degrees</td><td width='150px'><div id='slider-z'/></td>
+</tr>
+<tr>
+<td colspan='3'/>
+<td align='center' style=''>
+    <div id='opt-coords'>
+        <input type='radio' id='opt-world' name='coords' checked='checked'/><label for='opt-world'>World</label>
+        <input type='radio' id='opt-camera' name='coords'/><label for='opt-camera'>Camera</label>
+    </div>
+</td>
+</tr>
+</table>
+</td>
+<td align='center' style='vertical-align:top'>
+<table id='tbl-matrix'>
+<tr><td id='m0' style='font-weight:bold'></td><td id='m4' style='font-weight:bold'></td><td id='m8' style='font-weight:bold'></td><td id='m12'></td></tr>
+<tr><td id='m1' style='font-weight:bold'></td><td id='m5' style='font-weight:bold'></td><td id='m9' style='font-weight:bold'></td><td id='m13'></td></tr>
+<tr><td id='m2' style='font-weight:bold'></td><td id='m6' style='font-weight:bold'></td><td id='m10' style='font-weight:bold'></td><td id='m14'></td></tr>
+<tr><td id='m3'></td><td id='m7'></td><td id='m11'></td><td id='m15'></td></tr>
+</table>
+</td>
+</tr>
+</table>
+</div>
+<script> 
+
+$('#slider-x').slider({value:0.0, min:-180.0, max:180, step:1, slide:function(){updateAngle('#slider-x');}});
+$('#slider-y').slider({value:0.0, min:-180.0, max:180.0, step:1, slide:function(){updateAngle('#slider-y');}});
+$('#slider-z').slider({value:0.0, min:-180.0, max:180.0, step:1, slide:function(){updateAngle('#slider-z');}});
+
+
+function updateAngle(selector){
+    var angle = $(selector).slider("value");
+    $(selector+'-value').html(angle);
+    
+    if(selector == '#slider-x'){
+        rotation[0] = angle;
+    }
+    else if(selector == '#slider-y'){
+        rotation[1] = angle;
+    }
+    else if (selector == '#slider-z'){
+        rotation[2] = angle;
+    }
+    app.refresh();
+}
+
+function updateSliders(){
+    $('#slider-x').slider("value",rotation[0]);
+    $('#slider-y').slider("value",rotation[1]);
+    $('#slider-z').slider("value",rotation[2]);
+    $('#slider-x-value').html(rotation[0]);
+    $('#slider-y-value').html(rotation[1]);
+    $('#slider-z-value').html(rotation[2]); 
+}
+
+$('#opt-coords').buttonset();
+
+$('#opt-world').click(
+    function(){
+        vec3.set(home,position);
+        rotation = [0,0,0];
+        updateSliders();
+        coords = COORDS_WORLD;
+        app.refresh();
+});
+
+$('#opt-camera').click(
+    function(){
+        vec3.set(home,position);
+        vec3.negate(position);
+        rotation = [0,0,0];        
+        updateSliders();
+        coords = COORDS_CAMERA;
+        app.refresh();
+});
+
+function displayMatrix(m){
+    var selector = '';
+    for(var i=0;i<16;i++){
+        selector = '#m'+i;
+        $(selector).html(m[i].toFixed(1));
+    }
+}
+
+
+</script>
+<script>cview.run(cview.MODE_VIEW);</script>
+</body>
+</html>

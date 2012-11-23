@@ -59,13 +59,15 @@ vxlTrackerInteractor.prototype.onKeyDown = function(ev){
     
     var camera = this.camera;
     
-    //ROTATING
+    
     if (!this.altPressed && !this.shiftPressed){
         switch(this.keyPressed){
               case 38:camera.changeElevation(10);  break;
               case 40:camera.changeElevation(-10); break;
               case 37:camera.changeAzimuth(-10);   break;
               case 39:camera.changeAzimuth(10);    break;
+              case 70: this.view.fullscreen(true); break;
+              case 88: this.view.fullscreen(false); break;
               default: break;
         }
     }
