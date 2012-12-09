@@ -37,4 +37,7 @@ c4n3l4/
 *.pyc
 .settings
 *~
+beginners-guide*/
+beginners_guide*/
+source/plexo*/
 
