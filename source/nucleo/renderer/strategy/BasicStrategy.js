@@ -123,6 +123,12 @@ vxlBasicStrategy.prototype._allocateActor = function(actor){
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
 	}
 	
+	//Bounding box Buffer 
+    buffers.bb = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.bb);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vxlModel.BB_INDICES), gl.STATIC_DRAW);
+    
+	
 	//Texture Coords Buffer
 	if (model.texture){
 	    buffers.texcoords = gl.createBuffer();
@@ -150,6 +156,7 @@ vxlBasicStrategy.prototype._allocateActor = function(actor){
  * @param {vxlActor} the actor 
  * we will update each Model-View matrix of each renderer according to
  * the actor position,scale and rotation.
+ * @private
  */
 vxlBasicStrategy.prototype._applyActorTransform = function(actor){
     
@@ -159,18 +166,41 @@ vxlBasicStrategy.prototype._applyActorTransform = function(actor){
     var glsl 	= vxl.def.glsl;
 
     trx.push();
-        
-        
-		mat4.translate	(trx.mvMatrix, actor.position);
-		mat4.scale      (trx.mvMatrix, actor.scale);
-		//@TODO: IMPLEMENT ACTOR ROTATIONS
-	    
+        mat4.multiply(trx.mvMatrix, actor._matrix);
 	    prg.setUniform(glsl.MODEL_VIEW_MATRIX,	r.transforms.mvMatrix);
 
 	    trx.calculateModelViewPerspective();
         prg.setUniform(glsl.MVP_MATRIX, r.transforms.mvpMatrix);
+        
+        trx.calculateNormal(); 
+        prg.setUniform(glsl.NORMAL_MATRIX, r.transforms.nMatrix);
+    
     trx.pop();
     
+    
+    
+    
+    
+ };
+ 
+ 
+ /**
+ * Passes the matrices to the shading program
+ * @param {vxlActor} the actor 
+ * we will update each Model-View matrix of each renderer according to
+ * the actor position,scale and rotation.
+ * @private
+ */
+vxlBasicStrategy.prototype._applyGlobalTransform = function(){
+    
+    var r       = this.renderer;
+    var trx     = r.transforms
+    var prg     = r.prg;
+    var glsl    = vxl.def.glsl;
+
+    prg.setUniform(glsl.MODEL_VIEW_MATRIX,  r.transforms.mvMatrix);
+    trx.calculateModelViewPerspective();
+    prg.setUniform(glsl.MVP_MATRIX, r.transforms.mvpMatrix);
     trx.calculateNormal(); 
     prg.setUniform(glsl.NORMAL_MATRIX, r.transforms.nMatrix);
     

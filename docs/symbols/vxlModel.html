@@ -37,7 +37,7 @@
 			<!-- begin publish.classesIndex -->
 			<div align="center"><h2><a href="../index.html">Class List</a></h2></div>
 <hr />
-<h3>Current Version:  0.88</h3>
+<h3>Current Version:  0.89</h3>
 <p>Download it <a href='http://voxelent.com/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -58,6 +58,8 @@
 	<li><a href="../symbols/vxl.def.camera.html">vxl.def.camera</a></li>
 	
 	<li><a href="../symbols/vxl.def.glsl.html">vxl.def.glsl</a></li>
+	
+	<li><a href="../symbols/vxl.def.interactor.html">vxl.def.interactor</a></li>
 	
 	<li><a href="../symbols/vxl.def.lut.html">vxl.def.lut</a></li>
 	
@@ -179,6 +181,30 @@
 
 <!-- ============================== properties summary ===================== -->
 			
+				
+				
+				<h2>Field Summary</h2>
+				<table class="summaryTable" summary="A summary of the fields documented in the class vxlModel.">
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">
+							    &lt;static&gt;&nbsp;</div></td>
+															
+							<td class="nameDescription">
+								<div class="fixedFont">
+								vxlModel.<b><a href="../symbols/vxlModel.html#.BB_INDICES">BB_INDICES</a></b>
+								</div>
+
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+
+				
+			
 
 <!-- ============================== methods summary ======================== -->
 			
@@ -225,7 +251,7 @@
 								
 								
 								<b><a href="../symbols/vxlModel.html#computeNormals">computeNormals</a></b>
-								(reverse)
+								()
 								</div>
 							</td>
 							
@@ -247,6 +273,50 @@
 								
 								
 								<b><a href="../symbols/vxlModel.html#computeWireframeIndices">computeWireframeIndices</a></b>
+								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlModel.html#flipNormals">flipNormals</a></b>
+								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlModel.html#getBoundingBoxVertices">getBoundingBoxVertices</a></b>
 								()
 								</div>
 							</td>
@@ -358,6 +428,35 @@
 
 <!-- ============================== field details ========================== -->
 			
+				<h2>
+					Field Detail
+				</h2>
+				
+					<div class='methodDetail'>
+					<a name=".BB_INDICES"> </a>
+					<div class="title">
+					<div class="fixedFont">&lt;static&gt; 
+
+					
+					<span class="light">vxlModel.</span><b>BB_INDICES</b>
+					</div>
+					</div>
+					<div class="description">
+						Indices to draw the bounding box. The vertices in this case will correspondto the actor bounding box calculation
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+
+					</div>
+				
+			
 
 <!-- ============================== method details ========================= -->
 			
@@ -407,7 +506,7 @@
 					
 					
 					
-					  <b>computeNormals</b>(reverse)
+					  <b>computeNormals</b>()
 					</div>
 					</div>
 					<div class="description">
@@ -418,23 +517,6 @@
 
 					
 
-						
-							<p class="heading">Parameters:</p>
-							<table class="paramTable">
-							
-							<tr><td>
-									<span class="light fixedFont">{bool}</span> 
-								</td>
-								<td>
-									<code>reverse</code>
-								</td>	
-								<td><p>if true will calculate the reversed normals
-								
-								</p>
-								</td>
-							</tr>	
-							
-							</table>
 						
 						
 						
@@ -460,6 +542,68 @@
 					</div>
 					<div class="description">
 						Generate the wireframe indices using the model indices
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="flipNormals"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>flipNormals</b>()
+					</div>
+					</div>
+					<div class="description">
+						Flips the normals
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="getBoundingBoxVertices"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>getBoundingBoxVertices</b>()
+					</div>
+					</div>
+					<div class="description">
+						Returns the bounding box vertices. This method is used by the rendering engine
 						
 						
 					</div>
@@ -547,7 +691,7 @@
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Nov 23 2012 10:51:48 GMT-0500 (EST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Dec 09 2012 17:32:43 GMT-0500 (EST)
 		</div>
         </div>
         </div>

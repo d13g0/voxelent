@@ -37,7 +37,7 @@
 			<!-- begin publish.classesIndex -->
 			<div align="center"><h2><a href="../index.html">Class List</a></h2></div>
 <hr />
-<h3>Current Version:  0.88</h3>
+<h3>Current Version:  0.89</h3>
 <p>Download it <a href='http://voxelent.com/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -58,6 +58,8 @@
 	<li><a href="../symbols/vxl.def.camera.html">vxl.def.camera</a></li>
 	
 	<li><a href="../symbols/vxl.def.glsl.html">vxl.def.glsl</a></li>
+	
+	<li><a href="../symbols/vxl.def.interactor.html">vxl.def.interactor</a></li>
 	
 	<li><a href="../symbols/vxl.def.lut.html">vxl.def.lut</a></li>
 	
@@ -313,7 +315,7 @@
 								
 								
 								<b><a href="../symbols/vxl.api.html#.flipActorNormals">flipActorNormals</a></b>
-								(flag)
+								()
 								</div>
 							</td>
 							
@@ -378,8 +380,52 @@
 								vxl.api.
 								
 								
+								<b><a href="../symbols/vxl.api.html#.getActor">getActor</a></b>
+								(actorNameOrUID, scene)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&lt;static&gt;&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								vxl.api.
+								
+								
 								<b><a href="../symbols/vxl.api.html#.getActorByName">getActorByName</a></b>
 								(actorName, scene)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&lt;static&gt;&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								vxl.api.
+								
+								
+								<b><a href="../symbols/vxl.api.html#.getActorByUID">getActorByUID</a></b>
+								(actorUID, scene)
 								</div>
 							</td>
 							
@@ -516,6 +562,28 @@
 								
 								<b><a href="../symbols/vxl.api.html#.getLookupTables">getLookupTables</a></b>
 								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&lt;static&gt;&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								vxl.api.
+								
+								
+								<b><a href="../symbols/vxl.api.html#.getProgram">getProgram</a></b>
+								(view)
 								</div>
 							</td>
 							
@@ -1433,34 +1501,17 @@
 					
 					     <span class="light">vxl.api.</span>
 					
-					  <b>flipActorNormals</b>(flag)
+					  <b>flipActorNormals</b>()
 					</div>
 					</div>
 					<div class="description">
-						
+						Flip the normals of the current actor or the whole scene if the current actor is undefined
 						
 						
 					</div>
 
 					
 
-						
-							<p class="heading">Parameters:</p>
-							<table class="paramTable">
-							
-							<tr><td>
-									<span class="light fixedFont">{bool}</span> 
-								</td>
-								<td>
-									<code>flag</code>
-								</td>	
-								<td><p>if true this method will flip the normals. If false normals will becalculated the 'normal' way.
-								
-								</p>
-								</td>
-							</tr>	
-							
-							</table>
 						
 						
 						
@@ -1566,6 +1617,68 @@
 				</div>	
 				
 				<div class='methodDetail'>
+					<a name=".getActor"> </a>
+					<div class="title">
+					<div class="fixedFont">&lt;static&gt; 
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					     <span class="light">vxl.api.</span>
+					
+					  <b>getActor</b>(actorNameOrUID, scene)
+					</div>
+					</div>
+					<div class="description">
+						Retrieves an actor by name or UID
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{String}</span> 
+								</td>
+								<td>
+									<code>actorNameOrUID</code>
+								</td>	
+								<td><p>actor name or UID
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									<span class="light fixedFont">{<a href="../symbols/vxlScene.html">vxlScene</a>}</span> 
+								</td>
+								<td>
+									<code>scene</code>
+								</td>	
+								<td><p>looks in the specified scene. This parameter is optional. If not specified, the current scene (vxl.c.scene) will be queried
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
 					<a name=".getActorByName"> </a>
 					<div class="title">
 					<div class="fixedFont">&lt;static&gt; 
@@ -1600,6 +1713,68 @@
 									<code>actorName</code>
 								</td>	
 								<td><p>the name of the actor
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									<span class="light fixedFont">{<a href="../symbols/vxlScene.html">vxlScene</a>}</span> 
+								</td>
+								<td>
+									<code>scene</code>
+								</td>	
+								<td><p>looks in the specified scene. This parameter is optional. If not specified, the current scene (vxl.c.scene) will be queried
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name=".getActorByUID"> </a>
+					<div class="title">
+					<div class="fixedFont">&lt;static&gt; 
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					     <span class="light">vxl.api.</span>
+					
+					  <b>getActorByUID</b>(actorUID, scene)
+					</div>
+					</div>
+					<div class="description">
+						Retrieves an actor object by UID
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{String}</span> 
+								</td>
+								<td>
+									<code>actorUID</code>
+								</td>	
+								<td><p>the UID of the actor
 								
 								</p>
 								</td>
@@ -1882,6 +2057,56 @@
 
 					
 
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name=".getProgram"> </a>
+					<div class="title">
+					<div class="fixedFont">&lt;static&gt; 
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					     <span class="light">vxl.api.</span>
+					
+					  <b>getProgram</b>(view)
+					</div>
+					</div>
+					<div class="description">
+						Returns the name of the current program
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{<a href="../symbols/vxlView.html">vxlView</a>}</span> 
+								</td>
+								<td>
+									<code>view</code>
+								</td>	
+								<td><p>the view that we want to query. If this parameter is not passed,the current view will be used (vxl.c.view)
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
 						
 						
 						
@@ -3550,7 +3775,7 @@
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Nov 23 2012 10:51:48 GMT-0500 (EST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Dec 09 2012 17:32:42 GMT-0500 (EST)
 		</div>
         </div>
         </div>

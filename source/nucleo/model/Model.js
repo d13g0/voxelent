@@ -43,12 +43,19 @@ function vxlModel(name, JSON_OBJECT){
 }
 
 /**
+ * Indices to draw the bounding box. The vertices in this case will correspond
+ * to the actor bounding box calculation 
+ * @static
+ */
+vxlModel.BB_INDICES = [0,1,1,2,2,3,3,0,0,4,4,5,5,6,6,7,7,4,1,5,2,6,3,7];
+
+/**
  * Populates this model with the JSON_OBJECT (JSON object)
  * @param {String} nm the name given to this model
  * @param {Object} JSON_OBJECT the JSON object that describes the model
  */
 vxlModel.prototype.load = function(nm,JSON_OBJECT){
-	this.name		= nm;
+	this.name		= nm.replace(/\.[^/.]+$/, "")
 	if (JSON_OBJECT.name != null){ //if the name is defined in the JSON object, then use it
 		this.name = JSON_OBJECT.name;
 	}
@@ -91,13 +98,9 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
 /**
  * Calculates the normals for this model in case that the JSON object does not include them
  * 
- * @param {bool} reverse if true will calculate the reversed normals
  * 
  */
-vxlModel.prototype.computeNormals = function(reverse){
-	if (reverse == undefined){
-		reverse = false;
-	}
+vxlModel.prototype.computeNormals = function(){
   //face normal calculation
     var vs = this.vertices;
 	var ind = this.indices;
@@ -129,12 +132,6 @@ vxlModel.prototype.computeNormals = function(reverse){
 		normal[y] = v1[z]*v2[x] - v1[x]*v2[z];
 		normal[z] = v1[x]*v2[y] - v1[y]*v2[x];
 		
-		if (reverse){
-			normal[x] = -normal[x];
-			normal[y] = -normal[y]; 
-			normal[z] = -normal[z]; 
-		}
-		
 		for(j=0;j<3;j++){ //update the normals of the triangle
 			ns[3*ind[i+j]+x] =  ns[3*ind[i+j]+x] + normal[x];
 			ns[3*ind[i+j]+y] =  ns[3*ind[i+j]+y] + normal[y];
@@ -162,6 +159,19 @@ vxlModel.prototype.computeNormals = function(reverse){
 		ns[i+z] = nn[z];
 	}
 	this.normals = ns;
+};
+
+/**
+ * Flips the normals 
+ */
+vxlModel.prototype.flipNormals = function(){
+    var ns = this.normals;
+    
+    if (ns == undefined) return; //no normals
+    
+    for (var i=0; i<ns.length; i+=1){
+        ns[i] = -ns[i];
+    }
 };
   
 /**
@@ -213,4 +223,19 @@ vxlModel.prototype.computeBoundingBox = function(){
     this.centre = c;
 };
 
-
+/**
+ *Returns the bounding box vertices. This method is used by the rendering engine 
+ */
+vxlModel.prototype.getBoundingBoxVertices = function(){
+    var b = this.bb;
+    return [
+        b[0], b[1], b[2],
+        b[0], b[4], b[2],
+        b[3], b[4], b[2],
+        b[3], b[1], b[2],
+        b[0], b[1], b[5],
+        b[0], b[4], b[5],
+        b[3], b[4], b[5],
+        b[3], b[1], b[5] 
+        ];
+};

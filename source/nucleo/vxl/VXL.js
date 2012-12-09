@@ -54,7 +54,7 @@ var vxl = {
 */
 version : 
 {
-   	number : '0.87.6',
+    number: '0.89',
    	codename : 'c4n314',
    	plugins  : []
 },
@@ -68,6 +68,14 @@ version :
  * 
  */
 def : {
+    /**
+     * Multiplicative constant to convert degrees to radians
+     */
+    deg2rad : Math.PI / 180,
+    /**
+     * Multiplicative constant to convert radians to degrees 
+     */
+    rad2deg : 180 / Math.PI,
     /**
      * Used mainly by <code>vxlRenderStrategy</code> and its descendents
      * @namespace GLSL constants
@@ -138,7 +146,29 @@ def : {
     */
     view			: {
     					background: [135/256,135/256,135/256]
-    				},			      
+    					
+    				},	
+    /**
+     *@namespace Default values for view interactors 
+     */ 				
+    interactor :{
+                        /** 
+                         * 
+                         * Enumeration of common camera tasks
+                         * 
+                         * <p>The camera tasks can be:
+                         * <ul>
+                         * <li><code>NONE</code></li>
+                         * <li><code>PAN</code></li> 
+                         * <li><code>ROTATE</code></li> 
+                         * <li><code>DOLLY</code></li>
+                         * <li><code>ROLL</code></li>
+                         * </ul>
+                         * </p>
+                         *  These constants are used internally and you probably would never need to use them.
+                         */
+                        task      : { NONE : 0, PAN : 1, ROTATE : 2, DOLLY : 3, ROLL : 4}
+    },     						      
 	/**
     * Contains the constants and default values that can be associated with <code>vxlActor</code>
     * 
@@ -154,6 +184,7 @@ def : {
                          * <li><code>WIREFRAME</code></li> 
                          * <li><code>POINTS</code></li> 
                          * <li><code>LINES</code></li>
+                         * <li><code>BOUNDING_BOX</code> (added in 0.88.1)</li>
                          * </ul>
                          * </p>
                          * <p> to set the actor mode you should use the <code>{@link vxlActor#setVisualizationMode}</code>
@@ -165,7 +196,16 @@ def : {
                          * </pre>
                          * @see vxlActor#setVisualizationMode
                          */
-						mode: {	TEXTURED:'TEXTURED', SOLID:'SOLID', WIREFRAME:'WIREFRAME', POINTS:'POINTS', LINES:'LINES'}
+						mode: {	
+						        TEXTURED:'TEXTURED', 
+						        SOLID:'SOLID', 
+						        WIREFRAME:'WIREFRAME', 
+						        POINTS:'POINTS', 
+						        LINES:'LINES', 
+						        BOUNDING_BOX:'BOUNDING_BOX',
+						        BB_AND_SOLID:'BBANDSOLID'
+						 }
+						
 					},
 	/**
 	 * Defines the constants that can be used with <code>vxlCamera</code> 
@@ -173,21 +213,7 @@ def : {
      * @namespace Default values for cameras
      */
 	camera          : {
-                        /** 
-                         * 
-                         * Enumeration of common camera tasks
-                         * 
-                         * <p>The camera tasks can be:
-                         * <ul>
-                         * <li><code>NONE</code></li>
-                         * <li><code>PAN</code></li> 
-                         * <li><code>ROTATE</code></li> 
-                         * <li><code>DOLLY</code></li>
-                         * </ul>
-                         * </p>
-                         *  These constants are used internally and you probably would never need to use them.
-                         */
-						task      : {	NONE : 0,	PAN : 1,	ROTATE : 2,	DOLLY : 3	},
+                        
                         /** 
                          * Camera types available
                          * 
@@ -224,9 +250,43 @@ def : {
     					/**
     					 * Default value for the far field: 10000 
     					 */
-    					far       : 10000
-    					
-    					
+    					far       : 10000,
+    					/**
+                         * <p>Defines the tracking modes available for instances of vxlCamera</p>
+                         * <p>A tracking mode is <u>only</u> required when the camera is set to follow an 
+                         * actor using <code>{@link vxlCamera#follow}</code></p> 
+                         * <p>The tracking  modes can be:
+                         * <ul>
+                         * <li><code>DEFAULT</code>: Used when the model associated with this actor has a texture</li>
+                         * <li><code>ROTATIONAL</code></li>
+                         * <li><code>TRANSLATIONAL</code></li> 
+                         * </ul>
+                         * </p>
+                         * <p> to set the tracking mode of the camera <code>myCamera</code> you should make sure that your camera is of tracking type with:
+                         *  <code>myCamera.setType(vxl.def.camera.type.TRACKING)</code>.
+                         *  For instance:
+                         * </p>
+                         *  <pre class='prettyprint'>
+                         *  var actor = vxl.api.getActor('cone'); //from the current scene
+                         *  var camera = vxl.c.camera;
+                         *  camera.setType(vxl.def.camera.type.TRACKING);
+                         *  camera.setTrackingMode(vxl.def.camera.tracking.ROTATIONAL);
+                         *  camera.follow(actor);
+                         * </pre>
+                         * <p> a shorter way would be:</p>
+                         * <pre class='prettyprint'>
+                         *  var actor = vxl.api.getActor('cone'); //from the current scene
+                         *  var camera = vxl.c.camera;
+                         *  camera.setType(vxl.def.camera.type.TRACKING);
+                         *  camera.follow(actor, vxl.def.camera.tracking.ROTATIONAL);
+                         * </pre>
+                         * @see vxlCamera#follow, vxlCamera#setTrackingMode
+                         */
+                        tracking: {
+                              DEFAULT:'DEFAULT',
+                              ROTATIONAL:'ROTATIONAL',
+                              TRANSLATIONAL:'TRANSLATIONAL'   
+                        }
 					},
 				 	
     /**
@@ -282,6 +342,7 @@ events : {
 	MODELS_LOADED		   : 'vxl.events.MODELS_LOADED',
 	ACTOR_MOVED            : 'vxl.events.ACTOR_MOVED',
 	ACTOR_SCALED           : 'vxl.events.ACTOR_SCALED',
+	ACTOR_ROTATED          : 'vxl.events.ACTOR_ROTATED',
 	ACTOR_CHANGED_COLOR    : 'vxl.events.ACTOR_CHANGED_COLOR',
 	ACTOR_CHANGED_SHADING  : 'vxl.events.ACTOR_CHANGED_SHADING',
 	VIEW_NEW               : 'vxl.events.VIEW_NEW',
@@ -467,7 +528,25 @@ util : {
         }
         else   
             return path + '/';
+    },
+    /**
+     * Returns an angle between 0 and 360 deg
+     * @param{Number} angle the angle 
+     */
+    getAngle: function(angle){
+        if (angle > 360 || angle <-360) {
+            return angle % 360;
+        }
+        else return angle;
+    },
+    /**
+     *Converts degrees to radians
+     * @param{Number} deg angle in degrees 
+     */
+    deg2rad: function(deg){
+        return deg * Math.PI / 180;
     }
+    
 }
 
 };

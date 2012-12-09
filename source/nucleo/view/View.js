@@ -291,5 +291,12 @@ vxlView.prototype.refresh = function(){
  */
 vxlView.prototype.setDragAndDrop = function(flag){
     this.dragndrop = flag;
-}
+};
 
+/**
+ * Get FPS metric from the view renderer
+ */
+vxlView.prototype.getFPS = function(){
+    return this.renderer.fps;
+    
+};

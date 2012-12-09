@@ -89,7 +89,10 @@ vxlPhongStrategy.prototype._renderActor = function(actor){
 	var trx 	= r.transforms;
 	var glsl    = vxl.def.glsl;
 	
-	this._applyActorTransform(actor);
+	if (actor.mode != vxl.def.actor.mode.BOUNDING_BOX &&
+        actor.mode != vxl.def.actor.mode.BB_AND_SOLID){
+       this._applyActorTransform(actor);
+    }
 	
 	var diffuse = [actor.color[0], actor.color[1], actor.color[2],1.0];
 	
@@ -200,6 +203,31 @@ vxlPhongStrategy.prototype._renderActor = function(actor){
 			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
 			gl.drawElements(gl.LINES, model.wireframe.length, gl.UNSIGNED_SHORT,0);
 		}
+		else if (actor.mode == vxl.def.actor.mode.BOUNDING_BOX){
+            prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
+            prg.setUniform("uUseShading", false);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.getBoundingBoxVertices()), gl.STATIC_DRAW);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.bb);
+            gl.drawElements(gl.LINES, vxlModel.BB_INDICES.length, gl.UNSIGNED_SHORT,0);
+            
+        }
+        else if (actor.mode == vxl.def.actor.mode.BB_AND_SOLID){
+            //solid
+            this._applyActorTransform(actor);
+            prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
+            prg.setUniform("uUseShading",actor.shading);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+            gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
+            //bounding box
+            this._applyGlobalTransform();
+            prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
+            prg.setUniform("uUseShading", false);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.getBoundingBoxVertices()), gl.STATIC_DRAW);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.bb);
+            gl.drawElements(gl.LINES, vxlModel.BB_INDICES.length, gl.UNSIGNED_SHORT,0);
+        }
 		else if (actor.mode == vxl.def.actor.mode.POINTS){
 			prg.setUniform("uUseShading", true);
 			prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);

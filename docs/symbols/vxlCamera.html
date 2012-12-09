@@ -37,7 +37,7 @@
 			<!-- begin publish.classesIndex -->
 			<div align="center"><h2><a href="../index.html">Class List</a></h2></div>
 <hr />
-<h3>Current Version:  0.88</h3>
+<h3>Current Version:  0.89</h3>
 <p>Download it <a href='http://voxelent.com/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -58,6 +58,8 @@
 	<li><a href="../symbols/vxl.def.camera.html">vxl.def.camera</a></li>
 	
 	<li><a href="../symbols/vxl.def.glsl.html">vxl.def.glsl</a></li>
+	
+	<li><a href="../symbols/vxl.def.interactor.html">vxl.def.interactor</a></li>
 	
 	<li><a href="../symbols/vxl.def.lut.html">vxl.def.lut</a></li>
 	
@@ -247,6 +249,50 @@ matrix manipulations that are required to view a 3D scene.</div>
 								
 								
 								
+								<b><a href="../symbols/vxlCamera.html#changeRoll">changeRoll</a></b>
+								(rl)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlCamera.html#closeUp">closeUp</a></b>
+								(actor)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
 								<b><a href="../symbols/vxlCamera.html#dolly">dolly</a></b>
 								(value)
 								</div>
@@ -269,8 +315,8 @@ matrix manipulations that are required to view a 3D scene.</div>
 								
 								
 								
-								<b><a href="../symbols/vxlCamera.html#focusOn">focusOn</a></b>
-								()
+								<b><a href="../symbols/vxlCamera.html#follow">follow</a></b>
+								(actor, trackingMode)
 								</div>
 							</td>
 							
@@ -317,6 +363,28 @@ matrix manipulations that are required to view a 3D scene.</div>
 								
 								<b><a href="../symbols/vxlCamera.html#longShot">longShot</a></b>
 								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlCamera.html#lookAt">lookAt</a></b>
+								(actor)
 								</div>
 							</td>
 							
@@ -404,7 +472,7 @@ matrix manipulations that are required to view a 3D scene.</div>
 								
 								
 								<b><a href="../symbols/vxlCamera.html#rotate">rotate</a></b>
-								(azimuth, elevation)
+								(azimuth, elevation, roll)
 								</div>
 							</td>
 							
@@ -557,8 +625,74 @@ matrix manipulations that are required to view a 3D scene.</div>
 								
 								
 								
+								<b><a href="../symbols/vxlCamera.html#setMatrix">setMatrix</a></b>
+								(matrix)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
 								<b><a href="../symbols/vxlCamera.html#setPosition">setPosition</a></b>
-								(x, y, z)
+								(y, z, z)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlCamera.html#setRoll">setRoll</a></b>
+								(angle)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlCamera.html#setTrackingMode">setTrackingMode</a></b>
+								(mode)
 								</div>
 							</td>
 							
@@ -580,29 +714,7 @@ matrix manipulations that are required to view a 3D scene.</div>
 								
 								
 								<b><a href="../symbols/vxlCamera.html#setType">setType</a></b>
-								(t)
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-							      <span>void</span>   
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
-								<b><a href="../symbols/vxlCamera.html#shot">shot</a></b>
-								(bb)
+								(type, trackingMode)
 								</div>
 							</td>
 							
@@ -625,6 +737,72 @@ matrix manipulations that are required to view a 3D scene.</div>
 								
 								<b><a href="../symbols/vxlCamera.html#status">status</a></b>
 								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlCamera.html#translate">translate</a></b>
+								(x, y, z)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlCamera.html#unfollow">unfollow</a></b>
+								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlCamera.html#updateWithActor">updateWithActor</a></b>
+								(actor)
 								</div>
 							</td>
 							
@@ -735,7 +913,7 @@ multiple cameras.
 					</div>
 					</div>
 					<div class="description">
-						Change the azimuth of the camera
+						Changes the initial azimuth of the camera
 						
 						
 					</div>
@@ -783,7 +961,7 @@ multiple cameras.
 					</div>
 					</div>
 					<div class="description">
-						Change the elevation of the camera
+						Changes the initial elevation of the camera
 						
 						
 					</div>
@@ -813,6 +991,107 @@ multiple cameras.
 						
 						
 						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="changeRoll"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>changeRoll</b>(rl)
+					</div>
+					</div>
+					<div class="description">
+						Changes the initial roll of the camera
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{Number}</span> 
+								</td>
+								<td>
+									<code>rl</code>
+								</td>	
+								<td><p>the roll increment in degrees
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="closeUp"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>closeUp</b>(actor)
+					</div>
+					</div>
+					<div class="description">
+						Performs a close up of an actor.
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{String|<a href="../symbols/vxlActor.html">vxlActor</a>}</span> 
+								</td>
+								<td>
+									<code>actor</code>
+								</td>	
+								<td><p>The name of the actor or the actor object this camera will look at.
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+							<p class="heading">See:</p>
+							
+								<span><a href="http://en.wikipedia.org/wiki/Close-up">Close-up (Wikipedia)</a></span>
+							
 						
 				</div>	
 				
@@ -873,7 +1152,7 @@ For that effect, every time that the new position  (after dollying) is calculate
 				</div>	
 				
 				<div class='methodDetail'>
-					<a name="focusOn"> </a>
+					<a name="follow"> </a>
 					<div class="title">
 					<div class="fixedFont">
 
@@ -883,11 +1162,12 @@ For that effect, every time that the new position  (after dollying) is calculate
 					
 					
 					
-					  <b>focusOn</b>()
+					  <b>follow</b>(actor, trackingMode)
 					</div>
 					</div>
 					<div class="description">
-						
+						Follows a given actor. If this operation is called on an ORBITING camera,
+the camera type will change to be a TRACKING camera.
 						
 						
 					</div>
@@ -899,12 +1179,24 @@ For that effect, every time that the new position  (after dollying) is calculate
 							<table class="paramTable">
 							
 							<tr><td>
+									<span class="light fixedFont">{<a href="../symbols/vxlActor.html">vxlActor</a>}</span> 
+								</td>
+								<td>
+									<code>actor</code>
+								</td>	
+								<td><p>actor to track
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
 									<span class="light fixedFont">{String}</span> 
 								</td>
 								<td>
-									<code>actorName.</code>
+									<code>trackingMode</code>
 								</td>	
-								<td><p>The name of the actor that the camera will focus on
+								<td><p>one of the possible values of <code>vxl.def.camera.tracking</code>
 								
 								</p>
 								</td>
@@ -917,6 +1209,11 @@ For that effect, every time that the new position  (after dollying) is calculate
 						
 						
 						
+						
+							<p class="heading">See:</p>
+							
+								<span></span>
+							
 						
 				</div>	
 				
@@ -986,6 +1283,59 @@ A long shot uses the global bounding box of the view's scene
 
 					
 
+						
+						
+						
+						
+						
+						
+						
+							<p class="heading">See:</p>
+							
+								<span><a href="http://en.wikipedia.org/wiki/Long_shot">Long Shot (Wikipedia)</a></span>
+							
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="lookAt"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>lookAt</b>(actor)
+					</div>
+					</div>
+					<div class="description">
+						Looks at a given actor without displacing the camera
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{String|<a href="../symbols/vxlActor.html">vxlActor</a>}</span> 
+								</td>
+								<td>
+									<code>actor</code>
+								</td>	
+								<td><p>The name of the actor or the actor object this camera will look at.
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
 						
 						
 						
@@ -1152,7 +1502,7 @@ vxlCamera.refresh -> vxlView.refresh -> vxlRenderer.render
 					
 					
 					
-					  <b>rotate</b>(azimuth, elevation)
+					  <b>rotate</b>(azimuth, elevation, roll)
 					</div>
 					</div>
 					<div class="description">
@@ -1186,6 +1536,18 @@ vxlCamera.refresh -> vxlView.refresh -> vxlRenderer.render
 									<code>elevation</code>
 								</td>	
 								<td><p>the relative elevation
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>roll</code>
+								</td>	
+								<td><p>
 								
 								</p>
 								</td>
@@ -1300,7 +1662,7 @@ vxlCamera.refresh -> vxlView.refresh -> vxlRenderer.render
 					</div>
 					</div>
 					<div class="description">
-						Sets the azimuth of the camera
+						Sets the initial azimuth of the camera
 						
 						
 					</div>
@@ -1348,7 +1710,7 @@ vxlCamera.refresh -> vxlView.refresh -> vxlRenderer.render
 					</div>
 					</div>
 					<div class="description">
-						Sets the distance from the current focal point
+						Position the camera to a given distance from the current focal point
 						
 						
 					</div>
@@ -1365,7 +1727,7 @@ vxlCamera.refresh -> vxlView.refresh -> vxlRenderer.render
 								<td>
 									<code>d</code>
 								</td>	
-								<td><p>
+								<td><p>the distance
 								
 								</p>
 								</td>
@@ -1396,7 +1758,7 @@ vxlCamera.refresh -> vxlView.refresh -> vxlRenderer.render
 					</div>
 					</div>
 					<div class="description">
-						Sets the elevation of the camera
+						Sets the initial elevation of the camera
 						
 						
 					</div>
@@ -1444,10 +1806,7 @@ vxlCamera.refresh -> vxlView.refresh -> vxlRenderer.render
 					</div>
 					</div>
 					<div class="description">
-						Sets the focal point of the camera
-
-This method has three parameters x,y,z which represent the coordinates for 
-the camera's focus.
+						Looks at a given point in space (sets the focal point of this camera)
 						
 						
 					</div>
@@ -1459,12 +1818,12 @@ the camera's focus.
 							<table class="paramTable">
 							
 							<tr><td>
-									<span class="light fixedFont">{Number|<a href="../symbols/Array.html">Array</a>}</span> 
+									<span class="light fixedFont">{Number|<a href="../symbols/Array.html">Array</a>|vec3}</span> 
 								</td>
 								<td>
 									<code>x</code>
 								</td>	
-								<td><p>the x-coordinate. x can also be an Array [a,b,c] in this case the y and z parameters are discarded.
+								<td><p>it can be the x coordinate, a 3-dimensional Array or a vec3 (glMatrix)
 								
 								</p>
 								</td>
@@ -1476,7 +1835,7 @@ the camera's focus.
 								<td>
 									<code>y</code>
 								</td>	
-								<td><p>the y-coordinate
+								<td><p>if x is a number, then this parameter corresponds to the y-coordinate
 								
 								</p>
 								</td>
@@ -1488,7 +1847,55 @@ the camera's focus.
 								<td>
 									<code>z</code>
 								</td>	
-								<td><p>the z-coordinate
+								<td><p>if x is a number, then this parameter corresponds to the z-coordinate
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="setMatrix"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setMatrix</b>(matrix)
+					</div>
+					</div>
+					<div class="description">
+						Sets the camera matrix
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{mat4}</span> 
+								</td>
+								<td>
+									<code>matrix</code>
+								</td>	
+								<td><p>the new camera matrix
 								
 								</p>
 								</td>
@@ -1515,13 +1922,21 @@ the camera's focus.
 					
 					
 					
-					  <b>setPosition</b>(x, y, z)
+					  <b>setPosition</b>(y, z, z)
 					</div>
 					</div>
 					<div class="description">
-						Sets the camera position in the scene
+						<p>Sets the camera position in the scene
 This method has three parameters x,y,z which represent the coordinates for 
 the camera's position.
+</p>
+<p>
+This method takes into account the current focal point. The camera will look at the
+focal point after this operation. If you want to move the camera position and the focal point
+simultaneously, then use <code>vxlCamera.translate</code>.
+</p>
+ 
+ * @param {Number, Array} x the x-coordinate. x can also be an Array [a,b,c] in this case the y and z parameters are discarded.
 						
 						
 					</div>
@@ -1531,18 +1946,6 @@ the camera's position.
 						
 							<p class="heading">Parameters:</p>
 							<table class="paramTable">
-							
-							<tr><td>
-									<span class="light fixedFont">{Number|<a href="../symbols/Array.html">Array</a>}</span> 
-								</td>
-								<td>
-									<code>x</code>
-								</td>	
-								<td><p>the x-coordinate. x can also be an Array [a,b,c] in this case the y and z parameters are discarded.
-								
-								</p>
-								</td>
-							</tr>	
 							
 							<tr><td>
 									<span class="light fixedFont">{Number}</span> 
@@ -1568,6 +1971,18 @@ the camera's position.
 								</td>
 							</tr>	
 							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>z</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
 							</table>
 						
 						
@@ -1575,6 +1990,126 @@ the camera's position.
 						
 						
 						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="setRoll"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setRoll</b>(angle)
+					</div>
+					</div>
+					<div class="description">
+						Sets the initial roll of the camera
+Rotates the camera around its view (forward) axis
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{Number}</span> 
+								</td>
+								<td>
+									<code>angle</code>
+								</td>	
+								<td><p>the roll angle
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="setTrackingMode"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setTrackingMode</b>(mode)
+					</div>
+					</div>
+					<div class="description">
+						Sets the tracking mode of this camera when it follows an actor
+<p> to set the tracking mode of the camera <code>myCamera</code> you should make sure that your camera is of tracking type with:
+ <code>myCamera.setType(vxl.def.camera.type.TRACKING)</code>.
+ For instance:
+</p>
+ <pre class='prettyprint'>
+ var actor = vxl.api.getActor('cone'); //from the current scene
+ var camera = vxl.c.camera;
+ camera.setType(vxl.def.camera.type.TRACKING);
+ camera.setTrackingMode(vxl.def.camera.tracking.ROTATIONAL);
+ camera.follow(actor);
+</pre>
+<p> a shorter way would be:</p>
+<pre class='prettyprint'>
+ var actor = vxl.api.getActor('cone'); //from the current scene
+ var camera = vxl.c.camera;
+ camera.setType(vxl.def.camera.type.TRACKING);
+ camera.follow(actor, vxl.def.camera.tracking.ROTATIONAL);
+</pre>
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>mode</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+							<p class="heading">See:</p>
+							
+								<span><a href="../symbols/vxlCamera.html#follow">vxlCamera#follow</a>, vxlCamera#setTrackingMode</span>
+							
 						
 				</div>	
 				
@@ -1589,7 +2124,7 @@ the camera's position.
 					
 					
 					
-					  <b>setType</b>(t)
+					  <b>setType</b>(type, trackingMode)
 					</div>
 					</div>
 					<div class="description">
@@ -1608,9 +2143,22 @@ the camera's position.
 									<span class="light fixedFont">{<a href="../symbols/vxl.def.camera.html#.type">vxl.def.camera.type</a>}</span> 
 								</td>
 								<td>
-									<code>t</code>
+									<code>type</code>
 								</td>	
 								<td><p>the type of camera
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									<span class="light fixedFont">{<a href="../symbols/vxl.def.camera.html#.tracking">vxl.def.camera.tracking</a>}</span> 
+								</td>
+								<td>
+									<code>trackingMode</code>
+								</td>	
+								<td><p>if the camera is of tracking type, the tracking mode can be set as 
+an optional parameter here.
 								
 								</p>
 								</td>
@@ -1628,55 +2176,6 @@ the camera's position.
 							
 								<span></span>
 							
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="shot"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>shot</b>(bb)
-					</div>
-					</div>
-					<div class="description">
-						This method sets the camera to a distance such that the area covered by the bounding box (parameter)
-is viewed.
-						
-						
-					</div>
-
-					
-
-						
-							<p class="heading">Parameters:</p>
-							<table class="paramTable">
-							
-							<tr><td>
-									<span class="light fixedFont">{<a href="../symbols/vxlBoundingBox.html">vxlBoundingBox</a>}</span> 
-								</td>
-								<td>
-									<code>bb</code>
-								</td>	
-								<td><p>the bounding box
-								
-								</p>
-								</td>
-							</tr>	
-							
-							</table>
-						
-						
-						
-						
-						
-						
 						
 				</div>	
 				
@@ -1711,6 +2210,159 @@ is viewed.
 						
 				</div>	
 				
+				<div class='methodDetail'>
+					<a name="translate"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>translate</b>(x, y, z)
+					</div>
+					</div>
+					<div class="description">
+						Translates the camera by a given vector
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{Number|<a href="../symbols/Array.html">Array</a>|vec3}</span> 
+								</td>
+								<td>
+									<code>x</code>
+								</td>	
+								<td><p>it can be the x coordinate, a 3-dimensional Array or a vec3 (glMatrix)
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									<span class="light fixedFont">{Number}</span> 
+								</td>
+								<td>
+									<code>y</code>
+								</td>	
+								<td><p>if x is a number, then this parameter corresponds to the y-coordinate
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									<span class="light fixedFont">{Number}</span> 
+								</td>
+								<td>
+									<code>z</code>
+								</td>	
+								<td><p>if x is a number, then this parameter corresponds to the z-coordinate
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="unfollow"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>unfollow</b>()
+					</div>
+					</div>
+					<div class="description">
+						Stops following an actor
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="updateWithActor"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>updateWithActor</b>(actor)
+					</div>
+					</div>
+					<div class="description">
+						Updates the camera according to the current tracking mode. This method is a callback used by the 
+vxlActor class to notify the camera of any actor transformations. This is applicable of course only when
+this camera is following the actor passed as parameter here
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{<a href="../symbols/vxlActor.html">vxlActor</a>}</span> 
+								</td>
+								<td>
+									<code>actor</code>
+								</td>	
+								<td><p>the actor being followed by this camera
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
 			
 
 <!-- ============================== event details ========================= -->
@@ -1723,7 +2375,7 @@ is viewed.
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Nov 23 2012 10:51:48 GMT-0500 (EST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Dec 09 2012 17:32:43 GMT-0500 (EST)
 		</div>
         </div>
         </div>

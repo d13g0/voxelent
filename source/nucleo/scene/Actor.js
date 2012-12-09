@@ -32,21 +32,21 @@
  * </p>
  * 
  * <pre class="prettyprint">
- * var actor = vxl.c.scene.getActorByName('example.json');
+ * var actor = vxl.c.scene.getActorByName('example');
  * actor.setProperty('color',[1.0,0.0,0.0], vxl.def.model)
  * </pre>
  * 
  * <p>If the change should be local (for just that actor)  then you should write:</p>
  * 
  * <pre class="prettyprint">
- * var actor = vxl.c.scene.getActorByName('example.json');
+ * var actor = vxl.c.scene.getActorByName('example');
  * actor.setProperty('color',[1.0,0.0,0.0], vxl.def.actor)
  * </pre>
  * 
  * <p> Or simply </p>
  *  
  * <pre class="prettyprint">
- * var actor = vxl.c.scene.getActorByName('example.json');
+ * var actor = vxl.c.scene.getActorByName('example');
  * actor.setProperty('color',[1.0,0.0,0.0])
  * </pre>
  * @class Actors represent models (assets) in a Scene
@@ -54,11 +54,13 @@
  */
 function vxlActor(model){
   
-  this.bb = [0, 0, 0, 0, 0, 0];
-  this.position 	= vec3.create([0, 0, 0]);
-  this.centre       = vec3.create([0, 0, 0]);
-  this.scale 		= vec3.create([1, 1, 1]);
-  this.rotation 	= vec3.create([0, 0, 0]);
+  this._bb = [0, 0, 0, 0, 0, 0];
+  this._position 	= vec3.create([0, 0, 0]);
+  this._translation = vec3.create([0, 0, 0]);
+  this._centre      = vec3.create([0, 0, 0]);
+  this._scale 		= vec3.create([1, 1, 1]);
+  this._rotation 	= vec3.create([0, 0, 0]);
+  this._matrix      = mat4.identity();
 
   this.visible      = true;
   this.mode         = vxl.def.actor.mode.SOLID;
@@ -72,16 +74,18 @@ function vxlActor(model){
   this.texture      = undefined;
   
   this.scene        = undefined;
+  
+  this._trackingCameras  = [];
 
   
   if (model){
   	this.model 	    = model;
   	this.name 	    = model.name;
-  	//In the newest versions of Voxelent JSON format, the diffuse property has been replaced with color property.
+  	//In Voxelent JSON format (0.87), the diffuse property has been replaced with color property.
   	this.color      = model.color!=undefined?model.color:(model.diffuse!=undefined?model.diffuse:undefined); 
-  	this.bb 	    = model.bb.slice(0);
   	this.mode       = model.mode;
-  	this.centre     = vec3.set(model.centre, vec3.create());
+  	this._bb         = model.bb.slice(0);
+  	this._centre     = vec3.set(model.centre, vec3.create());
   }
   
   if (this.mode == vxl.def.actor.mode.TEXTURED){
@@ -95,6 +99,7 @@ function vxlActor(model){
       [
         e.ACTOR_MOVED,
         e.ACTOR_SCALED,
+        e.ACTOR_ROTATED,
         e.ACTOR_CHANGED_COLOR,
         e.ACTOR_CHANGED_SHADING
       ], this);
@@ -116,19 +121,85 @@ vxlActor.prototype.setScene = function(scene){
 /**
  * Sets the position of this actor. 
  * 
- * It updates the bounding box according to the position of the actor. The position of the actor
- * is initially [0,0,0] and it is relative to the model centre. If the model is not centered in 
- * the origin, then the actor's position will be relative to the model centre.
  * 
  * @param {Number, Array, vec3} x it can be the x coordinate, a 3-dimensional Array or a vec3 (glMatrix)
  * @param {Number} y if x is a number, then this parameter corresponds to the y-coordinate
  * @param {Number} z if x is a number, then this parameter corresponds to the z-coordinate
  */
 vxlActor.prototype.setPosition = function (x,y,z){
-    this.position = vxl.util.createVec3(x,y,z); 
+    var np = vxl.util.createVec3(x,y,z);
+    vec3.subtract(np, this._position, this._translation);
+    this._position = np;  
+    
+    var m = this._matrix;
+    m[12] = this._position[0];
+    m[13] = this._position[1];
+    m[14] = this._position[2];
+    m[15] = 1;
+    this._computeBoundingBox();
+    this._notifyTrackingCameras();
     vxl.go.notifier.fire(vxl.events.ACTOR_MOVED, this);
 };
 
+
+/**
+ * Translates the actor by a given vector 
+ * 
+ * @param {Number, Array, vec3} x it can be the x coordinate, a 3-dimensional Array or a vec3 (glMatrix)
+ * @param {Number} y if x is a number, then this parameter corresponds to the y-coordinate
+ * @param {Number} z if x is a number, then this parameter corresponds to the z-coordinate
+ */
+vxlActor.prototype.translate = function (x,y,z){
+    this._translation = vxl.util.createVec3(x,y,z); 
+    
+    var m = this._matrix;
+    mat4.translate(m,this._translation);
+    this._position = vec3.createFrom(m[12], m[13], m[14]);
+    this._computeBoundingBox();
+    this._notifyTrackingCameras();
+    vxl.go.notifier.fire(vxl.events.ACTOR_MOVED, this);
+};
+
+
+/**
+ * Rotates the actor on the X axis 
+ * 
+ * @param {Number} angle the angle
+ */
+vxlActor.prototype.rotateX = function (angle){
+    var m = this._matrix;
+    var a = vxl.util.deg2rad(vxl.util.getAngle(angle));
+    mat4.rotateX(m,a);
+    this._computeBoundingBox();
+    vxl.go.notifier.fire(vxl.events.ACTOR_ROTATED, this);
+};
+
+/**
+ * Rotates the actor on the Y axis 
+ * 
+ * @param {Number} angle the angle
+ */
+vxlActor.prototype.rotateY = function (angle){
+    var m = this._matrix;
+    var a = vxl.util.deg2rad(vxl.util.getAngle(angle));
+    mat4.rotateY(m,a);
+    this._computeBoundingBox();
+    vxl.go.notifier.fire(vxl.events.ACTOR_ROTATED, this);
+};
+
+
+/**
+ * Rotates the actor on the Z axis 
+ * 
+ * @param {Number} angle the angle
+ */
+vxlActor.prototype.rotateZ = function (angle){
+    var m = this._matrix;
+    var a = vxl.util.deg2rad(vxl.util.getAngle(angle));
+    mat4.rotateZ(m,a);
+    this._computeBoundingBox();
+    vxl.go.notifier.fire(vxl.events.ACTOR_ROTATED, this);
+};
 
 /**
  * Scales this actor. 
@@ -140,12 +211,51 @@ vxlActor.prototype.setScale = function(s,a,b){
     
     
     if (typeof(s)=="number" && a == undefined && b == undefined){
-        this.scale = vxl.util.createVec3(s,s,s);
+        this._scale = vxl.util.createVec3(s,s,s);
     }
     else{
-        this.scale = vxl.util.createVec3(s,a,b);
+        this._scale = vxl.util.createVec3(s,a,b);
     }
+    
+    var m = this._matrix;
+    mat4.scale(m,this._scale);
+    this._computeBoundingBox();
     vxl.go.notifier.fire(vxl.events.ACTOR_SCALED, this);
+};
+
+/**
+ * Adds a tracking camera
+ * @param{vxlCamera} camera the tracking camera
+ */
+vxlActor.prototype.addTrackingCamera = function(camera){
+    if (camera instanceof vxlCamera && camera.type !=vxl.def.camera.type.TRACKING){
+        throw "vxlActor._addTrackingCamera ERROR: the selected camera is not set to tracking"
+    }
+    else if (camera instanceof vxlCamera){
+        this._trackingCameras.push(camera);
+    }
+    else{
+        throw "vxlActor._addTrackingCamera ERROR: the object passed as a parameter is not a vxlCamera"
+    }
+};
+
+/**
+ * Removes a tracking camera
+ * @param{vxlCamera} camera the tracknig camera
+ */
+vxlActor.prototype.removeTrackingCamera = function(camera){
+    var idx = this._trackingCameras.indexOf(camera);
+    this._trackingCameras.splice(idx,1);
+};
+
+/**
+ * Notifies all the tracking cameras of the actor translation 
+ * @param {Object} camera
+ */
+vxlActor.prototype._notifyTrackingCameras = function(){
+    for (var i=0, N = this._trackingCameras.length; i<N;i+=1){
+        this._trackingCameras[i].updateWithActor(this);
+    }
 };
 
 /**
@@ -155,53 +265,74 @@ vxlActor.prototype.setScale = function(s,a,b){
  * moving or scaling an actor for performance reasons.
  *  
  */
-vxlActor.prototype.computeBoundingBox = function(){
+vxlActor.prototype._computeBoundingBox = function(){
 
-    this.bb  = this.model.bb.slice(0);
-
-    var bb = this.bb;
-    var cc = this.model.centre;
-
-    var pos =this.position;
+    var vs  = this.model.vertices;
+    var vsT = [];
+    var T = this._matrix;
     
-    //Calculate position
-    bb[0] += pos[0];
-    bb[1] += pos[1];
-    bb[2] += pos[2];
-    bb[3] += pos[0];
-    bb[4] += pos[1];
-    bb[5] += pos[2];
+    for(var i=0;i<vs.length;i=i+3){
+        var x = vxl.util.createVec3(vs[i],vs[i+1],vs[i+2]);
+        mat4.multiplyVec3(T, x);
+        vsT.push(x[0], x[1], x[2]);    
+    }
     
-    var minY = bb[1];
-
-    //Recalculate centre 
-    cc[0] = (bb[3] + bb[0]) /2;
-    cc[1] = (bb[4] + bb[1]) /2;
-    cc[2] = (bb[5] + bb[2]) /2;
+    var bbA = [vsT[0],vsT[1],vsT[2],vsT[0],vsT[1],vsT[2]];
     
-    //Calculate scale
-    bb[0] *= this.scale[0];
-    bb[1] *= this.scale[1];
-    bb[2] *= this.scale[2];
-    bb[3] *= this.scale[0];
-    bb[4] *= this.scale[1];
-    bb[5] *= this.scale[2];
+    for(var i=0;i<vsT.length;i=i+3){
+        bbA[0] = Math.min(bbA[0],vsT[i]);
+        bbA[1] = Math.min(bbA[1],vsT[i+1]);
+        bbA[2] = Math.min(bbA[2],vsT[i+2]);
+        bbA[3] = Math.max(bbA[3],vsT[i]);
+        bbA[4] = Math.max(bbA[4],vsT[i+1]);
+        bbA[5] = Math.max(bbA[5],vsT[i+2]);
+    }
     
-    //Now recenter
-    var c = [0,0,0];
-    c[0] = (bb[3] + bb[0]) /2;
-    c[1] = (bb[4] + bb[1]) /2;
-    c[2] = (bb[5] + bb[2]) /2;
-    
-    //recalculate boundingbox
-    var shift = [c[0]-cc[0], bb[1]-minY,c[2]-cc[2]];
-    bb[0] -= shift[0];
-    bb[1] -= shift[1];
-    bb[2] -= shift[2];
-    bb[3] -= shift[0];
-    bb[4] -= shift[1];
-    bb[5] -= shift[2];
+     
+    this._bb = bbA;
 };
+
+/**
+ * Returns an array with the bounding box vertices. Good for rendering the transformed
+ * bounding box (after geometric transformations) 
+ * @returns {Array} a 8-element array with the vertices that constitute the actor bounding box
+ */
+vxlActor.prototype.getBoundingBoxVertices = function(){
+    var b = this._bb;
+    return [
+        b[0], b[1], b[2],
+        b[0], b[4], b[2],
+        b[3], b[4], b[2],
+        b[3], b[1], b[2],
+        b[0], b[1], b[5],
+        b[0], b[4], b[5],
+        b[3], b[4], b[5],
+        b[3], b[1], b[5] 
+        ];
+};
+
+
+/**
+ * Returns the bounding box for this actor. The actor's bounding box observes any geometric
+ * transformation suffered by the actor. Therefore it is ideal to do collision detection.
+ * 
+ * The format of the returned bounding box is [x-min, y-min, z-min, x-ax, y-max, z-max]
+ * @returns {Array} the current bounding box.
+ */
+vxlActor.prototype.getBoundingBox = function(){
+    return this._bb.slice[0];
+}
+
+
+/**
+ * Returns the height for the current actor. 
+ * @returns {Number} the current height
+ */
+vxlActor.prototype.getHeight = function(){
+   var bb = this._bb
+   return bb[4]-bb[1]
+};
+
 
 /**
 * Sets the actor color. This color can be different from the original model color
@@ -321,8 +452,8 @@ vxlActor.prototype.getProperty = function(property){
  * it only returns an estimate based on the location of its bounding box.
  */
 vxlActor.prototype.computePosition = function(){
-	bb = this.bb;
-	var cc = this.position;
+	bb = this._bb;
+	var cc = this._position;
 	
 	cc[0] = (bb[3] + bb[0]) /2;
 	cc[1] = (bb[4] + bb[1]) /2;
@@ -348,7 +479,7 @@ vxlActor.prototype.setVisualizationMode = function(mode){
 /**
 * Sets the lookup table for this actor.
 * This method will only succeed if the model that this actor represents has scalars 
-* @param {String} lutID the lookup table id. See {@link vxl.def.lut.list} for currently supported ids.
+* @param {String} lutID the lookup table id. See {@link vxl.def.lut} for currently supported ids.
 * @param {Number} min lowest value for interpolation
 * @param {Number} max highest value for interpolation
 */
@@ -364,7 +495,7 @@ vxlActor.prototype.setLookupTable = function(lutID,min,max){
 * @TODO: Review. we could want the actor to have flipped normals but not to impose this on the model. 
 */
 vxlActor.prototype.flipNormals = function(){
-	this.model.getNormals(true);
+	this.model.flipNormals();
 };
 
 /**
@@ -411,10 +542,8 @@ vxlActor.prototype.clone = function(){
 	var duplicate = new vxlActor(this.model);
 	duplicate.setScene(this.scene);
 	
-	vec3.set(this.scale,    duplicate.scale);
-	vec3.set(this.position, duplicate.position);
-	
-	
+	//TODO: duplicate.setMatrix(this._matrix); this method should update all the other variables (position, scale, rot, etc).
+     	
 	//Now to save us some memory, let's SHARE the WebGL buffers that the current actor has already allocated'
 	//duplicate.renderers = this._renderers;
 	//duplicate.buffers   = this._gl_buffers;
@@ -422,3 +551,6 @@ vxlActor.prototype.clone = function(){
 	duplicate.name     += '-'+this.clones; 
 	return duplicate;
 };
+
+
+

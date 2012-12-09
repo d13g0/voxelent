@@ -20,7 +20,7 @@
  * @author Diego Cantor
  */
 function vxlTransforms(vw){
-	this.stack = [];
+	this._stack = [];
 	this.view = vw;
 	this.mvMatrix    = mat4.identity();    // The Model-View matrix
 	this.pMatrix     = mat4.identity();    // The projection matrix
@@ -81,7 +81,7 @@ vxlTransforms.prototype.update = function(){
 vxlTransforms.prototype.push = function(){
 	var memento =  mat4.create();
 	mat4.set(this.mvMatrix, memento);
-	this.stack.push(memento);
+	this._stack.push(memento);
 };
 
 /**
@@ -89,6 +89,9 @@ vxlTransforms.prototype.push = function(){
  * This operation is called by vxlActor.updateMatrixStack
  */
 vxlTransforms.prototype.pop = function(){
-	if(this.stack.length == 0) return;
-	this.mvMatrix  =  this.stack.pop();
+	if(this._stack.length == 0) return;
+	this.mvMatrix  =  this._stack.pop();
+	this.calculatePerspective();
+	this.calculateNormal();
+	this.calculateModelViewPerspective();
 };

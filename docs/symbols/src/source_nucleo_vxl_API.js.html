@@ -372,282 +372,329 @@
 <span class='line'>365</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>366</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">_scene.getActorNames</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>367</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>368</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>369</span>   * Retrieves an actor object by name
-<span class='line'>370</span>   * @param {String} actorName the name of the actor
-<span class='line'>371</span>   * @param {vxlScene} scene looks in the specified scene. This parameter is optional. 
-<span class='line'>372</span>   * If not specified, the current scene (vxl.c.scene) will be queried
-<span class='line'>373</span>   *  
+<span class='line'>368</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>369</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>370</span>   *Retrieves an actor by name or UID
+<span class='line'>371</span>   * @param {String} actorNameOrUID actor name or UID
+<span class='line'>372</span>   * @param {vxlScene} scene looks in the specified scene. This parameter is optional. 
+<span class='line'>373</span>   * If not specified, the current scene (vxl.c.scene) will be queried
 <span class='line'>374</span>   */</span><span class="WHIT">
-<span class='line'>375</span> </span><span class="WHIT"> </span><span class="NAME">getActorByName</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">actorName</span><span class="PUNC">,</span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>376</span> </span><span class="WHIT"> 	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">_scene</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>377</span> </span><span class="WHIT"> 	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">//look in the current scene</span><span class="WHIT">
-<span class='line'>378</span> </span><span class="WHIT"> 		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>379</span> </span><span class="WHIT"> 			</span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">'vxl.api.getActorByName: There is no current scene. Please the scene you want to look the actor '</span><span class="PUNC">+</span><span class="NAME">actorName</span><span class="PUNC">+</span><span class="STRN">' into'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>380</span> </span><span class="WHIT"> 		</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>381</span> </span><span class="WHIT"> 		</span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>382</span> </span><span class="WHIT"> 			</span><span class="NAME">_scene</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">vxl.c.scene</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>383</span> </span><span class="WHIT"> 		</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>384</span> </span><span class="WHIT"> 	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>385</span> </span><span class="WHIT"> 	</span><span class="WHIT">
-<span class='line'>386</span> </span><span class="WHIT"> 	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">_scene.getActorByName</span><span class="PUNC">(</span><span class="NAME">actorName</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>387</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>388</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>389</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>390</span>   * @param {Number} op  opacity value between 0 and 1 (float)
-<span class='line'>391</span>   * @TODO: Reevaluate this method. Opacity is shader dependent
-<span class='line'>392</span>   */</span><span class="WHIT">
-<span class='line'>393</span> </span><span class="WHIT"> </span><span class="NAME">setActorOpacity</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">op</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>394</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">opacity</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.min</span><span class="PUNC">(</span><span class="NAME">Math.max</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="NAME">Math.abs</span><span class="PUNC">(</span><span class="NAME">op</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>395</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.actor</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>396</span> </span><span class="WHIT">		</span><span class="NAME">vxl.c.actor.setOpacity</span><span class="PUNC">(</span><span class="NAME">op</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>397</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>398</span> </span><span class="WHIT">	</span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>399</span> </span><span class="WHIT">		</span><span class="NAME">vxl.c.view.scene.setOpacity</span><span class="PUNC">(</span><span class="NAME">opacity</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>400</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>401</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.view.refresh</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>402</span> </span><span class="WHIT">	</span><span class="NAME">vxl.go.console</span><span class="PUNC">(</span><span class="STRN">'API:Opacity changed to '</span><span class="PUNC">+</span><span class="PUNC">(</span><span class="NAME">op</span><span class="PUNC">*</span><span class="NUMB">100</span><span class="PUNC">)</span><span class="PUNC">+</span><span class="STRN">'%'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>403</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>404</span> </span><span class="WHIT">  </span><span class="WHIT">
-<span class='line'>405</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>406</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>407</span>   * Sets a property for one of the actors in the current scene.
-<span class='line'>408</span>   * This metod requires a current scene
-<span class='line'>409</span>   * @param {vxlActor, String} actor it can be a vxlActor or a String with the actor name
-<span class='line'>410</span>   * @param {String} property the property to change 
-<span class='line'>411</span>   * @param {Object} value the new value
-<span class='line'>412</span>   */</span><span class="WHIT">
-<span class='line'>413</span> </span><span class="WHIT"> </span><span class="NAME">setActorProperty</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">actor</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">property</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>414</span> </span><span class="WHIT">	</span><span class="WHIT">
-<span class='line'>415</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">'vxl.api.setActorProperty: there is no current scene. Please call vxl.api.setCurrentScene'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>416</span> </span><span class="WHIT">	</span><span class="WHIT">
-<span class='line'>417</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">vxl.c.scene</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>418</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">_actor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">actor</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>419</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_actor</span><span class="WHIT"> </span><span class="KEYW">instanceof</span><span class="WHIT"> </span><span class="NAME">vxlActor</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>420</span> </span><span class="WHIT">		</span><span class="NAME">_actor.setProperty</span><span class="PUNC">(</span><span class="NAME">property</span><span class="PUNC">,</span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>421</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>422</span> </span><span class="WHIT">	</span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">//TODO: assuming string.VALIDATE!</span><span class="WHIT">
-<span class='line'>423</span> </span><span class="WHIT">		</span><span class="NAME">_actor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">scene.getActorByName</span><span class="PUNC">(</span><span class="NAME">_actor</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>424</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_actor</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="STRN">'The actor '</span><span class="PUNC">+</span><span class="NAME">_actor</span><span class="PUNC">+</span><span class="STRN">' does not belong to the current scene'</span><span class="WHIT">
-<span class='line'>425</span> </span><span class="WHIT">		</span><span class="NAME">_actor.setProperty</span><span class="PUNC">(</span><span class="NAME">property</span><span class="PUNC">,</span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>426</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>427</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>428</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>429</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>430</span>   * Sets a property for all the actors 
-<span class='line'>431</span>   * @param {String} property the property to change 
-<span class='line'>432</span>   * @param {Object} value the new value
-<span class='line'>433</span>   * @param {vxlScene} scene the scene (optional). If this parameter is not passed the current scene is used 
-<span class='line'>434</span>   */</span><span class="WHIT">
-<span class='line'>435</span> </span><span class="WHIT"> </span><span class="NAME">setPropertyForAll</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">property</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>436</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>437</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">'vxl.api.setPropertyForAll: there is no current scene. Please call vxl.api.setCurrentScene'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>438</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>439</span> </span><span class="WHIT">        </span><span class="NAME">s</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">vxl.c.scene</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>440</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>441</span> </span><span class="WHIT">    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>442</span> </span><span class="WHIT">        </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>443</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>444</span> </span><span class="WHIT">    </span><span class="NAME">s.setPropertyForAll</span><span class="PUNC">(</span><span class="NAME">property</span><span class="PUNC">,</span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">         </span><span class="WHIT">
-<span class='line'>445</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>446</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>447</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>448</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>449</span>   * Sets a property for all the actors in the list 
-<span class='line'>450</span>   * @param {Array} list list of actors (String or vxlActor)
-<span class='line'>451</span>   * @param {String} property the property to change 
-<span class='line'>452</span>   * @param {Object} value the new value
-<span class='line'>453</span>   * @param {vxlScene} scene the scene (optional). If this parameter is not passed the current scene is used 
-<span class='line'>454</span>   */</span><span class="WHIT">
-<span class='line'>455</span> </span><span class="WHIT"> </span><span class="NAME">setPropertyFor</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">list</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">property</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>456</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>457</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">'vxl.api.setPropertyForAll: there is no current scene. Please call vxl.api.setCurrentScene'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>458</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>459</span> </span><span class="WHIT">        </span><span class="NAME">s</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">vxl.c.scene</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>460</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>461</span> </span><span class="WHIT">    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>462</span> </span><span class="WHIT">        </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>463</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>464</span> </span><span class="WHIT">    </span><span class="NAME">s.setPropertyFor</span><span class="PUNC">(</span><span class="NAME">list</span><span class="PUNC">,</span><span class="NAME">property</span><span class="PUNC">,</span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>465</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>466</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>467</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>468</span>  * &lt;p>Returns a list of actors based on the condition passed as parameter.&lt;/p>
-<span class='line'>469</span>  * &lt;p>The condition is a function with the following signature:&lt;/p>
-<span class='line'>470</span>  * &lt;p>&lt;code> condition(vxlActor): returns boolean&lt;/code>&lt;/p>
-<span class='line'>471</span>  * &lt;p>If the condition evaluates true then that actor is included in the results&lt;/p>
-<span class='line'>472</span>  * 
-<span class='line'>473</span>  * @param {function} condition the condition to evaluate in the actor list
-<span class='line'>474</span>  * @param {vxlScene} scene (Optional) If this parameter is not set, the current scene will be used
-<span class='line'>475</span>  * @returns {Array} list of actors 
-<span class='line'>476</span>  */</span><span class="WHIT">
-<span class='line'>477</span> </span><span class="WHIT"> </span><span class="NAME">getActorsThat</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">condition</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>478</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>479</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">'vxl.api.setPropertyForAll: there is no current scene. Please call vxl.api.setCurrentScene'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>480</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>481</span> </span><span class="WHIT">        </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">vxl.c.scene</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>482</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>483</span> </span><span class="WHIT">    </span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>484</span> </span><span class="WHIT">        </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>485</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>486</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">s.getActorsThat</span><span class="PUNC">(</span><span class="NAME">condition</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>487</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>488</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>489</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>490</span>   * @param {bool} flag if true this method will flip the normals. If false normals will be
-<span class='line'>491</span>   * calculated the 'normal' way.
-<span class='line'>492</span>   */</span><span class="WHIT">
-<span class='line'>493</span> </span><span class="WHIT"> </span><span class="NAME">flipActorNormals</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">flag</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>494</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.actor</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>495</span> </span><span class="WHIT">		</span><span class="NAME">vxl.c.actor.flipNormals</span><span class="PUNC">(</span><span class="NAME">flag</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>496</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>497</span> </span><span class="WHIT">	</span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>498</span> </span><span class="WHIT">		</span><span class="NAME">vxl.c.view.scene.flipNormals</span><span class="PUNC">(</span><span class="NAME">flag</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>499</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>500</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.view.refresh</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>501</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>502</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>503</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>504</span>   *If there is an animation object (vxl.c.animation) then
-<span class='line'>505</span>   * it stops the animation 
-<span class='line'>506</span>   */</span><span class="WHIT">
-<span class='line'>507</span> </span><span class="WHIT"> </span><span class="NAME">stopAnimation</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>508</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">vxl.c.animation</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">vxl.c.animation.stop</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>509</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>510</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>511</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>512</span>   *If there is an animation object (vxl.c.animation) then 
-<span class='line'>513</span>   * it starts the animation 
-<span class='line'>514</span>   */</span><span class="WHIT">
-<span class='line'>515</span> </span><span class="WHIT"> </span><span class="NAME">startAnimation</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>516</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">vxl.c.animation</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">vxl.c.animation.start</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>517</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>518</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>519</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>520</span>   * If there is a vxlFrameAnimation object attached to the scene then it 
-<span class='line'>521</span>   * sets the current animation frame
-<span class='line'>522</span>   * @param {Number} f the animation frame index
-<span class='line'>523</span>   */</span><span class="WHIT">
-<span class='line'>524</span> </span><span class="WHIT"> </span><span class="NAME">setFrame</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">f</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>525</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.animation</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>526</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">a</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">vxl.c.animation</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>527</span> </span><span class="WHIT">	</span><span class="NAME">a.stop</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>528</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">f</span><span class="PUNC">>=</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>529</span> </span><span class="WHIT">		</span><span class="NAME">a.setFrame</span><span class="PUNC">(</span><span class="NAME">f</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>375</span> </span><span class="WHIT"> </span><span class="NAME">getActor</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">actorNameOrUID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>376</span> </span><span class="WHIT">     </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">actor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getActorByName</span><span class="PUNC">(</span><span class="NAME">actorNameOrUID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>377</span> </span><span class="WHIT">     </span><span class="WHIT">
+<span class='line'>378</span> </span><span class="WHIT">     </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">actor</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>379</span> </span><span class="WHIT">         </span><span class="NAME">actor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.getActorByUID</span><span class="PUNC">(</span><span class="NAME">actorNameOrUID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>380</span> </span><span class="WHIT">     </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>381</span> </span><span class="WHIT">     </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">actor</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>382</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>383</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>384</span>   * Retrieves an actor object by UID
+<span class='line'>385</span>   * @param {String} actorUID the UID of the actor
+<span class='line'>386</span>   * @param {vxlScene} scene looks in the specified scene. This parameter is optional. 
+<span class='line'>387</span>   * If not specified, the current scene (vxl.c.scene) will be queried
+<span class='line'>388</span>   *  
+<span class='line'>389</span>   */</span><span class="WHIT">
+<span class='line'>390</span> </span><span class="WHIT"> </span><span class="NAME">getActorByUID</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">actorUID</span><span class="PUNC">,</span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>391</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">_scene</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>392</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">//look in the current scene</span><span class="WHIT">
+<span class='line'>393</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>394</span> </span><span class="WHIT">            </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">'vxl.api.getActorByUID: There is no current scene. Please the scene you want to look the actor with uid: '</span><span class="PUNC">+</span><span class="NAME">UID</span><span class="PUNC">+</span><span class="STRN">' into'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>395</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>396</span> </span><span class="WHIT">        </span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>397</span> </span><span class="WHIT">            </span><span class="NAME">_scene</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">vxl.c.scene</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>398</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>399</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>400</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>401</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">_scene.getActorByUID</span><span class="PUNC">(</span><span class="NAME">actorUID</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>402</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>403</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>404</span>   * Retrieves an actor object by name
+<span class='line'>405</span>   * @param {String} actorName the name of the actor
+<span class='line'>406</span>   * @param {vxlScene} scene looks in the specified scene. This parameter is optional. 
+<span class='line'>407</span>   * If not specified, the current scene (vxl.c.scene) will be queried
+<span class='line'>408</span>   *  
+<span class='line'>409</span>   */</span><span class="WHIT">
+<span class='line'>410</span> </span><span class="WHIT"> </span><span class="NAME">getActorByName</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">actorName</span><span class="PUNC">,</span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>411</span> </span><span class="WHIT"> 	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">_scene</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>412</span> </span><span class="WHIT"> 	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">//look in the current scene</span><span class="WHIT">
+<span class='line'>413</span> </span><span class="WHIT"> 		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>414</span> </span><span class="WHIT"> 			</span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">'vxl.api.getActorByName: There is no current scene. Please the scene you want to look the actor '</span><span class="PUNC">+</span><span class="NAME">actorName</span><span class="PUNC">+</span><span class="STRN">' into'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>415</span> </span><span class="WHIT"> 		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>416</span> </span><span class="WHIT"> 		</span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>417</span> </span><span class="WHIT"> 			</span><span class="NAME">_scene</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">vxl.c.scene</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>418</span> </span><span class="WHIT"> 		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>419</span> </span><span class="WHIT"> 	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>420</span> </span><span class="WHIT"> 	</span><span class="WHIT">
+<span class='line'>421</span> </span><span class="WHIT"> 	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">_scene.getActorByName</span><span class="PUNC">(</span><span class="NAME">actorName</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>422</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>423</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>424</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>425</span>   * @param {Number} op  opacity value between 0 and 1 (float)
+<span class='line'>426</span>   * @TODO: Reevaluate this method. Opacity is shader dependent
+<span class='line'>427</span>   */</span><span class="WHIT">
+<span class='line'>428</span> </span><span class="WHIT"> </span><span class="NAME">setActorOpacity</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">op</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>429</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">opacity</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.min</span><span class="PUNC">(</span><span class="NAME">Math.max</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="NAME">Math.abs</span><span class="PUNC">(</span><span class="NAME">op</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>430</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.actor</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>431</span> </span><span class="WHIT">		</span><span class="NAME">vxl.c.actor.setOpacity</span><span class="PUNC">(</span><span class="NAME">op</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>432</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>433</span> </span><span class="WHIT">	</span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>434</span> </span><span class="WHIT">		</span><span class="NAME">vxl.c.view.scene.setOpacity</span><span class="PUNC">(</span><span class="NAME">opacity</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>435</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>436</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.view.refresh</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>437</span> </span><span class="WHIT">	</span><span class="NAME">vxl.go.console</span><span class="PUNC">(</span><span class="STRN">'API:Opacity changed to '</span><span class="PUNC">+</span><span class="PUNC">(</span><span class="NAME">op</span><span class="PUNC">*</span><span class="NUMB">100</span><span class="PUNC">)</span><span class="PUNC">+</span><span class="STRN">'%'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>438</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>439</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>440</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>441</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>442</span>   * Sets a property for one of the actors in the current scene.
+<span class='line'>443</span>   * This metod requires a current scene
+<span class='line'>444</span>   * @param {vxlActor, String} actor it can be a vxlActor or a String with the actor name
+<span class='line'>445</span>   * @param {String} property the property to change 
+<span class='line'>446</span>   * @param {Object} value the new value
+<span class='line'>447</span>   */</span><span class="WHIT">
+<span class='line'>448</span> </span><span class="WHIT"> </span><span class="NAME">setActorProperty</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">actor</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">property</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>449</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'>450</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">'vxl.api.setActorProperty: there is no current scene. Please call vxl.api.setCurrentScene'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>451</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'>452</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">vxl.c.scene</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>453</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">_actor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">actor</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>454</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_actor</span><span class="WHIT"> </span><span class="KEYW">instanceof</span><span class="WHIT"> </span><span class="NAME">vxlActor</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>455</span> </span><span class="WHIT">		</span><span class="NAME">_actor.setProperty</span><span class="PUNC">(</span><span class="NAME">property</span><span class="PUNC">,</span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>456</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>457</span> </span><span class="WHIT">	</span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">//TODO: assuming string.VALIDATE!</span><span class="WHIT">
+<span class='line'>458</span> </span><span class="WHIT">		</span><span class="NAME">_actor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">scene.getActorByName</span><span class="PUNC">(</span><span class="NAME">_actor</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>459</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">_actor</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="STRN">'The actor '</span><span class="PUNC">+</span><span class="NAME">_actor</span><span class="PUNC">+</span><span class="STRN">' does not belong to the current scene'</span><span class="WHIT">
+<span class='line'>460</span> </span><span class="WHIT">		</span><span class="NAME">_actor.setProperty</span><span class="PUNC">(</span><span class="NAME">property</span><span class="PUNC">,</span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>461</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>462</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>463</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>464</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>465</span>   * Sets a property for all the actors 
+<span class='line'>466</span>   * @param {String} property the property to change 
+<span class='line'>467</span>   * @param {Object} value the new value
+<span class='line'>468</span>   * @param {vxlScene} scene the scene (optional). If this parameter is not passed the current scene is used 
+<span class='line'>469</span>   */</span><span class="WHIT">
+<span class='line'>470</span> </span><span class="WHIT"> </span><span class="NAME">setPropertyForAll</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">property</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>471</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>472</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">'vxl.api.setPropertyForAll: there is no current scene. Please call vxl.api.setCurrentScene'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>473</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>474</span> </span><span class="WHIT">        </span><span class="NAME">s</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">vxl.c.scene</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>475</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>476</span> </span><span class="WHIT">    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>477</span> </span><span class="WHIT">        </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>478</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>479</span> </span><span class="WHIT">    </span><span class="NAME">s.setPropertyForAll</span><span class="PUNC">(</span><span class="NAME">property</span><span class="PUNC">,</span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">         </span><span class="WHIT">
+<span class='line'>480</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>481</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>482</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>483</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>484</span>   * Sets a property for all the actors in the list 
+<span class='line'>485</span>   * @param {Array} list list of actors (String or vxlActor)
+<span class='line'>486</span>   * @param {String} property the property to change 
+<span class='line'>487</span>   * @param {Object} value the new value
+<span class='line'>488</span>   * @param {vxlScene} scene the scene (optional). If this parameter is not passed the current scene is used 
+<span class='line'>489</span>   */</span><span class="WHIT">
+<span class='line'>490</span> </span><span class="WHIT"> </span><span class="NAME">setPropertyFor</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">list</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">property</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>491</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>492</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">'vxl.api.setPropertyForAll: there is no current scene. Please call vxl.api.setCurrentScene'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>493</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>494</span> </span><span class="WHIT">        </span><span class="NAME">s</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">vxl.c.scene</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>495</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>496</span> </span><span class="WHIT">    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>497</span> </span><span class="WHIT">        </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>498</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>499</span> </span><span class="WHIT">    </span><span class="NAME">s.setPropertyFor</span><span class="PUNC">(</span><span class="NAME">list</span><span class="PUNC">,</span><span class="NAME">property</span><span class="PUNC">,</span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>500</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>501</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>502</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>503</span>  * &lt;p>Returns a list of actors based on the condition passed as parameter.&lt;/p>
+<span class='line'>504</span>  * &lt;p>The condition is a function with the following signature:&lt;/p>
+<span class='line'>505</span>  * &lt;p>&lt;code> condition(vxlActor): returns boolean&lt;/code>&lt;/p>
+<span class='line'>506</span>  * &lt;p>If the condition evaluates true then that actor is included in the results&lt;/p>
+<span class='line'>507</span>  * 
+<span class='line'>508</span>  * @param {function} condition the condition to evaluate in the actor list
+<span class='line'>509</span>  * @param {vxlScene} scene (Optional) If this parameter is not set, the current scene will be used
+<span class='line'>510</span>  * @returns {Array} list of actors 
+<span class='line'>511</span>  */</span><span class="WHIT">
+<span class='line'>512</span> </span><span class="WHIT"> </span><span class="NAME">getActorsThat</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">condition</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>513</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>514</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">'vxl.api.setPropertyForAll: there is no current scene. Please call vxl.api.setCurrentScene'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>515</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">scene</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>516</span> </span><span class="WHIT">        </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">vxl.c.scene</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>517</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>518</span> </span><span class="WHIT">    </span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>519</span> </span><span class="WHIT">        </span><span class="NAME">s</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>520</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>521</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">s.getActorsThat</span><span class="PUNC">(</span><span class="NAME">condition</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>522</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>523</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>524</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>525</span>   * Flip the normals of the current actor or the whole scene if the current actor is undefined
+<span class='line'>526</span>   */</span><span class="WHIT">
+<span class='line'>527</span> </span><span class="WHIT"> </span><span class="NAME">flipActorNormals</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>528</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.actor</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>529</span> </span><span class="WHIT">		</span><span class="NAME">vxl.c.actor.flipNormals</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>530</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>531</span> </span><span class="WHIT">	</span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>532</span> </span><span class="WHIT">		</span><span class="NAME">vxl.go.console</span><span class="PUNC">(</span><span class="STRN">'API:frame '</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">f</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="STRN">' does not exist. Animation goes back to the beginning'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>533</span> </span><span class="WHIT">		</span><span class="NAME">a.setFrame</span><span class="PUNC">(</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>534</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>532</span> </span><span class="WHIT">		</span><span class="NAME">vxl.c.view.scene.flipNormals</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>533</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>534</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.view.refresh</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>535</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>536</span> 
+<span class='line'>536</span> </span><span class="WHIT"> </span><span class="WHIT">
 <span class='line'>537</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>538</span>   *Removes the current animation from the scene 
-<span class='line'>539</span>   */</span><span class="WHIT">
-<span class='line'>540</span> </span><span class="WHIT"> </span><span class="NAME">clearAnimation</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>541</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">vxl.c.animation</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>542</span> </span><span class="WHIT">		</span><span class="NAME">vxl.c.animation.stop</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>543</span> </span><span class="WHIT">		</span><span class="NAME">vxl.c.animation</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>544</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>545</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>546</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>547</span>   * Resets the current camera
+<span class='line'>538</span>   *If there is an animation object (vxl.c.animation) then
+<span class='line'>539</span>   * it stops the animation 
+<span class='line'>540</span>   */</span><span class="WHIT">
+<span class='line'>541</span> </span><span class="WHIT"> </span><span class="NAME">stopAnimation</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>542</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">vxl.c.animation</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">vxl.c.animation.stop</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>543</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>544</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>545</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>546</span>   *If there is an animation object (vxl.c.animation) then 
+<span class='line'>547</span>   * it starts the animation 
 <span class='line'>548</span>   */</span><span class="WHIT">
-<span class='line'>549</span> </span><span class="WHIT"> </span><span class="NAME">resetCamera</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>550</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.camera.reset</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>549</span> </span><span class="WHIT"> </span><span class="NAME">startAnimation</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>550</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">vxl.c.animation</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">vxl.c.animation.start</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>551</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>552</span> </span><span class="WHIT"> </span><span class="WHIT">
 <span class='line'>553</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>554</span>   * Saves the current camera state
-<span class='line'>555</span>   */</span><span class="WHIT">
-<span class='line'>556</span> </span><span class="WHIT"> </span><span class="NAME">saveCamera</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>557</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.camera.save</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>558</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>559</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>560</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>561</span>   * Retrieves the last saved camera state
-<span class='line'>562</span>   */</span><span class="WHIT">
-<span class='line'>563</span> </span><span class="WHIT"> </span><span class="NAME">retrieveCamera</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>564</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.camera.retrieve</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>565</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>566</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>567</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>568</span>   * Sets the azimuth of the camera
-<span class='line'>569</span>   * @param {Number} a azimuth
-<span class='line'>570</span>   */</span><span class="WHIT">
-<span class='line'>571</span> </span><span class="WHIT"> </span><span class="NAME">setAzimuth</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">a</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>572</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.camera.setAzimuth</span><span class="PUNC">(</span><span class="NAME">a</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>573</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>574</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>575</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>576</span>   * Sets the elevation of the camera
-<span class='line'>577</span>   * @param {Number} e elevation
-<span class='line'>578</span>   */</span><span class="WHIT">
-<span class='line'>579</span> </span><span class="WHIT"> </span><span class="NAME">setElevation</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>580</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.camera.setElevation</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>581</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>582</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>583</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>584</span> </span><span class="WHIT"> </span><span class="NAME">getLookupTables</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>585</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">vxl.go.lookupTableManager.getAllLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>586</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>587</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>588</span> </span><span class="WHIT"> </span><span class="COMM">//runScript :  function(file){</span><span class="WHIT">
-<span class='line'>589</span> </span><span class="WHIT"> </span><span class="COMM">//use JQuery here.</span><span class="WHIT">
-<span class='line'>590</span> </span><span class="WHIT"> </span><span class="COMM">//}</span><span class="WHIT">
-<span class='line'>591</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>592</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>593</span>   * Loads a program
-<span class='line'>594</span>   * @param{vxlView} view the view to configure
-<span class='line'>595</span>   * @param{Object} program a JSON object that defines the progrma to execute
-<span class='line'>596</span>   * @param{vxlRenderStrategy} strategy the strategy that the renderer should follow to communicate with the program
-<span class='line'>597</span>   */</span><span class="WHIT">
-<span class='line'>598</span> </span><span class="WHIT"> </span><span class="NAME">setProgram</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">view</span><span class="PUNC">,</span><span class="NAME">program</span><span class="PUNC">,</span><span class="NAME">strategy</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>599</span> </span><span class="WHIT">    </span><span class="NAME">view.renderer.setProgram</span><span class="PUNC">(</span><span class="NAME">program</span><span class="PUNC">,</span><span class="NAME">strategy</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>600</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>601</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>602</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>603</span> </span><span class="WHIT"> </span><span class="COMM">//TODO: Wwork in progress... sorry for the mess.</span><span class="WHIT">
-<span class='line'>604</span> </span><span class="WHIT"> </span><span class="COMM">//buildProgramFromDOM: function(id,VERTEX_SHADER_DOM_ID,FRAGMENT_SHADER_DOM_ID){</span><span class="WHIT">
-<span class='line'>605</span> </span><span class="WHIT"> </span><span class="COMM">//       var vshader= document.getElementById(VERTEX_SHADER_DOM_ID);</span><span class="WHIT">
-<span class='line'>606</span> </span><span class="WHIT">        </span><span class="WHIT">
-<span class='line'>607</span> </span><span class="WHIT">     </span><span class="WHIT">
-<span class='line'>608</span> </span><span class="WHIT"> </span><span class="COMM">//},</span><span class="WHIT">
-<span class='line'>609</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>610</span> </span><span class="WHIT"> </span><span class="COMM">/**
-<span class='line'>611</span>   * Sets a uniform
+<span class='line'>554</span>   * If there is a vxlFrameAnimation object attached to the scene then it 
+<span class='line'>555</span>   * sets the current animation frame
+<span class='line'>556</span>   * @param {Number} f the animation frame index
+<span class='line'>557</span>   */</span><span class="WHIT">
+<span class='line'>558</span> </span><span class="WHIT"> </span><span class="NAME">setFrame</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">f</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>559</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">vxl.c.animation</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>560</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">a</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">vxl.c.animation</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>561</span> </span><span class="WHIT">	</span><span class="NAME">a.stop</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>562</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">f</span><span class="PUNC">>=</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>563</span> </span><span class="WHIT">		</span><span class="NAME">a.setFrame</span><span class="PUNC">(</span><span class="NAME">f</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>564</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>565</span> </span><span class="WHIT">	</span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>566</span> </span><span class="WHIT">		</span><span class="NAME">vxl.go.console</span><span class="PUNC">(</span><span class="STRN">'API:frame '</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">f</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="STRN">' does not exist. Animation goes back to the beginning'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>567</span> </span><span class="WHIT">		</span><span class="NAME">a.setFrame</span><span class="PUNC">(</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>568</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>569</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>570</span> 
+<span class='line'>571</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>572</span>   *Removes the current animation from the scene 
+<span class='line'>573</span>   */</span><span class="WHIT">
+<span class='line'>574</span> </span><span class="WHIT"> </span><span class="NAME">clearAnimation</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>575</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">vxl.c.animation</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>576</span> </span><span class="WHIT">		</span><span class="NAME">vxl.c.animation.stop</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>577</span> </span><span class="WHIT">		</span><span class="NAME">vxl.c.animation</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>578</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>579</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>580</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>581</span>   * Resets the current camera
+<span class='line'>582</span>   */</span><span class="WHIT">
+<span class='line'>583</span> </span><span class="WHIT"> </span><span class="NAME">resetCamera</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>584</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.camera.reset</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>585</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>586</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>587</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>588</span>   * Saves the current camera state
+<span class='line'>589</span>   */</span><span class="WHIT">
+<span class='line'>590</span> </span><span class="WHIT"> </span><span class="NAME">saveCamera</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>591</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.camera.save</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>592</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>593</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>594</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>595</span>   * Retrieves the last saved camera state
+<span class='line'>596</span>   */</span><span class="WHIT">
+<span class='line'>597</span> </span><span class="WHIT"> </span><span class="NAME">retrieveCamera</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>598</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.camera.retrieve</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>599</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>600</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>601</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>602</span>   * Sets the azimuth of the camera
+<span class='line'>603</span>   * @param {Number} a azimuth
+<span class='line'>604</span>   */</span><span class="WHIT">
+<span class='line'>605</span> </span><span class="WHIT"> </span><span class="NAME">setAzimuth</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">a</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>606</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.camera.setAzimuth</span><span class="PUNC">(</span><span class="NAME">a</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>607</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>608</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>609</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>610</span>   * Sets the elevation of the camera
+<span class='line'>611</span>   * @param {Number} e elevation
 <span class='line'>612</span>   */</span><span class="WHIT">
-<span class='line'>613</span> </span><span class="WHIT">  </span><span class="NAME">setUniform</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">uniformID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">,</span><span class="NAME">hint</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>614</span> </span><span class="WHIT">      </span><span class="NAME">vxl.c.view.renderer.prg.setUniform</span><span class="PUNC">(</span><span class="NAME">uniformID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">,</span><span class="NAME">hint</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>615</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>616</span> </span><span class="WHIT">  </span><span class="WHIT">
-<span class='line'>617</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'>618</span>    * Return the uniform names of the current program
-<span class='line'>619</span>    */</span><span class="WHIT">
-<span class='line'>620</span> </span><span class="WHIT">  </span><span class="NAME">getUniformNames</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>621</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">vxl.c.view.renderer.prg._uniformList</span><span class="PUNC">[</span><span class="NAME">vxl.c.view.renderer.prg._currentProgramID</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>622</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>623</span> </span><span class="WHIT">  </span><span class="WHIT">
-<span class='line'>624</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'>625</span>    * &lt;p>Suscribes the to Voxelent events &lt;/p>
-<span class='line'>626</span>    * 
-<span class='line'>627</span>    * &lt;p>The context parameter corresponds to the class that is going to listen for Voxelent events.&lt;/p>
-<span class='line'>628</span>    * 
-<span class='line'>629</span>    * &lt;p>Such class needs to implement a method to handle the events that it has subscribed to. This method/function needs
-<span class='line'>630</span>    * to have the following signature:&lt;/p>
-<span class='line'>631</span>    * 
-<span class='line'>632</span>    * &lt;p>&lt;code>handleEvent(event, src)&lt;/code>&lt;/p>
-<span class='line'>633</span>    * 
-<span class='line'>634</span>    * &lt;p> The event parameter corresponds to the event that has been fired by Voxelent. Notice that 
-<span class='line'>635</span>    * your class will only be notified of those events that it has been subscribed to.
-<span class='line'>636</span>    * 
-<span class='line'>637</span>    * @param {String, Array} list the event or events that we are going to subscribe to
-<span class='line'>638</span>    * @param {Object} context the object that needs to implement the handleEvent method
-<span class='line'>639</span>    * 
-<span class='line'>640</span>    */</span><span class="WHIT">
-<span class='line'>641</span> </span><span class="WHIT">  </span><span class="NAME">subscribe</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">list</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">context</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>642</span> </span><span class="WHIT">  	</span><span class="NAME">vxl.go.notifier.subscribe</span><span class="PUNC">(</span><span class="NAME">list</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">context</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>643</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>644</span> </span><span class="WHIT">  </span><span class="WHIT">
-<span class='line'>645</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>646</span> </span><span class="WHIT"> </span></pre></body></html>
+<span class='line'>613</span> </span><span class="WHIT"> </span><span class="NAME">setElevation</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>614</span> </span><span class="WHIT">	</span><span class="NAME">vxl.c.camera.setElevation</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>615</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>616</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>617</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>618</span> </span><span class="WHIT"> </span><span class="NAME">getLookupTables</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>619</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">vxl.go.lookupTableManager.getAllLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>620</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>621</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>622</span> </span><span class="WHIT"> </span><span class="COMM">//runScript :  function(file){</span><span class="WHIT">
+<span class='line'>623</span> </span><span class="WHIT"> </span><span class="COMM">//use JQuery here.</span><span class="WHIT">
+<span class='line'>624</span> </span><span class="WHIT"> </span><span class="COMM">//}</span><span class="WHIT">
+<span class='line'>625</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>626</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>627</span>   * Loads a program
+<span class='line'>628</span>   * @param{vxlView} view the view to configure
+<span class='line'>629</span>   * @param{Object} program a JSON object that defines the progrma to execute
+<span class='line'>630</span>   * @param{vxlRenderStrategy} strategy the strategy that the renderer should follow to communicate with the program
+<span class='line'>631</span>   */</span><span class="WHIT">
+<span class='line'>632</span> </span><span class="WHIT"> </span><span class="NAME">setProgram</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">view</span><span class="PUNC">,</span><span class="NAME">program</span><span class="PUNC">,</span><span class="NAME">strategy</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>633</span> </span><span class="WHIT">    </span><span class="NAME">view.renderer.setProgram</span><span class="PUNC">(</span><span class="NAME">program</span><span class="PUNC">,</span><span class="NAME">strategy</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>634</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>635</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>636</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>637</span>   * Returns the name of the current program
+<span class='line'>638</span>   * @param {vxlView} view the view that we want to query. If this parameter is not passed,
+<span class='line'>639</span>   * the current view will be used (vxl.c.view) 
+<span class='line'>640</span>   */</span><span class="WHIT">
+<span class='line'>641</span> </span><span class="WHIT"> </span><span class="NAME">getProgram</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">view</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>642</span> </span><span class="WHIT">     </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">view</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>643</span> </span><span class="WHIT">         </span><span class="NAME">view</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">vxl.c.view</span><span class="WHIT">
+<span class='line'>644</span> </span><span class="WHIT">     </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>645</span> </span><span class="WHIT">     </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">view</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>646</span> </span><span class="WHIT">         </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">'vxl.api.getProgram: please indicate a view'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>647</span> </span><span class="WHIT">     </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>648</span> </span><span class="WHIT">     </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">view.renderer.prg._currentProgramID</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>649</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>650</span> </span><span class="WHIT"> </span><span class="COMM">//TODO: Wwork in progress... sorry for the mess.</span><span class="WHIT">
+<span class='line'>651</span> </span><span class="WHIT"> </span><span class="COMM">//buildProgramFromDOM: function(id,VERTEX_SHADER_DOM_ID,FRAGMENT_SHADER_DOM_ID){</span><span class="WHIT">
+<span class='line'>652</span> </span><span class="WHIT"> </span><span class="COMM">//       var vshader= document.getElementById(VERTEX_SHADER_DOM_ID);</span><span class="WHIT">
+<span class='line'>653</span> </span><span class="WHIT">        </span><span class="WHIT">
+<span class='line'>654</span> </span><span class="WHIT">     </span><span class="WHIT">
+<span class='line'>655</span> </span><span class="WHIT"> </span><span class="COMM">//},</span><span class="WHIT">
+<span class='line'>656</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>657</span> </span><span class="WHIT"> </span><span class="COMM">/**
+<span class='line'>658</span>   * Sets a uniform
+<span class='line'>659</span>   */</span><span class="WHIT">
+<span class='line'>660</span> </span><span class="WHIT">  </span><span class="NAME">setUniform</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">uniformID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">,</span><span class="NAME">hint</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>661</span> </span><span class="WHIT">      </span><span class="NAME">vxl.c.view.renderer.prg.setUniform</span><span class="PUNC">(</span><span class="NAME">uniformID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">,</span><span class="NAME">hint</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>662</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>663</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>664</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>665</span>    * Return the uniform names of the current program
+<span class='line'>666</span>    */</span><span class="WHIT">
+<span class='line'>667</span> </span><span class="WHIT">  </span><span class="NAME">getUniformNames</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>668</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">vxl.c.view.renderer.prg._uniformList</span><span class="PUNC">[</span><span class="NAME">vxl.c.view.renderer.prg._currentProgramID</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>669</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>670</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>671</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>672</span>    * &lt;p>Suscribes the to Voxelent events &lt;/p>
+<span class='line'>673</span>    * 
+<span class='line'>674</span>    * &lt;p>The context parameter corresponds to the class that is going to listen for Voxelent events.&lt;/p>
+<span class='line'>675</span>    * 
+<span class='line'>676</span>    * &lt;p>Such class needs to implement a method to handle the events that it has subscribed to. This method/function needs
+<span class='line'>677</span>    * to have the following signature:&lt;/p>
+<span class='line'>678</span>    * 
+<span class='line'>679</span>    * &lt;p>&lt;code>handleEvent(event, src)&lt;/code>&lt;/p>
+<span class='line'>680</span>    * 
+<span class='line'>681</span>    * &lt;p> The event parameter corresponds to the event that has been fired by Voxelent. Notice that 
+<span class='line'>682</span>    * your class will only be notified of those events that it has been subscribed to.
+<span class='line'>683</span>    * 
+<span class='line'>684</span>    * @param {String, Array} list the event or events that we are going to subscribe to
+<span class='line'>685</span>    * @param {Object} context the object that needs to implement the handleEvent method
+<span class='line'>686</span>    * 
+<span class='line'>687</span>    */</span><span class="WHIT">
+<span class='line'>688</span> </span><span class="WHIT">  </span><span class="NAME">subscribe</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">list</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">context</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>689</span> </span><span class="WHIT">  	</span><span class="NAME">vxl.go.notifier.subscribe</span><span class="PUNC">(</span><span class="NAME">list</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">context</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>690</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>691</span> </span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>692</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>693</span> </span><span class="WHIT"> </span></pre></body></html>

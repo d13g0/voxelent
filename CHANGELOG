@@ -1,4 +1,73 @@
 -------------------------------------------------------------------------------------------
+VERSION 0.89 - Crocodile Rock - Elton John
+-------------------------------------------------------------------------------------------
+API Updates
+------------------
+1. New API methods getActor, getActorByUID, getProgram
+2. Actors and models names are stripped from the '.json' suffix.
+
+Model Updates
+------------------
+1.New model method getBoundingBoxVertices
+2.New model static method BB_INDICES
+
+
+Actor Updates
+--------------
+1. New visualization mode for actors (BOUNDING BOX). Check vxl.def.actor.mode
+   Phong and Lambert strategies updated to be able to render actor bounding boxes
+
+2. New actor method getHeight (it behaves nicely after actor rotation/scaling always returning y-length of bounding box)
+
+3. Actors hold now an internal matrix to represent geometric transformations (i.e. rotation, translations, scaling)
+   Position, Scale and Rotation should be updated by the provided methods.
+   
+4. setPosition, setScale have been updated to use the internal matrix representation 
+
+5. the methods translate and rotate, rotateX, rotateY, rotateZ have been implemented
+
+6. the method vxlActor._computeBoundingBox is called after geometric transformation operations
+
+7. vxlScene will not invoke vxlActor._computeBoundingBox when the bounding box of the scene wants to be established.
+In other words, each actor is responsible to keep its bounding box up to date
+
+8. new method vxlActor.getBoundingBoxVertices, vxlActor.getBoundingBox
+
+9. Some actor properties are made private ('_' prefix)
+
+Camera Updates
+---------------------
+1. Tracking cameras reviewed and implemented
+
+2. Camera to follow actor:
+
+var camera = vxl.c.camera;
+camera.setType(vxl.def.camera.type.TRACKING);
+camera.follow(actor)
+
+The camera needs to be positioned first. You can do:
+
+camera.closeUp(actor)
+
+then
+
+camera.follow(actor)
+Any actor translation will be applied to the camera 
+Also, the camera has tracking modes (see the docs on vxl.def.camera.tracking)
+ 
+3. New methods: roll, translate, closeUp, follow, unfollow
+
+4. the shot method is made private (_shot). 
+
+5. The camera variables are made private ('_' prefix)
+
+vxlTrackerInteractor updates
+------------------------------
+1. Remember double click evokes current camera longShot method
+2. Ctrl+Mouse is ZOOM
+3. Shift + Ctrl + Mouse is ROLL
+
+-------------------------------------------------------------------------------------------
 VERSION 0.88 - Casablanca premiers in NYC
 -------------------------------------------------------------------------------------------
 1. Texture mapping has been implemented

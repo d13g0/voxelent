@@ -1,6 +1,17 @@
-import platform, sys,string,traceback, os.path, subprocess, shutil
+import platform, sys,string,traceback, os.path, subprocess, shutil, pdb, fileinput
 
-
+def updateVersion(VOX_VERSION_NUMBER):
+    once = True
+    for line in fileinput.input('../source/nucleo/vxl/VXL.js',inplace=1):
+        text = line.strip()
+        if text.startswith('number') and once:
+            sys.stdout.write("    number: '"+VOX_VERSION_NUMBER+"',\n")
+            once = False
+        else:
+            sys.stdout.write(line)
+        
+        
+       
 
 def pack(VOX_VERSION_NUMBER):
 
@@ -127,5 +138,6 @@ def pack(VOX_VERSION_NUMBER):
     print ' -- END PACKAGER --'
     
 if __name__ == '__main__':
+    updateVersion(sys.argv[1])
     pack(sys.argv[1])
 

@@ -37,7 +37,7 @@
 			<!-- begin publish.classesIndex -->
 			<div align="center"><h2><a href="../index.html">Class List</a></h2></div>
 <hr />
-<h3>Current Version:  0.88</h3>
+<h3>Current Version:  0.89</h3>
 <p>Download it <a href='http://voxelent.com/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -58,6 +58,8 @@
 	<li><a href="../symbols/vxl.def.camera.html">vxl.def.camera</a></li>
 	
 	<li><a href="../symbols/vxl.def.glsl.html">vxl.def.glsl</a></li>
+	
+	<li><a href="../symbols/vxl.def.interactor.html">vxl.def.interactor</a></li>
 	
 	<li><a href="../symbols/vxl.def.lut.html">vxl.def.lut</a></li>
 	
@@ -194,9 +196,7 @@
 							
 							<td class="returns">
 							
-								
-									<span><span class="light fixedFont">{<a href="../symbols/vxlActor.html">vxlActor</a>}</span> </span>
-							    
+							      <span>void</span>   
 							    
 							</td>
 							<td class="nameDescription">
@@ -204,8 +204,8 @@
 								
 								
 								
-								<b><a href="../symbols/vxlActor.html#clone">clone</a></b>
-								()
+								<b><a href="../symbols/vxlActor.html#addTrackingCamera">addTrackingCamera</a></b>
+								(camera)
 								</div>
 							</td>
 							
@@ -218,7 +218,9 @@
 							
 							<td class="returns">
 							
-							      <span>void</span>   
+								
+									<span><span class="light fixedFont">{<a href="../symbols/vxlActor.html">vxlActor</a>}</span> </span>
+							    
 							    
 							</td>
 							<td class="nameDescription">
@@ -226,7 +228,7 @@
 								
 								
 								
-								<b><a href="../symbols/vxlActor.html#computeBoundingBox">computeBoundingBox</a></b>
+								<b><a href="../symbols/vxlActor.html#clone">clone</a></b>
 								()
 								</div>
 							</td>
@@ -285,6 +287,78 @@
 							<td class="returns">
 							
 								
+									<span><span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> </span>
+							    
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActor.html#getBoundingBox">getBoundingBox</a></b>
+								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+								
+									<span><span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> </span>
+							    
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActor.html#getBoundingBoxVertices">getBoundingBoxVertices</a></b>
+								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+								
+									<span><span class="light fixedFont">{Number}</span> </span>
+							    
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActor.html#getHeight">getHeight</a></b>
+								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+								
 									<span><span class="light fixedFont">{Object}</span> </span>
 							    
 							    
@@ -320,6 +394,94 @@
 								
 								<b><a href="../symbols/vxlActor.html#isVisible">isVisible</a></b>
 								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActor.html#removeTrackingCamera">removeTrackingCamera</a></b>
+								(camera)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActor.html#rotateX">rotateX</a></b>
+								(angle)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActor.html#rotateY">rotateY</a></b>
+								(angle)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActor.html#rotateZ">rotateZ</a></b>
+								(angle)
 								</div>
 							</td>
 							
@@ -567,6 +729,28 @@
 							
 						</tr>
 					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActor.html#translate">translate</a></b>
+								(x, y, z)
+								</div>
+							</td>
+							
+						</tr>
+					
 					</tbody>
 				</table>
 				
@@ -590,7 +774,7 @@
 				</div>
 
 				<div class="description">
-					<p>An actor is a representation of a model in Voxelent. Actors can cache model properties and modified them. This is useful when there are several actors based in the same modelbut each one of them needs to have a different version of any given model property (i.e. color)</p><p> To propagate one change for all the actors based in the same model, the setProperty methodshould be invoked by setting the third parameter (scope) like this:</p><pre class="prettyprint">var actor = vxl.c.scene.getActorByName('example.json');actor.setProperty('color',[1.0,0.0,0.0], vxl.def.model)</pre><p>If the change should be local (for just that actor)  then you should write:</p><pre class="prettyprint">var actor = vxl.c.scene.getActorByName('example.json');actor.setProperty('color',[1.0,0.0,0.0], vxl.def.actor)</pre><p> Or simply </p> <pre class="prettyprint">var actor = vxl.c.scene.getActorByName('example.json');actor.setProperty('color',[1.0,0.0,0.0])</pre>
+					<p>An actor is a representation of a model in Voxelent. Actors can cache model properties and modified them. This is useful when there are several actors based in the same modelbut each one of them needs to have a different version of any given model property (i.e. color)</p><p> To propagate one change for all the actors based in the same model, the setProperty methodshould be invoked by setting the third parameter (scope) like this:</p><pre class="prettyprint">var actor = vxl.c.scene.getActorByName('example');actor.setProperty('color',[1.0,0.0,0.0], vxl.def.model)</pre><p>If the change should be local (for just that actor)  then you should write:</p><pre class="prettyprint">var actor = vxl.c.scene.getActorByName('example');actor.setProperty('color',[1.0,0.0,0.0], vxl.def.actor)</pre><p> Or simply </p> <pre class="prettyprint">var actor = vxl.c.scene.getActorByName('example');actor.setProperty('color',[1.0,0.0,0.0])</pre>
 					
 				</div>
 
@@ -637,6 +821,54 @@
 				</h2>
 				
 				<div class='methodDetail'>
+					<a name="addTrackingCamera"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>addTrackingCamera</b>(camera)
+					</div>
+					</div>
+					<div class="description">
+						Adds a tracking camera
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>camera</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
 					<a name="clone"> </a>
 					<div class="title">
 					<div class="fixedFont">
@@ -679,37 +911,6 @@
 							
 								<span><a href="../symbols/vxlModel.html">vxlModel</a></span>
 							
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="computeBoundingBox"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>computeBoundingBox</b>()
-					</div>
-					</div>
-					<div class="description">
-						Computes the current bounding box for this actor.This method is called on demand by the scene or any other object. The bounding box is NOT automatically recalculated when moving or scaling an actor for performance reasons.
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
 						
 				</div>	
 				
@@ -770,6 +971,129 @@
 						
 						
 						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="getBoundingBox"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					<span class="light">
+					  {<a href="../symbols/Array.html">Array</a>}
+					  </span>
+					
+					
+					
+					  <b>getBoundingBox</b>()
+					</div>
+					</div>
+					<div class="description">
+						Returns the bounding box for this actor. The actor's bounding box observes any geometrictransformation suffered by the actor. Therefore it is ideal to do collision detection.The format of the returned bounding box is [x-min, y-min, z-min, x-ax, y-max, z-max]
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+							<p class="heading">Returns:</p>
+							<table class="paramTable">
+							
+								<tr>
+								<td><span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> the current bounding box.</td></tr>
+							
+							</table>							
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="getBoundingBoxVertices"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					<span class="light">
+					  {<a href="../symbols/Array.html">Array</a>}
+					  </span>
+					
+					
+					
+					  <b>getBoundingBoxVertices</b>()
+					</div>
+					</div>
+					<div class="description">
+						Returns an array with the bounding box vertices. Good for rendering the transformedbounding box (after geometric transformations)
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+							<p class="heading">Returns:</p>
+							<table class="paramTable">
+							
+								<tr>
+								<td><span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> a 8-element array with the vertices that constitute the actor bounding box</td></tr>
+							
+							</table>							
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="getHeight"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					<span class="light">
+					  {Number}
+					  </span>
+					
+					
+					
+					  <b>getHeight</b>()
+					</div>
+					</div>
+					<div class="description">
+						Returns the height for the current actor.
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+							<p class="heading">Returns:</p>
+							<table class="paramTable">
+							
+								<tr>
+								<td><span class="light fixedFont">{Number}</span> the current height</td></tr>
+							
+							</table>							
 						
 						
 						
@@ -869,6 +1193,198 @@
 								<td><span class="light fixedFont">{boolean}</span> true if the object is visible</td></tr>
 							
 							</table>							
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="removeTrackingCamera"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>removeTrackingCamera</b>(camera)
+					</div>
+					</div>
+					<div class="description">
+						Removes a tracking camera
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>camera</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="rotateX"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>rotateX</b>(angle)
+					</div>
+					</div>
+					<div class="description">
+						Rotates the actor on the X axis
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{Number}</span> 
+								</td>
+								<td>
+									<code>angle</code>
+								</td>	
+								<td><p>the angle
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="rotateY"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>rotateY</b>(angle)
+					</div>
+					</div>
+					<div class="description">
+						Rotates the actor on the Y axis
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{Number}</span> 
+								</td>
+								<td>
+									<code>angle</code>
+								</td>	
+								<td><p>the angle
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="rotateZ"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>rotateZ</b>(angle)
+					</div>
+					</div>
+					<div class="description">
+						Rotates the actor on the Z axis
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{Number}</span> 
+								</td>
+								<td>
+									<code>angle</code>
+								</td>	
+								<td><p>the angle
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
 						
 						
 						
@@ -978,7 +1494,7 @@
 								<td>
 									<code>lutID</code>
 								</td>	
-								<td><p>the lookup table id. See vxl.def.lut.list for currently supported ids.
+								<td><p>the lookup table id. See <a href="../symbols/vxl.def.lut.html">vxl.def.lut</a> for currently supported ids.
 								
 								</p>
 								</td>
@@ -1081,7 +1597,7 @@
 					</div>
 					</div>
 					<div class="description">
-						Sets the position of this actor. It updates the bounding box according to the position of the actor. The position of the actoris initially [0,0,0] and it is relative to the model centre. If the model is not centered in the origin, then the actor's position will be relative to the model centre.
+						Sets the position of this actor.
 						
 						
 					</div>
@@ -1522,6 +2038,78 @@
 						
 				</div>	
 				
+				<div class='methodDetail'>
+					<a name="translate"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>translate</b>(x, y, z)
+					</div>
+					</div>
+					<div class="description">
+						Translates the actor by a given vector
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{Number|<a href="../symbols/Array.html">Array</a>|vec3}</span> 
+								</td>
+								<td>
+									<code>x</code>
+								</td>	
+								<td><p>it can be the x coordinate, a 3-dimensional Array or a vec3 (glMatrix)
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									<span class="light fixedFont">{Number}</span> 
+								</td>
+								<td>
+									<code>y</code>
+								</td>	
+								<td><p>if x is a number, then this parameter corresponds to the y-coordinate
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									<span class="light fixedFont">{Number}</span> 
+								</td>
+								<td>
+									<code>z</code>
+								</td>	
+								<td><p>if x is a number, then this parameter corresponds to the z-coordinate
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
 			
 
 <!-- ============================== event details ========================= -->
@@ -1534,7 +2122,7 @@
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Nov 23 2012 10:51:48 GMT-0500 (EST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Dec 09 2012 17:32:43 GMT-0500 (EST)
 		</div>
         </div>
         </div>

@@ -365,6 +365,41 @@ wireframeON :  function(){
     }
     return _scene.getActorNames();
  },
+ 
+ /**
+  *Retrieves an actor by name or UID
+  * @param {String} actorNameOrUID actor name or UID
+  * @param {vxlScene} scene looks in the specified scene. This parameter is optional. 
+  * If not specified, the current scene (vxl.c.scene) will be queried
+  */
+ getActor: function(actorNameOrUID, scene){
+     var actor = this.getActorByName(actorNameOrUID, scene);
+     
+     if (actor == undefined){
+         actor = this.getActorByUID(actorNameOrUID, scene);
+     }
+     return actor;
+ },
+ /**
+  * Retrieves an actor object by UID
+  * @param {String} actorUID the UID of the actor
+  * @param {vxlScene} scene looks in the specified scene. This parameter is optional. 
+  * If not specified, the current scene (vxl.c.scene) will be queried
+  *  
+  */
+ getActorByUID :  function(actorUID,scene){
+    var _scene = scene;
+    if (_scene == undefined){ //look in the current scene
+        if (vxl.c.scene == undefined){
+            throw ('vxl.api.getActorByUID: There is no current scene. Please the scene you want to look the actor with uid: '+UID+' into');
+        }
+        else{
+            _scene = vxl.c.scene;
+        }
+    }
+    
+    return _scene.getActorByUID(actorUID);
+ },
  /**
   * Retrieves an actor object by name
   * @param {String} actorName the name of the actor
@@ -487,15 +522,14 @@ wireframeON :  function(){
  },
  
  /**
-  * @param {bool} flag if true this method will flip the normals. If false normals will be
-  * calculated the 'normal' way.
+  * Flip the normals of the current actor or the whole scene if the current actor is undefined
   */
- flipActorNormals :  function (flag){
+ flipActorNormals :  function (){
 	if (vxl.c.actor){
-		vxl.c.actor.flipNormals(flag);
+		vxl.c.actor.flipNormals();
 	}
 	else{
-		vxl.c.view.scene.flipNormals(flag);
+		vxl.c.view.scene.flipNormals();
 	}
 	vxl.c.view.refresh();
  },
@@ -599,7 +633,20 @@ wireframeON :  function(){
     view.renderer.setProgram(program,strategy);
     
  },
- 
+ /**
+  * Returns the name of the current program
+  * @param {vxlView} view the view that we want to query. If this parameter is not passed,
+  * the current view will be used (vxl.c.view) 
+  */
+ getProgram : function(view){
+     if (view == undefined){
+         view = vxl.c.view
+     }
+     if (view == undefined){
+         throw ('vxl.api.getProgram: please indicate a view');
+     }
+     return view.renderer.prg._currentProgramID;
+ }, 
  //TODO: Wwork in progress... sorry for the mess.
  //buildProgramFromDOM: function(id,VERTEX_SHADER_DOM_ID,FRAGMENT_SHADER_DOM_ID){
  //       var vshader= document.getElementById(VERTEX_SHADER_DOM_ID);

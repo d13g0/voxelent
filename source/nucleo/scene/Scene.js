@@ -95,14 +95,14 @@ vxlScene.prototype.setLoadingMode = function(mode){
  */
 vxlScene.prototype._updateBoundingBoxWith = function(actor){
 
-    actor.computeBoundingBox();
+    //actor.computeBoundingBox();
     
-    var b = actor.bb;
+    var b = actor._bb;
     
     vxl.go.console('Scene: updating metrics with ('+ b[0]+','+b[1]+','+b[2]+') - ('+b[3]+','+b[4]+','+b[5]+')');
     if (this.actors.length == 1){
         //Quicky!  
-        this.bb = this.actors[0].bb.slice(0);
+        this.bb = this.actors[0]._bb.slice(0);
         this.toys.update();
         return;
     }
@@ -132,12 +132,12 @@ vxlScene.prototype._updateBoundingBoxWith = function(actor){
 
 /**
  * Calculates the global bounding box and the center of the scene.
- * Updates the Scene's axis and bounding box actors.
+ * Updates the Scene's axis and bounding box toys.
  */
 vxlScene.prototype.computeBoundingBox = function() {
     
     if (this.actors.length >0){
-	   this.bb = this.actors[0].bb.slice(0);
+	   this.bb = this.actors[0]._bb.slice(0);
 	}
 	else{
 	    this.bb = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
@@ -311,6 +311,7 @@ vxlScene.prototype.reset = function(){
  * @param name the name of the actor to retrieve
  */
 vxlScene.prototype.getActorByName = function(name){
+    name = name.replace(/\.[^/.]+$/, "");
 	var LEN = this.actors.length;
     for(var i=0; i<LEN; i+=1){
 		if(this.actors[i].name == name){
@@ -382,10 +383,9 @@ vxlScene.prototype.setOpacity = function(o,name){
  * Flips the normals for all the actors in the scene. This will
  * have an immediate effect in the side of the object that it is being lit.
  */
-vxlScene.prototype.flipNormals = function(flag){
-	this.normalsFlipped = flag;
+vxlScene.prototype.flipNormals = function(){
 	for(var i=0; i<this.actors.length; i++){
-		this.actors[i].flipNormals(flag);
+		this.actors[i].flipNormals();
 	}
 };
 

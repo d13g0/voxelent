@@ -26,7 +26,7 @@ vxlTrackerInteractor.prototype.constructor = vxlViewInteractor;
 function vxlTrackerInteractor(view,camera){
     vxlViewInteractor.call(this, view, camera);    
 	this.MOTION_FACTOR = 10.0;
-	this.task = vxl.def.camera.task.NONE;
+	this.task = vxl.def.interactor.task.NONE;
 	this.x = 0;
 	this.y = 0;
 	this.lastX = 0;
@@ -102,7 +102,7 @@ vxlTrackerInteractor.prototype.onKeyUp = function(ev){
  *Reacts to the canvas onmouseup event 
  */
 vxlTrackerInteractor.prototype.onMouseUp = function(ev){
-	task = vxl.def.camera.task.NONE;
+	task = vxl.def.interactor.task.NONE;
 	this.dragging = false;
 };
 
@@ -140,70 +140,26 @@ vxlTrackerInteractor.prototype.onMouseMove = function(ev){
 	
 	
 	 
-    if (this.altPressed){ 
+    if (this.ctrlPressed && !this.shiftPressed){ 
 		this.dolly(ry);
 	}
-	else if (this.shiftPressed){
+	else if (this.shiftPressed && !this.ctrlPressed){
 		this.pan(rx,ry);
 	}
-	else{
-	    this.rotate(rx,ry);
+	else if (this.ctrlPressed && this.shiftPressed){
+	    this.roll(ry);
 	}
+	else {
+        this.rotate(rx,ry);
+    }
 	
 	this.camera.refresh();
 };
 
 
 /**
- * Internal method used by this tracker to perform dollying
- * @param {Number} value the number of dollying steps
+ *  Implements the behaviour of the tracker on the ondragover mouse event
  */
-vxlTrackerInteractor.prototype.dolly = function(value){
-	
-	this.task = vxl.def.camera.task.DOLLY;
-    this.camera.dolly(value);
-};
-
-/**    this.dragndrop = false;
- * Internal method used by this tracker to rotate the camera.
- * @param {Number} dx the rotation on the X axis (elevation)
- * @param {Number} dy the rotation on the Y axis (azimuth)
- */
-vxlTrackerInteractor.prototype.rotate = function(rx, ry){
-	
-	this.task = vxl.def.camera.task.ROTATE;
-	
-	var canvas = this.camera.view.canvas;
-	var dx = -20.0 / canvas.height;
-	var dy = -20.0 / canvas.width;
-	var rotX = rx * dx * this.MOTION_FACTOR;
-	var rotY = ry * dy * this.MOTION_FACTOR;
-
-	this.camera.rotate(rotX, rotY);
-};
-
-/**
- * Internal method used by this tracker to perform panning 
- * @param {Object} dx
- * @param {Object} dy
- */
-vxlTrackerInteractor.prototype.pan = function(dx,dy){
-
-	this.task = vxl.def.camera.task.PAN;
-	
-	var camera = this.camera;
-	var canvas = camera.view.canvas;
-	var scene = camera.view.scene;    this.dragndrop = false;
-	var dimMax = Math.max(canvas.width, canvas.height);
-	var deltaX = 1 / dimMax;
-	var deltaY = 1 / dimMax;
-	var ndx = dx * deltaX * this.MOTION_FACTOR * scene.bb.max();
-	var ndy = dy * deltaY * this.MOTION_FACTOR * scene.bb.max();
-
-	camera.pan(ndx,ndy);
-};
-
-
 vxlTrackerInteractor.prototype.onDragOver = function(event){
     event.stopPropagation();
     event.preventDefault();
@@ -219,6 +175,9 @@ vxlTrackerInteractor.prototype.onDragOver = function(event){
     }
 };
 
+/**
+ * Implements the behaviour of the tracker on the ondragleave mouse event 
+ */
 vxlTrackerInteractor.prototype.onDragLeave = function(event){
     event.stopPropagation();
     event.preventDefault();
@@ -231,6 +190,10 @@ vxlTrackerInteractor.prototype.onDragLeave = function(event){
     
 };
 
+/**
+ * Implements the behaviour of the tracker on the ondrop mouse event
+ * @TODO: this method only works for VTK ascii files. Review other formats 
+ */
 vxlTrackerInteractor.prototype.onDrop = function(event){
     event.stopPropagation();
     event.preventDefault();
@@ -254,4 +217,73 @@ vxlTrackerInteractor.prototype.onDrop = function(event){
  */
 vxlTrackerInteractor.prototype.onDoubleClick = function(event){
     this.camera.longShot();
+};
+
+
+/**
+ * Internal method used by this tracker to perform dollying
+ * @param {Number} value the number of dollying steps
+ */
+vxlTrackerInteractor.prototype.dolly = function(value){
+	
+	this.task = vxl.def.interactor.task.DOLLY;
+    this.camera.dolly(value);
+};
+
+/**
+ * Internal method used by this tracker to perform rolling
+ * @param {Number} value the rolling angle
+ */
+vxlTrackerInteractor.prototype.roll = function(value){
+    
+    this.task = vxl.def.interactor.task.ROLL;
+    
+    var canvas = this.camera.view.canvas;
+    
+    var dy = -20.0 / canvas.width;
+    
+    var rotY = value * dy * this.MOTION_FACTOR;
+    
+    this.camera.rotate(0,0,rotY);
+};
+
+
+
+/**    this.dragndrop = false;
+ * Internal method used by this tracker to rotate the camera.
+ * @param {Number} dx the rotation on the X axis (elevation)
+ * @param {Number} dy the rotation on the Y axis (azimuth)
+ */
+vxlTrackerInteractor.prototype.rotate = function(rx, ry){
+	
+	this.task = vxl.def.interactor.task.ROTATE;
+	
+	var canvas = this.camera.view.canvas;
+	var dx = -20.0 / canvas.height;
+	var dy = -20.0 / canvas.width;
+	var rotX = rx * dx * this.MOTION_FACTOR;
+	var rotY = ry * dy * this.MOTION_FACTOR;
+
+	this.camera.rotate(rotX, rotY);
+};
+
+/**
+ * Internal method used by this tracker to perform panning 
+ * @param {Object} dx
+ * @param {Object} dy
+ */
+vxlTrackerInteractor.prototype.pan = function(dx,dy){
+
+	this.task = vxl.def.interactor.task.PAN;
+	
+	var camera = this.camera;
+	var canvas = camera.view.canvas;
+	var scene = camera.view.scene;    this.dragndrop = false;
+	var dimMax = Math.max(canvas.width, canvas.height);
+	var deltaX = 1 / dimMax;
+	var deltaY = 1 / dimMax;
+	var ndx = dx * deltaX * this.MOTION_FACTOR * scene.bb.max();
+	var ndy = dy * deltaY * this.MOTION_FACTOR * scene.bb.max();
+
+	camera.pan(ndx,ndy);
 };
