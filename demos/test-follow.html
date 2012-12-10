@@ -73,13 +73,13 @@ function handleEvent(event){
     
    
     var cam = vxl.c.camera;
-    //cam.setType(vxl.def.camera.type.TRACKING, vxl.def.camera.tracking.ROTATIONAL);
+    cam.setType(vxl.def.camera.type.TRACKING, vxl.def.camera.tracking.ROTATIONAL);
     cam.setPosition(0,5,60);
-    //cam.follow(cone);
+    cam.follow(cone);
     
     vxl.api.floorON(60,5);
     
-    //startAnimation();
+    startAnimation();
 }
 
 
