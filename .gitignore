@@ -1,42 +1,33 @@
-
-#ignore thumbnails created by windows
+# --------------------------------------------
+# Windows Files
+# --------------------------------------------
 Thumbs.db
-#Ignore files build by Visual Studio
-*.obj
-*.exe
-*.pdb
-*.user
-*.aps
-*.pch
-*.vspscc
-*_i.c
-*_p.c
-*.ncb
-*.suo
-*.tlb
-*.tlh
-*.bak
-*.cache
-*.ilk
-*.log
-[Bb]in
-[Dd]ebug*/
-*.lib
-*.sbr
 
-obj/
-[Rr]elease*/
-_ReSharper*/
-[Tt]est[Rr]esult*
-c4rd4m0m/
-c4n3l4/
+# --------------------------------------------
+# Mac Files
+# --------------------------------------------
 .DS_Store*
 ._.DS_Store
+
+# --------------------------------------------
+# Backup files
+# --------------------------------------------
+*~
+
+# --------------------------------------------
+# Aptana and Eclipse files
+# --------------------------------------------
 .project
 .pydevproject
-*.pyc
 .settings
-*~
+.metadata
+.metadata/
+
+# --------------------------------------------
+# Other files
+# --------------------------------------------
+c4rd4m0m/
+c4n3l4/
 beginners-guide*/
 beginners_guide*/
-
+*.pyc
