@@ -117,7 +117,7 @@ vxlBakeStrategy.prototype._populate = function(value, size){
  */
 vxlBakeStrategy.prototype._computeRequiredCalls = function(scene){
 
-    var elements    = scene.actors; //.concat(scene.toys.list);
+    var elements    = scene._actors; //.concat(scene.toys.list);
     var NUM         = elements.length;
     var accum = 0;
     var count = 1;
@@ -306,7 +306,7 @@ vxlBakeStrategy.prototype.allocate = function(scene){
         throw 'Not renderable yet. Working on it. The number of indices exceeds the 65K limit';
     }
     
-    var elements    = scene.actors; //.concat(scene.toys.list);
+    var elements    = scene._actors; //.concat(scene.toys.list);
     var NUM         = elements.length;
     var r           = this.renderer;
     var buffers     = this._gl_buffers;

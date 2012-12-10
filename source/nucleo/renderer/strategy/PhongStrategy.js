@@ -63,7 +63,7 @@ vxlPhongStrategy.prototype.render = function(scene){
     trx.calculateModelView();
     prg.setUniform(glsl.PERSPECTIVE_MATRIX, trx.pMatrix);
     
-    var elements = scene.actors.concat(scene.toys.list);
+    var elements = scene._actors.concat(scene.toys.list);
     var NUM = elements.length;
     
     if (scene.frameAnimation != undefined){

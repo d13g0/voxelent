@@ -97,7 +97,7 @@
 				var cam = view.cameraman.getActiveCamera();
 				
 				if (event == vxl.events.SCENE_UPDATED) {
-                    var loaded = src.actors.length;
+                    var loaded = src._actors.length;
                     $('#status').html('Objects loaded: ' + loaded + ' out of 60');
                 }
 				else if (event == vxl.events.MODELS_LOADED) {

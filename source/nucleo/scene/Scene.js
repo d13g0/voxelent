@@ -27,7 +27,7 @@
 function vxlScene()
 {
 	this.views  				= [];
-	this.actors 				= [];
+	this._actors 				= [];
 	this.toys					= new vxlSceneToys(this);
 	this.loadingMode 			= vxl.def.model.loadingMode.LIVE;
 	this.normalsFlipped 		= false;
@@ -100,9 +100,9 @@ vxlScene.prototype._updateBoundingBoxWith = function(actor){
     var b = actor._bb;
     
     vxl.go.console('Scene: updating metrics with ('+ b[0]+','+b[1]+','+b[2]+') - ('+b[3]+','+b[4]+','+b[5]+')');
-    if (this.actors.length == 1){
+    if (this._actors.length == 1){
         //Quicky!  
-        this.bb = this.actors[0]._bb.slice(0);
+        this.bb = this._actors[0]._bb.slice(0);
         this.toys.update();
         return;
     }
@@ -136,8 +136,8 @@ vxlScene.prototype._updateBoundingBoxWith = function(actor){
  */
 vxlScene.prototype.computeBoundingBox = function() {
     
-    if (this.actors.length >0){
-	   this.bb = this.actors[0]._bb.slice(0);
+    if (this._actors.length >0){
+	   this.bb = this._actors[0]._bb.slice(0);
 	}
 	else{
 	    this.bb = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
@@ -145,9 +145,9 @@ vxlScene.prototype.computeBoundingBox = function() {
 	
 	this.centre = [0.0, 0.0, 0.0];
 	
-	var LEN = this.actors.length;
+	var LEN = this._actors.length;
 	for(var i=0; i<LEN; i++){
-		this._updateBoundingBoxWith(this.actors[i]);
+		this._updateBoundingBoxWith(this._actors[i]);
 	}
 };
 
@@ -192,12 +192,12 @@ vxlScene.prototype.addActor = function(actor){
         actor.setLookupTable(this.lutID, this.scalarMIN, this.scalarMAX);
     }
     
-    this.actors.push(actor);
+    this._actors.push(actor);
     this._updateBoundingBoxWith(actor); 
     
     vxl.go.console('Scene: Actor for model '+actor.model.name+' added');
     
-    if (this.actors.length ==1){
+    if (this._actors.length ==1){
     	vxl.c.actor = actor; //if we have only one
     }
     else{
@@ -212,8 +212,8 @@ vxlScene.prototype.addActor = function(actor){
  * @param actor the actor to be removed from the scene
  */
 vxlScene.prototype.removeActor = function(actor){
-	var idx = this.actors.indexOf(actor);
-	this.actors.splice(idx,1);
+	var idx = this._actors.indexOf(actor);
+	this._actors.splice(idx,1);
     this.computeBoundingBox();
 };
 
@@ -223,7 +223,7 @@ vxlScene.prototype.removeActor = function(actor){
  */
 vxlScene.prototype.hasActor = function(actor){
 	if (actor instanceof vxlActor){
-		return (this.actors.indexOf(actor)!=-1)
+		return (this._actors.indexOf(actor)!=-1)
 	}
 	else if (typeof(actor)=='string'){
 		var aux = this.getActorByName(actor);
@@ -239,8 +239,8 @@ vxlScene.prototype.hasActor = function(actor){
  * @param {Object} value the value of the property
  */
 vxlScene.prototype.setPropertyForAll = function (property, value){
-    for(var i=0; i<this.actors.length; i++){
-        this.actors[i].setProperty(property, value);
+    for(var i=0; i<this._actors.length; i++){
+        this._actors[i].setProperty(property, value);
     }
 };
 
@@ -272,8 +272,8 @@ vxlScene.prototype.setPropertyFor = function (list, property, value){
  * Updates the Scene's scalarMAX and scalarMIN properties.
  */
 vxlScene.prototype.updateScalarRange = function(){
-	for(var i=0;i<this.actors.length;i++){
-		var actor = this.actors[i];
+	for(var i=0;i<this._actors.length;i++){
+		var actor = this._actors[i];
 		if (actor.model.scalars && actor.model.scalars.max() > this.scalarMAX) this.scalarMAX = actor.model.scalars.max();
 		if (actor.model.scalars && actor.model.scalars.min() < this.scalarMIN) this.scalarMIN = actor.model.scalars.min();
 	}
@@ -285,11 +285,8 @@ vxlScene.prototype.updateScalarRange = function(){
  */
 vxlScene.prototype.setLookupTable = function(lutID){
 	this.lutID = lutID;
-	for(var i =0; i<this.actors.length; i++){
-		var actor = this.actors[i];
-		if (actor.setLookupTable){
-			actor.setLookupTable(lutID,this.scalarMIN, this.scalarMAX);
-		}
+	for(var i =0, N = this._actors.length; i<N; i+=1){
+     	this._actors[i].setLookupTable(lutID,this.scalarMIN, this.scalarMAX);
 	}
 };
 
@@ -298,10 +295,10 @@ vxlScene.prototype.setLookupTable = function(lutID){
  * It will also set vxl.c.actor to null
  */
 vxlScene.prototype.reset = function(){
-	for(var i=0; i<this.actors.length; i++){
-		this.actors[i] = null;
+	for(var i=0; i<this._actors.length; i++){
+		this._actors[i] = null;
 	}
-	this.actors = [];
+	this._actors = [];
 	vxl.c.actor = null;
 	this.computeBoundingBox();
 };
@@ -312,10 +309,10 @@ vxlScene.prototype.reset = function(){
  */
 vxlScene.prototype.getActorByName = function(name){
     name = name.replace(/\.[^/.]+$/, "");
-	var LEN = this.actors.length;
+	var LEN = this._actors.length;
     for(var i=0; i<LEN; i+=1){
-		if(this.actors[i].name == name){
-			return this.actors[i];
+		if(this._actors[i].name == name){
+			return this._actors[i];
 		}
 	}
 	return undefined;
@@ -327,10 +324,10 @@ vxlScene.prototype.getActorByName = function(name){
  * @param UID the actor's UID
  */
 vxlScene.prototype.getActorByUID = function(UID){
-    var LEN = this.actors.length;
+    var LEN = this._actors.length;
     for(var i=0; i<LEN; i+=1){
-        if(this.actors[i].UID == UID){
-            return this.actors[i];
+        if(this._actors[i].UID == UID){
+            return this._actors[i];
         }
     }
     return undefined;
@@ -348,14 +345,14 @@ vxlScene.prototype.getActorByUID = function(UID){
  */
 vxlScene.prototype.getActorsThat = function(condition){
     var idx = [];
-    for (var i=0; i<this.actors.length; i+=1){
-        if (condition(this.actors[i])) {
+    for (var i=0; i<this._actors.length; i+=1){
+        if (condition(this._actors[i])) {
             idx.push(i);
         }
     }
     var results = [];
     for (var j=0; j<idx.length;j+=1){
-        results.push(this.actors[idx[j]]);
+        results.push(this._actors[idx[j]]);
     }
     return results;
 };
@@ -368,8 +365,8 @@ vxlScene.prototype.getActorsThat = function(condition){
  */
 vxlScene.prototype.setOpacity = function(o,name){
 	if (name == null){
-		for(var i=0; i<this.actors.length; i++){
-			this.actors[i].setOpacity(o);
+		for(var i=0; i<this._actors.length; i++){
+			this._actors[i].setOpacity(o);
 		}
 	}
 	else{
@@ -384,8 +381,8 @@ vxlScene.prototype.setOpacity = function(o,name){
  * have an immediate effect in the side of the object that it is being lit.
  */
 vxlScene.prototype.flipNormals = function(){
-	for(var i=0; i<this.actors.length; i++){
-		this.actors[i].flipNormals();
+	for(var i=0; i<this._actors.length; i++){
+		this._actors[i].flipNormals();
 	}
 };
 
@@ -396,8 +393,8 @@ vxlScene.prototype.flipNormals = function(){
  */
 vxlScene.prototype.setVisualizationMode = function(mode){
 	if (mode == null || mode == undefined) return;
-	for(var i=0; i<this.actors.length; i++){
-			this.actors[i].setVisualizationMode(mode);
+	for(var i=0; i<this._actors.length; i++){
+			this._actors[i].setVisualizationMode(mode);
 	}
 };
 
@@ -437,8 +434,8 @@ vxlScene.prototype.clearAnimation = function(){
  */
 vxlScene.prototype.getActorNames = function(){
 	var list = [];
-	for(var a=0, actorCount = this.actors.length; a < actorCount; a+=1){
-		list.push(this.actors[a].name);
+	for(var a=0, actorCount = this._actors.length; a < actorCount; a+=1){
+		list.push(this._actors[a].name);
 	}
 	return list;
 };

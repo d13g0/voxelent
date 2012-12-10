@@ -484,10 +484,18 @@ vxlActor.prototype.setVisualizationMode = function(mode){
 * @param {Number} max highest value for interpolation
 */
 vxlActor.prototype.setLookupTable = function(lutID,min,max){
-	if (this.model.scalars){
-		var lut = vxl.go.lookupTableManager.get(lutID);
-		this.colors  = lut.getColors(this.model.scalars,min,max);
+	
+	if (this.model.scalars == undefined) return;
+	
+	var self = this;
+	
+	function scheduledSetLookupTable(scalars){
+        var lut = vxl.go.lookupTableManager.get(lutID);
+        self.colors  = lut.getColors(self.model.scalars,min,max);
 	}
+	
+	//Given that obtaining the colors can be a time consume op, it is deferred here.
+	setTimeout(function(){scheduledSetLookupTable()},0); 
 };
 
 /**

@@ -72,13 +72,6 @@ function vxlCamera(vw,t) {
 };
 
 /**
- * Uses the current camera axes as the standard rotation and translation axes 
- */
-vxlCamera.prototype.setAxes = function(){
-    this._updateAxes();
-};
-
-/**
  * Establishes the type of camera
  * @param {vxl.def.camera.type} type the type of camera
  * @param {vxl.def.camera.tracking} trackingMode if the camera is of tracking type, the tracking mode can be set as 
@@ -193,8 +186,7 @@ vxlCamera.prototype.setPosition = function(x,y,z) {
     m[13] = this._position[1];
     m[14] = this._position[2];
     m[15] = 1;
-    
-    this._updateDistance();
+
     this.setFocalPoint(this._focalPoint);
 };
 
@@ -237,7 +229,7 @@ vxlCamera.prototype.setDistance = function(d) {
     m[14] = this._position[2];
     m[15] = 1;
     
-    this._updateDistance();
+    this._update();
 };
 
 /**
@@ -307,8 +299,8 @@ vxlCamera.prototype.rotate = function(azimuth,elevation,roll){
     this._roll      += this._relRoll;
     
     this._rotateMatrix();
-    this._updateAxes();
-    this._updateAngles();
+    //this._updateAxes();
+    //this._updateAngles();
 };
 
 /**
@@ -321,7 +313,7 @@ vxlCamera.prototype.rotate = function(azimuth,elevation,roll){
  * @see {vxlCamera#_updateDistance}
  */
 vxlCamera.prototype.dolly = function(value) {
-    this._updateAxes();
+    
 	var    n =  this._normal; 
     var pos = vec3.create(this._position);
     var step = value*this._dollyingStep;
@@ -348,9 +340,6 @@ vxlCamera.prototype.pan = function(tx, ty) {
  * @param {Number} z if x is a number, then this parameter corresponds to the z-coordinate
  */
 vxlCamera.prototype.translate = function(x,y,z){
-    
-    this._updateAxes();
-    
     var pos = vec3.create(this._position);
     
     vec3.add(pos, vec3.scale(this._right  ,x, vec3.create()));
@@ -361,7 +350,6 @@ vxlCamera.prototype.translate = function(x,y,z){
     vec3.add(fp, vec3.scale(this._right  ,x, vec3.create()));
     vec3.add(fp, vec3.scale(this._up     ,y, vec3.create()));    
     vec3.add(fp, vec3.scale(this._normal ,z, vec3.create()));
-    
     
     this.setPosition(pos);
     this.setFocalPoint(fp);
@@ -378,10 +366,14 @@ vxlCamera.prototype.setFocalPoint = function(x,y,z) {
     
     this._focalPoint = vxl.util.createVec3(x,y,z);
     
-    this._updateAxes();
-    mat4.inverse(mat4.lookAt(this._position, this._focalPoint, this._up), this._matrix);
-    this._updateAxes();
-    this._updateAngles();
+    var m = mat4.identity();
+    mat4.rotateX(m, this._elevation * vxl.def.deg2rad);
+    mat4.rotateY(m, this._azimuth   * vxl.def.deg2rad);
+    var up = mat4.multiplyVec3(m, [0,1,0], vec3.create())
+     
+    mat4.inverse(mat4.lookAt(this._position, this._focalPoint, up), this._matrix);
+    
+    this._update();
 };
 
 /**
@@ -531,9 +523,8 @@ vxlCamera.prototype.getViewTransform = function(){
  */
 vxlCamera.prototype.setMatrix = function(matrix){
     this._matrix = matrix;
-    this._updateAxes();
-    this._updateAngles();
-}
+    this._update();
+};
 
 /**
  * Sets the initial camera matrix
@@ -554,7 +545,7 @@ vxlCamera.prototype._setInitialMatrix = function(){
     var r = vec3.subtract(this._position, this._focalPoint, vec3.create());
     mat4.translate(this._matrix, r);
     
-    this._updateAxes();
+    this._update();
     
 };
 
@@ -591,19 +582,15 @@ vxlCamera.prototype._rotateMatrix = function(){
     this._relAzimuth   = 0;
     this._relElevation = 0;
     this._relRoll      = 0;
+    this._update();
 };
 
 
-
 /**
- * Updates the x,y and z axis of the camera according to the current camera matrix.
- * This is useful when one needs to know the values of the axis and operate with them directly.
- * Such is the case for zooming, where you need to know what is the normal axis to move
- * along it for dollying or zooming.
- * @private
+ * Updates the internal state of the camera when the camera matrix changes
  */
-vxlCamera.prototype._updateAxes = function(){
-   
+vxlCamera.prototype._update = function(){
+    
     var m       = this._matrix;
     vec3.set(mat4.multiplyVec4(m, [1, 0, 0, 0]), this._right);
     vec3.set(mat4.multiplyVec4(m, [0, 1, 0, 0]), this._up);
@@ -614,39 +601,16 @@ vxlCamera.prototype._updateAxes = function(){
     vec3.normalize(this._up);
     vec3.normalize(this._normal);
     
-
-    this._updateDistance();
-};
-
-
-/**
- * Updates the vector that moves the camera to the center of rotation. Called internally
- * when the focal point or the position of the camera are updated
- * @private
- */
-vxlCamera.prototype._updateDistance = function(){
     this._distanceVector = vec3.subtract(this._focalPoint, this._position, vec3.create());
     this._distance = vec3.length(this._distanceVector);
     this._dollyingStep = this._distance / 100;
-};
+           
+      
+    var x = this._distanceVector[0], y = this._distanceVector[1],  z = this._distanceVector[2];
+    var r = vec3.length(this._distanceVector);
 
-/**
- * Calculate the standard angles
- * @private
- */
-vxlCamera.prototype._updateAngles = function(){
-    var p = this._position, f = this._focalPoint;
-       
-    var d = vec3.subtract(f, p, vec3.create());  //distance vector
-    
-    var x = d[0], y =d[1], z =d[2], r = vec3.length(d);
-    
-    
-    var ele = Math.asin(y/r) * vxl.def.rad2deg;
-    var azi = 90 + Math.atan2(z,x) * vxl.def.rad2deg;
-    
-    this._elevation = ele;
-    this._azimuth   = azi;
+    this._elevation = Math.asin(y/r) * vxl.def.rad2deg;
+    this._azimuth   = 90 + Math.atan2(z,x) * vxl.def.rad2deg;
 };
 
 

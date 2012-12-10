@@ -166,7 +166,7 @@ function animate(){
     var cam = vxl.c.camera;
     cam.rotate(1.0,0.0);   
     
-    for (var i = 0; i<cubes.length; i+=1){
+    for (var i = 0; i<T; i+=1){
         cubes[i].setPosition(cubetimes[t][i]);    
     }
     t += 1;

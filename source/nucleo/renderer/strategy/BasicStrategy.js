@@ -54,7 +54,7 @@ function vxlBasicStrategy(renderer){
  * @param {vxlScene} scene the scene to allocate memory for
   */
 vxlBasicStrategy.prototype.allocate = function(scene){
-    var elements = scene.actors.concat(scene.toys.list);
+    var elements = scene._actors.concat(scene.toys.list);
     var NUM = elements.length;
     
     for(var i = 0; i < NUM; i+=1){

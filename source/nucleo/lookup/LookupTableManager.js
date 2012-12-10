@@ -7,7 +7,7 @@
  */
 function vxlLookupTableManager(){
 	this.lutTimerID = 0;
-	this.tables = [];
+	this._hashmap = {};
 	this.location = "";
 	vxl.go.notifier.publish(vxl.events.DEFAULT_LUT_LOADED,this);
 };
@@ -45,7 +45,7 @@ vxlLookupTableManager.prototype.load = function(name){
 vxlLookupTableManager.prototype.handle = function (ID, payload) {
 	var lut = new vxlLookupTable();
 	lut.load(ID,payload);
-	this.tables.push(lut);
+	this._hashmap[ID] = lut;
 	
 	if (lut.ID == vxl.def.lut.main){
 		vxl.go.notifier.fire(vxl.events.DEFAULT_LUT_LOADED, this);
@@ -56,10 +56,7 @@ vxlLookupTableManager.prototype.handle = function (ID, payload) {
  * @param {String} ID the id of the table to check
  */
 vxlLookupTableManager.prototype.isLoaded = function(ID){
-	for(var i=0;i<this.tables.length;i++){
-		if (this.tables[i].ID == ID) return true;
-	}
-	return false;
+	return this._hashmap[ID] != undefined;
 };
 
 /**
@@ -67,10 +64,7 @@ vxlLookupTableManager.prototype.isLoaded = function(ID){
  * @param {String} ID id of the lookup table to retrieve
  */
 vxlLookupTableManager.prototype.get = function(ID){
-	for(var i=0;i<this.tables.length;i++){
-		if (this.tables[i].ID == ID) return this.tables[i];
-	}
-	return null;
+	return this._hashmap[ID];
 };
 
 /**
@@ -78,19 +72,22 @@ vxlLookupTableManager.prototype.get = function(ID){
  * @returns {Array} an array with the names of the lookup tables that have been loaded
  */
 vxlLookupTableManager.prototype.getAllLoaded = function(){
-    var tablenames = [];
-    for(var i=0;i<this.tables.length;i++){
-        tablenames[i] = this.tables[i].ID;
+    var tables = [];
+    for(lut in this._hashmap){
+        tables.push(this._hashmap[lut].ID);
     }
-    return tablenames;
+    return tables;
 };
 
 /**
  * Checks if all the lookup tables have been loaded
  */
 vxlLookupTableManager.prototype.allLoaded = function(){
-	//@TODO: think of a timeout to alter this state in the case not all tables are loaded (can this happen?)
-	return (vxl.def.lut.list.length == this.tables.length);
+    var size = 0;
+	for(lut in this._hashmap){
+        size++;
+    }
+	return (vxl.def.lut.list.length == size);
 };
 
 /**

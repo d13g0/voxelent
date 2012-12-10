@@ -43,10 +43,12 @@
 	}
 	
 	function handleEvent(event, src){
-    	vxl.api.setLookupTable('default');
-    	vxl.c.camera.longShot();
-    	vxl.api.boundingBoxON();
-    	$('#overlay-div').fadeIn(3000);
+	    if (event == vxl.events.MODELS_LOADED){
+        	vxl.api.setLookupTable('default');
+        	vxl.c.camera.longShot();
+        	vxl.api.boundingBoxON();
+        	$('#overlay-div').fadeIn(3000);
+    	}
 	}
 </script>
         
@@ -88,13 +90,13 @@
 	 
 <div><img src="css/img/voxelent.png" /></div>
 <div class='show'>
-<canvas id = 'view-1' width='1200' height='600'>
+<canvas id = 'view-1' width='1200' height='400'>
 	<p>
 		Your browser does not support WebGL :-(
 	</p>
 </canvas>
 <div id='overlay-div' class='overlay'>
-      <p> Alt + Left Click + Drag: Camera dollying</p>
+      <p> Ctrl + Left Click + Drag: Camera dollying</p>
       <p> Shift + Left Click + Drag: Camera panning</p>
       <p>
       <button class='ui-button-success' id='toggleMesh'> Show Wireframe</button>

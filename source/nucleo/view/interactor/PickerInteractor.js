@@ -80,7 +80,7 @@ vxlPickerInteractor.prototype.configure = function(){
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     
     //5. Assign random colors to object in current scene
-    //for(var i=0, max = this.view.scene.actors.length; i<max; i+=1){
+    //for(var i=0, max = this.view.scene._actors.length; i<max; i+=1){
     	//this
    // }
 };
@@ -127,8 +127,8 @@ vxlPickerInteractor.prototype.find = function(coords){
     var scene = this.view.scene;
     if (this.hitPropertyCallback == undefined) {alert('The picker needs an object property to perform the comparison'); return;}
 
-    for(var i = 0, max = scene.actors.length; i < max; i+=1){
-        var ob = scene.actors[i];
+    for(var i = 0, max = scene._actors.length; i < max; i+=1){
+        var ob = scene._actors[i];
         if (ob.name == 'floor') continue;
                 
         var property  = this.hitPropertyCallback(ob);

@@ -143,9 +143,6 @@ vxlModelManager.prototype.add = function(JSON_OBJECT,name,scene){
     			//do nothing
     		}
     	}
-    	
-        
-        
         
     	if(self.allLoaded()){ 
     		vxl.go.notifier.fire(vxl.events.MODELS_LOADED, self);
