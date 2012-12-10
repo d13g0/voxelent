@@ -1,0 +1,134 @@
+<html>
+<head>
+<meta name='Diego Cantor' content='Voxelent: The best WebGL platform yet'>
+<meta name='copyright' content='&copy 2011'>
+<meta name='robots' content='all'>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name='keywords' content='webgl, webgl platform, medical imaging, webgl api'>
+
+<title>Voxelent - Following an actor</title>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script type='text/javascript' src='voxelent_v0.89.js'> </script>
+
+<script type='text/javascript'>
+
+var view;
+//var cone;
+var body;
+var back;
+var phone = [];
+var bodyColor = '3691c2';
+var initLoad = true;
+var initXRotation = 0;
+var initYRotation = 0;
+var initZRotation = 0;
+
+function runVoxApp(){
+    vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
+    view = vxl.api.setup('view-1');
+    //vxl.api.load('cone.json','');
+    list = ['part1.json','part2.json','part3.json','part4.json','part5.json','part6.json','part7.json']
+    vxl.api.load(list,'../assets/models/texture/phone');
+  	view.setBackgroundColor(0.2, 0.2, 0.2);
+    view.start();
+    view.cameraman.getActiveCamera().setPosition(0,0,8);
+    vxl.api.setUniform('uLightDirection',[0.0,0.0,-1.0])
+}
+
+function handleEvent(event){
+
+    //cone    = vxl.api.getActor('cone'); //new method introduced in 0.88.1
+    //cone.setPosition(0,5,0);
+    var camera = vxl.c.camera;
+    //cam.setType(vxl.def.camera.type.TRACKING);
+    //cam.setPosition(0,3,30);
+    //cam.longShot();
+    //cam.follow(cone, vxl.def.camera.tracking.ROTATIONAL);
+    //vxl.api.floorON(50,5);
+    
+	vxl.c.camera.longShot();
+        body = vxl.api.getActorByName('part1.json');
+        back = vxl.api.getActorByName('part4.json');
+        body.setColor([54/256,145/256,194/256]);
+        back.setColor([54/256,145/256,194/256]);
+	
+		phone[0] = vxl.api.getActorByName('part1.json');
+		phone[1] = vxl.api.getActorByName('part2.json');
+		phone[2] = vxl.api.getActorByName('part3.json');
+		phone[3] = vxl.api.getActorByName('part4.json');
+		phone[4] = vxl.api.getActorByName('part5.json');		
+		phone[5] = vxl.api.getActorByName('part6.json');		
+		phone[6] = vxl.api.getActorByName('part7.json');	
+	
+	
+	startAnimation();
+   
+}
+
+function loadData(filename){
+
+var successHandler = function(){
+	return function(json, textStatus){
+	        if (json == null) return;
+
+            var d = json.data;
+            var m = mat4.identity();
+			if (initLoad)
+			{
+				initXRotation = Math.round(d[0]);
+				initYRotation = Math.round(d[1]);
+				initZRotation = Math.round(d[2]);
+				initLoad = false;
+			}			
+			for (var i=0; i<phone.length; i++)
+			{
+            mat4.translate(m, phone[i]._position);
+            mat4.set(m, phone[i]._matrix);
+            phone[i].rotateZ(Math.round(d[0]) - initXRotation);
+            phone[i].rotateX(Math.round(d[1]) - initYRotation);
+            phone[i].rotateY(Math.round(d[2]) - initZRotation);
+            }
+			view.refresh();
+	}
+};
+	
+var errorHandler = function(filename){
+	return function(request, status, error){
+	}
+};
+
+var request  = $.ajax({
+	url			:filename,
+	type		:"GET",
+	dataType	:"json",
+	success 	: successHandler(),
+	error		: errorHandler(filename)
+});   
+
+};
+
+
+function onFrame(){
+   loadData('data.json');
+}
+ 
+function startAnimation(){
+    setInterval(onFrame,50);
+}
+</script>
+
+
+</head>
+<body onload='runVoxApp()'>
+	
+	<div>
+	<canvas id = 'view-1' width='1200' height='600'>
+		<p>
+			Your browser does not support WebGL :-(
+		</p>
+	</canvas>
+    </div>
+</body>			
+</html>
+

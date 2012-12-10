@@ -1,0 +1,207 @@
+<html>
+<head>
+<meta name='Diego Cantor' content='Voxelent: The best WebGL platform yet'>
+<meta name='copyright' content='&copy 2011'>
+<meta name='robots' content='all'>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name='keywords' content='webgl, webgl platform, medical imaging, webgl api'>
+
+<title>Voxelent - Following an actor</title>
+<link rel='stylesheet' type='text/css' href='../css/jquery-ui-bs/theme.css'/>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script src="../lib/jquery-ui.js" type="text/javascript"> </script>
+<script type='text/javascript' src='voxelent_v0.89.js'> </script>
+<script type='text/javascript' src='../lib/vox-gui_v0.1.js'> </script>
+<script src="sylvester.js"></script>
+<script type='text/javascript'>
+
+//var view;
+var cone;
+
+var view, scene, animation, gui;
+
+			function runVoxApp() {
+
+				var e = vxl.events;
+				var ntf = vxl.go.notifier;
+				ntf.subscribe([e.MODELS_LOADED, e.SCENE_UPDATED], this);
+
+				//1. Setup the view
+				view = vxl.api.setup('view-1');
+				scene = view.scene;
+				gui   = new vxlGUI(view);
+				
+				
+
+				//2. Load assets
+				var list = ["MYO_01.vtk", "RAV_01.vtk", "LAA_01.vtk", 
+				            "MYO_02.vtk", "RAV_02.vtk", "LAA_02.vtk", 
+				            "MYO_03.vtk", "RAV_03.vtk", "LAA_03.vtk", 
+				            "MYO_04.vtk", "RAV_04.vtk", "LAA_04.vtk", 
+				            "MYO_05.vtk", "RAV_05.vtk", "LAA_05.vtk", 
+				            "MYO_06.vtk", "RAV_06.vtk", "LAA_06.vtk", 
+				            "MYO_07.vtk", "RAV_07.vtk", "LAA_07.vtk", 
+				            "MYO_08.vtk", "RAV_08.vtk", "LAA_08.vtk", 
+				            "MYO_09.vtk", "RAV_09.vtk", "LAA_09.vtk", 
+				            "MYO_10.vtk", "RAV_10.vtk", "LAA_10.vtk", 
+				            "MYO_11.vtk", "RAV_11.vtk", "LAA_11.vtk", 
+				            "MYO_12.vtk", "RAV_12.vtk", "LAA_12.vtk", 
+				            "MYO_13.vtk", "RAV_13.vtk", "LAA_13.vtk", 
+				            "MYO_14.vtk", "RAV_14.vtk", "LAA_14.vtk", 
+				            "MYO_15.vtk", "RAV_15.vtk", "LAA_15.vtk", 
+				            "MYO_16.vtk", "RAV_16.vtk", "LAA_16.vtk", 
+				            "MYO_17.vtk", "RAV_17.vtk", "LAA_17.vtk", 
+				            "MYO_18.vtk", "RAV_18.vtk", "LAA_18.vtk", 
+				            "MYO_19.vtk", "RAV_19.vtk", "LAA_19.vtk", 
+				            "MYO_20.vtk", "RAV_20.vtk", "LAA_20.vtk"];
+				
+				vxl.api.load(list,'../assets/models/heart');
+
+				//3. Define animation map
+				var map = {
+					frame1 : ["MYO_01.vtk", "RAV_01.vtk", "LAA_01.vtk"],
+					frame2 : ["MYO_02.vtk", "RAV_02.vtk", "LAA_02.vtk"],
+					frame3 : ["MYO_03.vtk", "RAV_03.vtk", "LAA_03.vtk"],
+					frame4 : ["MYO_04.vtk", "RAV_04.vtk", "LAA_04.vtk"],
+					frame5 : ["MYO_05.vtk", "RAV_05.vtk", "LAA_05.vtk"],
+					frame6 : ["MYO_06.vtk", "RAV_06.vtk", "LAA_06.vtk"],
+					frame7 : ["MYO_07.vtk", "RAV_07.vtk", "LAA_07.vtk"],
+					frame8 : ["MYO_08.vtk", "RAV_08.vtk", "LAA_08.vtk"],
+					frame9 : ["MYO_09.vtk", "RAV_09.vtk", "LAA_09.vtk"],
+					frame10 : ["MYO_10.vtk", "RAV_10.vtk", "LAA_10.vtk"],
+					frame11 : ["MYO_11.vtk", "RAV_11.vtk", "LAA_11.vtk"],
+					frame12 : ["MYO_12.vtk", "RAV_12.vtk", "LAA_12.vtk"],
+					frame13 : ["MYO_13.vtk", "RAV_13.vtk", "LAA_13.vtk"],
+					frame14 : ["MYO_14.vtk", "RAV_14.vtk", "LAA_14.vtk"],
+					frame15 : ["MYO_15.vtk", "RAV_15.vtk", "LAA_15.vtk"],
+					frame16 : ["MYO_16.vtk", "RAV_16.vtk", "LAA_16.vtk"],
+					frame17 : ["MYO_17.vtk", "RAV_17.vtk", "LAA_17.vtk"],
+					frame18 : ["MYO_18.vtk", "RAV_18.vtk", "LAA_18.vtk"],
+					frame19 : ["MYO_19.vtk", "RAV_19.vtk", "LAA_19.vtk"],
+					frame20 : ["MYO_20.vtk", "RAV_20.vtk", "LAA_20.vtk"]
+				};
+				
+				//Create the animation object
+				animation = new vxlFrameAnimation(map);
+				
+				//Tell the scene to run the animation 
+				scene.setAnimation(animation);
+				
+				//Start the view
+				view.start();
+				
+			};
+
+
+function handleEvent(event){
+     if (event == vxl.events.MODELS_LOADED) {
+        var cam = vxl.c.camera;
+		cam.setType(vxl.def.camera.type.ORBITING);
+		cam.setPosition([0, 0, 500]);
+		cam.setElevation(90);
+
+		animation.start(100);		//Start the animation at 100ms per frame
+		
+		openChannel();              //Read Data
+	} 
+};
+
+function readData(){
+    filename = 'data.json';
+    var successHandler = function(){
+	    return function(json, textStatus){
+	            if (json == null) return;
+	            var d = json.data;
+	            if (d == undefined) return;
+	            
+                var cam = vxl.c.camera;
+                
+                var k = runKalman(-d[0], -d[1], d[2]);
+
+                cam.setAzimuth  (k[0]);
+                cam.setElevation(k[1]);
+                cam.setRoll     (k[2]);
+                view.refresh();
+	    }
+    };
+	
+    var errorHandler = function(filename){
+	    return function(request, status, error){
+	    }
+    };
+
+    var request  = $.ajax({
+	    url			:filename,
+	    type		:"GET",
+	    dataType	:"json",
+	    success 	: successHandler(),
+	    error		: errorHandler(filename)
+    });   
+
+};
+
+function openChannel(){
+    setInterval(readData,50);
+};
+
+
+var decay = 0.003;
+var R = Matrix.Diagonal([0.02, 0.02, 0.02]); 
+var x = $M([[0],[0],[0],[0],[0],[0]]);
+var P = Matrix.Random(6, 6);
+var H = $M([[1, 0, 0, 0, 0, 0],[0, 1, 0, 0, 0 ,0],[0, 0, 1, 0, 0 ,0]]);
+var I = Matrix.I(6);
+var time = $.now();
+
+function runKalman(xMeasure, yMeasure, zMeasure){
+    // change in time
+    now = $.now();
+    dt = now - time;
+    time = now;
+
+    // Derive the next state
+    F = $M([[1, 0, 0, dt, 0,  0],
+            [0, 1, 0, 0, dt,  0],
+            [0, 0, 1, 0,  0, dt],
+            [0, 0, 0, 1,  0,  0],
+            [0, 0, 0, 0,  1,  0],
+            [0, 0, 0, 0,  0,  1],
+           ]);
+   
+    // decay confidence
+    // to account for change in velocity
+    P = P.map(function(x) {
+        return x * (1 + decay * dt);
+    });
+    
+    // prediction
+    x = F.x(x);
+    P = F.x(P).x(F.transpose());
+
+    // measurement update
+    Z = $M([[xMeasure, yMeasure, zMeasure]]);
+    y = Z.transpose().subtract(H.x(x));
+    S = H.x(P).x(H.transpose()).add(R);
+
+    K = P.x(H.transpose()).x(S.inverse());
+    x = x.add(K.x(y));
+    P = I.subtract(K.x(H)).x(P);
+    
+    return [x.e(1, 1),x.e(2, 1), x.e(3,1)];
+};
+</script>
+
+
+</head>
+<body onload='runVoxApp()'>
+	
+	<div>
+	<canvas id = 'view-1' width='1200' height='600'>
+		<p>
+			Your browser does not support WebGL :-(
+		</p>
+	</canvas>
+    </div>
+</body>			
+</html>
+

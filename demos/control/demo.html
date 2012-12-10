@@ -1,0 +1,143 @@
+<html>
+<head>
+<meta name='Diego Cantor' content='Voxelent: The best WebGL platform yet'>
+<meta name='copyright' content='&copy 2011'>
+<meta name='robots' content='all'>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name='keywords' content='webgl, webgl platform, medical imaging, webgl api'>
+
+<title>Voxelent - Following an actor</title>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script type='text/javascript' src='voxelent_v0.89.js'> </script>
+<script src="sylvester.js"></script>
+<script type='text/javascript'>
+
+var view;
+var cone;
+
+function runVoxApp(){
+    vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
+    view = vxl.api.setup('view-1');
+    vxl.api.load('cone.json');
+    view.start();
+}
+
+function handleEvent(event){
+
+    cone    = vxl.api.getActor('cone'); //new method introduced in 0.88.1
+    cone.setPosition(0,5,0);
+    var cam = vxl.c.camera;
+    cam.setType(vxl.def.camera.type.TRACKING);
+    cam.setPosition(0,10,50);
+    //cam.longShot();
+    //cam.follow(cone, vxl.def.camera.tracking.ROTATIONAL);
+    vxl.api.floorON(50,5);
+    startAnimation();
+   
+}
+
+function loadData(filename){
+
+var successHandler = function(){
+	return function(json, textStatus){
+	        if (json == null) return;
+	        var d = json.data;
+	        if (d == undefined) return;
+	        
+            var cam = vxl.c.camera;
+            
+            var k = runKalman(-d[0], -d[1], d[2]);
+
+            cam.setAzimuth  (k[0]);
+            cam.setElevation(k[1]);
+            cam.setRoll     (k[2]);
+            view.refresh();
+	}
+};
+	
+var errorHandler = function(filename){
+	return function(request, status, error){
+	}
+};
+
+var request  = $.ajax({
+	url			:filename,
+	type		:"GET",
+	dataType	:"json",
+	success 	: successHandler(),
+	error		: errorHandler(filename)
+});   
+
+};
+
+
+function onFrame(){
+   loadData('data.json');
+}
+ 
+function startAnimation(){
+    setInterval(onFrame,50);
+}
+
+
+var decay = 0.003;
+var R = Matrix.Diagonal([0.02, 0.02, 0.02]); 
+var x = $M([[0],[0],[0],[0],[0],[0]]);
+var P = Matrix.Random(6, 6);
+var H = $M([[1, 0, 0, 0, 0, 0],[0, 1, 0, 0, 0 ,0],[0, 0, 1, 0, 0 ,0]]);
+var I = Matrix.I(6);
+var time = $.now();
+
+function runKalman(xMeasure, yMeasure, zMeasure){
+    // change in time
+    now = $.now();
+    dt = now - time;
+    time = now;
+
+    // Derive the next state
+    F = $M([[1, 0, 0, dt, 0,  0],
+            [0, 1, 0, 0, dt,  0],
+            [0, 0, 1, 0,  0, dt],
+            [0, 0, 0, 1,  0,  0],
+            [0, 0, 0, 0,  1,  0],
+            [0, 0, 0, 0,  0,  1],
+           ]);
+   
+    // decay confidence
+    // to account for change in velocity
+    P = P.map(function(x) {
+        return x * (1 + decay * dt);
+    });
+    
+    // prediction
+    x = F.x(x);
+    P = F.x(P).x(F.transpose());
+
+    // measurement update
+    Z = $M([[xMeasure, yMeasure, zMeasure]]);
+    y = Z.transpose().subtract(H.x(x));
+    S = H.x(P).x(H.transpose()).add(R);
+
+    K = P.x(H.transpose()).x(S.inverse());
+    x = x.add(K.x(y));
+    P = I.subtract(K.x(H)).x(P);
+    
+    return [x.e(1, 1),x.e(2, 1), x.e(3,1)];
+};
+</script>
+
+
+</head>
+<body onload='runVoxApp()'>
+	
+	<div>
+	<canvas id = 'view-1' width='1200' height='600'>
+		<p>
+			Your browser does not support WebGL :-(
+		</p>
+	</canvas>
+    </div>
+</body>			
+</html>
+
