@@ -540,12 +540,11 @@ vxlCamera.prototype._setInitialMatrix = function(){
     var rotQ = quat4.multiply(rotY, rotX, quat4.create());
     var rotMatrix = quat4.toMat4(rotQ);
     
+    
     mat4.translate(this._matrix, this._focalPoint);
     mat4.multiply(this._matrix, rotMatrix);
     var r = vec3.subtract(this._position, this._focalPoint, vec3.create());
     mat4.translate(this._matrix, r);
-    
-    this._update();
     
 };
 
