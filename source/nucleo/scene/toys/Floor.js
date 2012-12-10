@@ -16,7 +16,7 @@
 
 
 vxl.def.model.floor = new vxlModel();
-vxl.def.model.floor.load('floor',{"vertices":[],"indices":[],"diffuse":[1.0,1.0,1.0,1.0]});
+vxl.def.model.floor.load('floor',{"vertices":[],"indices":[],"color":[1.0,1.0,1.0,1.0]});
 
 vxlFloor.prototype = new vxlActor();
 vxlFloor.prototype.constructor = vxlFloor;

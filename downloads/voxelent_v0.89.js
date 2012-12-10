@@ -4670,6 +4670,9 @@ vxlCamera.prototype._setInitialMatrix = function(){
     mat4.multiply(this._matrix, rotMatrix);
     var r = vec3.subtract(this._position, this._focalPoint, vec3.create());
     mat4.translate(this._matrix, r);
+    
+    this._updateAxes();
+    
 };
 
 /**
@@ -5316,7 +5319,7 @@ vxlTrackerInteractor.prototype.pan = function(dx,dy){
 	var deltaX = 1 / dimMax;
 	var deltaY = 1 / dimMax;
 	var ndx = dx * deltaX * this.MOTION_FACTOR * scene.bb.max();
-	var ndy = dy * deltaY * this.MOTION_FACTOR * scene.bb.max();
+	var ndy = -dy * deltaY * this.MOTION_FACTOR * scene.bb.max();
 
 	camera.pan(ndx,ndy);
 };/*-------------------------------------------------------------------------
@@ -7013,6 +7016,14 @@ vxlModel.prototype.computeWireframeIndices = function(){
  * 
  */
 vxlModel.prototype.computeBoundingBox = function(){	
+    
+    //This is the case with the scene toys
+    if (this.vertices.length == 0){
+        this.bb = [0,0,0,0,0,0];
+        this.centre = [0,0,0,0,0,0];
+        return;
+    }
+    
 	var vs = this.vertices;
 	var bbm  = [vs[0],vs[1],vs[2],vs[0],vs[1],vs[2]];
 	  
@@ -8452,8 +8463,8 @@ vxlBlenderStrategy.prototype._applyActorTransform = function(actor){
     var glsl    = vxl.def.glsl;
 
     trx.push();
-        mat4.translate  (trx.mvMatrix, actor.position);
-        mat4.scale      (trx.mvMatrix, actor.scale);
+        mat4.translate  (trx.mvMatrix, actor._position);
+        mat4.scale      (trx.mvMatrix, actor._scale);
         //@TODO: IMPLEMENT ACTOR ROTATIONS
         
         prg.setUniform(glsl.MODEL_VIEW_MATRIX,  r.transforms.mvMatrix);
@@ -9621,7 +9632,12 @@ vxl.go.lookupTableManager = new vxlLookupTableManager();
 
 
 vxl.def.model.boundingBox = new vxlModel();
-vxl.def.model.boundingBox.load('bounding box', { "centre":[0,0,0], "vertices" : [], "wireframe":[0,1,1,2,2,3,3,0,0,4,4,5,5,6,6,7,7,4,1,5,2,6,3,7], "diffuse":[1.0,1.0,1.0,1.0]});
+vxl.def.model.boundingBox.load(
+    'bounding box', 
+    { "vertices" : [],
+      "wireframe":[0,1,1,2,2,3,3,0,0,4,4,5,5,6,6,7,7,4,1,5,2,6,3,7], 
+      "color":[1.0,1.0,1.0,1.0]
+    });
 
 //vxlBoundingBox IS a vxlActor                                               
 vxlBoundingBox.prototype = new vxlActor();
@@ -9762,7 +9778,7 @@ vxlAxis.prototype.setCentre = function (ctr){
 
 
 vxl.def.model.floor = new vxlModel();
-vxl.def.model.floor.load('floor',{"vertices":[],"indices":[],"diffuse":[1.0,1.0,1.0,1.0]});
+vxl.def.model.floor.load('floor',{"vertices":[],"indices":[],"color":[1.0,1.0,1.0,1.0]});
 
 vxlFloor.prototype = new vxlActor();
 vxlFloor.prototype.constructor = vxlFloor;

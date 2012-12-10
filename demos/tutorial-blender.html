@@ -30,6 +30,9 @@ function runVoxApp(){
 
 function handleEvent(event){
     vxl.c.camera.longShot();
+    vxl.c.camera.setElevation(-7);
+    vxl.c.camera.setAzimuth(-143);
+    vxl.c.camera.setDistance(10);
     vxl.api.boundingBoxON();
 }
 </script>

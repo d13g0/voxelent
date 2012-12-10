@@ -199,6 +199,14 @@ vxlModel.prototype.computeWireframeIndices = function(){
  * 
  */
 vxlModel.prototype.computeBoundingBox = function(){	
+    
+    //This is the case with the scene toys
+    if (this.vertices.length == 0){
+        this.bb = [0,0,0,0,0,0];
+        this.centre = [0,0,0,0,0,0];
+        return;
+    }
+    
 	var vs = this.vertices;
 	var bbm  = [vs[0],vs[1],vs[2],vs[0],vs[1],vs[2]];
 	  

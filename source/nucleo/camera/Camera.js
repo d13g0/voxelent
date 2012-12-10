@@ -553,6 +553,9 @@ vxlCamera.prototype._setInitialMatrix = function(){
     mat4.multiply(this._matrix, rotMatrix);
     var r = vec3.subtract(this._position, this._focalPoint, vec3.create());
     mat4.translate(this._matrix, r);
+    
+    this._updateAxes();
+    
 };
 
 /**

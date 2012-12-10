@@ -102,7 +102,7 @@ var timer = -1;
 function handleEvent(event){
 
     
-    var cube = vxl.api.getActorByName('cube.json');
+    var cube = vxl.api.getActor('cube');
     view.scene.removeActor(cube);
     
     //Create all the copies based on the cube actor that was removed from the scene
@@ -112,9 +112,7 @@ function handleEvent(event){
  
     //Setup our camera
     var cam = vxl.c.camera;
-    cam.setPosition(0,0,33);
-    cam.setAzimuth(-43);   
-    cam.setElevation(-17);
+    cam.setDistance(214);
     
     cubetimes = computeMotion();
     
@@ -123,7 +121,6 @@ function handleEvent(event){
     vxl.api.setRenderMode(vxl.def.renderer.mode.ANIMFRAME);
     timer = setInterval(animate,15);
       
-    
     $('#overlay-div').fadeIn(3000);
     $('#cube-count').html('Cube count: '+T);  
 }; 
@@ -136,7 +133,7 @@ function computeMotion(){
     
     for(var i=0;i<cubes.length;i+=1){
         normals[i] = vec3.create();
-        vec3.set(cubes[i].position, normals[i]);
+        vec3.set(cubes[i]._position, normals[i]);
         vec3.normalize(normals[i]);
     }
     
@@ -148,7 +145,7 @@ function computeMotion(){
         pos[k] = [];  
         for(var i=0;i<cubes.length;i+=1){
             
-            vec3.set(cubes[i].position, p);
+            vec3.set(cubes[i]._position, p);
             vec3.set(normals[i],s);
             vec3.scale(s,50*Math.sin(angle * Math.PI/180));
             vec3.add(p,s);
@@ -174,8 +171,6 @@ function animate(){
     }
     t += 1;
     t %= 360;
-   // console.info(t);
-    view.refresh(); 
 };
 
 </script>
@@ -216,7 +211,12 @@ function animate(){
 }
 
 .overlay #view-1-fps{
-    display:none;
+   color: #BCBCBC; 
+   background: rgba(15,15,15,0.5);
+   height: 30px;
+   font-size:16px;
+   font-family: Arial,Helvetica;
+   text-align:center;
 }
 
 </style> 
@@ -232,7 +232,7 @@ function animate(){
     
     
     <div id = 'overlay-div' class='overlay'>
-      <p id='view-1-fps'></p>        
+      <div id='view-1-fps'></div>        
       <p id='cube-count'></p>
       <p><input type='checkbox' id='toggleAnimation'/><label for='toggleAnimation'>Stop Animation</label></p>
       <p>Please select one lookup table</p>
@@ -256,18 +256,6 @@ $('#toggleAnimation').button().click(
     }
 );
 
-var fpsshown = false;
-$(document).keydown(function(event){
-   if (event.keyCode == 70){
-       if(fpsshown){
-            $('#view-1-fps').hide();
-       }
-       else{
-           $('#view-1-fps').show();
-       }
-       fpsshown = !fpsshown;
-   } 
-});
 </script>    
 </body>			
 </html>

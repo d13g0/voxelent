@@ -77,8 +77,8 @@ vxlBlenderStrategy.prototype._applyActorTransform = function(actor){
     var glsl    = vxl.def.glsl;
 
     trx.push();
-        mat4.translate  (trx.mvMatrix, actor.position);
-        mat4.scale      (trx.mvMatrix, actor.scale);
+        mat4.translate  (trx.mvMatrix, actor._position);
+        mat4.scale      (trx.mvMatrix, actor._scale);
         //@TODO: IMPLEMENT ACTOR ROTATIONS
         
         prg.setUniform(glsl.MODEL_VIEW_MATRIX,  r.transforms.mvMatrix);
