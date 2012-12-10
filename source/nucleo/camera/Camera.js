@@ -538,13 +538,19 @@ vxlCamera.prototype._setInitialMatrix = function(){
     var rotY  = quat4.fromAngleAxis(this._azimuth   * vxl.def.deg2rad, [0,1,0]);
     var rotZ  = quat4.fromAngleAxis(this._roll      * vxl.def.deg2rad, [0,0,1]); 
     var rotQ = quat4.multiply(rotY, rotX, quat4.create());
+    rotQ = quat4.multiply(rotQ, rotZ, quat4.create());
     var rotMatrix = quat4.toMat4(rotQ);
     
-    
-    mat4.translate(this._matrix, this._focalPoint);
-    mat4.multiply(this._matrix, rotMatrix);
-    var r = vec3.subtract(this._position, this._focalPoint, vec3.create());
-    mat4.translate(this._matrix, r);
+    if (this.type ==  vxl.def.camera.type.ORBITING){
+        mat4.translate(this._matrix, this._focalPoint);
+        mat4.multiply(this._matrix, rotMatrix);
+        var r = vec3.subtract(this._position, this._focalPoint, vec3.create());
+        mat4.translate(this._matrix, r);
+    } 
+    else if(this.type ==  vxl.def.camera.type.TRACKING){
+        mat4.translate(this._matrix, this._position);
+        mat4.multiply(this._matrix, rotMatrix);
+    }
     
 };
 
