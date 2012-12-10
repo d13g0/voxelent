@@ -8723,8 +8723,8 @@ vxlBakeStrategy.prototype._allocateActor = function(actor){
     offsets.scale[actor.UID]    = data.scale.length;
     offsets.shading[actor.UID]  = data.shading.length;
     
-    data.position = data.position.concat(this._populate(actor.position, NUM_VERTICES/3));
-    data.scale    = data.scale.concat(this._populate(actor.scale, NUM_VERTICES/3));
+    data.position = data.position.concat(this._populate(actor._position, NUM_VERTICES/3));
+    data.scale    = data.scale.concat(this._populate(actor._scale, NUM_VERTICES/3));
     
     if (actor.shading){
         data.shading = data.shading.concat(this._populate(1.0, NUM_VERTICES/3));
@@ -8761,9 +8761,9 @@ vxlBakeStrategy.prototype._updateActorPosition = function(actor){
     
     var LEN = actor.model.vertices.length + offset;
     for(var i =offset;i<LEN;i+=3){
-        data.position[i]   = actor.position[0];
-        data.position[i+1] = actor.position[1];
-        data.position[i+2] = actor.position[2];
+        data.position[i]   = actor._position[0];
+        data.position[i+1] = actor._position[1];
+        data.position[i+2] = actor._position[2];
     }
 };
 
@@ -8778,9 +8778,9 @@ vxlBakeStrategy.prototype._updateActorScale = function(actor){
     
     var LEN = actor.model.vertices.length + offset;
     for(var i =offset;i<LEN;i+=3){
-        data.scale[i]   = actor.scale[0];
-        data.scale[i+1] = actor.scale[1];
-        data.scale[i+2] = actor.scale[2];
+        data.scale[i]   = actor._scale[0];
+        data.scale[i+1] = actor._scale[1];
+        data.scale[i+2] = actor._scale[2];
     }
 };
 
@@ -9621,7 +9621,7 @@ vxl.go.lookupTableManager = new vxlLookupTableManager();
 
 
 vxl.def.model.boundingBox = new vxlModel();
-vxl.def.model.boundingBox.load('bounding box', { "vertices" : [], "wireframe":[0,1,1,2,2,3,3,0,0,4,4,5,5,6,6,7,7,4,1,5,2,6,3,7], "diffuse":[1.0,1.0,1.0,1.0]});
+vxl.def.model.boundingBox.load('bounding box', { "centre":[0,0,0], "vertices" : [], "wireframe":[0,1,1,2,2,3,3,0,0,4,4,5,5,6,6,7,7,4,1,5,2,6,3,7], "diffuse":[1.0,1.0,1.0,1.0]});
 
 //vxlBoundingBox IS a vxlActor                                               
 vxlBoundingBox.prototype = new vxlActor();
@@ -9848,21 +9848,22 @@ vxlFloor.prototype.setGrid =function(dimension, spacing){
 * @constructor
 * @param {String} canvasID id of the canvas in the DOM tree. That's all we need to setup a vxlView for you
 * @param {vxlScene} scene if this view is sharing a scene, this parameter corresponds to the scene being shared.
+* @param {Boolean} handleLayout if true or absent, the canvas will be resized dynamically
 * @author Diego Cantor
 */
 
-function vxlView(canvasID, scene){
-	//View Identification
+function vxlView(canvasID, scene, handleLayout){
+
 	//this.id = 0; //@TODO: Who handles this? Maybe one Scene has several Views?
-	this.name = canvasID;
-	this.canvas = document.getElementById(this.name);
+	
+	this.canvas = document.getElementById(canvasID);
+	
 	if (this.canvas == null){
 		alert('View: the canvas ' + canvasID+ ' does not exist.');
 		throw('View: the canvas ' + canvasID+ ' does not exist.');
 	}
-	else{
-	    this._wrapDiv();
-	}
+	
+	this.name = canvasID;
 	
     //View dimensions
 	this.width = this.canvas.width;
@@ -9905,7 +9906,12 @@ function vxlView(canvasID, scene){
 	}
 	
 	vxl.go.views.push(this);
-	this.setAutoResize(true);
+	
+	if (handleLayout == undefined){
+	    handleLayout = true;
+	}
+	
+	this.setAutoResize(handleLayout);
 	
 	this.UID = vxl.util.generateUID();
 
@@ -9941,7 +9947,7 @@ vxlView.prototype.clear = function(){
 };
 
 /**
- * It creates a div around the canvas to handle resizing appropiately
+ * It creates a div around the canvas to handle resizing appropriately
  * @private 
  */
 vxlView.prototype._wrapDiv = function(){
@@ -9990,7 +9996,9 @@ vxlView.prototype.resize = function(){
  * @param flag enbles automatic resizing if true, disables it if false
  */
 vxlView.prototype.setAutoResize = function(flag){
+    
     if (flag){
+         this._wrapDiv();
          this.resize(); //first time
         $(window).resize((function(self){return function(){self.resize();}})(this));
     }
@@ -10359,11 +10367,12 @@ vxl.api = {
   * Creates and returns a vxlView object
   * @param {String} canvas_id The canvas' Document Object Model (DOM) id.
   * @param {vxlScene} scene optional, the scene associated to this view
+  * @param {Boolean} handleLayout if true or absent, the canvas will be resized dynamically
   * @returns {vxlView} a new vxlView object
   */
- setup : function(canvas_id, scene){
+ setup : function(canvas_id, scene, handleLayout){
  	if (scene != null && !(scene instanceof vxlScene)) throw ('api.setup: scene parameter is invalid');
- 	return new vxlView(canvas_id,scene);
+ 	return new vxlView(canvas_id,scene,handleLayout);
  },
   
   /**

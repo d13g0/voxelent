@@ -25,21 +25,22 @@
 * @constructor
 * @param {String} canvasID id of the canvas in the DOM tree. That's all we need to setup a vxlView for you
 * @param {vxlScene} scene if this view is sharing a scene, this parameter corresponds to the scene being shared.
+* @param {Boolean} handleLayout if true or absent, the canvas will be resized dynamically
 * @author Diego Cantor
 */
 
-function vxlView(canvasID, scene){
-	//View Identification
+function vxlView(canvasID, scene, handleLayout){
+
 	//this.id = 0; //@TODO: Who handles this? Maybe one Scene has several Views?
-	this.name = canvasID;
-	this.canvas = document.getElementById(this.name);
+	
+	this.canvas = document.getElementById(canvasID);
+	
 	if (this.canvas == null){
 		alert('View: the canvas ' + canvasID+ ' does not exist.');
 		throw('View: the canvas ' + canvasID+ ' does not exist.');
 	}
-	else{
-	    this._wrapDiv();
-	}
+	
+	this.name = canvasID;
 	
     //View dimensions
 	this.width = this.canvas.width;
@@ -82,7 +83,12 @@ function vxlView(canvasID, scene){
 	}
 	
 	vxl.go.views.push(this);
-	this.setAutoResize(true);
+	
+	if (handleLayout == undefined){
+	    handleLayout = true;
+	}
+	
+	this.setAutoResize(handleLayout);
 	
 	this.UID = vxl.util.generateUID();
 
@@ -118,7 +124,7 @@ vxlView.prototype.clear = function(){
 };
 
 /**
- * It creates a div around the canvas to handle resizing appropiately
+ * It creates a div around the canvas to handle resizing appropriately
  * @private 
  */
 vxlView.prototype._wrapDiv = function(){
@@ -167,7 +173,9 @@ vxlView.prototype.resize = function(){
  * @param flag enbles automatic resizing if true, disables it if false
  */
 vxlView.prototype.setAutoResize = function(flag){
+    
     if (flag){
+         this._wrapDiv();
          this.resize(); //first time
         $(window).resize((function(self){return function(){self.resize();}})(this));
     }

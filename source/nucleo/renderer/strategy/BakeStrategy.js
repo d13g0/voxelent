@@ -186,8 +186,8 @@ vxlBakeStrategy.prototype._allocateActor = function(actor){
     offsets.scale[actor.UID]    = data.scale.length;
     offsets.shading[actor.UID]  = data.shading.length;
     
-    data.position = data.position.concat(this._populate(actor.position, NUM_VERTICES/3));
-    data.scale    = data.scale.concat(this._populate(actor.scale, NUM_VERTICES/3));
+    data.position = data.position.concat(this._populate(actor._position, NUM_VERTICES/3));
+    data.scale    = data.scale.concat(this._populate(actor._scale, NUM_VERTICES/3));
     
     if (actor.shading){
         data.shading = data.shading.concat(this._populate(1.0, NUM_VERTICES/3));
@@ -224,9 +224,9 @@ vxlBakeStrategy.prototype._updateActorPosition = function(actor){
     
     var LEN = actor.model.vertices.length + offset;
     for(var i =offset;i<LEN;i+=3){
-        data.position[i]   = actor.position[0];
-        data.position[i+1] = actor.position[1];
-        data.position[i+2] = actor.position[2];
+        data.position[i]   = actor._position[0];
+        data.position[i+1] = actor._position[1];
+        data.position[i+2] = actor._position[2];
     }
 };
 
@@ -241,9 +241,9 @@ vxlBakeStrategy.prototype._updateActorScale = function(actor){
     
     var LEN = actor.model.vertices.length + offset;
     for(var i =offset;i<LEN;i+=3){
-        data.scale[i]   = actor.scale[0];
-        data.scale[i+1] = actor.scale[1];
-        data.scale[i+2] = actor.scale[2];
+        data.scale[i]   = actor._scale[0];
+        data.scale[i+1] = actor._scale[1];
+        data.scale[i+2] = actor._scale[2];
     }
 };
 

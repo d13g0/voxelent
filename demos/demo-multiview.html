@@ -13,7 +13,7 @@
 		<script src="lib/jquery.js" type="text/javascript"></script>
 		<script type='text/javascript' src='lib/voxelent_v0.89.js'></script>
 
-		<title>Voxelent - Heart Demo</title>
+		<title>Voxelent - MultiView Demo</title>
 		<script type='text/javascript' id='code-js'>
 			var view, scene, animation, view2;
 
@@ -24,10 +24,10 @@
 				ntf.subscribe([e.MODELS_LOADED, e.SCENE_UPDATED], this);
 
 				//1. Setup the view
-				view = vxl.api.setup('view-1');
+				view = vxl.api.setup('view-1',null,false);
 				scene = view.scene;
 				
-				view2 = vxl.api.setup('view-2',scene);
+				view2 = vxl.api.setup('view-2',scene,false);
 				
 
 				//2. Load assets
@@ -95,13 +95,13 @@
 				
 				if (event == vxl.events.MODELS_LOADED) {
 					
-					//Set up the camera
+					//Set up camera #1
 					cam1.setPosition([0, 0, 500]);
 					cam1.setElevation(90);
 					
+					//Set up camera #2
 					cam2.setPosition(0,0,500);
-					cam2.setElevation(90);
-					cam2.setAzimuth(90);
+
 					
 					//Start the animation at 100ms per frame
 					animation.start(100);
@@ -121,51 +121,45 @@
 	 width: 400px;
 	 height:400px;
 	 padding:3px;
-     float:left;
+     position:absolute;
 }
 
 .show2 {
 	 width: 400px;
 	 height:400px;
 	 padding:3px;
-     margin-left:400px;
+	 margin-left:410px;
+     position: relative;
 }
 
-.overlay {
-    width: 160px;
-    height: 30px;
-    position: absolute;
-    top: 5px;
-    right: 15px;
-    font-size:12px;
-	font-family: Arial,Helvetica;
-	text-align:right;
-}
+
 
 </style> 
 
 </head>
 <body onload='runVoxApp()'>
 	<div><img src="css/img/voxelent.png" /></div>
-	<div>
+	<p id='status'>Message</p>
+	
 	<div class='show1'>
-	<canvas id = 'view-1' width=350 height=650 >
+	<p>View 1</p>
+	<canvas id = 'view-1' width=400 height=400 >
 		<p>
 			Your browser does not support WebGL :-(
 		</p>
 	</canvas>
-    <div class='overlay'>
-      <p id='status'>Loading models...</p>
-    </div>  
     </div>
-    
     <div class='show2'>
-    <canvas id = 'view-2' width=350 height=650 >
+    <p>View 2</p>
+    <canvas id = 'view-2' width=400 height=400 >
 		<p>
 			Your browser does not support WebGL :-(
 		</p>
 	</canvas>
 	</div>
-	</div>
+	
+	
+	
+    
 </body>    
 </html>

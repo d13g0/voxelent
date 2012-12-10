@@ -28,11 +28,12 @@ vxl.api = {
   * Creates and returns a vxlView object
   * @param {String} canvas_id The canvas' Document Object Model (DOM) id.
   * @param {vxlScene} scene optional, the scene associated to this view
+  * @param {Boolean} handleLayout if true or absent, the canvas will be resized dynamically
   * @returns {vxlView} a new vxlView object
   */
- setup : function(canvas_id, scene){
+ setup : function(canvas_id, scene, handleLayout){
  	if (scene != null && !(scene instanceof vxlScene)) throw ('api.setup: scene parameter is invalid');
- 	return new vxlView(canvas_id,scene);
+ 	return new vxlView(canvas_id,scene,handleLayout);
  },
   
   /**
