@@ -558,6 +558,7 @@ vxlCamera.prototype._setInitialMatrix = function(){
 /**
  * This method updates the current camera matrix upon changes in location, 
  * and rotation (azimuth, elevation)
+ * @see <a href='http://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Quaternion_rotation_operations'>Quaternions in Wikipedia</a>
  * @private
  */
 vxlCamera.prototype._rotateMatrix = function(){
