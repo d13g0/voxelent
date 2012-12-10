@@ -17,12 +17,12 @@ function runVoxApp(){
      vxl.api.loadLUTS('assets/tables');
      vxl.api.setLookupTable('default');
      view = vxl.api.setup('view-1');
-     vxl.api.load('assets/models/kamyar/myVTKModel.json');
+     vxl.api.load('myVTKModel.json','assets/models/kamyar');
      view.start();
 }
 
 function handleEvent(event){
-    vxl.c.camera.focusOn('myVTKModel.json');
+    vxl.c.camera.longShot();
     vxl.c.camera.setElevation(90); //this particular model happens to be rotated -90 degrees.
     vxl.api.boundingBoxON();
 }
