@@ -150,65 +150,62 @@
 <span class='line'>143</span> </span><span class="WHIT">    			</span><span class="COMM">//do nothing</span><span class="WHIT">
 <span class='line'>144</span> </span><span class="WHIT">    		</span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>145</span> </span><span class="WHIT">    	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>146</span> </span><span class="WHIT">    	</span><span class="WHIT">
-<span class='line'>147</span> </span><span class="WHIT">        </span><span class="WHIT">
-<span class='line'>148</span> </span><span class="WHIT">        </span><span class="WHIT">
-<span class='line'>149</span> </span><span class="WHIT">        </span><span class="WHIT">
-<span class='line'>150</span> </span><span class="WHIT">    	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">self.allLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>151</span> </span><span class="WHIT">    		</span><span class="NAME">vxl.go.notifier.fire</span><span class="PUNC">(</span><span class="NAME">vxl.events.MODELS_LOADED</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">self</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>146</span> </span><span class="WHIT">        </span><span class="WHIT">
+<span class='line'>147</span> </span><span class="WHIT">    	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">self.allLoaded</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>148</span> </span><span class="WHIT">    		</span><span class="NAME">vxl.go.notifier.fire</span><span class="PUNC">(</span><span class="NAME">vxl.events.MODELS_LOADED</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">self</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>149</span> </span><span class="WHIT">    	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>150</span> </span><span class="WHIT">    	</span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>151</span> </span><span class="WHIT">    	    </span><span class="NAME">vxl.go.notifier.fire</span><span class="PUNC">(</span><span class="NAME">vxl.events.MODEL_NEW</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">self</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>152</span> </span><span class="WHIT">    	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>153</span> </span><span class="WHIT">    	</span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>154</span> </span><span class="WHIT">    	    </span><span class="NAME">vxl.go.notifier.fire</span><span class="PUNC">(</span><span class="NAME">vxl.events.MODEL_NEW</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">self</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>155</span> </span><span class="WHIT">    	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>156</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>157</span> </span><span class="WHIT">	</span><span class="WHIT">
-<span class='line'>158</span> </span><span class="WHIT">	</span><span class="NAME">setTimeout</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="NAME">scheduledAdd</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>159</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>160</span> </span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>161</span> </span><span class="COMM">/**
-<span class='line'>162</span>  * It will delete all of the loaded models
-<span class='line'>163</span>  */</span><span class="WHIT">  </span><span class="WHIT">
-<span class='line'>164</span> </span><span class="NAME">vxlModelManager.prototype.reset</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>165</span> </span><span class="WHIT">	</span><span class="NAME">this.firstLoadedModel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>166</span> </span><span class="WHIT">	</span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="NAME">this.models.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>167</span> </span><span class="WHIT">		</span><span class="NAME">this.models</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>168</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>169</span> </span><span class="WHIT">	</span><span class="WHIT">
-<span class='line'>170</span> </span><span class="WHIT">	</span><span class="NAME">this.models</span><span class="WHIT">        </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>171</span> </span><span class="WHIT">	</span><span class="NAME">this.toLoad</span><span class="WHIT">        </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>172</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>173</span> 
-<span class='line'>174</span> </span><span class="COMM">/**
-<span class='line'>175</span>  * Checks if a model has been loaded yet
-<span class='line'>176</span>  * @param {String} name the name of the model to check
-<span class='line'>177</span>  */</span><span class="WHIT">
-<span class='line'>178</span> </span><span class="NAME">vxlModelManager.prototype.isModelLoaded</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">name</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>179</span> </span><span class="WHIT">	</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">this.models.length</span><span class="PUNC">;</span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>180</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.models</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">name</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">name</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>181</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>182</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>183</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>184</span> 
-<span class='line'>185</span> </span><span class="COMM">/**
-<span class='line'>186</span>  * Returns true if all the models in the list passed to the method loadList have been loaded.
-<span class='line'>187</span>  */</span><span class="WHIT">
-<span class='line'>188</span> </span><span class="NAME">vxlModelManager.prototype.allLoaded</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>189</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.toLoad.length</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>190</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>191</span> 
-<span class='line'>192</span> 
-<span class='line'>193</span> </span><span class="COMM">/**
-<span class='line'>194</span>  * Returns the model if it has been loaded by this model manager, null otherwise.
-<span class='line'>195</span>  * @param {String} name the name of the model to retrieve
-<span class='line'>196</span>  */</span><span class="WHIT">
-<span class='line'>197</span> </span><span class="NAME">vxlModelManager.prototype.getModelByName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">name</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>198</span> </span><span class="WHIT"> 	</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">max</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.models.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">max</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">+</span><span class="PUNC">=</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>199</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.models</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">name</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">name</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.models</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>200</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>201</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>202</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>203</span> 
-<span class='line'>204</span> </span><span class="COMM">/**
-<span class='line'>205</span>  * Defines the global Model Manager 
-<span class='line'>206</span>  */</span><span class="WHIT">
-<span class='line'>207</span> </span><span class="NAME">vxl.go.modelManager</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">vxlModelManager</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span></pre></body></html>
+<span class='line'>153</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>154</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'>155</span> </span><span class="WHIT">	</span><span class="NAME">setTimeout</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="NAME">scheduledAdd</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>156</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>157</span> </span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>158</span> </span><span class="COMM">/**
+<span class='line'>159</span>  * It will delete all of the loaded models
+<span class='line'>160</span>  */</span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>161</span> </span><span class="NAME">vxlModelManager.prototype.reset</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>162</span> </span><span class="WHIT">	</span><span class="NAME">this.firstLoadedModel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>163</span> </span><span class="WHIT">	</span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="NAME">this.models.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>164</span> </span><span class="WHIT">		</span><span class="NAME">this.models</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>165</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>166</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'>167</span> </span><span class="WHIT">	</span><span class="NAME">this.models</span><span class="WHIT">        </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>168</span> </span><span class="WHIT">	</span><span class="NAME">this.toLoad</span><span class="WHIT">        </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>169</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>170</span> 
+<span class='line'>171</span> </span><span class="COMM">/**
+<span class='line'>172</span>  * Checks if a model has been loaded yet
+<span class='line'>173</span>  * @param {String} name the name of the model to check
+<span class='line'>174</span>  */</span><span class="WHIT">
+<span class='line'>175</span> </span><span class="NAME">vxlModelManager.prototype.isModelLoaded</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">name</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>176</span> </span><span class="WHIT">	</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">this.models.length</span><span class="PUNC">;</span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>177</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.models</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">name</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">name</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>178</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>179</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>180</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>181</span> 
+<span class='line'>182</span> </span><span class="COMM">/**
+<span class='line'>183</span>  * Returns true if all the models in the list passed to the method loadList have been loaded.
+<span class='line'>184</span>  */</span><span class="WHIT">
+<span class='line'>185</span> </span><span class="NAME">vxlModelManager.prototype.allLoaded</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>186</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.toLoad.length</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>187</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>188</span> 
+<span class='line'>189</span> 
+<span class='line'>190</span> </span><span class="COMM">/**
+<span class='line'>191</span>  * Returns the model if it has been loaded by this model manager, null otherwise.
+<span class='line'>192</span>  * @param {String} name the name of the model to retrieve
+<span class='line'>193</span>  */</span><span class="WHIT">
+<span class='line'>194</span> </span><span class="NAME">vxlModelManager.prototype.getModelByName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">name</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>195</span> </span><span class="WHIT"> 	</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">max</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.models.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">max</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">+</span><span class="PUNC">=</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>196</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.models</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">name</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">name</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.models</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>197</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>198</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>199</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>200</span> 
+<span class='line'>201</span> </span><span class="COMM">/**
+<span class='line'>202</span>  * Defines the global Model Manager 
+<span class='line'>203</span>  */</span><span class="WHIT">
+<span class='line'>204</span> </span><span class="NAME">vxl.go.modelManager</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">vxlModelManager</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span></pre></body></html>

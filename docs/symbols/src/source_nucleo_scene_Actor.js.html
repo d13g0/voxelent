@@ -491,74 +491,82 @@
 <span class='line'>484</span> * @param {Number} max highest value for interpolation
 <span class='line'>485</span> */</span><span class="WHIT">
 <span class='line'>486</span> </span><span class="NAME">vxlActor.prototype.setLookupTable</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">lutID</span><span class="PUNC">,</span><span class="NAME">min</span><span class="PUNC">,</span><span class="NAME">max</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>487</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.model.scalars</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>488</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">lut</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">vxl.go.lookupTableManager.get</span><span class="PUNC">(</span><span class="NAME">lutID</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>489</span> </span><span class="WHIT">		</span><span class="NAME">this.colors</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">lut.getColors</span><span class="PUNC">(</span><span class="NAME">this.model.scalars</span><span class="PUNC">,</span><span class="NAME">min</span><span class="PUNC">,</span><span class="NAME">max</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>490</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>491</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>492</span> 
-<span class='line'>493</span> </span><span class="COMM">/**
-<span class='line'>494</span> * Flips the normal for this actor. It delegates the task to the model
-<span class='line'>495</span> * @TODO: Review. we could want the actor to have flipped normals but not to impose this on the model. 
-<span class='line'>496</span> */</span><span class="WHIT">
-<span class='line'>497</span> </span><span class="NAME">vxlActor.prototype.flipNormals</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>498</span> </span><span class="WHIT">	</span><span class="NAME">this.model.flipNormals</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>487</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'>488</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.model.scalars</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>489</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'>490</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">self</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>491</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'>492</span> </span><span class="WHIT">	</span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">scheduledSetLookupTable</span><span class="PUNC">(</span><span class="NAME">scalars</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>493</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">lut</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">vxl.go.lookupTableManager.get</span><span class="PUNC">(</span><span class="NAME">lutID</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>494</span> </span><span class="WHIT">        </span><span class="NAME">self.colors</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">lut.getColors</span><span class="PUNC">(</span><span class="NAME">self.model.scalars</span><span class="PUNC">,</span><span class="NAME">min</span><span class="PUNC">,</span><span class="NAME">max</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>495</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>496</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'>497</span> </span><span class="WHIT">	</span><span class="COMM">//Given that obtaining the colors can be a time consume op, it is deferred here.</span><span class="WHIT">
+<span class='line'>498</span> </span><span class="WHIT">	</span><span class="NAME">setTimeout</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="NAME">scheduledSetLookupTable</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
 <span class='line'>499</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>500</span> 
 <span class='line'>501</span> </span><span class="COMM">/**
-<span class='line'>502</span> * Sets the visibility of the actor
-<span class='line'>503</span> * @param {boolean} flag true or false
+<span class='line'>502</span> * Flips the normal for this actor. It delegates the task to the model
+<span class='line'>503</span> * @TODO: Review. we could want the actor to have flipped normals but not to impose this on the model. 
 <span class='line'>504</span> */</span><span class="WHIT">
-<span class='line'>505</span> </span><span class="NAME">vxlActor.prototype.setVisible</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">flag</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>506</span> </span><span class="WHIT">    </span><span class="NAME">this.visible</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">flag</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>505</span> </span><span class="NAME">vxlActor.prototype.flipNormals</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>506</span> </span><span class="WHIT">	</span><span class="NAME">this.model.flipNormals</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>507</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>508</span> 
 <span class='line'>509</span> </span><span class="COMM">/**
-<span class='line'>510</span> * Is visible?
-<span class='line'>511</span> * @returns {boolean} true if the object is visible
+<span class='line'>510</span> * Sets the visibility of the actor
+<span class='line'>511</span> * @param {boolean} flag true or false
 <span class='line'>512</span> */</span><span class="WHIT">
-<span class='line'>513</span> </span><span class="NAME">vxlActor.prototype.isVisible</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>514</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.visible</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>513</span> </span><span class="NAME">vxlActor.prototype.setVisible</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">flag</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>514</span> </span><span class="WHIT">    </span><span class="NAME">this.visible</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">flag</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>515</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>516</span> 
 <span class='line'>517</span> </span><span class="COMM">/**
-<span class='line'>518</span>  * Duplicates this actor.
-<span class='line'>519</span>  * 
-<span class='line'>520</span>  * Properties copied by REFERENCE:
-<span class='line'>521</span>  * model,
-<span class='line'>522</span>  * buffers,
-<span class='line'>523</span>  * renderers
-<span class='line'>524</span>  * 
-<span class='line'>525</span>  * Everything else is copied by VALUE.
-<span class='line'>526</span>  * 
-<span class='line'>527</span>  * This method is fundamental to replicate objects in the scene, without having to duplicate
-<span class='line'>528</span>  * the shared model. A cloned actor however can have different position, colors, properties, etc.
-<span class='line'>529</span>  * 
-<span class='line'>530</span>  * If a cloned actor modifies his internal model, any other actor that shares the model will be
-<span class='line'>531</span>  * affected. 
+<span class='line'>518</span> * Is visible?
+<span class='line'>519</span> * @returns {boolean} true if the object is visible
+<span class='line'>520</span> */</span><span class="WHIT">
+<span class='line'>521</span> </span><span class="NAME">vxlActor.prototype.isVisible</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>522</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.visible</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>523</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>524</span> 
+<span class='line'>525</span> </span><span class="COMM">/**
+<span class='line'>526</span>  * Duplicates this actor.
+<span class='line'>527</span>  * 
+<span class='line'>528</span>  * Properties copied by REFERENCE:
+<span class='line'>529</span>  * model,
+<span class='line'>530</span>  * buffers,
+<span class='line'>531</span>  * renderers
 <span class='line'>532</span>  * 
-<span class='line'>533</span>  * The returned actor is not added to the scene automatically. It is up the
-<span class='line'>534</span>  * programmer to determine the scene the cloned actor needs to be added to if any.
-<span class='line'>535</span>  * 
-<span class='line'>536</span>  * @see vxlModel
-<span class='line'>537</span>  * @returns {vxlActor} an actor 
-<span class='line'>538</span>  */</span><span class="WHIT">
-<span class='line'>539</span> </span><span class="NAME">vxlActor.prototype.clone</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>540</span> </span><span class="WHIT">    </span><span class="NAME">this.clones</span><span class="PUNC">++</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>541</span> </span><span class="WHIT">	</span><span class="WHIT">
-<span class='line'>542</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">duplicate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">vxlActor</span><span class="PUNC">(</span><span class="NAME">this.model</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>543</span> </span><span class="WHIT">	</span><span class="NAME">duplicate.setScene</span><span class="PUNC">(</span><span class="NAME">this.scene</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>544</span> </span><span class="WHIT">	</span><span class="WHIT">
-<span class='line'>545</span> </span><span class="WHIT">	</span><span class="COMM">//TODO: duplicate.setMatrix(this._matrix); this method should update all the other variables (position, scale, rot, etc).</span><span class="WHIT">
-<span class='line'>546</span> </span><span class="WHIT">     	</span><span class="WHIT">
-<span class='line'>547</span> </span><span class="WHIT">	</span><span class="COMM">//Now to save us some memory, let's SHARE the WebGL buffers that the current actor has already allocated'</span><span class="WHIT">
-<span class='line'>548</span> </span><span class="WHIT">	</span><span class="COMM">//duplicate.renderers = this._renderers;</span><span class="WHIT">
-<span class='line'>549</span> </span><span class="WHIT">	</span><span class="COMM">//duplicate.buffers   = this._gl_buffers;</span><span class="WHIT">
-<span class='line'>550</span> 
-<span class='line'>551</span> </span><span class="WHIT">	</span><span class="NAME">duplicate.name</span><span class="WHIT">     </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'-'</span><span class="PUNC">+</span><span class="NAME">this.clones</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>552</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">duplicate</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>553</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>554</span> 
-<span class='line'>555</span> 
-<span class='line'>556</span> 
-<span class='line'>557</span> </span></pre></body></html>
+<span class='line'>533</span>  * Everything else is copied by VALUE.
+<span class='line'>534</span>  * 
+<span class='line'>535</span>  * This method is fundamental to replicate objects in the scene, without having to duplicate
+<span class='line'>536</span>  * the shared model. A cloned actor however can have different position, colors, properties, etc.
+<span class='line'>537</span>  * 
+<span class='line'>538</span>  * If a cloned actor modifies his internal model, any other actor that shares the model will be
+<span class='line'>539</span>  * affected. 
+<span class='line'>540</span>  * 
+<span class='line'>541</span>  * The returned actor is not added to the scene automatically. It is up the
+<span class='line'>542</span>  * programmer to determine the scene the cloned actor needs to be added to if any.
+<span class='line'>543</span>  * 
+<span class='line'>544</span>  * @see vxlModel
+<span class='line'>545</span>  * @returns {vxlActor} an actor 
+<span class='line'>546</span>  */</span><span class="WHIT">
+<span class='line'>547</span> </span><span class="NAME">vxlActor.prototype.clone</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>548</span> </span><span class="WHIT">    </span><span class="NAME">this.clones</span><span class="PUNC">++</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>549</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'>550</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">duplicate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">vxlActor</span><span class="PUNC">(</span><span class="NAME">this.model</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>551</span> </span><span class="WHIT">	</span><span class="NAME">duplicate.setScene</span><span class="PUNC">(</span><span class="NAME">this.scene</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>552</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'>553</span> </span><span class="WHIT">	</span><span class="COMM">//TODO: duplicate.setMatrix(this._matrix); this method should update all the other variables (position, scale, rot, etc).</span><span class="WHIT">
+<span class='line'>554</span> </span><span class="WHIT">     	</span><span class="WHIT">
+<span class='line'>555</span> </span><span class="WHIT">	</span><span class="COMM">//Now to save us some memory, let's SHARE the WebGL buffers that the current actor has already allocated'</span><span class="WHIT">
+<span class='line'>556</span> </span><span class="WHIT">	</span><span class="COMM">//duplicate.renderers = this._renderers;</span><span class="WHIT">
+<span class='line'>557</span> </span><span class="WHIT">	</span><span class="COMM">//duplicate.buffers   = this._gl_buffers;</span><span class="WHIT">
+<span class='line'>558</span> 
+<span class='line'>559</span> </span><span class="WHIT">	</span><span class="NAME">duplicate.name</span><span class="WHIT">     </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'-'</span><span class="PUNC">+</span><span class="NAME">this.clones</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>560</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">duplicate</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>561</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>562</span> 
+<span class='line'>563</span> 
+<span class='line'>564</span> 
+<span class='line'>565</span> </span></pre></body></html>
