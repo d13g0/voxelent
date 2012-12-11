@@ -32,8 +32,6 @@
  * @author Diego Cantor
  */
 function vxlCamera(vw,t) {
-
-    this.id             = 0;    //Used by the camera manager to switch cameras
     this.UID            = vxl.util.generateUID(); //unique identification key
     this.view           = vw;
 
