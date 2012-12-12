@@ -91,6 +91,9 @@ vxlCameraManager.prototype.switchTo = function(idx){
     else{
         throw ('vxlCameraManager.switchTo ERROR: switching to camera ['+idx+'] while the view '+view.name+' does not have an interactor set');
     }
+    
+    vxl.c.camera = this.active;
+	
 	return this.active;
 };
 

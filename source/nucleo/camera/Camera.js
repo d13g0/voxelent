@@ -179,16 +179,39 @@ vxlCamera.prototype.updateWithActor = function(actor){
  * @see{vxlCamera#translate}
  */
 vxlCamera.prototype.setPosition = function(x,y,z) {
-    this._position = vxl.util.createVec3(x,y,z);
-    
-    var m = this._matrix;
-    m[12] = this._position[0];
-    m[13] = this._position[1];
-    m[14] = this._position[2];
-    m[15] = 1;
-    
+    this._setPosition(x,y,z);
     this.setFocalPoint(this._focalPoint);
-    this._update();
+};
+
+/**
+ * Looks at a given point in space (sets the focal point of this camera).
+ * 
+ * Note: If the camera is doing cinematic tracking, the up vector will be affected.
+ * @param {Number, Array, vec3} x it can be the x coordinate, a 3-dimensional Array or a vec3 (glMatrix)
+ * @param {Number} y if x is a number, then this parameter corresponds to the y-coordinate
+ * @param {Number} z if x is a number, then this parameter corresponds to the z-coordinate
+ */
+vxlCamera.prototype.setFocalPoint = function(x,y,z) {
+    
+    var up = vec3.create([0,1,0]);
+    this._focalPoint = vxl.util.createVec3(x,y,z);
+    
+    if (this._trackingMode == vxl.def.camera.tracking.CINEMATIC){
+        var d  = vec3.subtract(this._focalPoint, this._position, vec3.create());
+        var x  = d[0], y = d[1],  z = d[2],  r  = vec3.length(d);
+        var el =      Math.asin(y/r)  * vxl.def.rad2deg;
+        var az = 90 + Math.atan2(z,x) * vxl.def.rad2deg;
+        var m = mat4.identity();
+        mat4.rotateY(m, az * vxl.def.deg2rad);
+        mat4.rotateX(m, el * vxl.def.deg2rad);
+        up = mat4.multiplyVec3(m, [0,1,0], vec3.create());
+    }
+    
+    mat4.inverse(mat4.lookAt(this._position, this._focalPoint, up), this._matrix);
+    
+    this._getAxes();
+    this._getDistance();
+    this._getAngles();
 };
 
 /**
@@ -222,15 +245,7 @@ vxlCamera.prototype.setDistance = function(d) {
     pos[1] = d*n[1] + f[1];
     pos[2] = d*n[2] + f[2];
     
-    vec3.set(pos, this._position);
-    
-    var m = this._matrix;
-    m[12] = this._position[0];
-    m[13] = this._position[1];
-    m[14] = this._position[2];
-    m[15] = 1;
-    
-    this._update();
+    this._setPosition(pos);
 };
 
 /**
@@ -264,7 +279,14 @@ vxlCamera.prototype.changeRoll = function(rl){
 vxlCamera.prototype.setAzimuth = function(az){
     this._azimuth = this._getAngle(az);
     this._computeMatrix();
-    this._update();
+    
+    this._getAxes();
+    if (this.type == vxl.def.camera.type.ORBITING){
+        this._getPosition();
+    }
+    else if (this.type == vxl.def.camera.type.TRACKING){
+        this._getFocalPoint();
+    }
 };
 
 /**
@@ -274,7 +296,14 @@ vxlCamera.prototype.setAzimuth = function(az){
 vxlCamera.prototype.setElevation = function(el){
     this._elevation =this._getAngle(el);
     this._computeMatrix();
-    this._update();
+    
+    this._getAxes();
+    if (this.type == vxl.def.camera.type.ORBITING){
+        this._getPosition();
+    }
+    else if (this.type == vxl.def.camera.type.TRACKING){
+        this._getFocalPoint();
+    }
 };
 
 /**
@@ -283,9 +312,16 @@ vxlCamera.prototype.setElevation = function(el){
  * @param {Number} angle the roll angle
  */
 vxlCamera.prototype.setRoll = function(angle){
-       this._roll = this._getAngle(angle);
-       this._computeMatrix();
-       this._update();  
+    this._roll = this._getAngle(angle);
+    this._computeMatrix();
+       
+    this._getAxes();
+    if (this.type == vxl.def.camera.type.ORBITING){
+        this._getPosition();
+    }
+    else if (this.type == vxl.def.camera.type.TRACKING){
+        this._getFocalPoint();
+    }
 };
 
 /**
@@ -294,6 +330,9 @@ vxlCamera.prototype.setRoll = function(angle){
  * @param {Number} elevation the relative elevation
  */
 vxlCamera.prototype.rotate = function(azimuth,elevation,roll){
+    
+    if (Math.abs(this._elevation + elevation) > 90) return; //don't allow
+    
     this._relElevation = this._getAngle(elevation);
     this._relAzimuth   = this._getAngle(azimuth);
     this._relRoll      = this._getAngle(roll);
@@ -302,14 +341,20 @@ vxlCamera.prototype.rotate = function(azimuth,elevation,roll){
     this._azimuth   += this._relAzimuth;
     this._roll      += this._relRoll;
     
-   
     this._computeMatrix();
-    
-    if (this.type == vxl.def.camera.type.TRACKING){
-        mat4.multiplyVec3(mat4.toRotationMat(this._matrix), [0,0,-this._distance], this._distanceVector); 
-        vec3.add(this._position, this._distanceVector, this._focalPoint);               
+   
+       
+    this._getAxes();
+    if (this.type == vxl.def.camera.type.ORBITING){
+        this._getPosition();
     }
-    this._update();
+    else if (this.type == vxl.def.camera.type.TRACKING){
+        this._getFocalPoint();
+    }
+    
+    
+    
+   this._update();
 };
 
 /**
@@ -330,7 +375,8 @@ vxlCamera.prototype.dolly = function(value) {
     pos[1] += step*n[1];
     pos[2] += step*n[2];
     
-    this.setPosition(pos);
+    this._setPosition(pos);
+    this._getDistance();
 };
 
 /**
@@ -361,39 +407,12 @@ vxlCamera.prototype.translate = function(x,y,z){
     vec3.add(fp, vec3.scale(this._up     ,y, vec3.create()));    
     vec3.add(fp, vec3.scale(this._normal ,z, vec3.create()));
     
-    this.setPosition(pos);
+    this._setPosition(pos);
     this.setFocalPoint(fp);
 };
 
 
-/**
- * Looks at a given point in space (sets the focal point of this camera).
- * 
- * Note: If the camera is doing cinematic tracking, the up vector will be affected.
- * @param {Number, Array, vec3} x it can be the x coordinate, a 3-dimensional Array or a vec3 (glMatrix)
- * @param {Number} y if x is a number, then this parameter corresponds to the y-coordinate
- * @param {Number} z if x is a number, then this parameter corresponds to the z-coordinate
- */
-vxlCamera.prototype.setFocalPoint = function(x,y,z) {
-    
-    var up = vec3.create([0,1,0]);
-    this._focalPoint = vxl.util.createVec3(x,y,z);
-    
-    if (this._trackingMode == vxl.def.camera.tracking.CINEMATIC){
-        var d  = vec3.subtract(this._focalPoint, this._position, vec3.create());
-        var x  = d[0], y = d[1],  z = d[2],  r  = vec3.length(d);
-        var el =      Math.asin(y/r)  * vxl.def.rad2deg;
-        var az = 90 + Math.atan2(z,x) * vxl.def.rad2deg;
-        var m = mat4.identity();
-        mat4.rotateY(m, az * vxl.def.deg2rad);
-        mat4.rotateX(m, el * vxl.def.deg2rad);
-        up = mat4.multiplyVec3(m, [0,1,0], vec3.create());
-    }
-    
-    mat4.inverse(mat4.lookAt(this._position, this._focalPoint, up), this._matrix);
-    
-    this._update();
-};
+
 
 /**
  * This method updates the 3D scene
@@ -572,38 +591,120 @@ vxlCamera.prototype._computeMatrix = function(){
     }
 };
 
+/**
+ * Updates the camera matrix. Used on rotate to avoid gimbal lock
+ * @private
+ */
+/*vxlCamera.prototype._updateMatrix = function(){
+    
+    
+    var rotX  = quat4.fromAngleAxis(this._relElevation * vxl.def.deg2rad, [1,0,0]);
+    var rotY  = quat4.fromAngleAxis(this._relAzimuth   * vxl.def.deg2rad, [0,1,0]);
+    var rotZ  = quat4.fromAngleAxis(this._relRoll      * vxl.def.deg2rad, [0,0,1]); 
+    var rotQ = quat4.multiply(rotY, rotX, quat4.create());
+    rotQ = quat4.multiply(rotQ, rotZ, quat4.create());
+    var rotMatrix = quat4.toMat4(rotQ);
+    
+    if (this.type ==  vxl.def.camera.type.ORBITING){
+        mat4.translate(this._matrix, [0,0,-this._distance]);
+        mat4.multiply(this._matrix, rotMatrix);
+        mat4.translate(this._matrix, [0,0,this._distance]);
+    } 
+    else if(this.type ==  vxl.def.camera.type.TRACKING){
+        mat4.multiply(this._matrix, rotMatrix);
+    }
+    
+    this._relElevation  = 0;
+    this._relAzimuth    = 0;
+    this._relRoll       = 0;
+};*/
+
 
 /**
- * Updates the internal state of the camera when the camera matrix changes
+ * Sets the camera position in the camera matrix
+ * @private
  */
-vxlCamera.prototype._update = function(){
+vxlCamera.prototype._setPosition = function(x,y,z){
+    this._position = vxl.util.createVec3(x,y,z);
+    var m = this._matrix;
+    m[12] = this._position[0];
+    m[13] = this._position[1];
+    m[14] = this._position[2];
+    m[15] = 1;
+};
 
-    //Recalculates axes    
+/**
+ * Recalculates axes based on the current matrix
+ * @private
+ */
+vxlCamera.prototype._getAxes = function(){
     var m       = this._matrix;
     vec3.set(mat4.multiplyVec4(m, [1, 0, 0, 0]), this._right);
     vec3.set(mat4.multiplyVec4(m, [0, 1, 0, 0]), this._up);
     vec3.set(mat4.multiplyVec4(m, [0, 0, 1, 0]), this._normal);
-    vec3.set(mat4.multiplyVec4(m, [0, 0, 0, 1]), this._position);
     vec3.normalize(this._right);
     vec3.normalize(this._up);
     vec3.normalize(this._normal);
-    
-    
-    //Recalculates distance vector, distance and dollying steps
-    //These are affected by changes in focal point, or position (translate, pan, dolly, setDistance, setPosition)
+};
+
+/**
+ * Recalculates the position based on the current matrix
+ * Called only when camera is of ORBITING type
+ * @private
+ */
+vxlCamera.prototype._getPosition = function(){
+    var m       = this._matrix;
+    vec3.set(mat4.multiplyVec4(m, [0, 0, 0, 1]), this._position);
+    this._getDistance();
+};
+
+/**
+ * Called only when camera is of TRACKING type
+ * @private
+ */
+vxlCamera.prototype._getFocalPoint = function(){
+    mat4.multiplyVec3(mat4.toRotationMat(this._matrix), [0,0,-this._distance], this._distanceVector); 
+    vec3.add(this._position, this._distanceVector, this._focalPoint);
+    this._getDistance();               
+};
+
+/**
+ * Recalculates the distance variables based on the current state
+ * @private
+ */
+vxlCamera.prototype._getDistance = function(){
     this._distanceVector = vec3.subtract(this._focalPoint, this._position, vec3.create());
     this._distance = vec3.length(this._distanceVector);
     this._dollyingStep = this._distance / 100;
-           
+};
+
+/**
+ * Recalculates euler angles based on the current state
+ * @private
+ */
+vxlCamera.prototype._getAngles = function(){
     //Recalculates angles  
     var x = this._distanceVector[0], y = this._distanceVector[1],  z = this._distanceVector[2];
     var r = vec3.length(this._distanceVector);
     this._elevation = Math.asin(y/r)    * vxl.def.rad2deg;
     this._azimuth   = Math.atan2(-x,-z) * vxl.def.rad2deg;
- 
 };
 
 
+/**
+ * Recalculates the camera state from the camera matrix
+ * @private
+ */
+vxlCamera.prototype._update = function(){
+    this._getAxes();
+    this._getPosition();
+    this._getDistance();
+    this._getAngles();
+};
+
+/**
+ * @private
+ */
 vxlCamera.prototype._calculateAngles = function(){
     var rotM = mat4.toMat3(this._matrix);
     var Q = mat3.toQuat4(rotM);
