@@ -74,9 +74,10 @@ function handleEvent(event){
    
     var cam = vxl.c.camera;
     cam.setType(vxl.def.camera.type.TRACKING, vxl.def.camera.tracking.ROTATIONAL);
-    cam.setPosition(0,5,60);
+    cam.setPosition(0,60,60);
+    cam.setAzimuth(30);
+    cam.setElevation(-45);
     cam.follow(cone);
-    
     vxl.api.floorON(60,5);
     
     startAnimation();

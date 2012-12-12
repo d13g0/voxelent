@@ -9,124 +9,138 @@
 <title>Voxelent - Following an actor</title>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-<script type='text/javascript' src='voxelent_v0.89.js'> </script>
+<script type='text/javascript' src='../lib/voxelent_v0.89.js'> </script>
 <script src="sylvester.js"></script>
+
+<script src="Kalman.js"></script>
+<script src="DataStreamReader.js"></script>
+
 <script type='text/javascript'>
 
 var view;
-var cone;
+var cone, sphere, cylinder, ball;
+
+var kalman = new vxlKalmanFilter();
+var reader = new vxlDataStreamReader();
+
+var statusMessage = 'Stand by';
 
 function runVoxApp(){
     vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
     view = vxl.api.setup('view-1');
-    vxl.api.load('cone.json');
+    vxl.api.load(['cone.json','sphere.json','cylinder.json'],'../assets/models/geometry/',vxl.def.model.loadingMode.DETACHED);
     view.start();
-}
+    reader.setup('data.json', processData);
+};
 
 function handleEvent(event){
+    
+    /**
+    * The models were loaded with the DETACHED mode, meaning that no actors were created. So we retrieve them 
+    * from the model manager and create the actors. These three actors will serve to create the clones
+    */
+    var mman = vxl.go.modelManager;
 
-    cone    = vxl.api.getActor('cone'); //new method introduced in 0.88.1
-    cone.setPosition(0,5,0);
+    cone     = new vxlActor(mman.getModelByName('cone'))
+    sphere   = new vxlActor(mman.getModelByName('sphere'));
+    cylinder = new vxlActor(mman.getModelByName('cylinder'));
+    ball     = sphere.clone();
+    
+    var scene = view.scene;
+
+
+    vxl.api.floorON(60,5);
+    
+    
+    
+    vxl.api.floorON(50,5);
+    createScene();
     var cam = vxl.c.camera;
     cam.setType(vxl.def.camera.type.TRACKING);
-    cam.setPosition(0,10,50);
-    //cam.longShot();
-    //cam.follow(cone, vxl.def.camera.tracking.ROTATIONAL);
-    vxl.api.floorON(50,5);
-    startAnimation();
-   
-}
-
-function loadData(filename){
-
-var successHandler = function(){
-	return function(json, textStatus){
-	        if (json == null) return;
-	        var d = json.data;
-	        if (d == undefined) return;
-	        
-            var cam = vxl.c.camera;
-            
-            var k = runKalman(-d[0], -d[1], d[2]);
-
-            cam.setAzimuth  (k[0]);
-            cam.setElevation(k[1]);
-            cam.setRoll     (k[2]);
-            view.refresh();
-	}
-};
-	
-var errorHandler = function(filename){
-	return function(request, status, error){
-	}
+    cam.setPosition(0,10,100);
+    reader.start(50);
 };
 
-var request  = $.ajax({
-	url			:filename,
-	type		:"GET",
-	dataType	:"json",
-	success 	: successHandler(),
-	error		: errorHandler(filename)
-});   
+var old = undefined;
 
-};
-
-
-function onFrame(){
-   loadData('data.json');
-}
- 
-function startAnimation(){
-    setInterval(onFrame,50);
-}
-
-
-var decay = 0.003;
-var R = Matrix.Diagonal([0.02, 0.02, 0.02]); 
-var x = $M([[0],[0],[0],[0],[0],[0]]);
-var P = Matrix.Random(6, 6);
-var H = $M([[1, 0, 0, 0, 0, 0],[0, 1, 0, 0, 0 ,0],[0, 0, 1, 0, 0 ,0]]);
-var I = Matrix.I(6);
-var time = $.now();
-
-function runKalman(xMeasure, yMeasure, zMeasure){
-    // change in time
-    now = $.now();
-    dt = now - time;
-    time = now;
-
-    // Derive the next state
-    F = $M([[1, 0, 0, dt, 0,  0],
-            [0, 1, 0, 0, dt,  0],
-            [0, 0, 1, 0,  0, dt],
-            [0, 0, 0, 1,  0,  0],
-            [0, 0, 0, 0,  1,  0],
-            [0, 0, 0, 0,  0,  1],
-           ]);
-   
-    // decay confidence
-    // to account for change in velocity
-    P = P.map(function(x) {
-        return x * (1 + decay * dt);
-    });
+function processData(json){
+   if (json.data == undefined) return;
+    var cam = vxl.c.camera;
+    var d = json.data;
+    var k = kalman.filter(-d[0], -d[1], -d[2]);
+    cam.setAzimuth  (k[0]);
+    cam.setElevation(k[1]);
+    cam.setRoll     (k[2]);
+    view.refresh();
     
-    // prediction
-    x = F.x(x);
-    P = F.x(P).x(F.transpose());
-
-    // measurement update
-    Z = $M([[xMeasure, yMeasure, zMeasure]]);
-    y = Z.transpose().subtract(H.x(x));
-    S = H.x(P).x(H.transpose()).add(R);
-
-    K = P.x(H.transpose()).x(S.inverse());
-    x = x.add(K.x(y));
-    P = I.subtract(K.x(H)).x(P);
     
-    return [x.e(1, 1),x.e(2, 1), x.e(3,1)];
+    if (old == undefined){
+        old = json.data.slice(0);
+    }
+    else{
+        if (old[0] == d[0] && old[1] ==d[1] && old[2] == d[2]){
+            statusMessage = 'Not new data';
+        }
+        else {
+            statusMessage = 'Reading data';        
+        }
+        $('#status').html(statusMessage);
+    }
 };
+
+
+function generateCoords(s){
+    var c = [Math.random()*s, 0, Math.random()*s];
+    
+    for (var i=0;i<3;i+=1){
+        if (Math.random()>0.5){
+            c[i] = -c[i]
+        }
+    }
+    return c;
+};
+
+/**
+ * Creates the cube array
+ */
+function createScene(){
+    view.scene.reset();
+    var count = 0, clon = undefined;
+    for (var i=0;i<=10;i+=1){
+            var t = Math.random();
+            if (t<=0.4){
+                clon = cone.clone();
+             }
+             else if (t>0.4 && t<=0.6){
+                clon = sphere.clone();
+             }
+             else{
+                clon = cylinder.clone();
+            }
+            clon.setPosition(generateCoords(50));
+            clon.setColor(Math.random()+0.2,Math.random()+0.2, Math.random()+.2);
+
+            view.scene.addActor(clon);
+    }
+};
+
+
 </script>
-
+<style type="text/css">
+.overlay {
+    background: rgba(50,50,50,0.5);
+    padding: 5px;
+    width: 150px;
+    height: 50px;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size:12px;
+    font-family: Arial,Helvetica;
+    color: white;
+    z-index: 5;
+}
+</style>
 
 </head>
 <body onload='runVoxApp()'>
@@ -137,7 +151,9 @@ function runKalman(xMeasure, yMeasure, zMeasure){
 			Your browser does not support WebGL :-(
 		</p>
 	</canvas>
+	
     </div>
+    <div class='overlay'><p id='status'>Stand By</p></div>
 </body>			
 </html>
 

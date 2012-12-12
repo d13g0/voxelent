@@ -257,9 +257,10 @@ def : {
                          * actor using <code>{@link vxlCamera#follow}</code></p> 
                          * <p>The tracking  modes can be:
                          * <ul>
-                         * <li><code>DEFAULT</code>: Used when the model associated with this actor has a texture</li>
-                         * <li><code>ROTATIONAL</code></li>
-                         * <li><code>TRANSLATIONAL</code></li> 
+                         * <li><code>DEFAULT</code>:  The camera does not follow an actor. Controlled by the user to look around the world.</li>
+                         * <li><code>ROTATIONAL</code>: The camera does not move but follows an actor position</li>
+                         * <li><code>TRANSLATIONAL</code>: The camera moves with the actor, the angle is constant</li> 
+                         * <li><code>CINEMATIC</code>: Similar to ROTATIONAL but allowing camera roll for a more dramatic effect</li>
                          * </ul>
                          * </p>
                          * <p> to set the tracking mode of the camera <code>myCamera</code> you should make sure that your camera is of tracking type with:
@@ -285,7 +286,8 @@ def : {
                         tracking: {
                               DEFAULT:'DEFAULT',
                               ROTATIONAL:'ROTATIONAL',
-                              TRANSLATIONAL:'TRANSLATIONAL'   
+                              TRANSLATIONAL:'TRANSLATIONAL',
+                              CINEMATIC: 'CINEMATIC'   
                         }
 					},
 				 	

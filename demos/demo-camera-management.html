@@ -1,0 +1,196 @@
+<html>
+<head>
+<meta name='Diego Cantor' content='Voxelent: The best WebGL platform yet'>
+<meta name='copyright' content='&copy; 2011'>
+<meta name='robots' content='all'>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name='keywords' content='webgl, webgl platform, medical imaging, webgl api'>
+
+<title>Voxelent - Camera Management Demo</title>
+
+<script type="text/javascript" src="lib/jquery.js" ></script>
+<script type="text/javascript" src="lib/jquery-ui.js" ></script>
+<script type='text/javascript' src='lib/voxelent_v0.89.js'></script>
+
+<link rel='stylesheet' type='text/css' href='css/jquery-ui/theme-1.css'/>
+
+<script type='text/javascript'>
+
+var view, cone, sphere, cylinder, cam0, cam1, cam2;
+
+/**
+ * Main function
+ */
+function runVoxApp(){
+    vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
+    view = vxl.api.setup('view-1');
+    vxl.api.load(['cone.json','sphere.json','cylinder.json'],'assets/models/geometry/',vxl.def.model.loadingMode.DETACHED);
+    view.start();
+};
+
+
+function generateCoords(s){
+    var c = [Math.random()*s, 0, Math.random()*s];
+    
+    for (var i=0;i<3;i+=1){
+        if (Math.random()>0.5){
+            c[i] = -c[i]
+        }
+    }
+    return c;
+};
+
+/**
+ * Creates the cube array
+ */
+function createScene(){
+    view.scene.reset();
+    var count = 0, clon = undefined;
+    for (var i=0;i<=10;i+=1){
+            var t = Math.random();
+            if (t<=0.4){
+                clon = cone.clone();
+             }
+             else if (t>0.4 && t<=0.6){
+                clon = sphere.clone();
+             }
+             else{
+                clon = cylinder.clone();
+            }
+            clon.setPosition(generateCoords(50));
+            clon.setColor(Math.random()+0.2,Math.random()+0.2, Math.random()+.2);
+
+            view.scene.addActor(clon);
+    }
+};
+
+
+function handleEvent(event){
+    
+    /**
+    * The models were loaded with the DETACHED mode, meaning that no actors were created. So we retrieve them 
+    * from the model manager and create the actors. These three actors will serve to create the clones
+    */
+    var mman = vxl.go.modelManager;
+
+    cone     = new vxlActor(mman.getModelByName('cone'))
+    sphere   = new vxlActor(mman.getModelByName('sphere'));
+    cylinder = new vxlActor(mman.getModelByName('cylinder'));
+    
+    var scene = view.scene;
+
+
+    vxl.api.floorON(60,5);
+    //Create all the copies based on the cube actor that was removed from the scene
+    
+ 
+ 
+    //Setup cameras
+    cam0 = vxl.c.camera;
+    cam0.setType(vxl.def.camera.type.TRACKING);
+    cam0.setPosition(0,30,120);
+    
+    cam1 = view.cameraman.create(vxl.def.camera.type.ORBITING);
+    cam1.setDistance(160);
+    cam1.setElevation(-10);
+    cam1.setAzimuth(10);
+    
+    
+    cam2 = view.cameraman.create(vxl.def.camera.type.ORBITING);
+    cam2.setDistance(160);
+    cam2.setAzimuth(-70);
+    cam2.setElevation(-40);
+    
+    createScene();
+    $('#overlay-div').fadeIn(3000);
+}; 
+
+</script>
+
+<script type="text/javascript">
+  //Google Analytics Script 
+  var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-26954785-1']); _gaq.push(['_trackPageview']);  (function() {  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);   })();
+</script>
+
+<style type="text/css">
+.show {
+
+     position: relative;
+}
+
+.overlay {
+    background: rgba(150,150,150,0.5);
+    padding: 5px;
+    width: 150px;
+    height: 20%;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size:12px;
+	font-family: Arial,Helvetica;
+	color: white;
+}
+
+.overlay select{&nbsp;
+   background: #333;
+   color: #BCBCBC;
+   width: 100px;
+   padding: 5px;
+   font-size: 13px;
+   height: 30px;
+   border: 0px;
+}
+
+.overlay #view-1-fps{
+    display:none;
+}
+
+</style> 
+</head>
+<body onload='runVoxApp()'>
+	<div><img src="css/img/voxelent.png" /></div>
+	<div class='show'>
+	<canvas id = 'view-1' width=800 height=650 >
+		<p>
+			Your browser does not support WebGL :-(
+		</p>
+	</canvas>
+    
+    
+    <div id = 'overlay-div' class='overlay'>
+      <p><a href='#' id='btnGenerateScene'>Generate Random Scene</a></p>
+      <p><a href='#' id='btnCam0'>Camera 0 - Tracking </a></p>
+      <p><a href='#' id='btnCam1'>Camera 1 - Orbiting</a></p>
+      <p><a href='#' id='btnCam2'>Camera 2 - Orbiting</a></p>
+    </div>  
+    
+    </div>
+    
+<script>
+$('#btnGenerateScene').button().click(
+    function(){
+        createScene(); //deletes all actors in the scene
+        
+    }
+);
+
+$('#btnCam0').button().click(
+    function(){
+        view.cameraman.switchTo(0);
+    }
+);
+
+$('#btnCam1').button().click(
+    function(){
+        view.cameraman.switchTo(1);
+    }
+);
+
+$('#btnCam2').button().click(
+    function(){
+        view.cameraman.switchTo(2);
+    }
+);
+</script>    
+</body>			
+</html>
