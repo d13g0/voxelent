@@ -22,7 +22,7 @@
 	    vxl.api.setProgram(view, vxl.def.glsl.bake, vxlBakeStrategy);
 	    vxl.api.load(['cone.json','cube.json'],'assets/models/simple/');
 	    view.start();
-	    view.cameraman.getActiveCamera().setPosition(0,0,8);
+	    view.cameraman.active.setPosition(0,0,8);
 	    vxl.api.setRenderMode(vxl.def.renderer.mode.ANIMFRAME);
 	}
 	

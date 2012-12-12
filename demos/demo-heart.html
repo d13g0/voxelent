@@ -94,18 +94,17 @@
 			};
 
 			function handleEvent(event, src) {
-				var cam = view.cameraman.getActiveCamera();
+				
 				
 				if (event == vxl.events.SCENE_UPDATED) {
                     var loaded = src._actors.length;
                     $('#status').html('Objects loaded: ' + loaded + ' out of 60');
                 }
 				else if (event == vxl.events.MODELS_LOADED) {
-					
-					//Set up the camera
+				    //Set up the camera
+				    var cam = view.cameraman.active;
+                    cam.setType(vxl.def.camera.type.TRACKING);	
 					cam.setPosition([0, 0, 500]);
-					cam.setElevation(90);
-					//Start the animation at 100ms per frame
 					animation.start(100);
 
 					

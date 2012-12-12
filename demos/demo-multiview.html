@@ -90,8 +90,8 @@
 			}
 
 			function handleEvent(event, src) {
-				var cam1 = view.cameraman.getActiveCamera();
-				var cam2 = view2.cameraman.getActiveCamera();
+				var cam1 = view.cameraman.active;
+				var cam2 = view2.cameraman.active;
 				
 				if (event == vxl.events.MODELS_LOADED) {
 					
