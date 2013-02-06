@@ -1,4 +1,19 @@
 -------------------------------------------------------------------------------------------
+VERSION 0.89.1 - Network ops + Camera bug fixes
+-------------------------------------------------------------------------------------------
+
+document_plexo.py has been renamed to document.py now all the subprojects get documented at the same 
+time so we don't miss anything.
+
+New classes in Plexo
+----------------------
+vxlDataStreamReader : encapsulates a data source
+   |
+   + -- vxlJSONReader: reads a JSON data source
+   
+
+
+-------------------------------------------------------------------------------------------
 VERSION 0.89 - Crocodile Rock - Elton John
 -------------------------------------------------------------------------------------------
 API Updates

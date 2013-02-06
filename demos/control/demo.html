@@ -9,11 +9,11 @@
 <title>Voxelent - Following an actor</title>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-<script type='text/javascript' src='../lib/voxelent_v0.89.js'> </script>
-<script src="sylvester.js"></script>
+<script type='text/javascript' src='../lib/voxelent_v0.89.1.js'> </script>
+<script type='text/javascript' src='../lib/vox-plexo_v0.89.1.js'> </script>
 
+<script src="sylvester.js"></script>
 <script src="Kalman.js"></script>
-<script src="DataStreamReader.js"></script>
 
 <script type='text/javascript'>
 
@@ -21,7 +21,7 @@ var view;
 var cone, sphere, cylinder, ball;
 
 var kalman = new vxlKalmanFilter();
-var reader = new vxlDataStreamReader();
+var reader = new vxlJSONReader();
 
 var statusMessage = 'Stand by';
 

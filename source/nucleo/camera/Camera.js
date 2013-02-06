@@ -376,7 +376,13 @@ vxlCamera.prototype.dolly = function(value) {
     pos[2] += step*n[2];
     
     this._setPosition(pos);
-    this._getDistance();
+    if (this.type == vxl.def.camera.type.ORBITING){
+        this._getDistance();
+    }
+    else if (this.type == vxl.def.camera.type.TRACKING){
+        //move the focal point and keep the distance
+        vec3.add(pos, this._distanceVector, this._focalPoint);
+    }
 };
 
 /**

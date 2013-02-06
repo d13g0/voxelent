@@ -54,7 +54,7 @@ var vxl = {
 */
 version : 
 {
-    number: '0.89',
+    number: '0.89.1',
    	codename : 'c4n314',
    	plugins  : []
 },

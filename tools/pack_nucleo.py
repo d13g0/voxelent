@@ -92,11 +92,11 @@ def pack(VOX_VERSION_NUMBER):
         target =  tdir + '/' + tail + VERSION_TAG + '.js'
         target_min =  tdir + '/' + tail + VERSION_TAG + '-min.js'
         subprocess.call(['java','-jar','yui.jar','--type', 'js', '--line-break', '500', origin, '-o',target_min])
-        shutil.copy(origin, target) #test
+        shutil.copy(origin, target) 
     
    
     hashmap = {}
-    for root, dirs, files in os.walk(SLUG+SEP+"source"):
+    for root, dirs, files in os.walk(SLUG+SEP+"source"+SEP+"nucleo"):
         for name in files:
     
             n = os.path.join(root,name)

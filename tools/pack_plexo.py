@@ -19,11 +19,11 @@ def pack(VOX_VERSION_NUMBER):
     
     minify = False
     #Here is one of the beauties of this script: It does not matter how the files are organized into folders. This will always be the order. regardless.
-    plexo = ['Network', 'SceneDescriptor','CameraDescriptor']
+    plexo = ['Network', 'SceneDescriptor', 'DataStreamReader','JSONReader']
     
     
     vox_files = [os.path.join(root,name)
-                 for root, dirs, files in os.walk(".."+SEP+"source") #in windows replace / with \\
+                 for root, dirs, files in os.walk(".."+SEP+"source"+SEP+"plexo") #in windows replace / with \\
                  for name in files
                  if name.endswith(".js")]
     
@@ -34,21 +34,20 @@ def pack(VOX_VERSION_NUMBER):
         tdir = SLUG + '/' + head
         tdir = str.replace(tdir,'../','')
         
+        print 'Processing ' + tail
+        
         if not os.path.exists(tdir):
-                print "creating "+tdir
                 os.makedirs(tdir)
         
         origin =  head + '/' + tail + '.js'
         target =  tdir + '/' + tail + VERSION_TAG + '.js'
-        #print "Packing " + origin + ' into ' + target
-        if (minify):
-            subprocess.call("java -jar yui.jar --type js --line-break 500  "+ origin + " -o "+target)
-        else:
-            shutil.copy(origin, target); #test
+        target_min =  tdir + '/' + tail + VERSION_TAG + '-min.js'
+        subprocess.call(['java','-jar','yui.jar','--type', 'js', '--line-break', '500', origin, '-o',target_min])
+        shutil.copy(origin, target); 
     
   
     hashmap = {}
-    for root, dirs, files in os.walk(SLUG+SEP+"source"):
+    for root, dirs, files in os.walk(SLUG+SEP+"source"+SEP+"plexo"):
         for name in files:
     
             n = os.path.join(root,name)
@@ -60,28 +59,38 @@ def pack(VOX_VERSION_NUMBER):
                     print 'error'
             finally:
                 f.close()
+    
     buffer = ''
+    buffer_min = ''
     for lkp in plexo:
         key = lkp + VERSION_TAG + '.js'
+        key_min = lkp + VERSION_TAG + '-min.js'
         if key in hashmap:
             buffer += hashmap[key]
             print "Adding " + key + " to vox-plexo"+VERSION_TAG+".js"
-            
+        if key_min in hashmap:
+            buffer_min += hashmap[key_min]
+            print "Adding " + key_min + " to vox-plexo"+VERSION_TAG+"-min.js"    
     
     
     demos_dir = open('..'+SEP+'demos'+SEP+'lib'+SEP+'vox-plexo'+VERSION_TAG+'.js','w');
-    lib_dir   = open('..'+SEP+'library'+SEP+'vox-plexo'+VERSION_TAG+'.js','w');
-    net_dir   = open('..'+SEP+'..'+SEP+'..'+SEP+'vox-net'+SEP+'lib'+SEP+'vox-plexo'+VERSION_TAG+'.js','w');
+    demos_dir_min = open('..'+SEP+'demos'+SEP+'lib'+SEP+'vox-plexo'+VERSION_TAG+'-min.js','w');
+    lib_dir   = open('..'+SEP+'downloads'+SEP+'vox-plexo'+VERSION_TAG+'.js','w');
+    lib_dir_min = open('..'+SEP+'downloads'+SEP+'vox-plexo'+VERSION_TAG+'-min.js','w');
+    
     
     
     demos_dir.write(buffer);
+    demos_dir_min.write(buffer_min);
     lib_dir.write(buffer);
-    net_dir.write(buffer);
+    lib_dir_min.write(buffer_min);
+    
     
     demos_dir.close();
+    demos_dir_min.close();
     lib_dir.close();
-    net_dir.close();
-    print ' -- END --'
+    lib_dir_min.close();
+    print ' -- END PACKAGER --'
     
 if __name__ == '__main__':
     pack(sys.argv[1])
