@@ -69,7 +69,6 @@ vxlBasicStrategy.prototype.deallocate = function(scene){
     //DO NOTHING. THE DESCENDANTS WILL.
 }
 
-
 /**
  * Renders the actors one by one
  * @param {vxlScene} scene the scene to render
@@ -86,7 +85,12 @@ vxlBasicStrategy.prototype.render = function(scene){
  */
 vxlBasicStrategy.prototype._allocateActor = function(actor){
    
-    if (this._gl_buffers[actor.UID] != undefined) return; // the actor has already been allocated
+    if (this._gl_buffers[actor.UID] != undefined){
+        if (actor.dirty){
+            this._reallocateActor(actor); 
+        }
+        return;
+    }
    	
 	var gl = this.renderer.gl;
 	var model = actor.model;
@@ -94,21 +98,16 @@ vxlBasicStrategy.prototype._allocateActor = function(actor){
 	
 	//Vertex Buffer
 	buffers.vertex = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices), gl.STATIC_DRAW);
+	
 	
 	//Index Buffer
 	if (model.indices != undefined){
 		buffers.index = gl.createBuffer();
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices), gl.STATIC_DRAW);
 	}
 	
 	//Normals Buffer
 	if (model.normals){
 		buffers.normal = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals), gl.STATIC_DRAW);
 	}
 	
 	//Color Buffer for scalars
@@ -119,22 +118,78 @@ vxlBasicStrategy.prototype._allocateActor = function(actor){
 	//Wireframe Buffer 
 	if (model.wireframe != undefined){
 		buffers.wireframe = gl.createBuffer();
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
 	}
 	
 	//Bounding box Buffer 
     buffers.bb = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.bb);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vxlModel.BB_INDICES), gl.STATIC_DRAW);
-    
 	
 	//Texture Coords Buffer
 	if (model.texture){
 	    buffers.texcoords = gl.createBuffer();
-	    
-	    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texcoords);
-	    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.texcoords), gl.STATIC_DRAW);
+	}
+	   
+    //Cleaning up
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	
+	
+	this._gl_buffers[actor.UID] = buffers;
+	this._reallocateActor(actor);
+};
+
+
+/**
+ * Receives one actor and returns the GL buffers
+ */
+vxlBasicStrategy.prototype._reallocateActor = function(actor){
+   
+    
+    vxlRenderStrategy
+    var gl = this.renderer.gl;
+    var model = actor.model;
+    var buffers = this._gl_buffers[actor.UID];
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices), gl.STATIC_DRAW);
+    
+    //Index Buffer
+    if (model.indices != undefined){    
+    //Cleaning up
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices), gl.STATIC_DRAW);
+    }
+    
+    //Normals Buffer
+    if (model.normals){
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals), gl.STATIC_DRAW);
+    }
+    
+    //Color Buffer for scalars
+    if (model.scalars != undefined || model.colors != undefined){
+        buffers.color = gl.createBuffer(); //we don't BIND values or use the buffers until the lut is loaded and available
+    }
+    
+    //Wireframe Buffer 
+    if (model.wireframe != undefined){
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
+    }   
+    //Cleaning up
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    
+    //Bounding box Buffer 
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.bb);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vxlModel.BB_INDICES), gl.STATIC_DRAW);
+    
+    
+    //Texture Coords Buffer
+    if (model.texture){
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texcoords);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.texcoords), gl.STATIC_DRAW);
         
         this._gl_textures[actor.UID] = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this._gl_textures[actor.UID]);
@@ -142,15 +197,13 @@ vxlBasicStrategy.prototype._allocateActor = function(actor){
         gl.generateMipmap(gl.TEXTURE_2D);
         
         gl.bindTexture(gl.TEXTURE_2D, null);
-	}
-	
-	//Cleaning up
-	gl.bindBuffer(gl.ARRAY_BUFFER, null);
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-	
-	this._gl_buffers[actor.UID] = buffers; 
+    }
+    
+    
+    //Cleaning up
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 };
-
 /**
  * Passes the matrices to the shading program
  * @param {vxlActor} the actor 
@@ -176,11 +229,6 @@ vxlBasicStrategy.prototype._applyActorTransform = function(actor){
         prg.setUniform(glsl.NORMAL_MATRIX, r.transforms.nMatrix);
     
     trx.pop();
-    
-    
-    
-    
-    
  };
  
  
@@ -203,7 +251,5 @@ vxlBasicStrategy.prototype._applyGlobalTransform = function(){
     prg.setUniform(glsl.MVP_MATRIX, r.transforms.mvpMatrix);
     trx.calculateNormal(); 
     prg.setUniform(glsl.NORMAL_MATRIX, r.transforms.nMatrix);
-    
-    
     
  };

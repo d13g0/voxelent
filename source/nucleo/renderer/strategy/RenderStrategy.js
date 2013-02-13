@@ -23,7 +23,7 @@
  */
 function vxlRenderStrategy(renderer){
 	this.renderer = renderer;
-}
+};
 
 
 /**
@@ -31,7 +31,7 @@ function vxlRenderStrategy(renderer){
  */
 vxlRenderStrategy.prototype.allocate = function(scene){
 	//DO NOTHING. THE DESCENDANTS WILL.
-}
+};
 
 
 /**
@@ -39,13 +39,30 @@ vxlRenderStrategy.prototype.allocate = function(scene){
  */
 vxlRenderStrategy.prototype.deallocate = function(scene){
 	//DO NOTHING. THE DESCENDANTS WILL.
-}
+};
 
 /**
  * @param {vxlScene} scene the scene to render
  */
 vxlRenderStrategy.prototype.render = function(scene){
 	//DO NOTHING. THE DESCENDANTS WILL.
-}
+};
+
+
+/**
+ * Enables offscreen rendering
+ */
+vxlRenderStrategy.prototype.enableOffscreen = function(target){
+    //DO NOTHING. THE DESCENDANTS WILL.
+};
+
+
+/**
+ * Enables offscreen rendering
+ */
+vxlRenderStrategy.prototype.disableOffscreen = function(){
+    //DO NOTHING. THE DESCENDANTS WILL.
+};
+
 
 

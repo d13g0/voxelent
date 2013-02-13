@@ -18,17 +18,10 @@
  * @class
  * @constructor 
  */
-function vxlViewInteractor(view, camera){
-    this.view   = view;
-	this.camera = camera;
-	
-	if (view != undefined){
-	   this.connectView(view);
-	}
-	
-	if (camera != undefined){
-	    this.connectCamera(camera);
-	}
+function vxlViewInteractor(){
+    this.view   = undefined;
+	this.camera = undefined;
+	this.UID    = vxl.util.generateUID();
 };
 
 /**

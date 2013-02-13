@@ -63,11 +63,15 @@ version :
  * @namespace Voxelent Default/Definition Objects
  * @property {vxl.def.glsl}     glsl    GLSL constants
  * @property {vxl.def.lut}      lut     Lookup Table Definitions
- * @property {vxl.def.model}    model   Default values for models
+ * @property {vxl.def.model}    model   Default          values for models
  * @property {vxl.def.view}     view    Default values for views 
  * 
  */
 def : {
+    /**
+     * Pi divided by 2
+     */
+    piOver2: Math.PI /2,
     /**
      * Multiplicative constant to convert degrees to radians
      */
@@ -103,7 +107,8 @@ def : {
 						VERTEX_ATTRIBUTE    : 'aVertexPosition',
 						NORMAL_ATTRIBUTE    : 'aVertexNormal',
 						COLOR_ATTRIBUTE     : 'aVertexColor',
-						TEXCOORD_ATTRIBUTE  : 'aVertexTextureCoords'
+						TEXCOORD_ATTRIBUTE  : 'aVertexTextureCoords',
+						PICKING_COLOR_ATTRIBUTE : 'aVertexPickingColor'
 					},
     /** 
      * @namespace Lookup Table Definitions 
@@ -185,6 +190,9 @@ def : {
                          * <li><code>POINTS</code></li> 
                          * <li><code>LINES</code></li>
                          * <li><code>BOUNDING_BOX</code> (added in 0.88.1)</li>
+                         * <li><code>BB_AND_SOLID</code> (added in 0.89)</li>
+                         * <li><code>WIRED_AND_SOLID</code> (added in 0.89.1)</li>
+                         * <li><code>FLAT</code> (added in 0.89.1)</li>
                          * </ul>
                          * </p>
                          * <p> to set the actor mode you should use the <code>{@link vxlActor#setVisualizationMode}</code>
@@ -203,7 +211,31 @@ def : {
 						        POINTS:'POINTS', 
 						        LINES:'LINES', 
 						        BOUNDING_BOX:'BOUNDING_BOX',
-						        BB_AND_SOLID:'BBANDSOLID'
+						        BB_AND_SOLID:'BBANDSOLID',
+						        WIRED_AND_SOLID:'WIRED_AND_SOLID',
+						        FLAT:'FLAT',
+						 },
+						 /**
+						  *  <p>Defines the culling modes available for instances of vxlActor</p> 
+                          *  <p>These modes can be BACK,FRONT or NONE</p>
+                          *  <pre class='prettyprint'>
+                          *   var actor = vxl.c.scene.getActorByName('sphere'); //from the current scene
+                          *   actor.cullFace(vxl.def.actor.cull.BACK); //hides the back face.
+                          *  </pre>
+						  */
+						 cull:{
+						     BACK:'BACK',
+						     FRONT:'FRONT',
+						     NONE:'NONE'
+						 },
+						 
+						 /**
+						  * <p>Defines the picking modes available for <code>vxlActor</code></p> 
+						  */
+						 picking: {
+						     DISABLED:'DISABLED',
+						     CELL:'CELL',
+						     OBJECT:'OBJECT'
 						 }
 						
 					},
@@ -436,6 +468,12 @@ c : {
  * 
  */
 util : {
+    /**
+     *Returns a RGB color based on an integer (0..16 millions?) 
+     */
+    int2rgb: function(i){
+        return [((i >> 16) & 0xFF)/256,((i >> 8) & 0xFF)/256,(i & 0xFF)/256]; 
+    },
     /**
      * Formats Arrays, vec3 and vec4 for display
      * 

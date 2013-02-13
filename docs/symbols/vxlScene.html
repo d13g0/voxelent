@@ -97,6 +97,8 @@
 	
 	<li><a href="../symbols/vxlCameraState.html">vxlCameraState</a></li>
 	
+	<li><a href="../symbols/vxlCell.html">vxlCell</a></li>
+	
 	<li><a href="../symbols/vxlDataStreamReader.html">vxlDataStreamReader</a></li>
 	
 	<li><a href="../symbols/vxlFloor.html">vxlFloor</a></li>
@@ -110,6 +112,8 @@
 	<li><a href="../symbols/vxlLookupTable.html">vxlLookupTable</a></li>
 	
 	<li><a href="../symbols/vxlLookupTableManager.html">vxlLookupTableManager</a></li>
+	
+	<li><a href="../symbols/vxlMesh.html">vxlMesh</a></li>
 	
 	<li><a href="../symbols/vxlModel.html">vxlModel</a></li>
 	
@@ -334,6 +338,30 @@
 							
 							<td class="returns">
 							
+								
+									<span><span class="light fixedFont">{<a href="../symbols/vxlActor.html">vxlActor</a>|null}</span> </span>
+							    
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlScene.html#getActorByCellUID">getActorByCellUID</a></b>
+								(cellUID)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
 							      <span>void</span>   
 							    
 							</td>
@@ -414,6 +442,28 @@
 								
 								<b><a href="../symbols/vxlScene.html#getActorsThat">getActorsThat</a></b>
 								(condition)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlScene.html#getPickableActors">getPickableActors</a></b>
+								()
 								</div>
 							</td>
 							
@@ -656,6 +706,28 @@
 								
 								<b><a href="../symbols/vxlScene.html#setVisualizationMode">setVisualizationMode</a></b>
 								(mode)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlScene.html#updateActor">updateActor</a></b>
+								(actor)
 								</div>
 							</td>
 							
@@ -984,6 +1056,64 @@
 				</div>	
 				
 				<div class='methodDetail'>
+					<a name="getActorByCellUID"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					<span class="light">
+					  {<a href="../symbols/vxlActor.html">vxlActor</a>|null}
+					  </span>
+					
+					
+					
+					  <b>getActorByCellUID</b>(cellUID)
+					</div>
+					</div>
+					<div class="description">
+						Given a cell uid the scene identifies the actor it belongs to. If an actor is not foundthis method returns null
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{String}</span> 
+								</td>
+								<td>
+									<code>cellUID</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+							<p class="heading">Returns:</p>
+							<table class="paramTable">
+							
+								<tr>
+								<td><span class="light fixedFont">{<a href="../symbols/vxlActor.html">vxlActor</a>|null}</span> </td></tr>
+							
+							</table>							
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
 					<a name="getActorByName"> </a>
 					<div class="title">
 					<div class="fixedFont">
@@ -1154,7 +1284,7 @@
 								<td>
 									<code>condition</code>
 								</td>	
-								<td><p>the condition to evaluate in the actor list
+								<td><p>the condition to evaluate in the actor list it receives an actor as a parameter
 								
 								</p>
 								</td>
@@ -1173,6 +1303,37 @@
 								<td><span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>}</span> list of actors</td></tr>
 							
 							</table>							
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="getPickableActors"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>getPickableActors</b>()
+					</div>
+					</div>
+					<div class="description">
+						Return a list with the actors that are currently pickable
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
 						
 						
 						
@@ -1760,6 +1921,54 @@
 				</div>	
 				
 				<div class='methodDetail'>
+					<a name="updateActor"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>updateActor</b>(actor)
+					</div>
+					</div>
+					<div class="description">
+						Recreates the WebGL buffers when an actor has changed its geometry
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>actor</code>
+								</td>	
+								<td><p>the actor to be updated
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
 					<a name="updateScalarRange"> </a>
 					<div class="title">
 					<div class="fixedFont">
@@ -1802,7 +2011,7 @@
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Feb 06 2013 11:59:46 GMT-0500 (EST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Feb 13 2013 17:21:34 GMT-0500 (EST)
 		</div>
         </div>
         </div>

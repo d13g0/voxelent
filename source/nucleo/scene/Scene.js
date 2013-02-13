@@ -208,6 +208,20 @@ vxlScene.prototype.addActor = function(actor){
 };
 
 /**
+ * Recreates the WebGL buffers when an actor has changed its geometry 
+ * @param actor the actor to be updated
+ */
+vxlScene.prototype.updateActor = function(actor){
+    if(!this.hasActor(actor)) return;
+    
+    actor.dirty = true;
+    for(var i = 0; i < this.views.length; i +=1){
+        this.views[i].renderer.reallocate();                
+    }
+    actor.dirty = false;
+};
+
+/**
  * Removes one actor
  * @param actor the actor to be removed from the scene
  */
@@ -340,7 +354,7 @@ vxlScene.prototype.getActorByUID = function(UID){
  * <p><code> condition(vxlActor): returns boolean</code></p>
  * <p>If the condition evaluates true then that actor is included in the results</p>
  * 
- * @param {function} condition the condition to evaluate in the actor list
+ * @param {function} condition the condition to evaluate in the actor list it receives an actor as a parameter
  * @returns {Array} list of actors 
  */
 vxlScene.prototype.getActorsThat = function(condition){
@@ -440,5 +454,31 @@ vxlScene.prototype.getActorNames = function(){
 	return list;
 };
 
+/**
+ * Return a list with the actors that are currently pickable 
+ */
+vxlScene.prototype.getPickableActors = function(){
+    
+    function condition(actor){
+        return actor.isPickable();
+    }
+    
+    return this.getActorsThat(condition);
+};
 
-
+/**
+ * Given a cell uid the scene identifies the actor it belongs to. If an actor is not found
+ * this method returns null 
+ * @param {String} cellUID
+ * @returns {vxlActor|null}
+ * 
+ */
+vxlScene.prototype.getActorByCellUID = function(UID){
+    var list = [];
+    for(var a=0, actorCount = this._actors.length; a < actorCount; a+=1){
+        if (actor.mesh != undefined && actor.mesh.hasCell(UID)){
+            return actor;
+        }
+    }
+    return null;
+};

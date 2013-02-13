@@ -97,6 +97,8 @@
 	
 	<li><a href="../symbols/vxlCameraState.html">vxlCameraState</a></li>
 	
+	<li><a href="../symbols/vxlCell.html">vxlCell</a></li>
+	
 	<li><a href="../symbols/vxlDataStreamReader.html">vxlDataStreamReader</a></li>
 	
 	<li><a href="../symbols/vxlFloor.html">vxlFloor</a></li>
@@ -110,6 +112,8 @@
 	<li><a href="../symbols/vxlLookupTable.html">vxlLookupTable</a></li>
 	
 	<li><a href="../symbols/vxlLookupTableManager.html">vxlLookupTableManager</a></li>
+	
+	<li><a href="../symbols/vxlMesh.html">vxlMesh</a></li>
 	
 	<li><a href="../symbols/vxlModel.html">vxlModel</a></li>
 	
@@ -160,7 +164,7 @@
 				
 				
 
-				Interactor that implements a picking mechanism. Still in development.
+				Interactor that implements a picking mechanism. Implemented in 0.89.1
 
 				
 					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_view_interactor_PickerInteractor.js.html">PickerInteractor.js</a>.
@@ -208,72 +212,6 @@
 								
 								
 								
-								<b><a href="../symbols/vxlPickerInteractor.html#configure">configure</a></b>
-								()
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-							      <span>void</span>   
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
-								<b><a href="../symbols/vxlPickerInteractor.html#connectCamera">connectCamera</a></b>
-								(camera)
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-							      <span>void</span>   
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
-								<b><a href="../symbols/vxlPickerInteractor.html#find">find</a></b>
-								(coords)
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-							      <span>void</span>   
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
 								<b><a href="../symbols/vxlPickerInteractor.html#get2DCoords">get2DCoords</a></b>
 								(ev)
 								</div>
@@ -296,30 +234,8 @@
 								
 								
 								
-								<b><a href="../symbols/vxlPickerInteractor.html#onKeyDown">onKeyDown</a></b>
-								(ev)
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-							      <span>void</span>   
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
-								<b><a href="../symbols/vxlPickerInteractor.html#onKeyUp">onKeyUp</a></b>
-								(ev)
+								<b><a href="../symbols/vxlPickerInteractor.html#getType">getType</a></b>
+								()
 								</div>
 							</td>
 							
@@ -362,52 +278,8 @@
 								
 								
 								
-								<b><a href="../symbols/vxlPickerInteractor.html#onMouseMove">onMouseMove</a></b>
-								(ev)
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-							      <span>void</span>   
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
 								<b><a href="../symbols/vxlPickerInteractor.html#onMouseUp">onMouseUp</a></b>
 								(ev)
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-							      <span>void</span>   
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
-								<b><a href="../symbols/vxlPickerInteractor.html#stop">stop</a></b>
-								()
 								</div>
 							</td>
 							
@@ -497,133 +369,6 @@
 				</h2>
 				
 				<div class='methodDetail'>
-					<a name="configure"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>configure</b>()
-					</div>
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="connectCamera"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>connectCamera</b>(camera)
-					</div>
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-
-					
-
-						
-							<p class="heading">Parameters:</p>
-							<table class="paramTable">
-							
-							<tr><td>
-									
-								</td>
-								<td>
-									<code>camera</code>
-								</td>	
-								<td><p>
-								
-								</p>
-								</td>
-							</tr>	
-							
-							</table>
-						
-						
-						
-						
-						
-						
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="find"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>find</b>(coords)
-					</div>
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-
-					
-
-						
-							<p class="heading">Parameters:</p>
-							<table class="paramTable">
-							
-							<tr><td>
-									
-								</td>
-								<td>
-									<code>coords</code>
-								</td>	
-								<td><p>
-								
-								</p>
-								</td>
-							</tr>	
-							
-							</table>
-						
-						
-						
-						
-						
-						
-						
-				</div>	
-				
-				<div class='methodDetail'>
 					<a name="get2DCoords"> </a>
 					<div class="title">
 					<div class="fixedFont">
@@ -672,7 +417,7 @@
 				</div>	
 				
 				<div class='methodDetail'>
-					<a name="onKeyDown"> </a>
+					<a name="getType"> </a>
 					<div class="title">
 					<div class="fixedFont">
 
@@ -682,7 +427,7 @@
 					
 					
 					
-					  <b>onKeyDown</b>(ev)
+					  <b>getType</b>()
 					</div>
 					</div>
 					<div class="description">
@@ -693,71 +438,6 @@
 
 					
 
-						
-							<p class="heading">Parameters:</p>
-							<table class="paramTable">
-							
-							<tr><td>
-									
-								</td>
-								<td>
-									<code>ev</code>
-								</td>	
-								<td><p>
-								
-								</p>
-								</td>
-							</tr>	
-							
-							</table>
-						
-						
-						
-						
-						
-						
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="onKeyUp"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>onKeyUp</b>(ev)
-					</div>
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-
-					
-
-						
-							<p class="heading">Parameters:</p>
-							<table class="paramTable">
-							
-							<tr><td>
-									
-								</td>
-								<td>
-									<code>ev</code>
-								</td>	
-								<td><p>
-								
-								</p>
-								</td>
-							</tr>	
-							
-							</table>
 						
 						
 						
@@ -782,55 +462,7 @@
 					</div>
 					</div>
 					<div class="description">
-						
-						
-						
-					</div>
-
-					
-
-						
-							<p class="heading">Parameters:</p>
-							<table class="paramTable">
-							
-							<tr><td>
-									
-								</td>
-								<td>
-									<code>ev</code>
-								</td>	
-								<td><p>
-								
-								</p>
-								</td>
-							</tr>	
-							
-							</table>
-						
-						
-						
-						
-						
-						
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="onMouseMove"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>onMouseMove</b>(ev)
-					</div>
-					</div>
-					<div class="description">
-						
+						Reacts to the onmouse event on the canvas
 						
 						
 					</div>
@@ -842,12 +474,12 @@
 							<table class="paramTable">
 							
 							<tr><td>
-									
+									<span class="light fixedFont">{Object}</span> 
 								</td>
 								<td>
 									<code>ev</code>
 								</td>	
-								<td><p>
+								<td><p>mouse event
 								
 								</p>
 								</td>
@@ -878,7 +510,7 @@
 					</div>
 					</div>
 					<div class="description">
-						
+						Reacts to the onmouse up event on the canvas
 						
 						
 					</div>
@@ -890,7 +522,7 @@
 							<table class="paramTable">
 							
 							<tr><td>
-									
+									<span class="light fixedFont">{Object}</span> 
 								</td>
 								<td>
 									<code>ev</code>
@@ -902,37 +534,6 @@
 							</tr>	
 							
 							</table>
-						
-						
-						
-						
-						
-						
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="stop"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>stop</b>()
-					</div>
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-
-					
-
 						
 						
 						
@@ -954,7 +555,7 @@
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Feb 06 2013 11:59:46 GMT-0500 (EST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Feb 13 2013 17:21:34 GMT-0500 (EST)
 		</div>
         </div>
         </div>

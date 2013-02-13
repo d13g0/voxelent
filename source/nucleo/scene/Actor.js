@@ -61,31 +61,36 @@ function vxlActor(model){
   this._scale 		= vec3.create([1, 1, 1]);
   this._rotation 	= vec3.create([0, 0, 0]);
   this._matrix      = mat4.identity();
+  this._renderers   = [];
+  this._gl_buffers  = [];
 
   this.visible      = true;
   this.mode         = vxl.def.actor.mode.SOLID;
+  this.cull         = vxl.def.actor.cull.NONE;
   this.opacity      = 1.0;
-  this.colors       = model?(model.colors!=null?model.colors:null):null;	//it will create colors for this actor once a lookup table had been set up
   this.clones       = 0;
-  
-  this._renderers   = [];
-  this._gl_buffers  = [];
   this.shading      = true;
   this.texture      = undefined;
-  
   this.scene        = undefined;
   
   this._trackingCameras  = [];
+  this._picking     = vxl.def.actor.picking.DISABLED;
+  this._pickingCallback = undefined;
 
+  this.mesh             = undefined;
   
   if (model){
   	this.model 	    = model;
   	this.name 	    = model.name;
   	//In Voxelent JSON format (0.87), the diffuse property has been replaced with color property.
-  	this.color      = model.color!=undefined?model.color:(model.diffuse!=undefined?model.diffuse:undefined); 
+  	this.color      = model.color!=undefined?model.color:(model.diffuse!=undefined?model.diffuse:undefined);
+    this.colors     = model.colors!=undefined?model.colors:undefined;    //it will create colors for this actor once a lookup table had been set up 
   	this.mode       = model.mode;
-  	this._bb         = model.bb.slice(0);
-  	this._centre     = vec3.set(model.centre, vec3.create());
+  	this._bb        = model.bb.slice(0);
+  	this._centre    = vec3.set(model.centre, vec3.create());
+  }
+  else{
+      this.model = new vxlModel();
   }
   
   if (this.mode == vxl.def.actor.mode.TEXTURED){
@@ -225,6 +230,7 @@ vxlActor.prototype.setScale = function(s,a,b){
 
 /**
  * Adds a tracking camera
+ * 
  * @param{vxlCamera} camera the tracking camera
  */
 vxlActor.prototype.addTrackingCamera = function(camera){
@@ -477,6 +483,16 @@ vxlActor.prototype.setVisualizationMode = function(mode){
 };
 
 /**
+ *Sets the culling mode for this actor.
+ * @param {vxl.def.actor.cull} face face needs to be one of the elements defined in vxl.def.actor.cull
+ *  @TODO: VALIDATE
+ */
+vxlActor.prototype.cullFace = function(face){
+    this.cull = face;
+};
+
+
+/**
 * Sets the lookup table for this actor.
 * This method will only succeed if the model that this actor represents has scalars 
 * @param {String} lutID the lookup table id. See {@link vxl.def.lut} for currently supported ids.
@@ -560,5 +576,33 @@ vxlActor.prototype.clone = function(){
 	return duplicate;
 };
 
+/**
+ * 
+ * @param {String} type one of the possible values for vxl.def.actor.picking
+ * @param {Object} callback a function that is invoked when a picking event occurs. This parameter is 
+ * required if the type (first argument) is different from vxl.def.actor.picking.DISABLED 
+ * the callback receives an actor object to operate over it.
+ */
+vxlActor.prototype.setPicker = function(type, callback){
+    this._picking = type;
+    
+    if (type != vxl.def.actor.picking.DISABLED){
+        this._pickingCallback = callback;
+    }
+    else{
+        this._pickingCallback = undefined;
+    }
+    
+    if (this._picking == vxl.def.actor.picking.CELL && this.mesh == undefined){
+        this.mesh = new vxlMesh(this.model);
+    }
+};
 
+/**
+ * Reports if the current actor is pickable or not
+ *   
+ */
+vxlActor.prototype.isPickable = function(){
+    return (this._picking  != vxl.def.actor.picking.DISABLED);  
+};
 

@@ -1,16 +1,74 @@
 -------------------------------------------------------------------------------------------
-VERSION 0.89.1 - Network ops + Camera bug fixes
+VERSION 0.89.1 - Lots of stuff
 -------------------------------------------------------------------------------------------
 
 document_plexo.py has been renamed to document.py now all the subprojects get documented at the same 
-time so we don't miss anything.
+time so we don't miss anything.
+
+New classes in Nucleo
+----------------------
+vxlMesh: enables cell by cell operations (triangles) on raw geometry (model)
+vxlCell: elements of a vxlMesh
+vxlPicker: handles picking
+
 
 New classes in Plexo
 ----------------------
 vxlDataStreamReader : encapsulates a data source
    |
    + -- vxlJSONReader: reads a JSON data source
+
+New classes in Nucleo
+----------------------
+vxlMesh
+vxlCell
+vxlPicker
+vxlPickerInteractor
+vxlRenderTarget
+
+Actor Updates
+---------------
+
+1. Face culling
+vxlActor supports now back face and front face culling:
+
+var actor = vxl.c.scene.getActorByName('sphere'); //from the current scene
+actor.cullFace(vxl.def.actor.cull.BACK); //hides the back face.
+
+2. New actor visualization methods
+
+Now actors can be visualized with the wireframe overlaid on top of the solid geometry:
+
+actor.setVisualizationMode(vxl.def.actor.mode.WIRED_AND_SOLID)
+
+Also flat shading is available:
+actor.setVisualizationMode(vxl.def.actor.mode.FLAT)
+
    
+Picking API
+-------------
+
+Picking is available at the object and cell levels:
+
+actor._picking = vxl.def.actor.picking.CELL
+                 vxl.def.actor.picking.OBJECT (to be implemented in 0.90)
+                 vxl.def.actor.picking.DISABLED
+                 
+
+actor.setPicker(type, callback)
+
+actor.isPickable() : returns true if actor._picking != vxl.def.actor.picking.DISABLED
+
+vxlPickerInteractor
+---------------------
+the vxlPickerInteractor is fully implemented. An example of how to use it is in the test-cell-picking.html file under demos 
+
+Strategy Pattern
+------------------
+The lambert and phong strategies are going to be merged in the next version. In this version
+you can see the intense effort made to make the lambert strategy more readable and easy to debug.
+
+
 
 
 -------------------------------------------------------------------------------------------

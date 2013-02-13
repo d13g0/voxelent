@@ -97,6 +97,8 @@
 	
 	<li><a href="../symbols/vxlCameraState.html">vxlCameraState</a></li>
 	
+	<li><a href="../symbols/vxlCell.html">vxlCell</a></li>
+	
 	<li><a href="../symbols/vxlDataStreamReader.html">vxlDataStreamReader</a></li>
 	
 	<li><a href="../symbols/vxlFloor.html">vxlFloor</a></li>
@@ -110,6 +112,8 @@
 	<li><a href="../symbols/vxlLookupTable.html">vxlLookupTable</a></li>
 	
 	<li><a href="../symbols/vxlLookupTableManager.html">vxlLookupTableManager</a></li>
+	
+	<li><a href="../symbols/vxlMesh.html">vxlMesh</a></li>
 	
 	<li><a href="../symbols/vxlModel.html">vxlModel</a></li>
 	
@@ -276,6 +280,28 @@
 								
 								
 								
+								<b><a href="../symbols/vxlActor.html#cullFace">cullFace</a></b>
+								(face)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
 								<b><a href="../symbols/vxlActor.html#flipNormals">flipNormals</a></b>
 								()
 								</div>
@@ -374,6 +400,28 @@
 								
 								<b><a href="../symbols/vxlActor.html#getProperty">getProperty</a></b>
 								(property)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActor.html#isPickable">isPickable</a></b>
+								()
 								</div>
 							</td>
 							
@@ -552,6 +600,28 @@
 								
 								<b><a href="../symbols/vxlActor.html#setOpacity">setOpacity</a></b>
 								(o)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActor.html#setPicker">setPicker</a></b>
+								(type, callback)
 								</div>
 							</td>
 							
@@ -950,6 +1020,54 @@
 				</div>	
 				
 				<div class='methodDetail'>
+					<a name="cullFace"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>cullFace</b>(face)
+					</div>
+					</div>
+					<div class="description">
+						Sets the culling mode for this actor.
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{<a href="../symbols/vxl.def.actor.html#.cull">vxl.def.actor.cull</a>}</span> 
+								</td>
+								<td>
+									<code>face</code>
+								</td>	
+								<td><p>face needs to be one of the elements defined in vxl.def.actor.cull
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
 					<a name="flipNormals"> </a>
 					<div class="title">
 					<div class="fixedFont">
@@ -1156,6 +1274,37 @@
 								<td><span class="light fixedFont">{Object}</span> the property or undefined if the property is not found</td></tr>
 							
 							</table>							
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="isPickable"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>isPickable</b>()
+					</div>
+					</div>
+					<div class="description">
+						Reports if the current actor is pickable or not
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
 						
 						
 						
@@ -1571,6 +1720,66 @@
 									<code>o</code>
 								</td>	
 								<td><p>a float value between 0 and 1.
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="setPicker"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setPicker</b>(type, callback)
+					</div>
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{String}</span> 
+								</td>
+								<td>
+									<code>type</code>
+								</td>	
+								<td><p>one of the possible values for vxl.def.actor.picking
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									<span class="light fixedFont">{Object}</span> 
+								</td>
+								<td>
+									<code>callback</code>
+								</td>	
+								<td><p>a function that is invoked when a picking event occurs. This parameter is required if the type (first argument) is different from vxl.def.actor.picking.DISABLED the callback receives an actor object to operate over it.
 								
 								</p>
 								</td>
@@ -2126,7 +2335,7 @@
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Feb 06 2013 11:59:45 GMT-0500 (EST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Feb 13 2013 17:21:33 GMT-0500 (EST)
 		</div>
         </div>
         </div>

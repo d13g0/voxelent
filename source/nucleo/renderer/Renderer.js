@@ -40,7 +40,8 @@ function vxlRenderer(vw){
     this._time          = 0;
     this._startDate     = 0;
     this._running       = false;
-    
+    this._clearColor    = undefined;
+    this._renderTarget  = undefined;
     this.setProgram(vxl.def.glsl.lambert, vxlLambertStrategy);
     
 }
@@ -91,10 +92,7 @@ vxlRenderer.prototype._initializeGLContext = function(gl){
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.depthFunc(gl.LESS);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-}
-
-
-
+};
 
 
 /**
@@ -252,6 +250,7 @@ vxlRenderer.prototype.setRenderRate = function(rate){ //rate in ms
  * @see vxlView#setBackgroundColor
  */
 vxlRenderer.prototype.clearColor = function(cc){
+    this._clearColor = cc.slice(0);
 	this.gl.clearColor(cc[0], cc[1], cc[2], 1.0);
 };
 
@@ -283,6 +282,27 @@ vxlRenderer.prototype.render = function(){
         this.fps = Math.round((this.fps * 0.80 + (1000.0/elapsed) * 0.2)* 100)/100;
     }
     
-    $('#'+this.view.name+'-fps').html(this.fps);
+};
+
+/**
+ * Reallocates the actors marked as dirty, without requiring rerendering. This mechanism allows
+ * to update the GL buffers for dirty actors. 
+ */
+vxlRenderer.prototype.reallocate = function(){
+  this.strategy.allocate(this.view.scene);  
+};
+
+
+vxlRenderer.prototype.disableOffscreen = function(){
+    this.strategy.disableOffscreen();
+};
+
+
+/**
+ *Sets the render target for this renderer 
+ */
+vxlRenderer.prototype.enableOffscreen = function(){
+    this._renderTarget = new vxlRenderTarget(this);
+    this.strategy.enableOffscreen(this._renderTarget);    
 };
 

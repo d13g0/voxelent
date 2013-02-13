@@ -25,8 +25,8 @@
  */
 function vxlModel(name, JSON_OBJECT){
 	this.name       = name;
-	this.indices 	= null;
-	this.vertices 	= null;
+	this.indices 	= [];
+	this.vertices 	= [];
 	this.scalars 	= null;
 	this.diffuse	= null;
 	this.normals 	= null;
@@ -36,6 +36,7 @@ function vxlModel(name, JSON_OBJECT){
 	this.mode       = null;
 	this.image      = null;
 	this.uri        = null;
+	this.colors     = [];
 	    
     if (JSON_OBJECT != undefined){
         this.load(this.name, JSON_OBJECT);

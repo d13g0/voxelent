@@ -97,6 +97,8 @@
 	
 	<li><a href="../symbols/vxlCameraState.html">vxlCameraState</a></li>
 	
+	<li><a href="../symbols/vxlCell.html">vxlCell</a></li>
+	
 	<li><a href="../symbols/vxlDataStreamReader.html">vxlDataStreamReader</a></li>
 	
 	<li><a href="../symbols/vxlFloor.html">vxlFloor</a></li>
@@ -110,6 +112,8 @@
 	<li><a href="../symbols/vxlLookupTable.html">vxlLookupTable</a></li>
 	
 	<li><a href="../symbols/vxlLookupTableManager.html">vxlLookupTableManager</a></li>
+	
+	<li><a href="../symbols/vxlMesh.html">vxlMesh</a></li>
 	
 	<li><a href="../symbols/vxlModel.html">vxlModel</a></li>
 	
@@ -223,7 +227,7 @@
 
 				
 				<dl class="inheritsList">
-				<dt>Methods borrowed from class <code><a href="../symbols/vxlActor.html">vxlActor</a></code>: </dt><dd><code><a href="../symbols/vxlActor.html#addTrackingCamera">addTrackingCamera</a></code>, <code><a href="../symbols/vxlActor.html#clone">clone</a></code>, <code><a href="../symbols/vxlActor.html#computePosition">computePosition</a></code>, <code><a href="../symbols/vxlActor.html#flipNormals">flipNormals</a></code>, <code><a href="../symbols/vxlActor.html#getBoundingBox">getBoundingBox</a></code>, <code><a href="../symbols/vxlActor.html#getBoundingBoxVertices">getBoundingBoxVertices</a></code>, <code><a href="../symbols/vxlActor.html#getHeight">getHeight</a></code>, <code><a href="../symbols/vxlActor.html#getProperty">getProperty</a></code>, <code><a href="../symbols/vxlActor.html#isVisible">isVisible</a></code>, <code><a href="../symbols/vxlActor.html#removeTrackingCamera">removeTrackingCamera</a></code>, <code><a href="../symbols/vxlActor.html#rotateX">rotateX</a></code>, <code><a href="../symbols/vxlActor.html#rotateY">rotateY</a></code>, <code><a href="../symbols/vxlActor.html#rotateZ">rotateZ</a></code>, <code><a href="../symbols/vxlActor.html#setColor">setColor</a></code>, <code><a href="../symbols/vxlActor.html#setLookupTable">setLookupTable</a></code>, <code><a href="../symbols/vxlActor.html#setOpacity">setOpacity</a></code>, <code><a href="../symbols/vxlActor.html#setPosition">setPosition</a></code>, <code><a href="../symbols/vxlActor.html#setProperty">setProperty</a></code>, <code><a href="../symbols/vxlActor.html#setScale">setScale</a></code>, <code><a href="../symbols/vxlActor.html#setScene">setScene</a></code>, <code><a href="../symbols/vxlActor.html#setShading">setShading</a></code>, <code><a href="../symbols/vxlActor.html#setTexture">setTexture</a></code>, <code><a href="../symbols/vxlActor.html#setVisible">setVisible</a></code>, <code><a href="../symbols/vxlActor.html#setVisualizationMode">setVisualizationMode</a></code>, <code><a href="../symbols/vxlActor.html#translate">translate</a></code></dd>
+				<dt>Methods borrowed from class <code><a href="../symbols/vxlActor.html">vxlActor</a></code>: </dt><dd><code><a href="../symbols/vxlActor.html#addTrackingCamera">addTrackingCamera</a></code>, <code><a href="../symbols/vxlActor.html#clone">clone</a></code>, <code><a href="../symbols/vxlActor.html#computePosition">computePosition</a></code>, <code><a href="../symbols/vxlActor.html#cullFace">cullFace</a></code>, <code><a href="../symbols/vxlActor.html#flipNormals">flipNormals</a></code>, <code><a href="../symbols/vxlActor.html#getBoundingBox">getBoundingBox</a></code>, <code><a href="../symbols/vxlActor.html#getBoundingBoxVertices">getBoundingBoxVertices</a></code>, <code><a href="../symbols/vxlActor.html#getHeight">getHeight</a></code>, <code><a href="../symbols/vxlActor.html#getProperty">getProperty</a></code>, <code><a href="../symbols/vxlActor.html#isPickable">isPickable</a></code>, <code><a href="../symbols/vxlActor.html#isVisible">isVisible</a></code>, <code><a href="../symbols/vxlActor.html#removeTrackingCamera">removeTrackingCamera</a></code>, <code><a href="../symbols/vxlActor.html#rotateX">rotateX</a></code>, <code><a href="../symbols/vxlActor.html#rotateY">rotateY</a></code>, <code><a href="../symbols/vxlActor.html#rotateZ">rotateZ</a></code>, <code><a href="../symbols/vxlActor.html#setColor">setColor</a></code>, <code><a href="../symbols/vxlActor.html#setLookupTable">setLookupTable</a></code>, <code><a href="../symbols/vxlActor.html#setOpacity">setOpacity</a></code>, <code><a href="../symbols/vxlActor.html#setPicker">setPicker</a></code>, <code><a href="../symbols/vxlActor.html#setPosition">setPosition</a></code>, <code><a href="../symbols/vxlActor.html#setProperty">setProperty</a></code>, <code><a href="../symbols/vxlActor.html#setScale">setScale</a></code>, <code><a href="../symbols/vxlActor.html#setScene">setScene</a></code>, <code><a href="../symbols/vxlActor.html#setShading">setShading</a></code>, <code><a href="../symbols/vxlActor.html#setTexture">setTexture</a></code>, <code><a href="../symbols/vxlActor.html#setVisible">setVisible</a></code>, <code><a href="../symbols/vxlActor.html#setVisualizationMode">setVisualizationMode</a></code>, <code><a href="../symbols/vxlActor.html#translate">translate</a></code></dd>
 				</dl>
 				
 			
@@ -343,7 +347,7 @@
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Feb 06 2013 11:59:46 GMT-0500 (EST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Feb 13 2013 17:21:34 GMT-0500 (EST)
 		</div>
         </div>
         </div>

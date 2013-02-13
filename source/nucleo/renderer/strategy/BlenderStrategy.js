@@ -109,6 +109,17 @@ vxlBlenderStrategy.prototype._renderActor = function(actor){
 	var trx 	= r.transforms;
 	var glsl    = vxl.def.glsl;
 	
+	gl.disable(gl.CULL_FACE);
+    
+    if (actor.cull != vxl.def.actor.cull.NONE){
+        gl.enable(gl.CULL_FACE);
+        
+        switch (actor.cull){
+            case vxl.def.actor.cull.BACK: gl.cullFace(gl.BACK); break;
+            case vxl.def.actor.cull.FRONT: gl.cullFace(gl.FRONT); break;
+        }
+    }
+    
 	this._applyActorTransform(actor);
 	
 	prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);

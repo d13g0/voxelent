@@ -89,6 +89,17 @@ vxlPhongStrategy.prototype._renderActor = function(actor){
 	var trx 	= r.transforms;
 	var glsl    = vxl.def.glsl;
 	
+	gl.disable(gl.CULL_FACE);
+    
+    if (actor.cull != vxl.def.actor.cull.NONE){
+        gl.enable(gl.CULL_FACE);
+        
+        switch (actor.cull){
+            case vxl.def.actor.cull.BACK: gl.cullFace(gl.BACK); break;
+            case vxl.def.actor.cull.FRONT: gl.cullFace(gl.FRONT); break;
+        }
+    }
+    
 	if (actor.mode != vxl.def.actor.mode.BOUNDING_BOX &&
         actor.mode != vxl.def.actor.mode.BB_AND_SOLID){
        this._applyActorTransform(actor);
@@ -227,6 +238,21 @@ vxlPhongStrategy.prototype._renderActor = function(actor){
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.getBoundingBoxVertices()), gl.STATIC_DRAW);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.bb);
             gl.drawElements(gl.LINES, vxlModel.BB_INDICES.length, gl.UNSIGNED_SHORT,0);
+        }
+        else if (actor.mode == vxl.def.actor.mode.WIRED_AND_SOLID){
+            
+            
+            prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
+            prg.setUniform("uUseShading",actor.shading);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+            gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
+            
+            prg.setUniform("uUseShading",false);
+            prg.setUniform("uMaterialDiffuse",[0.9,0.9,0.9,1.0]);
+            prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
+            gl.drawElements(gl.LINES, model.wireframe.length, gl.UNSIGNED_SHORT,0);
         }
 		else if (actor.mode == vxl.def.actor.mode.POINTS){
 			prg.setUniform("uUseShading", true);

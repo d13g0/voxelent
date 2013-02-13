@@ -164,9 +164,7 @@ function animate(){
    border: 0px;
 }
 
-.overlay #view-1-fps{
-    display:none;
-}
+
 
 </style> 
 </head>
@@ -181,7 +179,6 @@ function animate(){
     
     
     <div id = 'overlay-div' class='overlay'>
-      <p id='view-1-fps'></p>        
       <p><input type='checkbox' id='toggleAnimation'/><label for='toggleAnimation'>Stop Animation</label></p>
       <p>Please select one lookup table</p>
       <select id='lutPicker'></select>
@@ -204,18 +201,6 @@ $('#toggleAnimation').button().click(
     }
 );
 
-var fpsshown = false;
-$(document).keydown(function(event){
-   if (event.keyCode == 70){
-       if(fpsshown){
-            $('#view-1-fps').hide();
-       }
-       else{
-           $('#view-1-fps').show();
-       }
-       fpsshown = !fpsshown;
-   } 
-});
 </script>    
 </body>			
 </html>

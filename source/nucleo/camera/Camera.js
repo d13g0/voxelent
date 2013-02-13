@@ -122,14 +122,18 @@ vxlCamera.prototype.setTrackingMode = function(mode){
 /**
  * Follows a given actor. If this operation is called on an ORBITING camera,
  * the camera type will change to be a TRACKING camera.
+ * 
  * @param {vxlActor} actor actor to track
  * @param {String} trackingMode one of the possible values of <code>vxl.def.camera.tracking</code>
  * @see {vxlCamera#setType, vxl.def.camera.tracking}
  */
 vxlCamera.prototype.follow = function(actor, trackingMode){
     this.setType(vxl.def.camera.type.TRACKING, trackingMode);
+    if (actor == undefined || actor == null){
+        alert("vxlCamera.follow: Unable to follow undefined/null actor");
+        console.error("vxlCamera.follow: Unable to follow undefined/null actor");
+    }
     this._following = actor;
-    
     actor.addTrackingCamera(this);
 };
 

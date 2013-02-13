@@ -23,8 +23,8 @@ vxlTrackerInteractor.prototype.constructor = vxlViewInteractor;
  * Interprets mouse and keyboard events and translate them to camera actions
  * @augments vxlViewInteractor
  */
-function vxlTrackerInteractor(view,camera){
-    vxlViewInteractor.call(this, view, camera);    
+function vxlTrackerInteractor(){
+    vxlViewInteractor.call(this);    
 	this.MOTION_FACTOR = 10.0;
 	this.task = vxl.def.interactor.task.NONE;
 	this.x = 0;

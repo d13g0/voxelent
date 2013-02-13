@@ -62,7 +62,9 @@ function vxlView(canvasID, scene, handleLayout){
 	this.cameraman = new vxlCameraManager(this);
 	
 	//Create View Interactor
-	this.interactor = new vxlTrackerInteractor(this);
+	this.interactor = new vxlTrackerInteractor();
+	
+	this.interactor.connectView(this);
 	
 	//Create Scene
 	if (scene != null && scene instanceof vxlScene){

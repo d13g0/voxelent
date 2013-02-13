@@ -63,11 +63,15 @@ version :
  * @namespace Voxelent Default/Definition Objects
  * @property {vxl.def.glsl}     glsl    GLSL constants
  * @property {vxl.def.lut}      lut     Lookup Table Definitions
- * @property {vxl.def.model}    model   Default values for models
+ * @property {vxl.def.model}    model   Default          values for models
  * @property {vxl.def.view}     view    Default values for views 
  * 
  */
 def : {
+    /**
+     * Pi divided by 2
+     */
+    piOver2: Math.PI /2,
     /**
      * Multiplicative constant to convert degrees to radians
      */
@@ -103,7 +107,8 @@ def : {
 						VERTEX_ATTRIBUTE    : 'aVertexPosition',
 						NORMAL_ATTRIBUTE    : 'aVertexNormal',
 						COLOR_ATTRIBUTE     : 'aVertexColor',
-						TEXCOORD_ATTRIBUTE  : 'aVertexTextureCoords'
+						TEXCOORD_ATTRIBUTE  : 'aVertexTextureCoords',
+						PICKING_COLOR_ATTRIBUTE : 'aVertexPickingColor'
 					},
     /** 
      * @namespace Lookup Table Definitions 
@@ -185,6 +190,9 @@ def : {
                          * <li><code>POINTS</code></li> 
                          * <li><code>LINES</code></li>
                          * <li><code>BOUNDING_BOX</code> (added in 0.88.1)</li>
+                         * <li><code>BB_AND_SOLID</code> (added in 0.89)</li>
+                         * <li><code>WIRED_AND_SOLID</code> (added in 0.89.1)</li>
+                         * <li><code>FLAT</code> (added in 0.89.1)</li>
                          * </ul>
                          * </p>
                          * <p> to set the actor mode you should use the <code>{@link vxlActor#setVisualizationMode}</code>
@@ -203,7 +211,31 @@ def : {
 						        POINTS:'POINTS', 
 						        LINES:'LINES', 
 						        BOUNDING_BOX:'BOUNDING_BOX',
-						        BB_AND_SOLID:'BBANDSOLID'
+						        BB_AND_SOLID:'BBANDSOLID',
+						        WIRED_AND_SOLID:'WIRED_AND_SOLID',
+						        FLAT:'FLAT',
+						 },
+						 /**
+						  *  <p>Defines the culling modes available for instances of vxlActor</p> 
+                          *  <p>These modes can be BACK,FRONT or NONE</p>
+                          *  <pre class='prettyprint'>
+                          *   var actor = vxl.c.scene.getActorByName('sphere'); //from the current scene
+                          *   actor.cullFace(vxl.def.actor.cull.BACK); //hides the back face.
+                          *  </pre>
+						  */
+						 cull:{
+						     BACK:'BACK',
+						     FRONT:'FRONT',
+						     NONE:'NONE'
+						 },
+						 
+						 /**
+						  * <p>Defines the picking modes available for <code>vxlActor</code></p> 
+						  */
+						 picking: {
+						     DISABLED:'DISABLED',
+						     CELL:'CELL',
+						     OBJECT:'OBJECT'
 						 }
 						
 					},
@@ -436,6 +468,12 @@ c : {
  * 
  */
 util : {
+    /**
+     *Returns a RGB color based on an integer (0..16 millions?) 
+     */
+    int2rgb: function(i){
+        return [((i >> 16) & 0xFF)/256,((i >> 8) & 0xFF)/256,(i & 0xFF)/256]; 
+    },
     /**
      * Formats Arrays, vec3 and vec4 for display
      * 
@@ -4241,14 +4279,18 @@ vxlCamera.prototype.setTrackingMode = function(mode){
 /**
  * Follows a given actor. If this operation is called on an ORBITING camera,
  * the camera type will change to be a TRACKING camera.
+ * 
  * @param {vxlActor} actor actor to track
  * @param {String} trackingMode one of the possible values of <code>vxl.def.camera.tracking</code>
  * @see {vxlCamera#setType, vxl.def.camera.tracking}
  */
 vxlCamera.prototype.follow = function(actor, trackingMode){
     this.setType(vxl.def.camera.type.TRACKING, trackingMode);
+    if (actor == undefined || actor == null){
+        alert("vxlCamera.follow: Unable to follow undefined/null actor");
+        console.error("vxlCamera.follow: Unable to follow undefined/null actor");
+    }
     this._following = actor;
-    
     actor.addTrackingCamera(this);
 };
 
@@ -4987,17 +5029,10 @@ vxlCameraManager.prototype._checkBoundary = function(idx){
  * @class
  * @constructor 
  */
-function vxlViewInteractor(view, camera){
-    this.view   = view;
-	this.camera = camera;
-	
-	if (view != undefined){
-	   this.connectView(view);
-	}
-	
-	if (camera != undefined){
-	    this.connectCamera(camera);
-	}
+function vxlViewInteractor(){
+    this.view   = undefined;
+	this.camera = undefined;
+	this.UID    = vxl.util.generateUID();
 };
 
 /**
@@ -5149,8 +5184,8 @@ vxlTrackerInteractor.prototype.constructor = vxlViewInteractor;
  * Interprets mouse and keyboard events and translate them to camera actions
  * @augments vxlViewInteractor
  */
-function vxlTrackerInteractor(view,camera){
-    vxlViewInteractor.call(this, view, camera);    
+function vxlTrackerInteractor(){
+    vxlViewInteractor.call(this);    
 	this.MOTION_FACTOR = 10.0;
 	this.task = vxl.def.interactor.task.NONE;
 	this.x = 0;
@@ -5428,188 +5463,97 @@ vxlTrackerInteractor.prototype.pan = function(dx,dy){
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/  
 
-vxlPickerInteractor.prototype = new vxlTrackerInteractor();
+vxlPickerInteractor.prototype = new vxlViewInteractor();
 vxlPickerInteractor.prototype.constructor = vxlPickerInteractor;
 /**
  * @class 
- * Interactor that implements a picking mechanism. Still in development.
+ * Interactor that implements a picking mechanism. Implemented in 0.89.1
  * @constructor   
  * @param {Object} view the view this interactor will observe
  * @param {Object} camera the camera this interactor will master
  * @author Diego Cantor
  */
-function vxlPickerInteractor(view, camera){
-	vxlTrackerInteractor.call(this, view, camera);
-	this.plist 					= [];
-	this.texture 				= null;
-	this.framebuffer 			= null;
-	this.renderbuffer 			= null;
-	this.hitPropertyCallback 	= null;
-	this.processHitsCallback 	= null;
-	this.addHitCallback 		= null;
-	this.removeHitCallback 		= null;
-	this.moveCallback 			= null;
-	this.picking 				= false;
-    this.connectCamera(camera);
+function vxlPickerInteractor(){
+	vxlViewInteractor.call(this);
 };
 
-vxlPickerInteractor.prototype.connectCamera = function(camera){
-	vxlViewInteractor.prototype.connectCamera.apply(this, camera);
-	if (this.camera){
-		this.configure();
-	}
+
+vxlPickerInteractor.prototype.getType = function(){
+    return "vxlPickerInteractor";
 };
-
-vxlPickerInteractor.prototype.configure = function(){
-	
-	var gl = this.camera.view.renderer.gl;
-	
-	var width = 512*4; //@TODO get size from this.camera.view.canvas
-	var height = 512*4;
-	
-	//1. Init Picking Texture
-	this.texture = gl.createTexture();
-	gl.bindTexture(gl.TEXTURE_2D, this.texture);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-	
-	//2. Init Render Buffer
-	this.renderbuffer = gl.createRenderbuffer();
-    gl.bindRenderbuffer(gl.RENDERBUFFER, this.renderbuffer);
-    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
-	
-    
-    //3. Init Frame Buffer
-    this.framebuffer = gl.createFramebuffer();
-	gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texture, 0);
-    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.renderbuffer);
-	
-
-	//4. Clean up
-	gl.bindTexture(gl.TEXTURE_2D, null);
-    gl.bindRenderbuffer(gl.RENDERBUFFER, null);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    
-    //5. Assign random colors to object in current scene
-    //for(var i=0, max = this.view.scene._actors.length; i<max; i+=1){
-    	//this
-   // }
-};
-
 
 vxlPickerInteractor.prototype.get2DCoords = function(ev){
-	var x, y, top = 0, left = 0, obj = this.camera.view.canvas;
-
-	while (obj && obj.tagName != 'BODY') {
-		top += obj.offsetTop;
-		left += obj.offsetLeft;
-		obj = obj.offsetParent;
-	}
-    
-    left += window.pageXOffset;
-    top  += window.pageYOffset;
- 
-	// return relative mouse position
-	x = ev.clientX - left;
-	y = c_height - (ev.clientY - top); //c_height is a global variable that we maintain in codeview.js
+    var x, y, top = 0, left = 0, obj = this.view.canvas;
+    var rect = obj.getBoundingClientRect();
+     
+    // return relative mouse position
+    x = ev.clientX - rect.left;
+    y = vxl.c.view.canvas.height - (ev.clientY - rect.top); 
                                        //this variable contains the height of the canvas and it updates dynamically
                                        //as we resize the browser window.
-	
-	return {x:x,y:y};
+    console.info('x='+x+', y='+y);
+    return {x:x,y:y};
 };
 
-vxlPickerInteractor.prototype._compare = function(readout, color){
-    vxl.go.console('PickerInteractor: comparing object '+object.alias+' diffuse ('+Math.round(color[0]*255)+','+Math.round(color[1]*255)+','+Math.round(color[2]*255)+') == readout ('+ readout[0]+','+ readout[1]+','+ readout[2]+')');
-    return (Math.abs(Math.round(color[0]*255) - readout[0]) <= 1 &&
-			Math.abs(Math.round(color[1]*255) - readout[1]) <= 1 && 
-			Math.abs(Math.round(color[2]*255) - readout[2]) <= 1);
-};
 
-vxlPickerInteractor.prototype.find = function(coords){
-	
-	var gl = this.camera.view.renderer.gl;
-	//read one pixel
-	var readout = new Uint8Array(1 * 1 * 4);
-	gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
-	gl.readPixels(coords.x,coords.y,1,1,gl.RGBA,gl.UNSIGNED_BYTE,readout);
-	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-    var found = false;
-    var scene = this.view.scene;
-    if (this.hitPropertyCallback == undefined) {alert('The picker needs an object property to perform the comparison'); return;}
-
-    for(var i = 0, max = scene._actors.length; i < max; i+=1){
-        var ob = scene._actors[i];
-        if (ob.name == 'floor') continue;
-                
-        var property  = this.hitPropertyCallback(ob);
+/**
+ *  Reacts to the onmouse up event on the canvas
+ * @param {Object} ev
+ */
+vxlPickerInteractor.prototype.onMouseUp   = function(ev){
     
-        if (this._compare(readout, property)){
-            var idx  = this.plist.indexOf(ob);
-            if (idx != -1){
-                this.plist.splice(idx,1);
-                if (this.removeHitCallback){
-                    this.removeHitCallback(ob); 
-                }
-            }
-            else {
-                this.plist.push(ob);
-                if (this.addHitCallback){
-                    this.addHitCallback(ob); 
-                }
-            }
-            found = true;
-            break;
+    var rt     = this.view.renderer._renderTarget;
+    var coords = this.get2DCoords(ev);
+    var color  = rt.readPixel(coords);
+    
+    
+    var results = vxl.go.picker.query(color);
+    
+    if (results == null) return;
+    
+    var actor  = this.view.scene.getActorByCellUID(results.uid);
+    
+    if (actor != null){
+        console.info('vxlPickerInteractor: actor ['+actor.name+'] has been picked');
+       
+        if (actor.isPickable()){
+            actor._pickingCallback(actor, results.uid);
         }
     }
-    draw();
-    return found;
 };
 
-vxlPickerInteractor.prototype.stop = function(){
-    if (this.processHitsCallback != null && this.plist.length > 0){
-        this.processHitsCallback(this.plist);
-    }
-    this.plist = [];
+/**
+ * Reacts to the onmouse event on the canvas 
+ * @param {Object} ev mouse event
+ */
+vxlPickerInteractor.prototype.onMouseDown = function(ev){ 
+    
 };
 
-vxlPickerInteractor.prototype.onMouseUp = function(ev){
-	if(!ev.shiftKey){
-		this.stop();
-	}
+/**
+ * Reacts to the onmouse move event on the canvas  
+ * @param {Object} ev
+ */
+vxlViewInteractor.prototype.onMouseMove = function(ev){ 
+
 };
 
-vxlPickerInteractor.prototype.onMouseDown = function(ev){
-	var coords = this.get2DCoords(ev);
-	this.picking = this.find(coords);
-	if(!this.picking){
-		this.stop();
-	}
+/**
+ * Reacts to the key down event 
+ * @param {Object} ev
+ */
+vxlViewInteractor.prototype.onKeyDown   = function(ev){
+    
 };
 
-vxlPickerInteractor.prototype.onMouseMove = function(ev){
-	this.lastX = this.x;
-	this.lastY = this.y;
-	this.x = ev.clientX;
-	this.y = ev.clientY;
-	var dx = this.x - this.lastX;
-	var dy = this.y - this.lastY;
-	if(this.picking && this.moveCallback){
-		this.moveCallback(this, dx,dy);
-	}
+/**
+ * Abstract method to be implemented by the descendants 
+ * @param {Object} ev
+ */
+vxlViewInteractor.prototype.onKeyUp     = function(ev){ 
+
 };
 
-vxlPickerInteractor.prototype.onKeyDown = function(ev){
-	//@TODO: ENTER AND EXIT PICKING MODE MANUALLY
-	//this.view.listener.setInteractor(previous)
-};
-
-vxlPickerInteractor.prototype.onKeyUp = function(ev){
-	
-};
 
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
@@ -5735,7 +5679,8 @@ vxl.def.glsl.lambert = {
 	"aVertexPosition", 
 	"aVertexColor", 
 	"aVertexNormal",
-	"aVertexTextureCoords"],
+	"aVertexTextureCoords",
+	"aVertexPickingColor"],
 	
 	UNIFORMS : [
 	"mModelView",
@@ -5751,7 +5696,8 @@ vxl.def.glsl.lambert = {
 	"uUseShading",
 	"uUseTextures",
 	"uUseLightTranslation",
-	"uSampler"],
+	"uSampler"
+	],
 	
 	
     VERTEX_SHADER : [
@@ -5760,6 +5706,7 @@ vxl.def.glsl.lambert = {
 	"attribute vec3 aVertexNormal;",
 	"attribute vec3 aVertexColor;",
 	"attribute vec2 aVertexTextureCoords;",
+	"attribute vec3 aVertexPickingColor;",
     "uniform float uPointSize;",
 	"uniform mat4 mModelView;",
 	"uniform mat4 mPerspective;",
@@ -5779,6 +5726,7 @@ vxl.def.glsl.lambert = {
     "void main(void) {",
     "	gl_Position = mModelViewPerspective * vec4(aVertexPosition, 1.0);",
     "	gl_PointSize = uPointSize;",
+    
     "	if (uUseVertexColors) {",
     "		vFinalColor = vec4(aVertexColor,1.0);",
     "	}",
@@ -6659,7 +6607,8 @@ function vxlRenderer(vw){
     this._time          = 0;
     this._startDate     = 0;
     this._running       = false;
-    
+    this._clearColor    = undefined;
+    this._renderTarget  = undefined;
     this.setProgram(vxl.def.glsl.lambert, vxlLambertStrategy);
     
 }
@@ -6710,10 +6659,7 @@ vxlRenderer.prototype._initializeGLContext = function(gl){
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.depthFunc(gl.LESS);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-}
-
-
-
+};
 
 
 /**
@@ -6871,6 +6817,7 @@ vxlRenderer.prototype.setRenderRate = function(rate){ //rate in ms
  * @see vxlView#setBackgroundColor
  */
 vxlRenderer.prototype.clearColor = function(cc){
+    this._clearColor = cc.slice(0);
 	this.gl.clearColor(cc[0], cc[1], cc[2], 1.0);
 };
 
@@ -6902,9 +6849,111 @@ vxlRenderer.prototype.render = function(){
         this.fps = Math.round((this.fps * 0.80 + (1000.0/elapsed) * 0.2)* 100)/100;
     }
     
-    $('#'+this.view.name+'-fps').html(this.fps);
 };
 
+/**
+ * Reallocates the actors marked as dirty, without requiring rerendering. This mechanism allows
+ * to update the GL buffers for dirty actors. 
+ */
+vxlRenderer.prototype.reallocate = function(){
+  this.strategy.allocate(this.view.scene);  
+};
+
+
+vxlRenderer.prototype.disableOffscreen = function(){
+    this.strategy.disableOffscreen();
+};
+
+
+/**
+ *Sets the render target for this renderer 
+ */
+vxlRenderer.prototype.enableOffscreen = function(){
+    this._renderTarget = new vxlRenderTarget(this);
+    this.strategy.enableOffscreen(this._renderTarget);    
+};
+
+/*-------------------------------------------------------------------------
+    This file is part of Voxelent's Nucleo
+
+    Nucleo is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation version 3.
+
+    Nucleo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------------------------------------------*/   
+
+
+function vxlRenderTarget(renderer){
+   
+    this.canvas         = renderer.view.canvas;
+    this.texture        = null;
+    this.framebuffer    = null;
+    this.renderbuffer   = null;
+    this.gl             = renderer.gl;
+    this.configure(); 
+};
+
+
+vxlRenderTarget.prototype.configure = function(){
+    var width = this.canvas.width;
+    var height = this.canvas.height;
+    var gl = this.gl;
+    
+    //1. Init Picking Texture
+    this.texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    
+    //2. Init Render Buffer
+    this.renderbuffer = gl.createRenderbuffer();
+    gl.bindRenderbuffer(gl.RENDERBUFFER, this.renderbuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
+    
+    
+    //3. Init Frame Buffer
+    this.framebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texture, 0);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.renderbuffer);
+    
+
+    //4. Clean up
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+};
+
+vxlRenderTarget.prototype.update = function(){
+    
+    var gl = this.gl;
+    var width = this.canvas.width;
+    var height = this.canvas.height;
+   
+    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    
+    //2. Init Render Buffer
+    gl.bindRenderbuffer(gl.RENDERBUFFER, this.renderbuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
+};
+
+
+vxlRenderTarget.prototype.readPixel = function(coords){
+    
+    var gl = this.gl;
+    var readout = new Uint8Array(1 * 1 * 4);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
+    gl.readPixels(coords.x,coords.y,1,1,gl.RGBA,gl.UNSIGNED_BYTE,readout);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    return readout;
+}
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
@@ -6932,8 +6981,8 @@ vxlRenderer.prototype.render = function(){
  */
 function vxlModel(name, JSON_OBJECT){
 	this.name       = name;
-	this.indices 	= null;
-	this.vertices 	= null;
+	this.indices 	= [];
+	this.vertices 	= [];
 	this.scalars 	= null;
 	this.diffuse	= null;
 	this.normals 	= null;
@@ -6943,6 +6992,7 @@ function vxlModel(name, JSON_OBJECT){
 	this.mode       = null;
 	this.image      = null;
 	this.uri        = null;
+	this.colors     = [];
 	    
     if (JSON_OBJECT != undefined){
         this.load(this.name, JSON_OBJECT);
@@ -7168,6 +7218,241 @@ vxlModel.prototype.getBoundingBoxVertices = function(){
 
     You should have received a copy of the GNU General Public License
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------------------------------------------*/
+
+/**
+ * A cell is the minimum surface that can be selected on a mesh
+ * @class Provides cell definitions
+ * @constructor
+ * @author Diego Cantor
+ */
+function vxlCell(vertices){ 
+    this.UID = vxl.util.generateUID();
+    this.color  = vxl.go.picker.getColorFor(this); 
+    this.vertices = vertices;
+    this.normal = undefined; //cell normal
+    this._calculateNormal();
+};
+
+/**
+ * Calculates the cell normal
+ * @private
+ */
+vxlCell.prototype._calculateNormal = function(){
+    var p1 = vec3.subtract(this.vertices[1], this.vertices[0], vec3.create());
+    var p2 = vec3.subtract(this.vertices[2], this.vertices[0], vec3.create());
+    this.normal =  vec3.normalize(vec3.cross(p1,p2,vec3.create()));
+};
+
+/**
+ * Returns an unidimensional array with the vertex information
+ * [[a,b,c],[d,e,f],[g,h,i]] --> [a,b,c,d,e,f,g,h,i]
+ */
+vxlCell.prototype.getFlattenVertices = function(){
+    var vertices = [];
+    for (var i=0, count= this.vertices.length; i<count; i+=1){
+        vertices = vertices.concat(this.vertices[i]);
+    }
+    return vertices;
+}
+/*-------------------------------------------------------------------------
+    This file is part of Voxelent's Nucleo
+
+    Nucleo is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation version 3.
+
+    Nucleo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------------------------------------------*/ 
+
+/**
+ * In a mesh, the geometry is structured in units called cells (triangles).
+ * This class provides operations on individual cells.
+ * 
+ * @class Provides cell by cell operations on models
+ * @constructor 
+ * @param {vxlModel} model the model for this mesh
+ * @author Diego Cantor
+ */
+function vxlMesh(model){
+    
+    this.cells = [];
+    this.indices = [];
+    this.normals = [];
+    this.renderable = undefined;
+     
+    
+    this._init(model);
+};
+
+/**
+ * Identifies the cells existing in the 
+ * @private
+ */
+vxlMesh.prototype._init = function(model){
+    
+    var ver = model.vertices;
+    var ind = model.indices;
+    
+    var self = this;
+    
+    
+    function initMesh(){
+        var start = new Date().getTime();
+        for(var i=0, L = ind.length; i<L; i+=3){ //for all indices
+            idx  = ind[i];
+            var triangle = [],x,y,z,idx;
+
+            x = ver[idx*3];
+            y = ver[idx*3 + 1];
+            z = ver[idx*3 + 2];   
+            triangle.push([x,y,z]);
+
+            idx = ind[i+1];
+            x = ver[idx*3];
+            y = ver[idx*3 + 1];
+            z = ver[idx*3 + 2];   
+            triangle.push([x,y,z]);
+
+            idx = ind[i+2];            
+            x = ver[idx*3];
+            y = ver[idx*3 + 1];
+            z = ver[idx*3 + 2];   
+            triangle.push([x,y,z]);
+
+            self.indices.push([ind[i], ind[i+1], ind[i+2]]);
+            self.cells.push(new vxlCell(triangle));
+        }
+        
+        for (var i=0, L =self.cells.length; i<L; i+=1){
+            self.normals.push(self.cells[i]._normal);
+        }
+        
+        self.renderable = self._getRenderable();
+        var elapsed = new Date().getTime() - start;
+        console.info('Mesh ['+ model.name +'] generated in '+elapsed+ ' ms');
+    };
+    
+    //because this operation is time consuming it is deferred here.
+    //this causes that the reenderable object is not available in the renderer
+    //until this op finishes.
+    setTimeout(function(){initMesh()},0);
+};
+
+
+/**
+ * Returns a renderable model of the mesh
+ * @private
+ */
+vxlMesh.prototype._getRenderable = function(){
+    
+    var rmodel = new vxlModel();
+    
+    for(var i=0, count = this.cells.length; i<count; i +=1){
+            rmodel.indices   = rmodel.indices.concat([i*3, i*3+1, i*3+2]);
+            rmodel.vertices  = rmodel.vertices.concat(this.cells[i].getFlattenVertices());
+            for (var j = 0; j<3;j+=1){
+                rmodel.colors    = rmodel.colors.concat(this.cells[i].color);
+            }
+    }
+    
+    rmodel.computeNormals();
+    return rmodel;
+};
+
+/**
+ * @TODO: Improve. given a cell, find its index and update just that 
+ */
+vxlMesh.prototype.updateRenderableColors = function(){
+    var r = this.renderable;
+    r.colors = [];
+    for(var i=0, count = this.cells.length; i<count; i +=1){
+            for (var j = 0; j<3;j+=1){
+                r.colors    = r.colors.concat(this.cells[i].color);
+            }
+    }
+};
+ 
+/**
+ * Determines if this mesh contains the cell indicated by the parameter cellUID
+ * @param {string} cellUID the unique identifier of a cell
+ */
+vxlMesh.prototype.hasCell = function(cellUID){
+  for(var i=0, count= this.cells.length; i < count; i+=1){
+      if (this.cells[i].UID == cellUID){
+          return true;
+      }
+  } 
+  return false; 
+};  
+
+/**
+ * Determines if this mesh contains the cell indicated by the parameter cellUID
+ * @param {string} cellUID the unique identifier of a cell
+ */
+vxlMesh.prototype.getCell = function(cellUID){
+  for(var i=0, count= this.cells.length; i < count; i+=1){
+      if (this.cells[i].UID == cellUID){
+          return this.cells[i];
+      }
+  } 
+  return null; 
+};
+
+
+vxlMesh.prototype.removeCell = function(cellUID){
+  var idx = -1;
+  for(var i=0, count= this.cells.length; i < count; i+=1){
+      if (this.cells[i].UID == cellUID){
+          idx = i;
+          break;
+      }
+  }
+  if (idx !=-1) 
+   this.cells.splice(idx,1);
+};  
+
+/**
+ * This is just an experimental method. Determines what cells are facing the camera. 
+ * May be this can be used for anything? I don't know! 
+ * Maybe to see through a surface??
+ *
+ * @param {Object} camera
+ * @param {Object} angle
+ */
+vxlMesh.prototype.intersect = function(camera, angle){
+    
+    var ray = camera._normal;
+    
+    selection = [];
+
+    for(var i=0;i<this.normals.length; i+=1){
+        var dp = Math.acos(vec3.dot(ray, this.normals[i])) * vxl.def.rad2deg;
+        if (Math.abs(dp) <= angle){
+            selection = selection.concat(this.indices[i]);
+        }  
+    }
+    return selection;
+};/*-------------------------------------------------------------------------
+    This file is part of Voxelent's Nucleo
+
+    Nucleo is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation version 3.
+
+    Nucleo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/   
 
 
@@ -7217,31 +7502,36 @@ function vxlActor(model){
   this._scale 		= vec3.create([1, 1, 1]);
   this._rotation 	= vec3.create([0, 0, 0]);
   this._matrix      = mat4.identity();
+  this._renderers   = [];
+  this._gl_buffers  = [];
 
   this.visible      = true;
   this.mode         = vxl.def.actor.mode.SOLID;
+  this.cull         = vxl.def.actor.cull.NONE;
   this.opacity      = 1.0;
-  this.colors       = model?(model.colors!=null?model.colors:null):null;	//it will create colors for this actor once a lookup table had been set up
   this.clones       = 0;
-  
-  this._renderers   = [];
-  this._gl_buffers  = [];
   this.shading      = true;
   this.texture      = undefined;
-  
   this.scene        = undefined;
   
   this._trackingCameras  = [];
+  this._picking     = vxl.def.actor.picking.DISABLED;
+  this._pickingCallback = undefined;
 
+  this.mesh             = undefined;
   
   if (model){
   	this.model 	    = model;
   	this.name 	    = model.name;
   	//In Voxelent JSON format (0.87), the diffuse property has been replaced with color property.
-  	this.color      = model.color!=undefined?model.color:(model.diffuse!=undefined?model.diffuse:undefined); 
+  	this.color      = model.color!=undefined?model.color:(model.diffuse!=undefined?model.diffuse:undefined);
+    this.colors     = model.colors!=undefined?model.colors:undefined;    //it will create colors for this actor once a lookup table had been set up 
   	this.mode       = model.mode;
-  	this._bb         = model.bb.slice(0);
-  	this._centre     = vec3.set(model.centre, vec3.create());
+  	this._bb        = model.bb.slice(0);
+  	this._centre    = vec3.set(model.centre, vec3.create());
+  }
+  else{
+      this.model = new vxlModel();
   }
   
   if (this.mode == vxl.def.actor.mode.TEXTURED){
@@ -7381,6 +7671,7 @@ vxlActor.prototype.setScale = function(s,a,b){
 
 /**
  * Adds a tracking camera
+ * 
  * @param{vxlCamera} camera the tracking camera
  */
 vxlActor.prototype.addTrackingCamera = function(camera){
@@ -7633,6 +7924,16 @@ vxlActor.prototype.setVisualizationMode = function(mode){
 };
 
 /**
+ *Sets the culling mode for this actor.
+ * @param {vxl.def.actor.cull} face face needs to be one of the elements defined in vxl.def.actor.cull
+ *  @TODO: VALIDATE
+ */
+vxlActor.prototype.cullFace = function(face){
+    this.cull = face;
+};
+
+
+/**
 * Sets the lookup table for this actor.
 * This method will only succeed if the model that this actor represents has scalars 
 * @param {String} lutID the lookup table id. See {@link vxl.def.lut} for currently supported ids.
@@ -7716,7 +8017,155 @@ vxlActor.prototype.clone = function(){
 	return duplicate;
 };
 
+/**
+ * 
+ * @param {String} type one of the possible values for vxl.def.actor.picking
+ * @param {Object} callback a function that is invoked when a picking event occurs. This parameter is 
+ * required if the type (first argument) is different from vxl.def.actor.picking.DISABLED 
+ * the callback receives an actor object to operate over it.
+ */
+vxlActor.prototype.setPicker = function(type, callback){
+    this._picking = type;
+    
+    if (type != vxl.def.actor.picking.DISABLED){
+        this._pickingCallback = callback;
+    }
+    else{
+        this._pickingCallback = undefined;
+    }
+    
+    if (this._picking == vxl.def.actor.picking.CELL && this.mesh == undefined){
+        this.mesh = new vxlMesh(this.model);
+    }
+};
 
+/**
+ * Reports if the current actor is pickable or not
+ *   
+ */
+vxlActor.prototype.isPickable = function(){
+    return (this._picking  != vxl.def.actor.picking.DISABLED);  
+};
+
+/*-------------------------------------------------------------------------
+    This file is part of Voxelent's Nucleo
+
+    Nucleo is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation version 3.
+
+    Nucleo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------------------------------------------*/ 
+
+/**
+ * Picking in voxelent is based on colors. The vxlPicker class keeps track of the colors
+ * in the scene that are used to identify objects and cells. The picker contains a map
+ * that allows recognizing an object given a color.
+ */
+function vxlPicker(){
+    this._map = {};
+    this._colors = [];
+ 
+};
+
+
+/**
+ * Generates a color that has not been assigned to any object or cell in the scene
+ */
+vxlPicker.prototype._getColor = function(){
+    
+    function getN(){
+        var x =  Math.floor(Math.random()*256);
+        if (x == 0) 
+            return getN();
+        else
+            return x;
+    };
+    
+ 
+    return [getN(), getN(), getN()];
+};
+  
+/**
+ * 
+ */
+vxlPicker.prototype.color2decimal = function(color){
+    r = Math.round((color[0]/256)*100)/100;
+    g = Math.round((color[1]/256)*100)/100;
+    b = Math.round((color[2]/256)*100)/100;
+    return [r,g,b];
+}  
+
+
+/**
+ * @param {Object} obj an object that can be either a vxlCell or a vxlActor
+ */
+vxlPicker.prototype.getColorFor = function(obj){
+    
+    var uid = obj.UID;
+    
+    if (uid == null || uid  == undefined){
+        alert("vxlPicker.getColor: invalid object");
+        return;
+    }
+    
+    if(!this._map[uid]){
+        
+        var color, key; 
+        do{
+            color = this._getColor();
+            key = color[0] + ':' + color[1] + ':' + color[2];
+        } while(this._colors.indexOf(key) != -1);
+
+        this._map[uid] =  color;
+        this._colors.push(key);
+    }
+    return this.color2decimal(color);
+};
+
+/**
+ * Checks if the color passed as a parameter correspond to any UID (object,cell) assigned in the picker
+ * If so, it returns an object with the results
+ * If not, it returns null indicating the query was unsuccessful.
+ * @param {Array} color
+ * 
+ */
+vxlPicker.prototype.query = function(color){
+    
+    var distance = 100;
+    var closest_uid = undefined;
+    var results = {}
+    
+    for (uid in this._map){
+         var c = this._map[uid];
+         var currDistance  = (Math.abs(c[0]-color[0])+Math.abs(c[1]-color[1])+Math.abs(c[2]-color[2]));
+         if (currDistance < distance){
+             distance = currDistance;
+             closest_uid = uid;
+         }
+    }
+    
+    if (distance <=6){ //@TODO: this heuristic needs improvement.
+        results.uid = closest_uid;
+        results.distance = distance;
+        results.color = this._map[closest_uid];
+        return results;
+    }
+    else{
+        return null;
+    }
+};
+
+/**
+ * Defines a global picker 
+ */
+vxl.go.picker = new vxlPicker();
 
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
@@ -7743,7 +8192,7 @@ vxlActor.prototype.clone = function(){
  */
 function vxlRenderStrategy(renderer){
 	this.renderer = renderer;
-}
+};
 
 
 /**
@@ -7751,7 +8200,7 @@ function vxlRenderStrategy(renderer){
  */
 vxlRenderStrategy.prototype.allocate = function(scene){
 	//DO NOTHING. THE DESCENDANTS WILL.
-}
+};
 
 
 /**
@@ -7759,14 +8208,31 @@ vxlRenderStrategy.prototype.allocate = function(scene){
  */
 vxlRenderStrategy.prototype.deallocate = function(scene){
 	//DO NOTHING. THE DESCENDANTS WILL.
-}
+};
 
 /**
  * @param {vxlScene} scene the scene to render
  */
 vxlRenderStrategy.prototype.render = function(scene){
 	//DO NOTHING. THE DESCENDANTS WILL.
-}
+};
+
+
+/**
+ * Enables offscreen rendering
+ */
+vxlRenderStrategy.prototype.enableOffscreen = function(target){
+    //DO NOTHING. THE DESCENDANTS WILL.
+};
+
+
+/**
+ * Enables offscreen rendering
+ */
+vxlRenderStrategy.prototype.disableOffscreen = function(){
+    //DO NOTHING. THE DESCENDANTS WILL.
+};
+
 
 
 /*-------------------------------------------------------------------------
@@ -7840,7 +8306,6 @@ vxlBasicStrategy.prototype.deallocate = function(scene){
     //DO NOTHING. THE DESCENDANTS WILL.
 }
 
-
 /**
  * Renders the actors one by one
  * @param {vxlScene} scene the scene to render
@@ -7857,7 +8322,12 @@ vxlBasicStrategy.prototype.render = function(scene){
  */
 vxlBasicStrategy.prototype._allocateActor = function(actor){
    
-    if (this._gl_buffers[actor.UID] != undefined) return; // the actor has already been allocated
+    if (this._gl_buffers[actor.UID] != undefined){
+        if (actor.dirty){
+            this._reallocateActor(actor); 
+        }
+        return;
+    }
    	
 	var gl = this.renderer.gl;
 	var model = actor.model;
@@ -7865,21 +8335,16 @@ vxlBasicStrategy.prototype._allocateActor = function(actor){
 	
 	//Vertex Buffer
 	buffers.vertex = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices), gl.STATIC_DRAW);
+	
 	
 	//Index Buffer
 	if (model.indices != undefined){
 		buffers.index = gl.createBuffer();
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices), gl.STATIC_DRAW);
 	}
 	
 	//Normals Buffer
 	if (model.normals){
 		buffers.normal = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals), gl.STATIC_DRAW);
 	}
 	
 	//Color Buffer for scalars
@@ -7890,22 +8355,78 @@ vxlBasicStrategy.prototype._allocateActor = function(actor){
 	//Wireframe Buffer 
 	if (model.wireframe != undefined){
 		buffers.wireframe = gl.createBuffer();
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
 	}
 	
 	//Bounding box Buffer 
     buffers.bb = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.bb);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vxlModel.BB_INDICES), gl.STATIC_DRAW);
-    
 	
 	//Texture Coords Buffer
 	if (model.texture){
 	    buffers.texcoords = gl.createBuffer();
-	    
-	    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texcoords);
-	    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.texcoords), gl.STATIC_DRAW);
+	}
+	   
+    //Cleaning up
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	
+	
+	this._gl_buffers[actor.UID] = buffers;
+	this._reallocateActor(actor);
+};
+
+
+/**
+ * Receives one actor and returns the GL buffers
+ */
+vxlBasicStrategy.prototype._reallocateActor = function(actor){
+   
+    
+    vxlRenderStrategy
+    var gl = this.renderer.gl;
+    var model = actor.model;
+    var buffers = this._gl_buffers[actor.UID];
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices), gl.STATIC_DRAW);
+    
+    //Index Buffer
+    if (model.indices != undefined){    
+    //Cleaning up
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices), gl.STATIC_DRAW);
+    }
+    
+    //Normals Buffer
+    if (model.normals){
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals), gl.STATIC_DRAW);
+    }
+    
+    //Color Buffer for scalars
+    if (model.scalars != undefined || model.colors != undefined){
+        buffers.color = gl.createBuffer(); //we don't BIND values or use the buffers until the lut is loaded and available
+    }
+    
+    //Wireframe Buffer 
+    if (model.wireframe != undefined){
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
+    }   
+    //Cleaning up
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    
+    //Bounding box Buffer 
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.bb);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vxlModel.BB_INDICES), gl.STATIC_DRAW);
+    
+    
+    //Texture Coords Buffer
+    if (model.texture){
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texcoords);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.texcoords), gl.STATIC_DRAW);
         
         this._gl_textures[actor.UID] = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this._gl_textures[actor.UID]);
@@ -7913,15 +8434,13 @@ vxlBasicStrategy.prototype._allocateActor = function(actor){
         gl.generateMipmap(gl.TEXTURE_2D);
         
         gl.bindTexture(gl.TEXTURE_2D, null);
-	}
-	
-	//Cleaning up
-	gl.bindBuffer(gl.ARRAY_BUFFER, null);
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-	
-	this._gl_buffers[actor.UID] = buffers; 
+    }
+    
+    
+    //Cleaning up
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 };
-
 /**
  * Passes the matrices to the shading program
  * @param {vxlActor} the actor 
@@ -7947,11 +8466,6 @@ vxlBasicStrategy.prototype._applyActorTransform = function(actor){
         prg.setUniform(glsl.NORMAL_MATRIX, r.transforms.nMatrix);
     
     trx.pop();
-    
-    
-    
-    
-    
  };
  
  
@@ -7974,8 +8488,6 @@ vxlBasicStrategy.prototype._applyGlobalTransform = function(){
     prg.setUniform(glsl.MVP_MATRIX, r.transforms.mvpMatrix);
     trx.calculateNormal(); 
     prg.setUniform(glsl.NORMAL_MATRIX, r.transforms.nMatrix);
-    
-    
     
  };
 /*-------------------------------------------------------------------------
@@ -8013,6 +8525,10 @@ vxlLambertStrategy.prototype.constructor = vxlLambertStrategy;
  */
 function vxlLambertStrategy(renderer){
 	vxlBasicStrategy.call(this,renderer);
+
+	this._offscreen = false;
+	this._target    = undefined;
+	this._onPickingBuffer  = false;
 }
 
 
@@ -8023,10 +8539,11 @@ function vxlLambertStrategy(renderer){
 vxlLambertStrategy.prototype.render = function(scene){
 
     //Updates the perspective matrix and passes it to the program
-    var r       = this.renderer;
-    var trx     = r.transforms
-    var prg     = r.prg;
-    var glsl    = vxl.def.glsl;
+    var r       = this.renderer,
+    trx     = r.transforms,
+    prg     = r.prg,
+    glsl    = vxl.def.glsl,
+    gl      = r.gl;
     
     trx.calculatePerspective();
     trx.calculateModelView();
@@ -8038,194 +8555,519 @@ vxlLambertStrategy.prototype.render = function(scene){
     if (scene.frameAnimation != undefined){
         scene.frameAnimation.update();
     }
+    
+    this._handlePicking(scene._actors);
+    
 
     for(var i = 0; i < NUM; i+=1){
-        this._renderActor(elements[i]);
+            this._renderActor(elements[i]);
     }
 };
 
+/**
+ * @private
+ */
+vxlLambertStrategy.prototype._handlePicking = function(actors){
+    
+    if (this._target == undefined) return; //quick fail if the target has not been defined
+    
+    if (this._offscreen){
+        
+        var gl = this.renderer.gl;
+        
+        this._onPickingBuffer = true;
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this._target.framebuffer);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.clearColor(0,0,0,1);
+        
+        for(var i = 0, NUM = actors.length; i < NUM; i+=1){
+            if (actors[i].isPickable()){
+                this._renderActor(actors[i]);
+            }
+        }
+        
+        this._onPickingBuffer = false;
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        var cc = this.renderer._clearColor;
+        this.renderer.clearColor(cc);
+    }
+};
+
+/**
+ * @private
+ */
+vxlLambertStrategy.prototype._enableNormals = function(actor){
+    
+    var model = actor.model;
+    var gl = this.renderer.gl;
+    var prg = this.renderer.prg;
+    var buffers = this._gl_buffers[actor.UID];
+    var glsl    = vxl.def.glsl; 
+    
+    if(model.normals && actor.shading){
+        try{
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals), gl.STATIC_DRAW);
+            
+            prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
+            prg.setAttributePointer(glsl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
+            
+        }
+        catch(err){
+            alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
+            throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
+        }
+    }
+}; 
+
+/**
+ * @private
+ */
+vxlLambertStrategy.prototype._enableColors = function(actor){
+    
+    var model = actor.model;
+    var gl = this.renderer.gl;
+    var prg = this.renderer.prg;
+    var buffers = this._gl_buffers[actor.UID];
+    var glsl    = vxl.def.glsl; 
+    
+    if (actor.colors && actor.colors.length == actor.model.vertices.length){    
+        try{
+            prg.setUniform("uUseVertexColors", true);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.colors), gl.STATIC_DRAW);
+            
+            prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
+            prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+        }
+        catch(err){
+            alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+            throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+        }
+    }
+};
+
+/**
+ * Renders a solid actor
+ * @private
+ */
+vxlLambertStrategy.prototype._renderSolid = function(actor){
+    
+    var buffers = this._gl_buffers[actor.UID];
+    var gl      = this.renderer.gl;
+    
+    this._enableNormals(actor);
+    this._enableColors(actor);    
+
+    
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(actor.model.indices), gl.STATIC_DRAW);
+    gl.drawElements(gl.TRIANGLES, actor.model.indices.length, gl.UNSIGNED_SHORT,0);
+};
+
+/**
+ * Renders an actor as a wireframe
+ */
+vxlLambertStrategy.prototype._renderWireframe = function(actor){
+    
+
+    var buffers = this._gl_buffers[actor.UID];
+    var gl      = this.renderer.gl;
+    var prg     = this.renderer.prg;
+    var glsl    = vxl.def.glsl;
+    
+   
+    this._enableNormals(actor);
+    
+    if (actor.name == 'floor'){
+        prg.disableAttribute(glsl.NORMAL_ATTRIBUTE); //floor does not have reflections. Always mate color!
+    }
+    
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(actor.model.wireframe), gl.STATIC_DRAW);
+    gl.drawElements(gl.LINES, actor.model.wireframe.length, gl.UNSIGNED_SHORT,0);
+};
+
+/**
+ * @private
+ */
+vxlLambertStrategy.prototype._renderPoints = function(actor){
+    
+    var model   = actor.model;
+    var gl      = this.renderer.gl;
+    var prg     = this.renderer.prg;
+    var glsl    = vxl.def.glsl; 
+    
+    prg.setUniform("uUseShading", false);
+    prg.setUniform("uPointSize", 5);//TODO: this can be an actor property?
+    gl.drawArrays(gl.POINTS,0, model.vertices.length/3);
+};
+
+/**
+ * @private
+ */
+vxlLambertStrategy.prototype._renderLines = function(actor){
+    
+    var buffers = this._gl_buffers[actor.UID];
+    var gl      = this.renderer.gl;
+    var prg     = this.renderer.prg;
+    var glsl    = vxl.def.glsl;
+    
+    prg.setUniform("uUseShading", false);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+    gl.drawElements(gl.LINES, actor.model.indices.length, gl.UNSIGNED_SHORT,0); 
+};
+
+/**
+ * @private
+ */
+vxlLambertStrategy.prototype._renderBoundingBox = function(actor){
+    
+    var buffers = this._gl_buffers[actor.UID];
+    var gl      = this.renderer.gl;
+    var prg     = this.renderer.prg;
+    var glsl    = vxl.def.glsl; 
+    
+    prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
+    prg.setUniform("uUseShading", false);
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.getBoundingBoxVertices()), gl.STATIC_DRAW);
+    
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.bb);
+    gl.drawElements(gl.LINES, vxlModel.BB_INDICES.length, gl.UNSIGNED_SHORT,0);
+};
+
+/**
+ * @private
+ */
+vxlLambertStrategy.prototype._renderBoundingBoxAndSolid = function(actor){    var model   = actor.model;
+    
+    var buffers = this._gl_buffers[actor.UID];
+    var gl      = this.renderer.gl;
+    var prg     = this.renderer.prg;
+    var glsl    = vxl.def.glsl;
+    
+    //solid
+    this._renderSolid(actor);
+    
+    //bounding box, don't move the bb as it has been updated with the actor transform already ;-)
+    this._applyGlobalTransform();
+    
+    prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
+    prg.setUniform("uUseShading", false);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+    //@TODO: Review, should we be asking an actor for renderable vertices?
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.getBoundingBoxVertices()), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.bb);
+    gl.drawElements(gl.LINES, vxlModel.BB_INDICES.length, gl.UNSIGNED_SHORT,0);
+    
+};
+
+/**
+ * @private
+ */
+vxlLambertStrategy.prototype._renderWiredAndSolid = function(actor){
+   
+var model   = actor.model;
+    var buffers = this._gl_buffers[actor.UID];
+    var gl      = this.renderer.gl;
+    var prg     = this.renderer.prg;
+    var glsl    = vxl.def.glsl;
+    
+    
+    this._renderSolid(actor);
+    
+    prg.setUniform("uUseShading",false);
+    prg.setUniform("uMaterialDiffuse",[0.9,0.9,0.9,1.0]);
+    prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
+    gl.drawElements(gl.LINES, model.wireframe.length, gl.UNSIGNED_SHORT,0); 
+};
+
+/**
+ * @private
+ */
+vxlLambertStrategy.prototype._renderFlat = function(actor){
+    
+    var model   = actor.model;
+    var buffers = this._gl_buffers[actor.UID];
+    var texture = this._gl_textures[actor.UID]; 
+    var gl      = this.renderer.gl;
+    var prg     = this.renderer.prg;
+    var glsl    = vxl.def.glsl;
+    
+    if (actor.mesh == undefined){
+        actor.mesh = new vxlMesh(actor.model);
+    }
+    
+    /******************************************/
+    // TA DA!
+     r = actor.mesh.renderable;
+     if (r == undefined) return; 
+    /**************/
+   
+    prg.setUniform("uUseShading",true);
+    
+    try{
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(r.normals), gl.STATIC_DRAW);
+            
+            prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
+            prg.setAttributePointer(glsl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
+            
+        }
+        catch(err){
+            alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
+            throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
+        }
+        
+    try{
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(r.vertices), gl.STATIC_DRAW);
+        prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+    }
+    catch(err){
+        alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
+        throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
+    }
+    
+    prg.setUniform("uUseVertexColors", false);
+    /*if (model.colors && r.colors.length == r.vertices.length){    
+        try{
+            prg.setUniform("uUseVertexColors", true);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(r.colors), gl.STATIC_DRAW);
+            
+            prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
+            prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+        }
+        catch(err){
+            alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+            throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+        }
+    }*/
+    
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(r.indices), gl.STATIC_DRAW);
+    gl.drawElements(gl.TRIANGLES, r.indices.length, gl.UNSIGNED_SHORT,0);
+     
+};
 
 
+/**
+ * @private
+ */
+vxlLambertStrategy.prototype._renderPickingBuffer = function(actor){
+    
+    var model   = actor.model;
+    var buffers = this._gl_buffers[actor.UID];
+    var texture = this._gl_textures[actor.UID]; 
+    var gl      = this.renderer.gl;
+    var prg     = this.renderer.prg;
+    var glsl    = vxl.def.glsl;
+    
+    if (actor.mesh == undefined){
+        actor.mesh = new vxlMesh(actor.model);
+    }
+    
+    /******************************************/
+    // TA DA!
+     r = actor.mesh.renderable;
+     if (r == undefined) return; 
+    /******************************************/
+    
+    prg.setUniform("uUseShading",false);
+    
+    try{
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(r.vertices), gl.STATIC_DRAW);
+        prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+    }
+    catch(err){
+        alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
+        throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
+    }
+    
+    if (model.colors && r.colors.length == r.vertices.length){    
+        try{
+            prg.setUniform("uUseVertexColors", true);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(r.colors), gl.STATIC_DRAW);
+            
+            prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
+            prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+        }
+        catch(err){
+            alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+            throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+        }
+    }
+    
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(r.indices), gl.STATIC_DRAW);
+    gl.drawElements(gl.TRIANGLES, r.indices.length, gl.UNSIGNED_SHORT,0);
+    
+    //Cleaning up
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+     
+};
 
+/**
+ * @private
+ */
+vxlLambertStrategy.prototype._renderTextured = function(actor){
+    
+    var model   = actor.model;
+    var buffers = this._gl_buffers[actor.UID];
+    var texture = this._gl_textures[actor.UID]; 
+    var gl      = this.renderer.gl;
+    var prg     = this.renderer.prg;
+    var glsl    = vxl.def.glsl;   
+    
+    
+    if (model.texcoords){
+        try{
+            prg.setUniform("uUseTextures", true);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texcoords);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.texcoords), gl.STATIC_DRAW);
+            prg.setAttributePointer(glsl.TEXCOORD_ATTRIBUTE, 2, gl.FLOAT,false, 0,0);
+            prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+        }
+        catch(err){
+            alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the texture buffer. Error =' +err.description);
+            throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the texture buffer. Error =' +err.description);
+        }
+    }
+    else{
+        //@TODO: Be more specific
+        throw('error');
+    }
+            
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, actor.texture.getMagFilter(gl));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, actor.texture.getMinFilter(gl));
+    prg.setUniform("uSampler", 0);
+    
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+    gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
+};
+
+/**
+ * @private
+ */
+vxlLambertStrategy.prototype._handleCulling = function(actor){
+    var gl = this.renderer.gl;
+    
+    gl.disable(gl.CULL_FACE);
+    if (actor.cull != vxl.def.actor.cull.NONE){
+        gl.enable(gl.CULL_FACE);
+        switch (actor.cull){
+            case vxl.def.actor.cull.BACK: gl.cullFace(gl.BACK); break;
+            case vxl.def.actor.cull.FRONT: gl.cullFace(gl.FRONT); break;
+        }
+    } 
+    
+           
+}; 
+
+/**
+ * @private
+ */
 vxlLambertStrategy.prototype._renderActor = function(actor){
 
     if (!actor.visible) return; //Quick and simple
+    if (this._renderpass == true && actor.name == 'floor') return;
     
 	var model 	= actor.model;
     var buffers = this._gl_buffers[actor.UID];
     var texture = this._gl_textures[actor.UID]; 
-    var r  		= this.renderer;
-	var gl 		= r.gl;
-	var prg 	= r.prg;
-	var trx 	= r.transforms;
-	var glsl    = vxl.def.glsl;
-	
-	if (actor.mode != vxl.def.actor.mode.BOUNDING_BOX &&
-	    actor.mode != vxl.def.actor.mode.BB_AND_SOLID){
-	   this._applyActorTransform(actor);
-	}
-	
-	var diffuse = [actor.color[0], actor.color[1], actor.color[2],1.0];
-	
-	if (actor.opacity < 1.0){
-		diffuse[3] = actor.opacity;
-	}
-	else {
-		diffuse[3] = 1.0;
-	}
-	
-	prg.setUniform("uMaterialDiffuse",diffuse);
-	prg.setUniform("uUseVertexColors", false);
-	if (actor.mode == vxl.def.actor.mode.TEXTURED){
-	    prg.setUniform("uUseTextures", true);
-	    prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
-	}
-	else{
-	    prg.setUniform("uUseTextures", false);
-	    prg.disableAttribute(glsl.TEXCOORD_ATTRIBUTE);
-	}
+    var gl      = this.renderer.gl;
+    var prg     = this.renderer.prg;
+	var glsl    = vxl.def.glsl;   
+    var diffuse = [actor.color[0], actor.color[1], actor.color[2],actor.opacity];
     
+    
+	prg.disableAttribute(glsl.TEXCOORD_ATTRIBUTE);
     prg.disableAttribute(glsl.COLOR_ATTRIBUTE);
-	prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
-	prg.enableAttribute(glsl.VERTEX_ATTRIBUTE);
-	
-	try{
-		
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
-		prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
-	}
-    catch(err){
-        alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
-		throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
-    }
-    	
-	if (actor.colors){	
-		try{
-			prg.setUniform("uUseVertexColors", true);
-			gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.colors.slice(0)), gl.STATIC_DRAW);
-			
-			prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
-			prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
-		}
-		catch(err){
-        	alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
-			throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
-   		}
-    }
+    prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
+    prg.disableAttribute(glsl.PICKING_COLOR_ATTRIBUTE);
+    prg.enableAttribute(glsl.VERTEX_ATTRIBUTE);
     
-    if(model.normals){
-	    try{
-			gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals.slice(0)), gl.STATIC_DRAW);
-			
-			prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
-			prg.setAttributePointer(glsl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
-		}
-	    catch(err){
-	        alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
-			throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
-	    }
-	}
-	
-	if (model.texcoords && actor.mode == vxl.def.actor.mode.TEXTURED){
-	    try{
-	        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texcoords);
-	        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.texcoords), gl.STATIC_DRAW);
-	        
-	        prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
-	        prg.setAttributePointer(glsl.TEXCOORD_ATTRIBUTE, 2, gl.FLOAT,false, 0,0);
-	        
-	        
-	    }
-	    catch(err){
-            alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the texture buffer. Error =' +err.description);
-            throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the texture buffer. Error =' +err.description);
-        }
-	}
-	
+    prg.setUniform("uUseVertexColors", false);
+    prg.setUniform("uUseTextures", false);
     prg.setUniform("uUseShading",actor.shading);
+    prg.setUniform("uMaterialDiffuse",diffuse);
     
-    try{
-		if (actor.mode == vxl.def.actor.mode.SOLID){
-			prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
-			gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
-		}
-		else if (actor.mode == vxl.def.actor.mode.TEXTURED){
-            prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
-            
-            gl.activeTexture(gl.TEXTURE0);
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, actor.texture.getMagFilter(gl));
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, actor.texture.getMinFilter(gl));
-            prg.setUniform("uSampler", 0);
-            
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
-            gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
-        }
-		else if (actor.mode == vxl.def.actor.mode.WIREFRAME){
-			if (actor.name == 'floor'){
-			     prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
-			}
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
-			gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
-			gl.drawElements(gl.LINES, model.wireframe.length, gl.UNSIGNED_SHORT,0);
-		}
-		else if (actor.mode == vxl.def.actor.mode.BOUNDING_BOX){
-		    prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
-		    prg.setUniform("uUseShading", false);
-		    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.getBoundingBoxVertices()), gl.STATIC_DRAW);
-		    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.bb);
-            gl.drawElements(gl.LINES, vxlModel.BB_INDICES.length, gl.UNSIGNED_SHORT,0);
-		    
-		}
-		else if (actor.mode == vxl.def.actor.mode.BB_AND_SOLID){
-            //solid
-            this._applyActorTransform(actor);
-            prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
-            prg.setUniform("uUseShading",actor.shading);
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
-            gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
-            //bounding box
-            this._applyGlobalTransform();
-            prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
-            prg.setUniform("uUseShading", false);
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.getBoundingBoxVertices()), gl.STATIC_DRAW);
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.bb);
-            gl.drawElements(gl.LINES, vxlModel.BB_INDICES.length, gl.UNSIGNED_SHORT,0);
-		}
-		else if (actor.mode == vxl.def.actor.mode.POINTS){
-			prg.setUniform("uUseShading", true);
-			prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
-			gl.drawArrays(gl.POINTS,0, this.model.vertices.length/3);
-		}
-		else if (actor.mode == vxl.def.actor.mode.LINES){
-			prg.setUniform("uUseShading", false);
-			prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
-			gl.drawElements(gl.LINES, actor.model.indices.length, gl.UNSIGNED_SHORT,0);
-		}
-		else{
-            alert('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+actor.mode+' is not valid.');
-			throw('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+actor.mode+' is not valid.');
-			
-		}
-		//Cleaning up
-		 gl.bindBuffer(gl.ARRAY_BUFFER, null);
-	     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    
+    this._handleCulling(actor);
+    this._applyActorTransform(actor);
+    
+    
+    if(this._onPickingBuffer){
+        this._renderPickingBuffer(actor);
+        return;
     }
-	catch(err){
-		alert('Error rendering actor ['+actor.name+']. Error =' +err.description);
-		throw('Error rendering actor ['+actor.name+']. Error =' +err.description);
-	}
+    
+		
+	if (actor.mode != vxl.def.actor.mode.FLAT){
+    	try{
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
+    		prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+    	}
+        catch(err){
+            alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
+    		throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
+        }
+    }
+    
+    
+    var am = vxl.def.actor.mode;
+    
+    switch(actor.mode){
+        case am.SOLID:           this._renderSolid(actor);               break;
+        case am.WIREFRAME:       this._renderWireframe(actor);           break;
+        case am.POINTS:          this._renderPoints(actor);              break;
+        case am.LINES:           this._renderLines(actor);               break;
+        case am.BOUNDING_BOX:    this._renderBoundingBox(actor);         break;
+        case am.BB_AND_SOLID:    this._renderBoundingBoxAndSolid(actor); break;
+        case am.WIRED_AND_SOLID: this._renderWiredAndSolid(actor);       break;
+        case am.FLAT:            this._renderFlat(actor);                break;
+        case am.TEXTURED:        this._renderTextured(actor);            break;
+        default:
+            alert('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+actor.mode+' is not valid.');
+            throw('There was a problem while rendering the actor ['+actor.name+']. The visualization mode: '+actor.mode+' is not valid.'); 
+    }
+    
+    //Cleaning up
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+};
+    
+    
+/**
+ * Sets up the offscreen rendering variant
+ * @param {vxlRenderTarget} target the render target
+ */
+vxlLambertStrategy.prototype.enableOffscreen = function(target){
+    this._offscreen = true;
+    this._target = target;
 };
 
+/**
+ * Sets up the offscreen rendering variant
+ * @param {vxlRenderTarget} target the render target
+ */
+vxlLambertStrategy.prototype.disableOffscreen = function(){
+    this._offscreen = false;
+    this._target = undefined;
+};
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
@@ -8317,6 +9159,17 @@ vxlPhongStrategy.prototype._renderActor = function(actor){
 	var trx 	= r.transforms;
 	var glsl    = vxl.def.glsl;
 	
+	gl.disable(gl.CULL_FACE);
+    
+    if (actor.cull != vxl.def.actor.cull.NONE){
+        gl.enable(gl.CULL_FACE);
+        
+        switch (actor.cull){
+            case vxl.def.actor.cull.BACK: gl.cullFace(gl.BACK); break;
+            case vxl.def.actor.cull.FRONT: gl.cullFace(gl.FRONT); break;
+        }
+    }
+    
 	if (actor.mode != vxl.def.actor.mode.BOUNDING_BOX &&
         actor.mode != vxl.def.actor.mode.BB_AND_SOLID){
        this._applyActorTransform(actor);
@@ -8456,6 +9309,21 @@ vxlPhongStrategy.prototype._renderActor = function(actor){
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.bb);
             gl.drawElements(gl.LINES, vxlModel.BB_INDICES.length, gl.UNSIGNED_SHORT,0);
         }
+        else if (actor.mode == vxl.def.actor.mode.WIRED_AND_SOLID){
+            
+            
+            prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
+            prg.setUniform("uUseShading",actor.shading);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+            gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
+            
+            prg.setUniform("uUseShading",false);
+            prg.setUniform("uMaterialDiffuse",[0.9,0.9,0.9,1.0]);
+            prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
+            gl.drawElements(gl.LINES, model.wireframe.length, gl.UNSIGNED_SHORT,0);
+        }
 		else if (actor.mode == vxl.def.actor.mode.POINTS){
 			prg.setUniform("uUseShading", true);
 			prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
@@ -8593,6 +9461,17 @@ vxlBlenderStrategy.prototype._renderActor = function(actor){
 	var trx 	= r.transforms;
 	var glsl    = vxl.def.glsl;
 	
+	gl.disable(gl.CULL_FACE);
+    
+    if (actor.cull != vxl.def.actor.cull.NONE){
+        gl.enable(gl.CULL_FACE);
+        
+        switch (actor.cull){
+            case vxl.def.actor.cull.BACK: gl.cullFace(gl.BACK); break;
+            case vxl.def.actor.cull.FRONT: gl.cullFace(gl.FRONT); break;
+        }
+    }
+    
 	this._applyActorTransform(actor);
 	
 	prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
@@ -9240,6 +10119,20 @@ vxlScene.prototype.addActor = function(actor){
 };
 
 /**
+ * Recreates the WebGL buffers when an actor has changed its geometry 
+ * @param actor the actor to be updated
+ */
+vxlScene.prototype.updateActor = function(actor){
+    if(!this.hasActor(actor)) return;
+    
+    actor.dirty = true;
+    for(var i = 0; i < this.views.length; i +=1){
+        this.views[i].renderer.reallocate();                
+    }
+    actor.dirty = false;
+};
+
+/**
  * Removes one actor
  * @param actor the actor to be removed from the scene
  */
@@ -9372,7 +10265,7 @@ vxlScene.prototype.getActorByUID = function(UID){
  * <p><code> condition(vxlActor): returns boolean</code></p>
  * <p>If the condition evaluates true then that actor is included in the results</p>
  * 
- * @param {function} condition the condition to evaluate in the actor list
+ * @param {function} condition the condition to evaluate in the actor list it receives an actor as a parameter
  * @returns {Array} list of actors 
  */
 vxlScene.prototype.getActorsThat = function(condition){
@@ -9472,9 +10365,34 @@ vxlScene.prototype.getActorNames = function(){
 	return list;
 };
 
+/**
+ * Return a list with the actors that are currently pickable 
+ */
+vxlScene.prototype.getPickableActors = function(){
+    
+    function condition(actor){
+        return actor.isPickable();
+    }
+    
+    return this.getActorsThat(condition);
+};
 
-
-/*-------------------------------------------------------------------------
+/**
+ * Given a cell uid the scene identifies the actor it belongs to. If an actor is not found
+ * this method returns null 
+ * @param {String} cellUID
+ * @returns {vxlActor|null}
+ * 
+ */
+vxlScene.prototype.getActorByCellUID = function(UID){
+    var list = [];
+    for(var a=0, actorCount = this._actors.length; a < actorCount; a+=1){
+        if (actor.mesh != undefined && actor.mesh.hasCell(UID)){
+            return actor;
+        }
+    }
+    return null;
+};/*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
     Nucleo is free software: you can redistribute it and/or modify
@@ -9993,7 +10911,9 @@ function vxlView(canvasID, scene, handleLayout){
 	this.cameraman = new vxlCameraManager(this);
 	
 	//Create View Interactor
-	this.interactor = new vxlTrackerInteractor(this);
+	this.interactor = new vxlTrackerInteractor();
+	
+	this.interactor.connectView(this);
 	
 	//Create Scene
 	if (scene != null && scene instanceof vxlScene){

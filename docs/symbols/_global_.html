@@ -97,6 +97,8 @@
 	
 	<li><a href="../symbols/vxlCameraState.html">vxlCameraState</a></li>
 	
+	<li><a href="../symbols/vxlCell.html">vxlCell</a></li>
+	
 	<li><a href="../symbols/vxlDataStreamReader.html">vxlDataStreamReader</a></li>
 	
 	<li><a href="../symbols/vxlFloor.html">vxlFloor</a></li>
@@ -110,6 +112,8 @@
 	<li><a href="../symbols/vxlLookupTable.html">vxlLookupTable</a></li>
 	
 	<li><a href="../symbols/vxlLookupTableManager.html">vxlLookupTableManager</a></li>
+	
+	<li><a href="../symbols/vxlMesh.html">vxlMesh</a></li>
 	
 	<li><a href="../symbols/vxlModel.html">vxlModel</a></li>
 	
@@ -169,6 +173,30 @@
 			
 
 <!-- ============================== properties summary ===================== -->
+			
+				
+				
+				<h2>Field Summary</h2>
+				<table class="summaryTable" summary="A summary of the fields documented in the class _global_.">
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">
+							    &nbsp;</div></td>
+															
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/_global_.html#r">r</a></b>
+								</div>
+
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+
+				
 			
 
 <!-- ============================== methods summary ======================== -->
@@ -237,6 +265,50 @@
 								
 								
 								
+								<b><a href="../symbols/_global_.html#vxlPicker">vxlPicker</a></b>
+								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/_global_.html#vxlRenderTarget">vxlRenderTarget</a></b>
+								(renderer)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
 								<b><a href="../symbols/_global_.html#vxlSceneDescriptor">vxlSceneDescriptor</a></b>
 								(scene, descriptorType, accessType)
 								</div>
@@ -257,6 +329,38 @@
 			
 
 <!-- ============================== field details ========================== -->
+			
+				<h2>
+					Field Detail
+				</h2>
+				
+					<div class='methodDetail'>
+					<a name="r"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					<b>r</b>
+					</div>
+					</div>
+					<div class="description">
+						**************************************
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/source_nucleo_renderer_strategy_LambertStrategy.js.html">LambertStrategy.js</a>.
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+
+					</div>
+				
 			
 
 <!-- ============================== method details ========================= -->
@@ -368,6 +472,93 @@
 				</div>	
 				
 				<div class='methodDetail'>
+					<a name="vxlPicker"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>vxlPicker</b>()
+					</div>
+					</div>
+					<div class="description">
+						Picking in voxelent is based on colors. The vxlPicker class keeps track of the colors
+in the scene that are used to identify objects and cells. The picker contains a map
+that allows recognizing an object given a color.
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/source_nucleo_scene_Picker.js.html">Picker.js</a>.
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="vxlRenderTarget"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>vxlRenderTarget</b>(renderer)
+					</div>
+					</div>
+					<div class="description">
+						
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/source_nucleo_renderer_RenderTarget.js.html">RenderTarget.js</a>.
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>renderer</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
 					<a name="vxlSceneDescriptor"> </a>
 					<div class="title">
 					<div class="fixedFont">
@@ -454,7 +645,7 @@
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Feb 06 2013 11:59:45 GMT-0500 (EST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Feb 13 2013 17:21:33 GMT-0500 (EST)
 		</div>
         </div>
         </div>

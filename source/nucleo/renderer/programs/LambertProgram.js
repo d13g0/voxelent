@@ -26,7 +26,8 @@ vxl.def.glsl.lambert = {
 	"aVertexPosition", 
 	"aVertexColor", 
 	"aVertexNormal",
-	"aVertexTextureCoords"],
+	"aVertexTextureCoords",
+	"aVertexPickingColor"],
 	
 	UNIFORMS : [
 	"mModelView",
@@ -42,7 +43,8 @@ vxl.def.glsl.lambert = {
 	"uUseShading",
 	"uUseTextures",
 	"uUseLightTranslation",
-	"uSampler"],
+	"uSampler"
+	],
 	
 	
     VERTEX_SHADER : [
@@ -51,6 +53,7 @@ vxl.def.glsl.lambert = {
 	"attribute vec3 aVertexNormal;",
 	"attribute vec3 aVertexColor;",
 	"attribute vec2 aVertexTextureCoords;",
+	"attribute vec3 aVertexPickingColor;",
     "uniform float uPointSize;",
 	"uniform mat4 mModelView;",
 	"uniform mat4 mPerspective;",
@@ -70,6 +73,7 @@ vxl.def.glsl.lambert = {
     "void main(void) {",
     "	gl_Position = mModelViewPerspective * vec4(aVertexPosition, 1.0);",
     "	gl_PointSize = uPointSize;",
+    
     "	if (uUseVertexColors) {",
     "		vFinalColor = vec4(aVertexColor,1.0);",
     "	}",
