@@ -41,20 +41,20 @@ function handleEvent(event){
     cone.setPosition(7,2,5);  
     cone.rotateZ(45);
     cone.setPicker(vxl.def.actor.picking.OBJECT,pickingCallback);
-    coneColor = cone.color;
+    coneColor = cone.material.diffuse;
     cone.setColor(color);
 
     cylinder.setPosition(-10,2,5);
     cylinder.setColor(0.7,0,0.1);
     cylinder.rotateZ(-30);
     cylinder.setPicker(vxl.def.actor.picking.OBJECT,pickingCallback);
-    cylinderColor = cylinder.color;
+    cylinderColor = cylinder.material.diffuse;
     cylinder.setColor(color);
 
     sphere.setPosition(0,2,-5);
     sphere.setColor(0,0.9,0.2);
     sphere.setPicker(vxl.def.actor.picking.OBJECT,pickingCallback);
-    sphereColor = sphere.color;
+    sphereColor = sphere.material.diffuse;
     sphere.setColor(color);
     
     var cam = vxl.c.camera;
