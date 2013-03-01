@@ -107,8 +107,7 @@ def : {
 						VERTEX_ATTRIBUTE    : 'aVertexPosition',
 						NORMAL_ATTRIBUTE    : 'aVertexNormal',
 						COLOR_ATTRIBUTE     : 'aVertexColor',
-						TEXCOORD_ATTRIBUTE  : 'aVertexTextureCoords',
-						PICKING_COLOR_ATTRIBUTE : 'aVertexPickingColor'
+						TEXCOORD_ATTRIBUTE  : 'aVertexTextureCoords'
 					},
     /** 
      * @namespace Lookup Table Definitions 
@@ -5679,8 +5678,7 @@ vxl.def.glsl.lambert = {
 	"aVertexPosition", 
 	"aVertexColor", 
 	"aVertexNormal",
-	"aVertexTextureCoords",
-	"aVertexPickingColor"],
+	"aVertexTextureCoords"],
 	
 	UNIFORMS : [
 	"mModelView",
@@ -5706,7 +5704,6 @@ vxl.def.glsl.lambert = {
 	"attribute vec3 aVertexNormal;",
 	"attribute vec3 aVertexColor;",
 	"attribute vec2 aVertexTextureCoords;",
-	"attribute vec3 aVertexPickingColor;",
     "uniform float uPointSize;",
 	"uniform mat4 mModelView;",
 	"uniform mat4 mPerspective;",
@@ -6609,7 +6606,7 @@ function vxlRenderer(vw){
     this._running       = false;
     this._clearColor    = undefined;
     this._renderTarget  = undefined;
-    this.setProgram(vxl.def.glsl.lambert, vxlLambertStrategy);
+    this.setProgram(vxl.def.glsl.lambert, vxlDefaultStrategy);
     
 }
 
@@ -6689,14 +6686,16 @@ vxlRenderer.prototype.setProgram = function(program,strategy){
 	
 	this.currentProgram = program;
 	
-	this.setStrategy(strategy);
+	if (strategy != undefined){
+	   this.setStrategy(strategy);
+	}
 };
 
 /**
  * Sets the current rendering strategy. If the strat parameter is null or undefined, this method will check if 
  * the current strategy is null and in that case sets the strategy as an instance of <code>vxlBasicStrategy</code>
  * 
- * @param {function} strat a descendant from vxlRenderStrategy. This parameter 
+ * @param {function} strat The strategy to be used. This parameter 
  * corresponds to the constructor of the strategy that should be used.  
  */
 vxlRenderer.prototype.setStrategy = function(strat){
@@ -6704,7 +6703,7 @@ vxlRenderer.prototype.setStrategy = function(strat){
         this.strategy = new strat(this);
     }
     else if (this.strategy == undefined){
-        this.strategy = new vxlLambertStrategy(this);
+        this.strategy = new vxlDefaultStrategy(this);
     }
 }
 
@@ -7456,11 +7455,6 @@ vxlMesh.prototype.intersect = function(camera, angle){
 ---------------------------------------------------------------------------*/   
 
 
-
-//@NOTE: Actors take care of rendering models
-//@NOTE: model has to be loaded to be able to create actor. look for a way to enforce this.
-//@NOTE: A possible optimization is to combine several actors in one buffer. Watch optimzation video on YouTube by Gregg Tavares
-
 /**
  * <p>
  * An actor is a representation of a model in Voxelent. Actors can cache model properties 
@@ -7508,11 +7502,14 @@ function vxlActor(model){
   this.visible      = true;
   this.mode         = vxl.def.actor.mode.SOLID;
   this.cull         = vxl.def.actor.cull.NONE;
+  
   this.opacity      = 1.0;
-  this.clones       = 0;
   this.shading      = true;
+  this.shininess    = 0;
   this.texture      = undefined;
+
   this.scene        = undefined;
+  this.clones       = 0;
   
   this._trackingCameras  = [];
   this._picking     = vxl.def.actor.picking.DISABLED;
@@ -7527,6 +7524,7 @@ function vxlActor(model){
   	this.color      = model.color!=undefined?model.color:(model.diffuse!=undefined?model.diffuse:undefined);
     this.colors     = model.colors!=undefined?model.colors:undefined;    //it will create colors for this actor once a lookup table had been set up 
   	this.mode       = model.mode;
+  	this.shininess  = model.shininess!=undefined?model.shininess:0;
   	this._bb        = model.bb.slice(0);
   	this._centre    = vec3.set(model.centre, vec3.create());
   }
@@ -7805,6 +7803,15 @@ vxlActor.prototype.setOpacity = function(o){
 	else throw 'The opacity value is not valid';
 };
 
+
+/**
+ * Sets the shininess of this actor 
+ * @param {Number} s a value for the shininess 
+ */
+vxlActor.prototype.setShininess = function(s){
+    this.shininess = s;
+};
+
 /**
  * Associates a new texture with this actor
  * @param {String} uri the location of the texture to load 
@@ -7822,31 +7829,17 @@ vxlActor.prototype.setTexture = function(uri){
  * @TODO: if the property is position or scale then call the respective methods from here
  */
 vxlActor.prototype.setProperty = function(property, value, scope){
-    
-    if (property == 'position') {
-    	this.setPosition(value);
-    	return;
+    switch (property){
+        case 'position': this.setPosition(value);  break;
+        case 'scale':    this.setScale(value);     break;
+        case 'color':    this.setColor(value);     break;
+        case 'shading':  this.setShading(value);   break;
+        case 'texture':  this.setTexture(value);   break;
+        case 'opacity':  this.setOpacity(value);   break;
+        case 'shininess':this.setShininess(value); break;
+        
     }
-    
-    if (property == 'scale')    {
-    	this.setScale(value);
-    	return;
-    }
-    
-    if (property == 'color') {
-        this.setColor(value);
-        return;
-    }
-    
-    if (property == 'shading'){
-        this.setShading(value);
-        return;
-    }
-    
-    if (property == 'texture'){
-        this.setTexture(value);
-        return
-    }
+  
     
     if (scope == vxl.def.actor || scope == undefined || scope == null){
 		this[property] = value;
@@ -11992,7 +11985,8 @@ wireframeON :  function(){
   * Loads a program
   * @param{vxlView} view the view to configure
   * @param{Object} program a JSON object that defines the progrma to execute
-  * @param{vxlRenderStrategy} strategy the strategy that the renderer should follow to communicate with the program
+  * @param{vxlRenderStrategy} strategy (optional) the strategy that the renderer should follow to communicate with the program. T
+  *                        
   */
  setProgram :  function(view,program,strategy){
     view.renderer.setProgram(program,strategy);

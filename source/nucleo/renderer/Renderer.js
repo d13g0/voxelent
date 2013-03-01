@@ -42,7 +42,7 @@ function vxlRenderer(vw){
     this._running       = false;
     this._clearColor    = undefined;
     this._renderTarget  = undefined;
-    this.setProgram(vxl.def.glsl.lambert, vxlLambertStrategy);
+    this.setProgram(vxl.def.glsl.lambert, vxlRenderStrategy);
     
 }
 
@@ -122,14 +122,16 @@ vxlRenderer.prototype.setProgram = function(program,strategy){
 	
 	this.currentProgram = program;
 	
-	this.setStrategy(strategy);
+	if (strategy != undefined){
+	   this.setStrategy(strategy);
+	}
 };
 
 /**
  * Sets the current rendering strategy. If the strat parameter is null or undefined, this method will check if 
  * the current strategy is null and in that case sets the strategy as an instance of <code>vxlBasicStrategy</code>
  * 
- * @param {function} strat a descendant from vxlRenderStrategy. This parameter 
+ * @param {function} strat The strategy to be used. This parameter 
  * corresponds to the constructor of the strategy that should be used.  
  */
 vxlRenderer.prototype.setStrategy = function(strat){
@@ -137,7 +139,7 @@ vxlRenderer.prototype.setStrategy = function(strat){
         this.strategy = new strat(this);
     }
     else if (this.strategy == undefined){
-        this.strategy = new vxlLambertStrategy(this);
+        this.strategy = new vxlRenderStrategy(this);
     }
 }
 
@@ -146,6 +148,7 @@ vxlRenderer.prototype.setStrategy = function(strat){
  * Clears the rendering context
  */
 vxlRenderer.prototype.clear = function(){
+    this.gl.clearColor(this._clearColor[0], this._clearColor[1], this._clearColor[2], 1.0);
 	this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 	this.gl.viewport(0, 0, this.view.canvas.width, this.view.canvas.height); //@TODO: Think about dividing view ports for multi-view apps - March 19/2012
 	this.transforms.calculatePerspective();
@@ -184,7 +187,7 @@ vxlRenderer.prototype.start = function(){
 
 /**
  * Implements a self adjusting timer
- * @see http://www.sitepoint.com/creating-accurate-timers-in-javascript/
+ * @see <a href="http://www.sitepoint.com/creating-accurate-timers-in-javascript/">Creating accurate timers in JavasScript</a>
  * @private   
  */
 vxlRenderer.prototype._timeUp = function(){

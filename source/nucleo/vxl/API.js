@@ -64,12 +64,18 @@ vxl.api = {
       
   },
   /**
-   * @TODO: is this deprecated?
+   *Changes the field of view of the current camera
+   * 
+   * @param{Number} fov the field of view in degrees [0-360] 
    */
- setCameraDistance :  function(op){
-	 g_fovy = op;
-	 vxl.go.console('fovY = ' + op);
- },
+  setFieldOfView : function(fov){
+      if (fov >0 && fov <= 360){
+        vxl.c.camera.setFieldOfView(fov);
+      }
+      else{
+          throw('api.setFieldOfView: the field of view should be between 0 and 360 degrees');
+      }
+  },
  
  /**
   * If the object passed as a parameter is a vxlView then it sets it up as the current view.
@@ -214,6 +220,31 @@ vxl.api = {
 	vxl.go.modelManager.loadList(models, scene);
  },
  
+ /**
+  * Loads a sequence
+  * @param {String} prefix the shared name by all the files. For instance part in part1, part2, ...
+  * @param {Number} start start number in the sequence
+  * @param {Number} end end number in the sequence
+  * @param {String} path relative path to the webpage where the files are located
+  * @param {String} mode a loading mode (See load method)
+  * @param {String} scene the scene where the generated actors should be placed
+  */
+ loadSequence :  function(prefix, start, end, path,mode,scene){
+    
+    var scene = scene==null?vxl.c.scene:scene;
+    var models = [];
+    
+    var p = vxl.util.getPath(path);
+    
+    for(var i=start;i<=end; i+=1){
+        models.push(p + prefix+i+'.json');
+    }
+    if (mode != undefined && mode != null){
+        scene.setLoadingMode(mode);
+    }
+    
+    vxl.go.modelManager.loadList(models, scene);
+ },
  
  /**
   * Activates the axis in the current view
@@ -350,6 +381,20 @@ wireframeON :  function(){
 	}
  },
  
+  /**
+  * Changes the visualization mode of the current actor (or all the actors if there's no current actor')
+  * to a solid representation
+  * @see vxl.def.actor.mode
+  */
+ solidWireframeON :  function(){
+    if (vxl.c.actor){
+        vxl.c.actor.setVisualizationMode(vxl.def.actor.mode.WIRED_AND_SOLID);
+    }
+    else {
+        vxl.c.view.scene.setVisualizationMode(vxl.def.actor.mode.WIRED_AND_SOLID);
+    }
+    vxl.go.console('API:Wireframe is hidden.');
+ },
  /**
   * Returns a list of actor names. 
   * @param {vxlScene} scene the scene. This parameter is optional 
@@ -628,7 +673,8 @@ wireframeON :  function(){
   * Loads a program
   * @param{vxlView} view the view to configure
   * @param{Object} program a JSON object that defines the progrma to execute
-  * @param{vxlRenderStrategy} strategy the strategy that the renderer should follow to communicate with the program
+  * @param{vxlRenderStrategy} strategy (optional) the strategy that the renderer should follow to communicate with the program. T
+  *                        
   */
  setProgram :  function(view,program,strategy){
     view.renderer.setProgram(program,strategy);

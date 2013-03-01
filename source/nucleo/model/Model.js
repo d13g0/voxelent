@@ -29,6 +29,9 @@ function vxlModel(name, JSON_OBJECT){
 	this.vertices 	= [];
 	this.scalars 	= null;
 	this.diffuse	= null;
+	this.ambient    = null;
+	this.specular   = null;
+	this.shininness = null;
 	this.normals 	= null;
 	this.wireframe 	= null;
 	this.centre 	= null;
@@ -76,10 +79,7 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
 		this.computeNormals();
 	}
 	
-	if(this.diffuse == undefined){
-		//We copy the default by value so posterior modifications of the default do not affect this model
-		this.diffuse = vxl.def.model.diffuse.slice(0); 
-	}
+	
 	
 	if (this.wireframe == undefined){
 		this.computeWireframeIndices();

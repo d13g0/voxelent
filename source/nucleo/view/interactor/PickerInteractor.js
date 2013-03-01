@@ -42,7 +42,7 @@ vxlPickerInteractor.prototype.get2DCoords = function(ev){
     y = vxl.c.view.canvas.height - (ev.clientY - rect.top); 
                                        //this variable contains the height of the canvas and it updates dynamically
                                        //as we resize the browser window.
-    console.info('x='+x+', y='+y);
+    //console.info('x='+x+', y='+y);
     return {x:x,y:y};
 };
 
@@ -64,10 +64,14 @@ vxlPickerInteractor.prototype.onMouseUp   = function(ev){
     
     var actor  = this.view.scene.getActorByCellUID(results.uid);
     
+    if (actor == null) { //try object UID
+        actor = this.view.scene.getActorByUID(results.uid);
+    }
+    
     if (actor != null){
-        console.info('vxlPickerInteractor: actor ['+actor.name+'] has been picked');
+        //console.info('vxlPickerInteractor: actor ['+actor.name+'] has been picked');
        
-        if (actor.isPickable()){
+        if (actor.isPickable() && actor._pickingCallback != undefined){
             actor._pickingCallback(actor, results.uid);
         }
     }

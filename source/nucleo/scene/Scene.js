@@ -476,6 +476,7 @@ vxlScene.prototype.getPickableActors = function(){
 vxlScene.prototype.getActorByCellUID = function(UID){
     var list = [];
     for(var a=0, actorCount = this._actors.length; a < actorCount; a+=1){
+        var actor = this._actors[a];
         if (actor.mesh != undefined && actor.mesh.hasCell(UID)){
             return actor;
         }

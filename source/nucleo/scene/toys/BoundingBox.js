@@ -20,7 +20,8 @@ vxl.def.model.boundingBox.load(
     'bounding box', 
     { "vertices" : [],
       "wireframe":[0,1,1,2,2,3,3,0,0,4,4,5,5,6,6,7,7,4,1,5,2,6,3,7], 
-      "color":[1.0,1.0,1.0,1.0]
+      "color":[1.0,1.0,1.0,1.0],
+      "shading": false
     });
 
 //vxlBoundingBox IS a vxlActor                                               
@@ -38,7 +39,6 @@ function vxlBoundingBox() {
     this.mode 		= vxl.def.actor.mode.WIREFRAME;
     this.visible 	= false;
     this.toy    	= true;
-    this.shading    = false;
 };
 
 /**

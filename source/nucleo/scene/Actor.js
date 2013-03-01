@@ -15,11 +15,6 @@
 ---------------------------------------------------------------------------*/   
 
 
-
-//@NOTE: Actors take care of rendering models
-//@NOTE: model has to be loaded to be able to create actor. look for a way to enforce this.
-//@NOTE: A possible optimization is to combine several actors in one buffer. Watch optimzation video on YouTube by Gregg Tavares
-
 /**
  * <p>
  * An actor is a representation of a model in Voxelent. Actors can cache model properties 
@@ -63,41 +58,34 @@ function vxlActor(model){
   this._matrix      = mat4.identity();
   this._renderers   = [];
   this._gl_buffers  = [];
-
-  this.visible      = true;
-  this.mode         = vxl.def.actor.mode.SOLID;
-  this.cull         = vxl.def.actor.cull.NONE;
-  this.opacity      = 1.0;
-  this.clones       = 0;
-  this.shading      = true;
-  this.texture      = undefined;
-  this.scene        = undefined;
-  
-  this._trackingCameras  = [];
   this._picking     = vxl.def.actor.picking.DISABLED;
   this._pickingCallback = undefined;
-
-  this.mesh             = undefined;
+  this._pickingColor    = undefined; //used when the picking is vxl.def.actor.picking.OBJECT
+  this._trackingCameras = [];
+  
+  this.UID = vxl.util.generateUID();
+  this.scene        = undefined;
+  this.clones       = 0;
+  
+  this.mode         = vxl.def.actor.mode.SOLID;
+  this.cull         = vxl.def.actor.cull.NONE;
+  this.visible      = true;
+ 
+  this.mesh         = undefined;
+  
+  this.material     = new vxlMaterial();
   
   if (model){
   	this.model 	    = model;
   	this.name 	    = model.name;
-  	//In Voxelent JSON format (0.87), the diffuse property has been replaced with color property.
-  	this.color      = model.color!=undefined?model.color:(model.diffuse!=undefined?model.diffuse:undefined);
-    this.colors     = model.colors!=undefined?model.colors:undefined;    //it will create colors for this actor once a lookup table had been set up 
   	this.mode       = model.mode;
   	this._bb        = model.bb.slice(0);
   	this._centre    = vec3.set(model.centre, vec3.create());
+  	this.material.getFrom(model);
   }
   else{
       this.model = new vxlModel();
   }
-  
-  if (this.mode == vxl.def.actor.mode.TEXTURED){
-      this.setTexture(this.model.path + this.model.texture);
-  }
-  
-  
   
   var e = vxl.events;
   vxl.go.notifier.publish(
@@ -108,9 +96,6 @@ function vxlActor(model){
         e.ACTOR_CHANGED_COLOR,
         e.ACTOR_CHANGED_SHADING
       ], this);
-  
-  
-  this.UID = vxl.util.generateUID();
 };
 
 
@@ -170,7 +155,7 @@ vxlActor.prototype.translate = function (x,y,z){
  * Rotates the actor on the X axis 
  * 
  * @param {Number} angle the angle
- */
+ */ 
 vxlActor.prototype.rotateX = function (angle){
     var m = this._matrix;
     var a = vxl.util.deg2rad(vxl.util.getAngle(angle));
@@ -304,7 +289,7 @@ vxlActor.prototype._computeBoundingBox = function(){
  * @returns {Array} a 8-element array with the vertices that constitute the actor bounding box
  */
 vxlActor.prototype.getBoundingBoxVertices = function(){
-    var b = this._bb;
+    var b = this._bb; 
     return [
         b[0], b[1], b[2],
         b[0], b[4], b[2],
@@ -347,7 +332,10 @@ vxlActor.prototype.getHeight = function(){
 * @param {Number} b if r is a number, then this parameter corresponds to the blue component
 */
 vxlActor.prototype.setColor = function (r,g,b){
-	this.color = vxl.util.createVec3(r,g,b); 
+	this.material.diffuse = vxl.util.createVec3(r,g,b);
+	if (this.mesh){
+	    this.mesh.setColor(this.color);
+	} 
 	vxl.go.notifier.fire(vxl.events.ACTOR_CHANGED_COLOR, this);
 };
 
@@ -359,9 +347,18 @@ vxlActor.prototype.setColor = function (r,g,b){
  */
 vxlActor.prototype.setOpacity = function(o){
 	if (o>=0 && o<=1){
-		this.opacity = o;
-	}
+		this.material.opacity = o;
+	} 
 	else throw 'The opacity value is not valid';
+};
+
+
+/**
+ * Sets the shininess of this actor 
+ * @param {Number} s a value for the shininess 
+ */
+vxlActor.prototype.setShininess = function(s){
+    this.material.shininess = s;
 };
 
 /**
@@ -369,50 +366,38 @@ vxlActor.prototype.setOpacity = function(o){
  * @param {String} uri the location of the texture to load 
  */
 vxlActor.prototype.setTexture = function(uri){
-    this.texture = new vxlTexture(uri);    
+    this.material.texture = new vxlTexture(uri);    
 }
 
 /**
  * If the property exists, then it updates it
- * @param {String} property 
- * @param {Object} value 
+ * @param {String} property name of the property 
+ * @param {Object} value  value to be set
  * @param {String} scope indicates if the change is made at the actor level or at the model level
  * valid values for scope are vxl.def.model and vxl.def.actor
  * @TODO: if the property is position or scale then call the respective methods from here
  */
 vxlActor.prototype.setProperty = function(property, value, scope){
     
-    if (property == 'position') {
-    	this.setPosition(value);
-    	return;
-    }
-    
-    if (property == 'scale')    {
-    	this.setScale(value);
-    	return;
-    }
-    
-    if (property == 'color') {
-        this.setColor(value);
-        return;
-    }
-    
-    if (property == 'shading'){
-        this.setShading(value);
-        return;
-    }
-    
-    if (property == 'texture'){
-        this.setTexture(value);
-        return
-    }
     
     if (scope == vxl.def.actor || scope == undefined || scope == null){
-		this[property] = value;
+
+        switch (property){
+            case 'position': this.setPosition(value);  break;
+            case 'scale':    this.setScale(value);     break;
+            case 'color':    this.setColor(value);     break;
+            case 'shading':  this.setShading(value);   break;
+            case 'texture':  this.setTexture(value);   break;
+            case 'opacity':  this.setOpacity(value);   break;
+            case 'shininess':this.setShininess(value); break;
+            default: this[property] = value; break;
+        }
+  
 		vxl.go.console('Actor: The actor '+this.name+' has been updated. ['+property+' = '+value+']');
 	}
 	else if(scope == vxl.def.model){
 		this.model[property] = value;
+		vxl.go.console('vxlActor: The model '+this.model.namname+' has been updated. ['+property+' = '+value+']');
 	}
 	else{
 		throw('vxlActor.setProperty. Scope:' + scope +' is not valid');
@@ -427,7 +412,7 @@ vxlActor.prototype.setProperty = function(property, value, scope){
  * @param {Boolean} flag can be true or false
  */
 vxlActor.prototype.setShading = function(flag){
-    this.shading = flag;
+    this.material.shading = flag;
     vxl.go.notifier.fire(vxl.events.ACTOR_CHANGED_SHADING, this);
 }
 
@@ -440,8 +425,15 @@ vxlActor.prototype.setShading = function(flag){
  * @returns {Object} the property or undefined if the property is not found 
  */
 vxlActor.prototype.getProperty = function(property){
-	if (this.hasOwnProperty(property)) {
+    
+    if (property == 'color'){
+        return this.materia.diffuse; //there's no real 'color' property.
+    }
+	else if (this.hasOwnProperty(property)) {
 		return this[property];
+	}
+	else if (this.material.hasOwnProperty(property)){
+	   return this.material[property];   
 	}
 	else if (this.model.hasOwnProperty(property)){
 		return this.model[property];
@@ -507,7 +499,7 @@ vxlActor.prototype.setLookupTable = function(lutID,min,max){
 	
 	function scheduledSetLookupTable(scalars){
         var lut = vxl.go.lookupTableManager.get(lutID);
-        self.colors  = lut.getColors(self.model.scalars,min,max);
+        self.material.colors  = lut.getColors(self.model.scalars,min,max);
 	}
 	
 	//Given that obtaining the colors can be a time consume op, it is deferred here.
@@ -586,15 +578,22 @@ vxlActor.prototype.clone = function(){
 vxlActor.prototype.setPicker = function(type, callback){
     this._picking = type;
     
-    if (type != vxl.def.actor.picking.DISABLED){
-        this._pickingCallback = callback;
-    }
-    else{
-        this._pickingCallback = undefined;
-    }
-    
-    if (this._picking == vxl.def.actor.picking.CELL && this.mesh == undefined){
-        this.mesh = new vxlMesh(this.model);
+    switch(type){
+        case vxl.def.actor.picking.DISABLED: 
+            this._pickingCallback = undefined; 
+            break;
+        
+        case vxl.def.actor.picking.CELL: 
+            if (this.mesh == undefined){
+                this.mesh = new vxlMesh(this.model); 
+                this.mesh.setColor(this.material.diffuse);           
+            };
+            this._pickingCallback = callback; 
+            break;
+        case vxl.def.actor.picking.OBJECT:
+            this._pickingColor = vxl.go.picker.getColorFor(this);
+            this._pickingCallback = callback;
+            break;
     }
 };
 

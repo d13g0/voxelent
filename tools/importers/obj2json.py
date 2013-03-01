@@ -16,7 +16,7 @@ VERTICES = []
 TEXCOORDS = []
 NORMALS = []
 
-VOX_SYNTAX = {'Kd':'color','Ka':'ambient','Ks':'specular'}
+VOX_SYNTAX = {'Kd':'color','Ka':'ambient','Ks':'specular','Ns':'shininess'}
 
 FILE = ''
 

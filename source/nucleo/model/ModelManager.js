@@ -62,6 +62,8 @@ vxlModelManager.prototype.load = function(filename, scene) {
 	
 	if (manager.isModelLoaded(name)) return;
 	
+	filename = filename +'?nocache=' + (new Date()).getTime();
+	
 	vxl.go.console('ModelManager.load: Requesting '+filename+'...');
 	vxl.go.notifier.fire(vxl.events.MODELS_LOADING, this);
 	

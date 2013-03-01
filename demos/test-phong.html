@@ -11,7 +11,7 @@
 <script src="lib/jquery.js" type="text/javascript"></script>
 <script src="lib/jquery-ui.js" type="text/javascript"> </script>
 <link rel='stylesheet' type='text/css' href='css/jquery-ui-bs/theme.css'/>
-<script type='text/javascript' src='lib/voxelent_v0.89.js'></script>
+<script type='text/javascript' src='lib/voxelent_v0.89.2.js'></script>
 
 
 <style type="text/css">
@@ -30,7 +30,7 @@
 </style>
 
 <script type='text/javascript'>
-    var view;
+    var view, actor;
     
     function runVoxApp(){
         
@@ -45,8 +45,8 @@
     }
     
     function handleEvent(event){
-        var cube = vxl.api.getActorByName('sphere.json');
-        cube.setPosition(1,0,-3);
+        actor = vxl.api.getActorByName('sphere.json');
+        actor.setPosition(1,0,-3);
         vxl.c.camera.longShot();
     }
 </script>
@@ -75,13 +75,13 @@
     <script>
     $('#btnPhong').button().click(
       function(){
-          vxl.api.setProgram(view, vxl.def.glsl.phong, vxlPhongStrategy);
+          actor.setShininess(300);
       }  
     );
     
     $('#btnLambert').button().click(
       function(){
-          vxl.api.setProgram(view, vxl.def.glsl.lambert, vxlLambertStrategy);
+          actor.setShininess(0);
       }  
     );
     </script>

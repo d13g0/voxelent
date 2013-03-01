@@ -13,9 +13,6 @@
     You should have received a copy of the GNU General Public License
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/ 
-//Inheritance stuff
-vxlBlenderStrategy.prototype = new vxlBasicStrategy()
-vxlBlenderStrategy.prototype.constructor = vxlBlenderStrategy;
 
 /**
  * Implements the strategy to render Blender scenes that have been exported to the OBJ format and from there
@@ -30,7 +27,7 @@ vxlBlenderStrategy.prototype.constructor = vxlBlenderStrategy;
  *  
  */
 function vxlBlenderStrategy(renderer) {
-	vxlBasicStrategy.call(this,renderer);
+	this.renderer = renderer;
 }
 
 /**

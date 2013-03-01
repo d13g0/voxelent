@@ -35,7 +35,7 @@ function vxlCamera(vw,t) {
     this.UID            = vxl.util.generateUID(); //unique identification key
     this.view           = vw;
 
-    this.FOV            = vxl.def.camera.fov;
+    this._fov           = vxl.def.camera.fov;
     this.Z_NEAR         = vxl.def.camera.near;    
     this.Z_FAR          = vxl.def.camera.far;
     
@@ -59,7 +59,7 @@ function vxlCamera(vw,t) {
     this._following     = undefined;
     this._trackingMode  = vxl.def.camera.tracking.DEFAULT;
     
-    this.states         = [];
+    this.landmarks         = [];
 
 	if (t != undefined && t !=null){
         this.type = t;
@@ -486,7 +486,54 @@ vxlCamera.prototype.longShot = function() {
     this._shot(this.view.scene.bb);
 };
 
+/**
+ * Changes the field of view of the  camera
+ * 
+ * @param{Number} fov the field of view in degrees [0-360] 
+ * @see <a href="http://en.wikipedia.org/wiki/Angle_of_view">Angle of view</a>
+ */
+vxlCamera.prototype.setFieldOfView = function(fov){
+    this._fov = fov;
+};
 
+/**
+ * Saves the current camera state in a landmark
+ * @param {String} name the landmark name
+ * @see vxlCameraState
+ */
+vxlCamera.prototype.setLandmark = function(name) {
+    var l = new vxlLandmark (name, this);
+    this.landmarks.push(l);
+};
+
+/**
+ * Retrieves the landmark by name from the known landmarks
+ * @param {String} name the landmark name
+ * @see vxlCameraState
+ */
+vxlCamera.prototype.goTo = function(name) {
+    for(var i=0, N =this.landmarks.length; i<N;i+=1){
+        if (this.landmarks[i].name == name){
+            this.landmarks[i].retrieve();
+            return;
+        }
+    }
+    console.warn('vxlCamera.goTo: landmark with name: '+name+', was not found');
+};
+
+/**
+ * Returns a list of known landmarks
+ */
+vxlCamera.prototype.getLandmarks = function(){
+  var lmarks = [];
+  for(var i=0, N =this.landmarks.length; i<N;i+=1){
+      lmarks.push(this.landmarks[i].name);
+  }
+  return lmarks;  
+};
+
+
+vxlCamera.prototype.getLandmarks
 /**
  * This method sets the camera to a distance such that the area covered by the bounding box (parameter)
  * is viewed.
@@ -510,35 +557,14 @@ vxlCamera.prototype._shot = function(bb){
 	cc[2] = Math.round(cc[2]*1000)/1000;
 	
 	if(maxDim != 0) {
-		var d = 1.5 * maxDim / (Math.tan(this.FOV * Math.PI / 180));
+		var d = 1.5 * maxDim / (Math.tan(this._fov * Math.PI / 180));
 		this.setPosition([cc[0], cc[1], cc[2]+ d]);
 	}
 	
 	this.setFocalPoint(cc);
 };
 
-/**
- * Saves the current camera state in a memento (vxlCameraState)
- * @see vxlCameraState
- */
-vxlCamera.prototype.save = function(name) {
-    var landmark = new vxlCameraState(name, this);
-	this.states.push(landmark);
-};
 
-/**
- * Retrieves the last saved camera state from the memento (vxlCameraState)
- * @see vxlCameraState
- */
-vxlCamera.prototype.retrieve = function(name) {
-	for(var i=0;i<this.states.length;i+=1){
-	    if (this.states[i].name == name){
-	        this.states[i].retrieve();
-	        return;
-	    }
-	}
-    throw 'vxlCamera.retrieve: state '+name+' not found'
-};
 
 /**
  * Prints a summary of the camera variables on the browser's console

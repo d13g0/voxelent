@@ -54,13 +54,18 @@
  * @class A vxlTexture is a representation of a raster image in Voxelent. 
  * @constructor
  * @param {String} uri texture location
+ * @author Diego Cantor
  */
 function vxlTexture(uri){
     var self = this;
 
     this.image = new Image();
     this.image.onload = function(){
-        self._handleLoadedImage();
+        self._onLoad();
+    }
+    
+    this.image.onError = function(){
+        self._onError();
     }
     
     this.uri = uri;
@@ -69,7 +74,26 @@ function vxlTexture(uri){
     }
     
     this.mag = vxl.def.texture.filter.LINEAR;
-    this.min = vxl.def.texture.filter.LINEAR_MIPMAP_LINEAR;     
+    this.min = vxl.def.texture.filter.LINEAR_MIPMAP_LINEAR;
+    this.loaded = false;     
+};
+
+/**
+ * Sets the magnification filter. 
+ * @param {String} magfilter one of the options in vxl.def.texture.filter
+ * @see {vxl.def.texture.filter}
+ */
+vxlTexture.prototype.setMagFilter = function(magfilter){
+    this.mag = magfilter;
+};
+
+/**
+ * Sets the minification filter. 
+ * @param {String} minfilter one of the options in vxl.def.texture.filter
+ * @see {vxl.def.texture.filter}
+ */
+vxlTexture.prototype.setMinFilter = function(minfilter){
+    this.min = minfilter;  
 };
 
 /**
@@ -83,14 +107,16 @@ vxlTexture.prototype.load = function(uri){
 /**
  * @private
  */
-vxlTexture.prototype._handleLoadedImage = function(){
-    /*var gl = this.gl;
-    gl.bindTexture(gl.TEXTURE_2D, this.tex);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.image);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+vxlTexture.prototype._onError = function(){
+    console.info('vxlTexture: the texture '+this.uri+' could not be found.');
+    this.loaded = false;
+};
 
-    gl.bindTexture(gl.TEXTURE_2D, null);*/   
+/**
+ * @private
+ */
+vxlTexture.prototype._onLoad = function(){
+    this.loaded = true;
 };
 
 /**

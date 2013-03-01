@@ -54,7 +54,7 @@ vxlTransforms.prototype.calculatePerspective = function(){
     var c = this.view.cameraman.active;
     var vw = this.view;
 	mat4.identity(this.pMatrix);
-	mat4.perspective(c.FOV, vw.width/vw.height, c.Z_NEAR, c.Z_FAR, this.pMatrix);
+	mat4.perspective(c._fov, vw.width/vw.height, c.Z_NEAR, c.Z_FAR, this.pMatrix);
 };
 
 

@@ -33,7 +33,7 @@ def pack(VOX_VERSION_NUMBER):
              'VXL',
              'Notifier', 
              'glMatrix',
-             'CameraState',   
+             'Landmark',   
              'Camera',
              'CameraManager',
              'CameraInteractor', 
@@ -54,9 +54,6 @@ def pack(VOX_VERSION_NUMBER):
              'Actor',
              'Picker', 
              'RenderStrategy',
-             'BasicStrategy',
-             'LambertStrategy',
-             'PhongStrategy',
              'BlenderStrategy',
              'BakeStrategy',
              'Scene', 
@@ -71,7 +68,8 @@ def pack(VOX_VERSION_NUMBER):
              'API', 
              'FrameAnimation',
              'VTKReader',
-             'Texture' 
+             'Texture',
+             'Material' 
     ]
     
     

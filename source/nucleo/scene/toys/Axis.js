@@ -19,7 +19,8 @@ vxl.def.model.axis = new vxlModel();
 vxl.def.model.axis.load('axis', {
                     	"vertices": [	-1, 0, 0, 	 1, 0, 0, 	 0,-2, 0,	 0, 2, 0,	 0, 0,-1,	 0, 0, 1	],
                     	"wireframe": [ 	0, 1, 	2, 3, 	4, 5	],
-                    	"colors": [	1, 0, 0, 	  1, 0, 0, 	0, 1 ,0, 	 0, 1 ,0,   0, 0, 1,	 0, 0, 1 	]
+                    	"colors": [	1, 0, 0, 	  1, 0, 0, 	0, 1 ,0, 	 0, 1 ,0,   0, 0, 1,	 0, 0, 1 	],
+                    	"shading": false
                     	});
  
 
@@ -37,7 +38,6 @@ function vxlAxis() {
 	this.mode 		= vxl.def.actor.mode.WIREFRAME;
 	this.visible 	= false;
 	this.toy     	= true;
-	this.shading    = false;
 };
 
 

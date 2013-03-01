@@ -14,10 +14,6 @@
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/ 
 
-//Inheritance stuff
-vxlBakeStrategy.prototype = new vxlBasicStrategy(undefined)
-vxlBakeStrategy.prototype.constructor = vxlBakeStrategy;
-
 /**
  * @constructor
  * @class
@@ -26,7 +22,7 @@ vxlBakeStrategy.prototype.constructor = vxlBakeStrategy;
  * vxl.def.glsl.bake
  */
 function vxlBakeStrategy(renderer){
-    vxlBasicStrategy.call(this,renderer);
+    this.renderer = renderer;
     
     var gl = renderer.gl;
     

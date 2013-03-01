@@ -22,7 +22,8 @@
  */
 function vxlCell(vertices){ 
     this.UID = vxl.util.generateUID();
-    this.color  = vxl.go.picker.getColorFor(this); 
+    this.color = [0.8,0.8,0.8];
+    this._pickingColor  = vxl.go.picker.getColorFor(this); 
     this.vertices = vertices;
     this.normal = undefined; //cell normal
     this._calculateNormal();

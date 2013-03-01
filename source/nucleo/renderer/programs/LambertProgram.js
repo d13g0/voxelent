@@ -26,8 +26,7 @@ vxl.def.glsl.lambert = {
 	"aVertexPosition", 
 	"aVertexColor", 
 	"aVertexNormal",
-	"aVertexTextureCoords",
-	"aVertexPickingColor"],
+	"aVertexTextureCoords"],
 	
 	UNIFORMS : [
 	"mModelView",
@@ -53,7 +52,6 @@ vxl.def.glsl.lambert = {
 	"attribute vec3 aVertexNormal;",
 	"attribute vec3 aVertexColor;",
 	"attribute vec2 aVertexTextureCoords;",
-	"attribute vec3 aVertexPickingColor;",
     "uniform float uPointSize;",
 	"uniform mat4 mModelView;",
 	"uniform mat4 mPerspective;",

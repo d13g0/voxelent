@@ -54,7 +54,7 @@ var vxl = {
 */
 version : 
 {
-    number: '0.89.1',
+    number: '0.89.2',
    	codename : 'c4n314',
    	plugins  : []
 },
@@ -107,8 +107,7 @@ def : {
 						VERTEX_ATTRIBUTE    : 'aVertexPosition',
 						NORMAL_ATTRIBUTE    : 'aVertexNormal',
 						COLOR_ATTRIBUTE     : 'aVertexColor',
-						TEXCOORD_ATTRIBUTE  : 'aVertexTextureCoords',
-						PICKING_COLOR_ATTRIBUTE : 'aVertexPickingColor'
+						TEXCOORD_ATTRIBUTE  : 'aVertexTextureCoords'
 					},
     /** 
      * @namespace Lookup Table Definitions 
@@ -129,10 +128,7 @@ def : {
     * @namespace Default values for models
     */
 	model			: {
-	                   /**
-	                    * Diffuse color used by default when a model does not have color information: [0.8,0.8,0.8,1.0] 
-	                    */ 
-						diffuse: [0.8,0.8,0.8,1.0],
+	                   
 						/** 
 						 *  Enumeration with the different loading modes provided for models
 						 * <ul>
@@ -145,6 +141,38 @@ def : {
                          */
                          loadingMode     : { LIVE:'LIVE', LATER:'LATER', DETACHED:'DETACHED'}
 					},
+    material        : {
+                       /**
+                        * Diffuse color used by default when a model does 
+                        * not have diffuse color information: [0.8,0.8,0.8,1.0] 
+                        */ 
+                        diffuse: [0.8,0.8,0.8,1.0],
+                        /**
+                        * Ambient color used by default when a model 
+                        * does not have ambient color information: [0.0,0.0,0.0,1.0] 
+                        */
+                        ambient: [0.0,0.0,0.0,1.0],
+                        /**
+                        * Specular color used by default when a model 
+                        * does not have specular color information: [0.0,0.0,0.0,1.0] 
+                        */
+                        specular: [0.0,0.0,0.0,1.0],
+                        /**
+                        * Shininess used by default when a model 
+                        * does not have shininess information: 0 
+                        */
+                        shininess : 0.0,
+                        /**
+                        * Opacity used by default when a model 
+                        * does not have opacity information: 0 
+                        */
+                        opacity : 1.0,
+                        /**
+                        * Shading used by default when a model 
+                        * does not have shading information: 0 
+                        */
+                        shading : true
+    },				
     /**
     * @namespace Default values for views
     * @property {Array} background  A 4-valued array that contains the default background colour for view. The format is [r,g,b,a]

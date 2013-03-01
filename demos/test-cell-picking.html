@@ -12,14 +12,14 @@
 
 <script src="lib/jquery.js" type="text/javascript"> </script>
 <script src="lib/jquery-ui.js" type="text/javascript"> </script>
-<script type='text/javascript' src='lib/voxelent_v0.89.1.js'> </script>
+<script type='text/javascript' src='lib/voxelent_v0.89.2.js'> </script>
 
 <script type='text/javascript'>
 
 var view, actor, mesh , pickerInteractor, currentInteractor;
 
 
-function runVoxApp(){
+function runVoxApp(){   
     vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
     view = vxl.api.setup('view-1');
     vxl.api.load('ball.json','assets/models/geometry');
@@ -41,22 +41,26 @@ function handleEvent(event){
     cam.setType(vxl.def.camera.type.ORBITING);
     cam.longShot();
     vxl.api.floorON(60,5);
+    $('#overlay-div').fadeIn(3000);
 };
 
 
 function pickingCallback(actor, uid){
     
-    console.info(uid);
-    //var cell = actor.mesh.getCell(cellid);
+    
+    var cell = actor.mesh.getCell(uid);
+    //cell.color = [1,0,0];
+    //actor.mesh.updateRenderableColors();
     actor.mesh.removeCell(uid);
     actor.mesh.renderable  = actor.mesh._getRenderable();
+    vxl.c.camera.refresh();
 };
 
 document.onkeypress = function(e){
     e = e || window.event;
     var charCode = (typeof e.which == "number") ? e.which : e.keyCode;
     
-    if (charCode == 112) {
+    if (charCode == 112 || charCode  == 80) {
         if ( view.interactor.UID == pickerInteractor.UID){
             view.setInteractor(defaultInteractor);
             console.info('default interactor active');
@@ -73,9 +77,34 @@ document.onkeypress = function(e){
 
 <script type="text/javascript">
   //Google Analytics Script 
-// var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-26954785-1']); _gaq.push(['_trackPageview']);  (function() {  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);   })();
+ var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-26954785-1']); _gaq.push(['_trackPageview']);  (function() {  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);   })();
 </script>
+<style type="text/css">
+.show {
 
+     position: relative;
+}
+
+.overlay {
+    background: rgba(100,100,100,0.5);
+    padding: 10px;
+    width: 200px;
+    height: 25%;
+    position: absolute;
+    top: 5px;
+    right: 15px;
+    font-size:12px;
+    font-family: Arial,Helvetica;
+    color: white;
+    display: none;
+}
+
+.overlay p {
+    padding-left:10px;
+    padding-right:10px;
+}
+
+</style>
 </head>
 <body onload='runVoxApp()'>
 	<div><img src="css/img/voxelent.png" /></div>
@@ -85,6 +114,13 @@ document.onkeypress = function(e){
 			Your browser does not support WebGL :-(
 		</p>
 	</canvas>
+	<div id='overlay-div' class='overlay'>
+      <p>Goal:</p>
+      <p> 
+          Switch to picking and select cells on the sphere to be eliminated.</p>
+      <p> Make sure you check the console for messages</p>
+      <p>Use <b>p</b> to switch between tracking and picking interactors</p>
+    </div>  
     </div>
 </body>			
 </html>

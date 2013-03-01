@@ -1,4 +1,108 @@
 -------------------------------------------------------------------------------------------
+VERSION 0.89.2 - UPDATES
+-------------------------------------------------------------------------------------------
+
+API UPDATES
+----------------------
+
+New methods:
+vxl.api.loadSequence('part',1,40,'/the/path');
+vxl.api.solidWireframeON(true|false);
+vxl.api.setFieldOfView(number [0-360]);
+
+Removed methods:
+
+vxl.api.setCameraDistance
+
+
+MATERIALS
+----------------------
+The concept of material has been added to voxelent. (See vxlMaterial on jsdocs).
+
+Each actor has now a material object that contains elements such as:
+
+- opacity
+- shininess
+- diffuse color
+- specular color
+- ambient color
+- texture
+- shading
+
+You can still change these properties through the respective set* methods in 
+vxlActor, 
+
+You can still query these propertyes through vxlActor.getProperty
+
+Additionally you can access the material and set the properties directly, like in:
+
+actor.material.shading = false
+
+
+
+
+
+
+Merging Lambert and Phong strategies
+----------------------------------------
+1. vxlLambertStrategy, vxlPhongStrategy, vxlRenderStrategy and vxlBasicStrategy
+are now merged into vxlRenderStrategy
+
+2. In both vxl.api.setProgram and vxlRenderer.setProgram, the strategy now is optional.
+By default, the new class vxlRenderStrategy has combined both the former lambert and phong strategies.
+
+3. The vxl.def.glsl.phong and vxl.def.glsl.lambert are still current. 
+You can use them with vxlRenderer.setProgram()
+
+
+Actor shininess
+-----------------
+
+The actor shininess property has been defined. the default strategy evaluates this property
+to decide the proper program to use (lambert vs phong). See vxlDefaultStrategy
+
+actor.setShininess(100); //the lower the value the bigger the specular reflection
+actor.setProperty('shininess',200); //also can be set this way
+
+
+Update on vxlTexture
+---------------------
+
+1. The new methods setMagFilter and setMinFilter are available
+2. vxlTexture controls the case where the texture can't be load (see vxlTexture._onError)
+
+
+
+Object picking
+----------------------
+Now object picking is available as promised in 0.89.1. Use:
+
+	actor.setPicker(vxl.def.actor.picking.OBJECT, callback)
+
+where callback can be any function that receives two arguments:
+
+	function whateverNameCallbackFunction(actor, uid)
+
+
+Camera updates
+---------------------
+
+1. The methotd vxlCamera.setFieldOfView has been added, there is an accessible method on the API 
+(see vxl.api.setFieldOfView)
+
+3. LANDMARKS
+The old vxlCameraState has been replaced by vxlLandmark
+The new camera methods are available:
+
+   - setLandmark
+   - goTo
+   - getLandmarks
+   
+   
+
+
+
+-------------------------------------------------------------------------------------------
 VERSION 0.89.1 - Lots of stuff
 -------------------------------------------------------------------------------------------
 
@@ -51,7 +155,7 @@ Picking API
 Picking is available at the object and cell levels:
 
 actor._picking = vxl.def.actor.picking.CELL
-                 vxl.def.actor.picking.OBJECT (to be implemented in 0.90)
+                 vxl.def.actor.picking.OBJECT (to be implemented in the follwing update)
                  vxl.def.actor.picking.DISABLED
                  
 

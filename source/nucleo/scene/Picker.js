@@ -15,14 +15,27 @@
 ---------------------------------------------------------------------------*/ 
 
 /**
+ * @constructor
+ * @class 
  * Picking in voxelent is based on colors. The vxlPicker class keeps track of the colors
  * in the scene that are used to identify objects and cells. The picker contains a map
  * that allows recognizing an object given a color.
+ * @author Diego Cantor
  */
 function vxlPicker(){
     this._map = {};
-    this._colors = [];
- 
+    
+    this._hmap = [];
+    
+    for (var i=0;i<=256; i+=1){
+        this._hmap[i] = [];
+        for(var j=0;j<=256; j+=1){
+            this._hmap[i][j] = [];
+            for(var k=0;k<=256; k+=1){
+                this._hmap[i][j][k] = null;
+                }
+        }
+    }    
 };
 
 
@@ -68,14 +81,13 @@ vxlPicker.prototype.getColorFor = function(obj){
     
     if(!this._map[uid]){
         
-        var color, key; 
+        var color; 
         do{
             color = this._getColor();
-            key = color[0] + ':' + color[1] + ':' + color[2];
-        } while(this._colors.indexOf(key) != -1);
+        } while(this._hmap[color[0]][color[1]][color[2]] != null);
 
         this._map[uid] =  color;
-        this._colors.push(key);
+        this._hmap[color[0]][color[1]][color[2]] = uid;
     }
     return this.color2decimal(color);
 };
@@ -92,25 +104,33 @@ vxlPicker.prototype.query = function(color){
     var distance = 100;
     var closest_uid = undefined;
     var results = {}
+    var v = 2;
     
-    for (uid in this._map){
-         var c = this._map[uid];
-         var currDistance  = (Math.abs(c[0]-color[0])+Math.abs(c[1]-color[1])+Math.abs(c[2]-color[2]));
-         if (currDistance < distance){
-             distance = currDistance;
-             closest_uid = uid;
-         }
-    }
-    
-    if (distance <=6){ //@TODO: this heuristic needs improvement.
-        results.uid = closest_uid;
-        results.distance = distance;
-        results.color = this._map[closest_uid];
+    if (this._hmap[color[0]][color[1]][color[2]] != null){
+        results.uid = this._hmap[color[0]][color[1]][color[2]];
+        results.color = color;
         return results;
     }
-    else{
-        return null;
+    
+        
+    for (var i=-v;i<=v;i+=1){
+        for (var j=-v;j<=v;j+=1){
+            for (var k=-v;k<=v;k+=1){
+                if (color[0]+i<0 || color[0]+i>256 || 
+                    color[1]+j<0 || color[1]+j>256 || 
+                    color[2]+k<0 || color[2]+k>256) continue;
+                var closest_uid = this._hmap[color[0]+i][color[1]+j][color[2]+k];
+                if (closest_uid != null){
+                    results.uid = closest_uid;
+                    results.color = [color[0]+i,color[1]+j,color[2]+k];
+                    return results;
+                }
+            }
+        }
     }
+    return null;
+            
+
 };
 
 /**

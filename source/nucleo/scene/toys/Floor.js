@@ -16,7 +16,7 @@
 
 
 vxl.def.model.floor = new vxlModel();
-vxl.def.model.floor.load('floor',{"vertices":[],"indices":[],"color":[1.0,1.0,1.0,1.0]});
+vxl.def.model.floor.load('floor',{"vertices":[],"indices":[],"color":[1.0,1.0,1.0,1.0],"shading": false});
 
 vxlFloor.prototype = new vxlActor();
 vxlFloor.prototype.constructor = vxlFloor;
@@ -31,7 +31,6 @@ function vxlFloor(){
 	this.mode 		= vxl.def.actor.mode.WIREFRAME;
     this.visible 	= false;
     this.toy    	= true;
-    this.shading    = false;
 };
 
 /**
