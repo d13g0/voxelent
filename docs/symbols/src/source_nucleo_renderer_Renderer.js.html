@@ -49,7 +49,7 @@
 <span class='line'> 42</span> </span><span class="WHIT">    </span><span class="NAME">this._running</span><span class="WHIT">       </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 43</span> </span><span class="WHIT">    </span><span class="NAME">this._clearColor</span><span class="WHIT">    </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 44</span> </span><span class="WHIT">    </span><span class="NAME">this._renderTarget</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 45</span> </span><span class="WHIT">    </span><span class="NAME">this.setProgram</span><span class="PUNC">(</span><span class="NAME">vxl.def.glsl.lambert</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">vxlLambertStrategy</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 45</span> </span><span class="WHIT">    </span><span class="NAME">this.setProgram</span><span class="PUNC">(</span><span class="NAME">vxl.def.glsl.lambert</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">vxlRenderStrategy</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 46</span> </span><span class="WHIT">    </span><span class="WHIT">
 <span class='line'> 47</span> </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'> 48</span> 
@@ -129,188 +129,191 @@
 <span class='line'>122</span> </span><span class="WHIT">	</span><span class="WHIT">
 <span class='line'>123</span> </span><span class="WHIT">	</span><span class="NAME">this.currentProgram</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">program</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>124</span> </span><span class="WHIT">	</span><span class="WHIT">
-<span class='line'>125</span> </span><span class="WHIT">	</span><span class="NAME">this.setStrategy</span><span class="PUNC">(</span><span class="NAME">strategy</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>126</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>127</span> 
-<span class='line'>128</span> </span><span class="COMM">/**
-<span class='line'>129</span>  * Sets the current rendering strategy. If the strat parameter is null or undefined, this method will check if 
-<span class='line'>130</span>  * the current strategy is null and in that case sets the strategy as an instance of &lt;code>vxlBasicStrategy&lt;/code>
-<span class='line'>131</span>  * 
-<span class='line'>132</span>  * @param {function} strat a descendant from vxlRenderStrategy. This parameter 
-<span class='line'>133</span>  * corresponds to the constructor of the strategy that should be used.  
-<span class='line'>134</span>  */</span><span class="WHIT">
-<span class='line'>135</span> </span><span class="NAME">vxlRenderer.prototype.setStrategy</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">strat</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>136</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">strat</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">strat</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>137</span> </span><span class="WHIT">        </span><span class="NAME">this.strategy</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">strat</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>138</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>139</span> </span><span class="WHIT">    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.strategy</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>140</span> </span><span class="WHIT">        </span><span class="NAME">this.strategy</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">vxlLambertStrategy</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>141</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>142</span> </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>143</span> 
-<span class='line'>144</span> 
-<span class='line'>145</span> </span><span class="COMM">/**
-<span class='line'>146</span>  * Clears the rendering context
-<span class='line'>147</span>  */</span><span class="WHIT">
-<span class='line'>148</span> </span><span class="NAME">vxlRenderer.prototype.clear</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>149</span> </span><span class="WHIT">	</span><span class="NAME">this.gl.clear</span><span class="PUNC">(</span><span class="NAME">this.gl.COLOR_BUFFER_BIT</span><span class="WHIT"> </span><span class="PUNC">|</span><span class="WHIT"> </span><span class="NAME">this.gl.DEPTH_BUFFER_BIT</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>150</span> </span><span class="WHIT">	</span><span class="NAME">this.gl.viewport</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.view.canvas.width</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.view.canvas.height</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">//@TODO: Think about dividing view ports for multi-view apps - March 19/2012</span><span class="WHIT">
-<span class='line'>151</span> </span><span class="WHIT">	</span><span class="NAME">this.transforms.calculatePerspective</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>152</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>153</span> 
-<span class='line'>154</span> </span><span class="COMM">/**
-<span class='line'>155</span>  * Sets the rendering mode. Options are in vxl.def.renderer.mode
-<span class='line'>156</span>  * This method updates the rendering mode and tries to restart the rendering process
-<span class='line'>157</span>  * @param {String} mode the mode to set
-<span class='line'>158</span>  */</span><span class="WHIT">
-<span class='line'>159</span> </span><span class="NAME">vxlRenderer.prototype.setMode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">mode</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>160</span> </span><span class="WHIT">    </span><span class="NAME">this.stop</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>161</span> </span><span class="WHIT">    </span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">mode</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>162</span> </span><span class="WHIT">    </span><span class="NAME">this.start</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">   </span><span class="WHIT">
-<span class='line'>163</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>164</span> 
-<span class='line'>165</span> </span><span class="COMM">/**
-<span class='line'>166</span>  * Starts the renderer
-<span class='line'>167</span>  */</span><span class="WHIT">
-<span class='line'>168</span> </span><span class="NAME">vxlRenderer.prototype.start</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>169</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>170</span> </span><span class="WHIT">    </span><span class="NAME">this._running</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>171</span> </span><span class="WHIT">    </span><span class="NAME">this._startDate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getTime</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>172</span> </span><span class="WHIT">    </span><span class="NAME">this._time</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>173</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>174</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">vxl.def.renderer.mode.TIMER</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>175</span> </span><span class="WHIT">		</span><span class="NAME">vxl.go.console</span><span class="PUNC">(</span><span class="STRN">'Renderer: starting rendering for view ['</span><span class="PUNC">+</span><span class="NAME">this.view.name</span><span class="PUNC">+</span><span class="STRN">'] at '</span><span class="PUNC">+</span><span class="NAME">this.renderRate</span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'ms'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>176</span> </span><span class="WHIT">		</span><span class="NAME">this._timeUp</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>177</span> </span><span class="WHIT">		</span><span class="COMM">//this.timerID = setInterval((function(self) {return function() {self.render();}})(this),this.renderRate); </span><span class="WHIT">
-<span class='line'>178</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>179</span> </span><span class="WHIT">	</span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">vxl.def.renderer.mode.ANIMFRAME</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>180</span> </span><span class="WHIT">	    </span><span class="NAME">vxl.go.console</span><span class="PUNC">(</span><span class="STRN">'Renderer: starting rendering at the fastest speed'</span><span class="PUNC">,</span><span class="KEYW">true</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>181</span> </span><span class="WHIT">		</span><span class="NAME">vxl.go.renderman.render</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>182</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>183</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>184</span> 
-<span class='line'>185</span> </span><span class="COMM">/**
-<span class='line'>186</span>  * Implements a self adjusting timer
-<span class='line'>187</span>  * @see http://www.sitepoint.com/creating-accurate-timers-in-javascript/
-<span class='line'>188</span>  * @private   
-<span class='line'>189</span>  */</span><span class="WHIT">
-<span class='line'>190</span> </span><span class="NAME">vxlRenderer.prototype._timeUp</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>191</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._running</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>192</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>193</span> </span><span class="WHIT">    </span><span class="NAME">this.render</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>194</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>195</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._time</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">this.renderRate</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">100</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">  </span><span class="WHIT">
-<span class='line'>196</span> </span><span class="WHIT">        </span><span class="NAME">this._time</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>197</span> </span><span class="WHIT">        </span><span class="NAME">this._startDate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getTime</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>198</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>199</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>200</span> </span><span class="WHIT">    </span><span class="NAME">this._time</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.renderRate</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>201</span> 
-<span class='line'>202</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">diff</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getTime</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">this._startDate</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">this._time</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>203</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>204</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">diff</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NAME">this.renderRate</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">diff</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">//ignore it</span><span class="WHIT">
-<span class='line'>205</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>206</span> </span><span class="WHIT">    </span><span class="NAME">setTimeout</span><span class="PUNC">(</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">self</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>207</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>208</span> </span><span class="WHIT">            </span><span class="NAME">self._timeUp</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>209</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>210</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.renderRate</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">diff</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>211</span> </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>212</span> </span><span class="COMM">/**
-<span class='line'>213</span>  * Stops the renderer
-<span class='line'>214</span>  */</span><span class="WHIT">
-<span class='line'>215</span> </span><span class="NAME">vxlRenderer.prototype.stop</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>216</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">vxl.def.renderer.mode.TIMER</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>217</span> </span><span class="WHIT">		</span><span class="COMM">//clearInterval(this.timerID);</span><span class="WHIT">
-<span class='line'>218</span> </span><span class="WHIT">		</span><span class="NAME">this._running</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>219</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>220</span> </span><span class="WHIT">	</span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">vxl.def.renderer.mode.ANIMFRAME</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>221</span> </span><span class="WHIT">		</span><span class="NAME">vxl.go.renderman.cancel</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>125</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">strategy</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>126</span> </span><span class="WHIT">	   </span><span class="NAME">this.setStrategy</span><span class="PUNC">(</span><span class="NAME">strategy</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>127</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>128</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>129</span> 
+<span class='line'>130</span> </span><span class="COMM">/**
+<span class='line'>131</span>  * Sets the current rendering strategy. If the strat parameter is null or undefined, this method will check if 
+<span class='line'>132</span>  * the current strategy is null and in that case sets the strategy as an instance of &lt;code>vxlBasicStrategy&lt;/code>
+<span class='line'>133</span>  * 
+<span class='line'>134</span>  * @param {function} strat The strategy to be used. This parameter 
+<span class='line'>135</span>  * corresponds to the constructor of the strategy that should be used.  
+<span class='line'>136</span>  */</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="NAME">vxlRenderer.prototype.setStrategy</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">strat</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>138</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">strat</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">strat</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>139</span> </span><span class="WHIT">        </span><span class="NAME">this.strategy</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">strat</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>140</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>141</span> </span><span class="WHIT">    </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.strategy</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>142</span> </span><span class="WHIT">        </span><span class="NAME">this.strategy</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">vxlRenderStrategy</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>143</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>144</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>145</span> 
+<span class='line'>146</span> 
+<span class='line'>147</span> </span><span class="COMM">/**
+<span class='line'>148</span>  * Clears the rendering context
+<span class='line'>149</span>  */</span><span class="WHIT">
+<span class='line'>150</span> </span><span class="NAME">vxlRenderer.prototype.clear</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>151</span> </span><span class="WHIT">    </span><span class="NAME">this.gl.clearColor</span><span class="PUNC">(</span><span class="NAME">this._clearColor</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._clearColor</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._clearColor</span><span class="PUNC">[</span><span class="NUMB">2</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">1.0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>152</span> </span><span class="WHIT">	</span><span class="NAME">this.gl.clear</span><span class="PUNC">(</span><span class="NAME">this.gl.COLOR_BUFFER_BIT</span><span class="WHIT"> </span><span class="PUNC">|</span><span class="WHIT"> </span><span class="NAME">this.gl.DEPTH_BUFFER_BIT</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>153</span> </span><span class="WHIT">	</span><span class="NAME">this.gl.viewport</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.view.canvas.width</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.view.canvas.height</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">//@TODO: Think about dividing view ports for multi-view apps - March 19/2012</span><span class="WHIT">
+<span class='line'>154</span> </span><span class="WHIT">	</span><span class="NAME">this.transforms.calculatePerspective</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>155</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>156</span> 
+<span class='line'>157</span> </span><span class="COMM">/**
+<span class='line'>158</span>  * Sets the rendering mode. Options are in vxl.def.renderer.mode
+<span class='line'>159</span>  * This method updates the rendering mode and tries to restart the rendering process
+<span class='line'>160</span>  * @param {String} mode the mode to set
+<span class='line'>161</span>  */</span><span class="WHIT">
+<span class='line'>162</span> </span><span class="NAME">vxlRenderer.prototype.setMode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">mode</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>163</span> </span><span class="WHIT">    </span><span class="NAME">this.stop</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>164</span> </span><span class="WHIT">    </span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">mode</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>165</span> </span><span class="WHIT">    </span><span class="NAME">this.start</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">   </span><span class="WHIT">
+<span class='line'>166</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>167</span> 
+<span class='line'>168</span> </span><span class="COMM">/**
+<span class='line'>169</span>  * Starts the renderer
+<span class='line'>170</span>  */</span><span class="WHIT">
+<span class='line'>171</span> </span><span class="NAME">vxlRenderer.prototype.start</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>172</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>173</span> </span><span class="WHIT">    </span><span class="NAME">this._running</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>174</span> </span><span class="WHIT">    </span><span class="NAME">this._startDate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getTime</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>175</span> </span><span class="WHIT">    </span><span class="NAME">this._time</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>176</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>177</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">vxl.def.renderer.mode.TIMER</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>178</span> </span><span class="WHIT">		</span><span class="NAME">vxl.go.console</span><span class="PUNC">(</span><span class="STRN">'Renderer: starting rendering for view ['</span><span class="PUNC">+</span><span class="NAME">this.view.name</span><span class="PUNC">+</span><span class="STRN">'] at '</span><span class="PUNC">+</span><span class="NAME">this.renderRate</span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'ms'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>179</span> </span><span class="WHIT">		</span><span class="NAME">this._timeUp</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>180</span> </span><span class="WHIT">		</span><span class="COMM">//this.timerID = setInterval((function(self) {return function() {self.render();}})(this),this.renderRate); </span><span class="WHIT">
+<span class='line'>181</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>182</span> </span><span class="WHIT">	</span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">vxl.def.renderer.mode.ANIMFRAME</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>183</span> </span><span class="WHIT">	    </span><span class="NAME">vxl.go.console</span><span class="PUNC">(</span><span class="STRN">'Renderer: starting rendering at the fastest speed'</span><span class="PUNC">,</span><span class="KEYW">true</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>184</span> </span><span class="WHIT">		</span><span class="NAME">vxl.go.renderman.render</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>185</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>186</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>187</span> 
+<span class='line'>188</span> </span><span class="COMM">/**
+<span class='line'>189</span>  * Implements a self adjusting timer
+<span class='line'>190</span>  * @see &lt;a href="http://www.sitepoint.com/creating-accurate-timers-in-javascript/">Creating accurate timers in JavasScript&lt;/a>
+<span class='line'>191</span>  * @private   
+<span class='line'>192</span>  */</span><span class="WHIT">
+<span class='line'>193</span> </span><span class="NAME">vxlRenderer.prototype._timeUp</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>194</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._running</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>195</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>196</span> </span><span class="WHIT">    </span><span class="NAME">this.render</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>197</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>198</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._time</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">this.renderRate</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">100</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>199</span> </span><span class="WHIT">        </span><span class="NAME">this._time</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>200</span> </span><span class="WHIT">        </span><span class="NAME">this._startDate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getTime</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>201</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>202</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>203</span> </span><span class="WHIT">    </span><span class="NAME">this._time</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.renderRate</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>204</span> 
+<span class='line'>205</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">diff</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getTime</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">this._startDate</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">this._time</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>206</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>207</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">diff</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NAME">this.renderRate</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="NAME">diff</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">//ignore it</span><span class="WHIT">
+<span class='line'>208</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>209</span> </span><span class="WHIT">    </span><span class="NAME">setTimeout</span><span class="PUNC">(</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">self</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>210</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>211</span> </span><span class="WHIT">            </span><span class="NAME">self._timeUp</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>212</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>213</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.renderRate</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">diff</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>214</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>215</span> </span><span class="COMM">/**
+<span class='line'>216</span>  * Stops the renderer
+<span class='line'>217</span>  */</span><span class="WHIT">
+<span class='line'>218</span> </span><span class="NAME">vxlRenderer.prototype.stop</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>219</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">vxl.def.renderer.mode.TIMER</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>220</span> </span><span class="WHIT">		</span><span class="COMM">//clearInterval(this.timerID);</span><span class="WHIT">
+<span class='line'>221</span> </span><span class="WHIT">		</span><span class="NAME">this._running</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>222</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>223</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>224</span> 
-<span class='line'>225</span> </span><span class="COMM">/**
-<span class='line'>226</span>  * Sets the rendering rate in ms
-<span class='line'>227</span>  * @param {Number} /test-baking.htmlrate the new rendering rate in milliseconds
-<span class='line'>228</span>  */</span><span class="WHIT">
-<span class='line'>229</span> </span><span class="NAME">vxlRenderer.prototype.setRenderRate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">rate</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">//rate in ms</span><span class="WHIT">
-<span class='line'>230</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>231</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">rate</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">rate</span><span class="WHIT"> </span><span class="PUNC">&lt;=</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>232</span> </span><span class="WHIT">        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="STRN">'vxlRenderer.setRenderRate: the rate cannot be zero or undefined'</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>233</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="WHIT">
-<span class='line'>234</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>235</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">vxl.def.renderer.mode.ANIMFRAME</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>236</span> </span><span class="WHIT">        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="STRN">'vxlRenderer.setRenderRate: if the mode is ANIMFRAME render rate is irrelevant'</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>237</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>238</span> </span><span class="WHIT">      </span><span class="WHIT">
-<span class='line'>239</span> </span><span class="WHIT">	</span><span class="NAME">this.stop</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>240</span> </span><span class="WHIT">	</span><span class="NAME">this.renderRate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">rate</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>241</span> </span><span class="WHIT">	</span><span class="NAME">this.start</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>242</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>243</span> </span><span class="WHIT">    </span><span class="NAME">vxl.go.console</span><span class="PUNC">(</span><span class="STRN">'Renderer: view['</span><span class="PUNC">+</span><span class="NAME">this.view.name</span><span class="PUNC">+</span><span class="STRN">'], render rate = '</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">rate</span><span class="PUNC">,</span><span class="KEYW">true</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>244</span> 
-<span class='line'>245</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>246</span> 
-<span class='line'>247</span> </span><span class="COMM">/**
-<span class='line'>248</span>  * Sets the color used to clear the rendering context
-<span class='line'>249</span>  * @param {Array} cc the new color passed as a numeric array of three elements
-<span class='line'>250</span>  * @see vxlView#setBackgroundColor
-<span class='line'>251</span>  */</span><span class="WHIT">
-<span class='line'>252</span> </span><span class="NAME">vxlRenderer.prototype.clearColor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">cc</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>253</span> </span><span class="WHIT">    </span><span class="NAME">this._clearColor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cc.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>254</span> </span><span class="WHIT">	</span><span class="NAME">this.gl.clearColor</span><span class="PUNC">(</span><span class="NAME">cc</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cc</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cc</span><span class="PUNC">[</span><span class="NUMB">2</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">1.0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>255</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>256</span> 
-<span class='line'>257</span> </span><span class="COMM">/**
-<span class='line'>258</span>  * Sets the clear depth for the rendering context
-<span class='line'>259</span>  * @param {Number} d the new clear depth
-<span class='line'>260</span>  */</span><span class="WHIT">
-<span class='line'>261</span> </span><span class="NAME">vxlRenderer.prototype.clearDepth</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">d</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>262</span> </span><span class="WHIT">	</span><span class="NAME">this.gl.clearDepth</span><span class="PUNC">(</span><span class="NAME">d</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>263</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>264</span> 
-<span class='line'>265</span> </span><span class="COMM">/**
-<span class='line'>266</span>  * Renders the scene according to the currently set strategy
-<span class='line'>267</span>  */</span><span class="WHIT">
-<span class='line'>268</span> </span><span class="NAME">vxlRenderer.prototype.render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>269</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">strategy</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.strategy</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.view.scene</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">start</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">elapsed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>270</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>271</span> </span><span class="WHIT">    </span><span class="NAME">this.clear</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">                   </span><span class="COMM">//clear the canvas</span><span class="WHIT">
-<span class='line'>272</span> </span><span class="WHIT">    </span><span class="NAME">strategy.allocate</span><span class="PUNC">(</span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">	    </span><span class="COMM">//allocate memory for actors added since last rendering</span><span class="WHIT">
+<span class='line'>223</span> </span><span class="WHIT">	</span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">vxl.def.renderer.mode.ANIMFRAME</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>224</span> </span><span class="WHIT">		</span><span class="NAME">vxl.go.renderman.cancel</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>225</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>226</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>227</span> 
+<span class='line'>228</span> </span><span class="COMM">/**
+<span class='line'>229</span>  * Sets the rendering rate in ms
+<span class='line'>230</span>  * @param {Number} /test-baking.htmlrate the new rendering rate in milliseconds
+<span class='line'>231</span>  */</span><span class="WHIT">
+<span class='line'>232</span> </span><span class="NAME">vxlRenderer.prototype.setRenderRate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">rate</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">//rate in ms</span><span class="WHIT">
+<span class='line'>233</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>234</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">rate</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">rate</span><span class="WHIT"> </span><span class="PUNC">&lt;=</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>235</span> </span><span class="WHIT">        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="STRN">'vxlRenderer.setRenderRate: the rate cannot be zero or undefined'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>236</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="WHIT">
+<span class='line'>237</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>238</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.mode</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">vxl.def.renderer.mode.ANIMFRAME</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>239</span> </span><span class="WHIT">        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="STRN">'vxlRenderer.setRenderRate: if the mode is ANIMFRAME render rate is irrelevant'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>240</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>241</span> </span><span class="WHIT">      </span><span class="WHIT">
+<span class='line'>242</span> </span><span class="WHIT">	</span><span class="NAME">this.stop</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>243</span> </span><span class="WHIT">	</span><span class="NAME">this.renderRate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">rate</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>244</span> </span><span class="WHIT">	</span><span class="NAME">this.start</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>245</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>246</span> </span><span class="WHIT">    </span><span class="NAME">vxl.go.console</span><span class="PUNC">(</span><span class="STRN">'Renderer: view['</span><span class="PUNC">+</span><span class="NAME">this.view.name</span><span class="PUNC">+</span><span class="STRN">'], render rate = '</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">rate</span><span class="PUNC">,</span><span class="KEYW">true</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>247</span> 
+<span class='line'>248</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>249</span> 
+<span class='line'>250</span> </span><span class="COMM">/**
+<span class='line'>251</span>  * Sets the color used to clear the rendering context
+<span class='line'>252</span>  * @param {Array} cc the new color passed as a numeric array of three elements
+<span class='line'>253</span>  * @see vxlView#setBackgroundColor
+<span class='line'>254</span>  */</span><span class="WHIT">
+<span class='line'>255</span> </span><span class="NAME">vxlRenderer.prototype.clearColor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">cc</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>256</span> </span><span class="WHIT">    </span><span class="NAME">this._clearColor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cc.slice</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>257</span> </span><span class="WHIT">	</span><span class="NAME">this.gl.clearColor</span><span class="PUNC">(</span><span class="NAME">cc</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cc</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cc</span><span class="PUNC">[</span><span class="NUMB">2</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">1.0</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>258</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>259</span> 
+<span class='line'>260</span> </span><span class="COMM">/**
+<span class='line'>261</span>  * Sets the clear depth for the rendering context
+<span class='line'>262</span>  * @param {Number} d the new clear depth
+<span class='line'>263</span>  */</span><span class="WHIT">
+<span class='line'>264</span> </span><span class="NAME">vxlRenderer.prototype.clearDepth</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">d</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>265</span> </span><span class="WHIT">	</span><span class="NAME">this.gl.clearDepth</span><span class="PUNC">(</span><span class="NAME">d</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>266</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>267</span> 
+<span class='line'>268</span> </span><span class="COMM">/**
+<span class='line'>269</span>  * Renders the scene according to the currently set strategy
+<span class='line'>270</span>  */</span><span class="WHIT">
+<span class='line'>271</span> </span><span class="NAME">vxlRenderer.prototype.render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>272</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">strategy</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.strategy</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">scene</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.view.scene</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">start</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">elapsed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>273</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>274</span> </span><span class="WHIT">    </span><span class="NAME">start</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getTime</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>275</span> </span><span class="WHIT">    </span><span class="NAME">strategy.render</span><span class="PUNC">(</span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>276</span> </span><span class="WHIT">    </span><span class="NAME">elapsed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getTime</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">start</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>277</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>278</span> </span><span class="WHIT">    </span><span class="NAME">strategy.deallocate</span><span class="PUNC">(</span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">     </span><span class="COMM">//deallocate memory if necessary</span><span class="WHIT">
-<span class='line'>279</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>280</span> </span><span class="WHIT">    </span><span class="COMM">// calculating FPS metric</span><span class="WHIT">
-<span class='line'>281</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">elapsed</span><span class="WHIT"> </span><span class="PUNC">></span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>282</span> </span><span class="WHIT">        </span><span class="NAME">this.fps</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.round</span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NAME">this.fps</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">0.80</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NUMB">1000.0</span><span class="PUNC">/</span><span class="NAME">elapsed</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">0.2</span><span class="PUNC">)</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">100</span><span class="PUNC">)</span><span class="PUNC">/</span><span class="NUMB">100</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>283</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>284</span> </span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>285</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>286</span> 
-<span class='line'>287</span> </span><span class="COMM">/**
-<span class='line'>288</span>  * Reallocates the actors marked as dirty, without requiring rerendering. This mechanism allows
-<span class='line'>289</span>  * to update the GL buffers for dirty actors. 
-<span class='line'>290</span>  */</span><span class="WHIT">
-<span class='line'>291</span> </span><span class="NAME">vxlRenderer.prototype.reallocate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>292</span> </span><span class="WHIT">  </span><span class="NAME">this.strategy.allocate</span><span class="PUNC">(</span><span class="NAME">this.view.scene</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">  </span><span class="WHIT">
-<span class='line'>293</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>294</span> 
-<span class='line'>295</span> 
-<span class='line'>296</span> </span><span class="NAME">vxlRenderer.prototype.disableOffscreen</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>297</span> </span><span class="WHIT">    </span><span class="NAME">this.strategy.disableOffscreen</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>298</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>299</span> 
-<span class='line'>300</span> 
-<span class='line'>301</span> </span><span class="COMM">/**
-<span class='line'>302</span>  *Sets the render target for this renderer 
-<span class='line'>303</span>  */</span><span class="WHIT">
-<span class='line'>304</span> </span><span class="NAME">vxlRenderer.prototype.enableOffscreen</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>305</span> </span><span class="WHIT">    </span><span class="NAME">this._renderTarget</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">vxlRenderTarget</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>306</span> </span><span class="WHIT">    </span><span class="NAME">this.strategy.enableOffscreen</span><span class="PUNC">(</span><span class="NAME">this._renderTarget</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">    </span><span class="WHIT">
-<span class='line'>307</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>308</span> 
-<span class='line'>309</span> </span></pre></body></html>
+<span class='line'>274</span> </span><span class="WHIT">    </span><span class="NAME">this.clear</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">                   </span><span class="COMM">//clear the canvas</span><span class="WHIT">
+<span class='line'>275</span> </span><span class="WHIT">    </span><span class="NAME">strategy.allocate</span><span class="PUNC">(</span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">	    </span><span class="COMM">//allocate memory for actors added since last rendering</span><span class="WHIT">
+<span class='line'>276</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>277</span> </span><span class="WHIT">    </span><span class="NAME">start</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getTime</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>278</span> </span><span class="WHIT">    </span><span class="NAME">strategy.render</span><span class="PUNC">(</span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>279</span> </span><span class="WHIT">    </span><span class="NAME">elapsed</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getTime</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">start</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>280</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>281</span> </span><span class="WHIT">    </span><span class="NAME">strategy.deallocate</span><span class="PUNC">(</span><span class="NAME">scene</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">     </span><span class="COMM">//deallocate memory if necessary</span><span class="WHIT">
+<span class='line'>282</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>283</span> </span><span class="WHIT">    </span><span class="COMM">// calculating FPS metric</span><span class="WHIT">
+<span class='line'>284</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">elapsed</span><span class="WHIT"> </span><span class="PUNC">></span><span class="NUMB">0</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>285</span> </span><span class="WHIT">        </span><span class="NAME">this.fps</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.round</span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NAME">this.fps</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">0.80</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NUMB">1000.0</span><span class="PUNC">/</span><span class="NAME">elapsed</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">0.2</span><span class="PUNC">)</span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">100</span><span class="PUNC">)</span><span class="PUNC">/</span><span class="NUMB">100</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>286</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>287</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>288</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>289</span> 
+<span class='line'>290</span> </span><span class="COMM">/**
+<span class='line'>291</span>  * Reallocates the actors marked as dirty, without requiring rerendering. This mechanism allows
+<span class='line'>292</span>  * to update the GL buffers for dirty actors. 
+<span class='line'>293</span>  */</span><span class="WHIT">
+<span class='line'>294</span> </span><span class="NAME">vxlRenderer.prototype.reallocate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>295</span> </span><span class="WHIT">  </span><span class="NAME">this.strategy.allocate</span><span class="PUNC">(</span><span class="NAME">this.view.scene</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">  </span><span class="WHIT">
+<span class='line'>296</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>297</span> 
+<span class='line'>298</span> 
+<span class='line'>299</span> </span><span class="NAME">vxlRenderer.prototype.disableOffscreen</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>300</span> </span><span class="WHIT">    </span><span class="NAME">this.strategy.disableOffscreen</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>301</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>302</span> 
+<span class='line'>303</span> 
+<span class='line'>304</span> </span><span class="COMM">/**
+<span class='line'>305</span>  *Sets the render target for this renderer 
+<span class='line'>306</span>  */</span><span class="WHIT">
+<span class='line'>307</span> </span><span class="NAME">vxlRenderer.prototype.enableOffscreen</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>308</span> </span><span class="WHIT">    </span><span class="NAME">this._renderTarget</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">vxlRenderTarget</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>309</span> </span><span class="WHIT">    </span><span class="NAME">this.strategy.enableOffscreen</span><span class="PUNC">(</span><span class="NAME">this._renderTarget</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>310</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>311</span> 
+<span class='line'>312</span> </span></pre></body></html>

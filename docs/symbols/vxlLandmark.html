@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>Voxelent Code Docs - vxlModel</title>
+		<title>Voxelent Code Docs - vxlLandmark</title>
 		<link rel='stylesheet' type='text/css' href='../style/style.css'/>
 		<link rel="stylesheet" type="text/css" href="../style/prettify.css"/>
 		<script type="text/javascript" src="../style/prettify.js"></script>
@@ -152,7 +152,7 @@
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class  <code>vxlModel</code>
+				Class  <code>vxlLandmark</code>
 			</h1>
 
 <!-- ============================== class summary ========================== -->
@@ -160,10 +160,10 @@
 				
 				
 
-				Represents a geometric object. A model is represented by an actor in a scene.
+				Stores the camera state so it can be retrieved later
 
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_model_Model.js.html">Model.js</a>.
+					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_camera_Landmark.js.html">Landmark.js</a>.
 				
 			</p>
 
@@ -175,9 +175,9 @@
 				<td class="attributes">&nbsp;</td>
 				<td class="nameDescription" >
 					<div class="fixedFont">
-						<b><a href="../symbols/vxlModel.html#constructor">vxlModel</a></b>(name, JSON_OBJECT)
+						<b><a href="../symbols/vxlLandmark.html#constructor">vxlLandmark</a></b>(camera, camera)
 					</div>
-					<div class="description">Models are totally independent of views and of the rendering process</div>
+					<div class="description">Creates a vxlLandmark object and associates it with a vxlCamera.</div>
 				</td>
 				</tr>
 				</table>
@@ -185,37 +185,13 @@
 
 <!-- ============================== properties summary ===================== -->
 			
-				
-				
-				<h2>Field Summary</h2>
-				<table class="summaryTable" summary="A summary of the fields documented in the class vxlModel.">
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">
-							    &lt;static&gt;&nbsp;</div></td>
-															
-							<td class="nameDescription">
-								<div class="fixedFont">
-								vxlModel.<b><a href="../symbols/vxlModel.html#.BB_INDICES">BB_INDICES</a></b>
-								</div>
-
-							</td>
-						</tr>
-					
-					</tbody>
-				</table>
-				
-
-				
-			
 
 <!-- ============================== methods summary ======================== -->
 			
 				
 				
 				<h2>Method Summary</h2>
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class vxlModel.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class vxlLandmark.">
 					
 						<tr>
 							<td class="attributes">
@@ -232,118 +208,8 @@
 								
 								
 								
-								<b><a href="../symbols/vxlModel.html#computeBoundingBox">computeBoundingBox</a></b>
+								<b><a href="../symbols/vxlLandmark.html#retrieve">retrieve</a></b>
 								()
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-							      <span>void</span>   
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
-								<b><a href="../symbols/vxlModel.html#computeNormals">computeNormals</a></b>
-								()
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-							      <span>void</span>   
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
-								<b><a href="../symbols/vxlModel.html#computeWireframeIndices">computeWireframeIndices</a></b>
-								()
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-							      <span>void</span>   
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
-								<b><a href="../symbols/vxlModel.html#flipNormals">flipNormals</a></b>
-								()
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-							      <span>void</span>   
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
-								<b><a href="../symbols/vxlModel.html#getBoundingBoxVertices">getBoundingBoxVertices</a></b>
-								()
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-							      <span>void</span>   
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
-								<b><a href="../symbols/vxlModel.html#load">load</a></b>
-								(nm, JSON_OBJECT)
 								</div>
 							</td>
 							
@@ -367,12 +233,12 @@
 				<div class='methodDetail'>
 				<div class="title">
 				<div class="fixedFont">
-						<b>vxlModel</b>(name, JSON_OBJECT)
+						<b>vxlLandmark</b>(camera, camera)
 				</div>
 				</div>
 
 				<div class="description">
-					Models are totally independent of views and of the rendering process
+					Creates a vxlLandmark object and associates it with a vxlCamera.
 					<br /><i>Author: </i>Diego Cantor.
 				</div>
 
@@ -385,13 +251,13 @@
 						
 							<tr>
 							<td>
-								<span class="light fixedFont">{String}</span> 
+								<span class="light fixedFont">{<a href="../symbols/vxlCamera.html">vxlCamera</a>}</span> 
 							</td>
 							<td>	
-								 <code>name</code>
+								 <code>camera</code>
 							</td>
 							<td>
-								<p>the name for this model
+								<p>
 								
 								</p>
 							</td>
@@ -399,13 +265,13 @@
 						
 							<tr>
 							<td>
-								<span class="light fixedFont">{Object}</span> 
+								
 							</td>
 							<td>	
-								 <code>JSON_OBJECT</code>
+								 <code>camera</code>
 							</td>
 							<td>
-								<p>the JSON Object that defines this model (Optional)
+								<p>
 								
 								</p>
 							</td>
@@ -422,7 +288,7 @@
 						<dl class="detailList">
 						<dt class="heading">See:</dt>
 						
-							<dd><a href="../symbols/vxlModel.html#load">vxlModel#load</a></dd>
+							<dd><a href="../symbols/vxlCamera.html">vxlCamera</a></dd>
 						
 						</dl>
 					
@@ -432,35 +298,6 @@
 
 <!-- ============================== field details ========================== -->
 			
-				<h2>
-					Field Detail
-				</h2>
-				
-					<div class='methodDetail'>
-					<a name=".BB_INDICES"> </a>
-					<div class="title">
-					<div class="fixedFont">&lt;static&gt; 
-
-					
-					<span class="light">vxlModel.</span><b>BB_INDICES</b>
-					</div>
-					</div>
-					<div class="description">
-						Indices to draw the bounding box. The vertices in this case will correspondto the actor bounding box calculation
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-
-					</div>
-				
-			
 
 <!-- ============================== method details ========================= -->
 			
@@ -469,7 +306,7 @@
 				</h2>
 				
 				<div class='methodDetail'>
-					<a name="computeBoundingBox"> </a>
+					<a name="retrieve"> </a>
 					<div class="title">
 					<div class="fixedFont">
 
@@ -479,201 +316,17 @@
 					
 					
 					
-					  <b>computeBoundingBox</b>()
+					  <b>retrieve</b>()
 					</div>
 					</div>
 					<div class="description">
-						Calculate the bounding box of this model and its centre
+						Updates the camera with the state stored in vxlLandmark.
 						
 						
 					</div>
 
 					
 
-						
-						
-						
-						
-						
-						
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="computeNormals"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>computeNormals</b>()
-					</div>
-					</div>
-					<div class="description">
-						Calculates the normals for this model in case that the JSON object does not include them
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="computeWireframeIndices"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>computeWireframeIndices</b>()
-					</div>
-					</div>
-					<div class="description">
-						Generate the wireframe indices using the model indices
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="flipNormals"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>flipNormals</b>()
-					</div>
-					</div>
-					<div class="description">
-						Flips the normals
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="getBoundingBoxVertices"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>getBoundingBoxVertices</b>()
-					</div>
-					</div>
-					<div class="description">
-						Returns the bounding box vertices. This method is used by the rendering engine
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="load"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>load</b>(nm, JSON_OBJECT)
-					</div>
-					</div>
-					<div class="description">
-						Populates this model with the JSON_OBJECT (JSON object)
-						
-						
-					</div>
-
-					
-
-						
-							<p class="heading">Parameters:</p>
-							<table class="paramTable">
-							
-							<tr><td>
-									<span class="light fixedFont">{String}</span> 
-								</td>
-								<td>
-									<code>nm</code>
-								</td>	
-								<td><p>the name given to this model
-								
-								</p>
-								</td>
-							</tr>	
-							
-							<tr><td>
-									<span class="light fixedFont">{Object}</span> 
-								</td>
-								<td>
-									<code>JSON_OBJECT</code>
-								</td>	
-								<td><p>the JSON object that describes the model
-								
-								</p>
-								</td>
-							</tr>	
-							
-							</table>
 						
 						
 						
