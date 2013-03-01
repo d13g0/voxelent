@@ -88,6 +88,9 @@ vxlProgram.prototype.loadProgram = function(ID){
         gl.attachShader(WEB_GL_PROGRAM, fs);
     }
     
+    //fix for version 0.89.2 Making sure that the vertex array is ALWAYS the attribute with location 0
+    gl.bindAttribLocation(WEB_GL_PROGRAM, 0 , vxl.def.glsl.VERTEX_ATTRIBUTE);
+    
     gl.linkProgram(WEB_GL_PROGRAM);
      
     if (!gl.getProgramParameter(WEB_GL_PROGRAM, gl.LINK_STATUS)) {

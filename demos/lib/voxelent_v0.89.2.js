@@ -5559,6 +5559,7 @@ vxlPickerInteractor.prototype.constructor = vxlPickerInteractor;
  */
 function vxlPickerInteractor(){
 	vxlViewInteractor.call(this);
+	this._drag = false;
 };
 
 
@@ -5579,13 +5580,10 @@ vxlPickerInteractor.prototype.get2DCoords = function(ev){
     return {x:x,y:y};
 };
 
-
 /**
- *  Reacts to the onmouse up event on the canvas
- * @param {Object} ev
+ * @private 
  */
-vxlPickerInteractor.prototype.onMouseUp   = function(ev){
-    
+vxlPickerInteractor.prototype._findHits = function(ev){
     var rt     = this.view.renderer._renderTarget;
     var coords = this.get2DCoords(ev);
     var color  = rt.readPixel(coords);
@@ -5611,11 +5609,20 @@ vxlPickerInteractor.prototype.onMouseUp   = function(ev){
 };
 
 /**
+ *  Reacts to the onmouse up event on the canvas
+ * @param {Object} ev
+ */
+vxlPickerInteractor.prototype.onMouseUp   = function(ev){
+    this._findHits(ev); 
+    this._drag = false;   
+};
+
+/**
  * Reacts to the onmouse event on the canvas 
  * @param {Object} ev mouse event
  */
 vxlPickerInteractor.prototype.onMouseDown = function(ev){ 
-    
+    this._drag = true;
 };
 
 /**
@@ -5623,7 +5630,9 @@ vxlPickerInteractor.prototype.onMouseDown = function(ev){
  * @param {Object} ev
  */
 vxlViewInteractor.prototype.onMouseMove = function(ev){ 
-
+    if (this._drag){
+        this._findHits(ev);
+    }
 };
 
 /**
@@ -6339,6 +6348,9 @@ vxlProgram.prototype.loadProgram = function(ID){
         var fs = this._createShader(vxl.def.glsl.FRAGMENT_SHADER,code.FRAGMENT_SHADER);
         gl.attachShader(WEB_GL_PROGRAM, fs);
     }
+    
+    //fix for version 0.89.2 Making sure that the vertex array is ALWAYS the attribute with location 0
+    gl.bindAttribLocation(WEB_GL_PROGRAM, 0 , vxl.def.glsl.VERTEX_ATTRIBUTE);
     
     gl.linkProgram(WEB_GL_PROGRAM);
      
@@ -7339,12 +7351,9 @@ vxlCell.prototype._calculateNormal = function(){
  * [[a,b,c],[d,e,f],[g,h,i]] --> [a,b,c,d,e,f,g,h,i]
  */
 vxlCell.prototype.getFlattenVertices = function(){
-    var vertices = [];
-    for (var i=0, count= this.vertices.length; i<count; i+=1){
-        vertices = vertices.concat(this.vertices[i]);
-    }
-    return vertices;
-}
+    var v = this.vertices;
+    return [v[0][0],v[0][1],v[0][2],v[1][0],v[1][1],v[1][2],v[2][0],v[2][1],v[2][2]];
+};
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
@@ -7456,11 +7465,11 @@ vxlMesh.prototype._getRenderable = function(){
     r.colors = [];
     r.pickingColors = [];
     for(var i=0, count = this.cells.length; i<count; i +=1){
-            r.indices   = r.indices.concat([i*3, i*3+1, i*3+2]);
-            r.vertices  = r.vertices.concat(this.cells[i].getFlattenVertices());
+            r.indices.push.apply(r.indices,[i*3, i*3+1, i*3+2]);
+            r.vertices.push.apply(r.vertices,this.cells[i].getFlattenVertices());
             for (var j = 0; j<3;j+=1){
-                r.colors    = r.colors.concat(this.cells[i].color);
-                r.pickingColors = r.pickingColors.concat(this.cells[i]._pickingColor);
+                r.colors.push.apply(r.colors,this.cells[i].color);
+                r.pickingColors.push.apply(r.pickingColors, this.cells[i]._pickingColor);
             }
     }
     
@@ -7477,8 +7486,8 @@ vxlMesh.prototype.updateRenderableColors = function(){
     r.pickingColors = [];
     for(var i=0, count = this.cells.length; i<count; i +=1){
             for (var j = 0; j<3;j+=1){
-                r.colors    = r.colors.concat(this.cells[i].color);
-                r.pickingColors = r.pickingColors.concat(this.cells[i]._pickingColor);
+                r.colors.push.apply(r.colors,this.cells[i].color);
+                r.pickingColors.push.apply(r.pickingColors, this.cells[i]._pickingColor);
             }
     }
 };
@@ -7518,8 +7527,11 @@ vxlMesh.prototype.removeCell = function(cellUID){
           break;
       }
   }
-  if (idx !=-1) 
+  if (idx !=-1) {
    this.cells.splice(idx,1);
+   //Now update the renderable model if there is one
+   }
+   
 };  
 
 /**
@@ -8424,8 +8436,6 @@ vxlRenderStrategy.prototype._allocateActor = function(actor){
  */
 vxlRenderStrategy.prototype._reallocateActor = function(actor){
    
-    
-    vxlRenderStrategy
     var gl = this.renderer.gl;
     var model = actor.model;
     var buffers = this._gl_buffers[actor.UID];
@@ -8474,7 +8484,7 @@ vxlRenderStrategy.prototype._reallocateActor = function(actor){
         
         this._gl_textures[actor.UID] = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this._gl_textures[actor.UID]);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, actor.texture.image);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, actor.material.texture.image);
         gl.generateMipmap(gl.TEXTURE_2D);
         
         gl.bindTexture(gl.TEXTURE_2D, null);
@@ -8822,6 +8832,7 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
     // THIS IS THE MAGIC TA DA!
     r = actor.mesh.renderable;
     if (r == undefined) {
+        
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
         prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
@@ -9017,8 +9028,8 @@ vxlRenderStrategy.prototype._renderTextured = function(actor){
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, actor.texture.getMagFilter(gl));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, actor.texture.getMinFilter(gl));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, actor.material.texture.getMagFilter(gl));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, actor.material.texture.getMinFilter(gl));
     prg.setUniform("uSampler", 0);
     
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
