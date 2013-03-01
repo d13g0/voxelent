@@ -182,7 +182,7 @@ vxlRenderStrategy.prototype._reallocateActor = function(actor){
         
         this._gl_textures[actor.UID] = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this._gl_textures[actor.UID]);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, actor.texture.image);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, actor.material.texture.image);
         gl.generateMipmap(gl.TEXTURE_2D);
         
         gl.bindTexture(gl.TEXTURE_2D, null);
@@ -725,8 +725,8 @@ vxlRenderStrategy.prototype._renderTextured = function(actor){
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, actor.texture.getMagFilter(gl));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, actor.texture.getMinFilter(gl));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, actor.material.texture.getMagFilter(gl));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, actor.material.texture.getMinFilter(gl));
     prg.setUniform("uSampler", 0);
     
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
