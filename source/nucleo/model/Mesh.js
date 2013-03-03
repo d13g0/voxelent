@@ -109,11 +109,11 @@ vxlMesh.prototype._getRenderable = function(){
     r.colors = [];
     r.pickingColors = [];
     for(var i=0, count = this.cells.length; i<count; i +=1){
-            r.indices   = r.indices.concat([i*3, i*3+1, i*3+2]);
-            r.vertices  = r.vertices.concat(this.cells[i].getFlattenVertices());
+            r.indices.push.apply(r.indices,[i*3, i*3+1, i*3+2]);
+            r.vertices.push.apply(r.vertices,this.cells[i].getFlattenVertices());
             for (var j = 0; j<3;j+=1){
-                r.colors    = r.colors.concat(this.cells[i].color);
-                r.pickingColors = r.pickingColors.concat(this.cells[i]._pickingColor);
+                r.colors.push.apply(r.colors,this.cells[i].color);
+                r.pickingColors.push.apply(r.pickingColors, this.cells[i]._pickingColor);
             }
     }
     
@@ -130,8 +130,8 @@ vxlMesh.prototype.updateRenderableColors = function(){
     r.pickingColors = [];
     for(var i=0, count = this.cells.length; i<count; i +=1){
             for (var j = 0; j<3;j+=1){
-                r.colors    = r.colors.concat(this.cells[i].color);
-                r.pickingColors = r.pickingColors.concat(this.cells[i]._pickingColor);
+                r.colors.push.apply(r.colors,this.cells[i].color);
+                r.pickingColors.push.apply(r.pickingColors, this.cells[i]._pickingColor);
             }
     }
 };
@@ -171,8 +171,11 @@ vxlMesh.prototype.removeCell = function(cellUID){
           break;
       }
   }
-  if (idx !=-1) 
+  if (idx !=-1) {
    this.cells.splice(idx,1);
+   //Now update the renderable model if there is one
+   }
+   
 };  
 
 /**

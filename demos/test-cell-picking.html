@@ -22,7 +22,7 @@ var view, actor, mesh , pickerInteractor, currentInteractor;
 function runVoxApp(){   
     vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
     view = vxl.api.setup('view-1');
-    vxl.api.load('ball.json','assets/models/geometry');
+    vxl.api.load('sphere.json','assets/models/geometry');
     view.start();
     view.renderer.enableOffscreen();
     pickerInteractor = new vxlPickerInteractor();
@@ -31,7 +31,7 @@ function runVoxApp(){
 
 function handleEvent(event){
      
-    actor = vxl.api.getActor('ball');
+    actor = vxl.api.getActor('sphere');
     actor.setColor(0,0.3,0.8);
     actor.setPosition(0,0,-10);
     actor.setVisualizationMode(vxl.def.actor.mode.FLAT);
@@ -51,9 +51,16 @@ function pickingCallback(actor, uid){
     var cell = actor.mesh.getCell(uid);
     //cell.color = [1,0,0];
     //actor.mesh.updateRenderableColors();
-    actor.mesh.removeCell(uid);
-    actor.mesh.renderable  = actor.mesh._getRenderable();
-    vxl.c.camera.refresh();
+    //test if we are facing the cell or not
+    
+    var angle = Math.acos(vec3.dot(cell.normal, vxl.c.camera._normal)) * vxl.def.rad2deg;
+    
+    if (angle <=90){
+    
+	    actor.mesh.removeCell(uid);
+	    actor.mesh.renderable  = actor.mesh._getRenderable();
+	    vxl.c.camera.refresh();
+    }
 };
 
 document.onkeypress = function(e){

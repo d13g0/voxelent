@@ -26,6 +26,7 @@ vxlPickerInteractor.prototype.constructor = vxlPickerInteractor;
  */
 function vxlPickerInteractor(){
 	vxlViewInteractor.call(this);
+	this._drag = false;
 };
 
 
@@ -46,13 +47,10 @@ vxlPickerInteractor.prototype.get2DCoords = function(ev){
     return {x:x,y:y};
 };
 
-
 /**
- *  Reacts to the onmouse up event on the canvas
- * @param {Object} ev
+ * @private 
  */
-vxlPickerInteractor.prototype.onMouseUp   = function(ev){
-    
+vxlPickerInteractor.prototype._findHits = function(ev){
     var rt     = this.view.renderer._renderTarget;
     var coords = this.get2DCoords(ev);
     var color  = rt.readPixel(coords);
@@ -78,11 +76,20 @@ vxlPickerInteractor.prototype.onMouseUp   = function(ev){
 };
 
 /**
+ *  Reacts to the onmouse up event on the canvas
+ * @param {Object} ev
+ */
+vxlPickerInteractor.prototype.onMouseUp   = function(ev){
+    this._findHits(ev); 
+    this._drag = false;   
+};
+
+/**
  * Reacts to the onmouse event on the canvas 
  * @param {Object} ev mouse event
  */
 vxlPickerInteractor.prototype.onMouseDown = function(ev){ 
-    
+    this._drag = true;
 };
 
 /**
@@ -90,7 +97,9 @@ vxlPickerInteractor.prototype.onMouseDown = function(ev){
  * @param {Object} ev
  */
 vxlViewInteractor.prototype.onMouseMove = function(ev){ 
-
+    if (this._drag){
+        this._findHits(ev);
+    }
 };
 
 /**
