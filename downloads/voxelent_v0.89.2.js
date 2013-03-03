@@ -7382,22 +7382,19 @@ vxlCell.prototype.getFlattenVertices = function(){
 function vxlMesh(model){
     
     this.cells = [];
-    this.indices = [];
-    this.normals = [];
-    this.renderable = undefined;
     this.color = [0.8,0.8,0.8]; 
-    
+    this._renderable = undefined;
     this._init(model);
 };
 
+/**
+ * Sets the mesh color
+ */
 vxlMesh.prototype.setColor = function(color){
     this.color = color;
-    
-    
-    if (this.renderable){
-        this.updateRenderableColors();
-    }
-}
+    this.setRenderableColor(this.color);
+};
+
 /**
  * Identifies the cells existing in the 
  * @private
@@ -7433,34 +7430,36 @@ vxlMesh.prototype._init = function(model){
             z = ver[idx*3 + 2];   
             triangle.push([x,y,z]);
 
-            self.indices.push([ind[i], ind[i+1], ind[i+2]]);
+            
             self.cells.push(new vxlCell(triangle));
         }
         var col = [self.color[0], self.color[1], self.color[2]];
         for (var i=0, L =self.cells.length; i<L; i+=1){
-            self.normals.push(self.cells[i]._normal);
+            
             self.cells[i].color = col; //BEWARE FLOATARRAYS DONT TRANSLATE WELL
         }
         
-        self.renderable = self._getRenderable();
+        self.createRenderableModel();
         var elapsed = new Date().getTime() - start;
         console.info('Mesh ['+ model.name +'] generated in '+elapsed+ ' ms');
     };
     
     //because this operation is time consuming it is deferred here.
-    //this causes that the reenderable object is not available in the renderer
-    //until this op finishes.
+    //this causes that the renderable object is not available in the renderer until this op finishes.
    setTimeout(function(){initMesh()},0);
 };
 
 
 /**
- * Returns a renderable model of the mesh
- * @private
+ * Based on the mesh information it creates an renderable model of the mesh.
+ * A renderable mesh model is used when the vxl.def.actor.mode.FLAT mode is the actor visualization mode.
+ * Also, a renderable mesh model is used for cell picking.
+ * 
  */
-vxlMesh.prototype._getRenderable = function(){
+vxlMesh.prototype.createRenderableModel = function(){
     
-    var r = new vxlModel();
+    this._renderable = new vxlModel();
+    var r = this._renderable;
     
     r.colors = [];
     r.pickingColors = [];
@@ -7478,13 +7477,31 @@ vxlMesh.prototype._getRenderable = function(){
 };
 
 /**
- * @TODO: Improve. given a cell, find its index and update just that 
+ * Sets the color for the renderable mesh model
+ * @param {vec3} color the new color
  */
+vxlMesh.prototype.setRenderableColor = function(color){
+    
+    if (this._renderable == undefined) return;
+    
+    var r = this._renderable;
+    r.colors = [];
+    
+    for(var i=0, count = this.cells.length; i<count; i +=1){
+            this.cells[i].color = [color[0], color[1], color[2]];
+            for (var j = 0; j<3;j+=1){
+                r.colors.push.apply(r.colors,this.cells[i].color);
+            }
+    }
+};
+
 vxlMesh.prototype.updateRenderableColors = function(){
-    var r = this.renderable;
+    var r = this._renderable;
+    
     r.colors = [];
     r.pickingColors = [];
     for(var i=0, count = this.cells.length; i<count; i +=1){
+           
             for (var j = 0; j<3;j+=1){
                 r.colors.push.apply(r.colors,this.cells[i].color);
                 r.pickingColors.push.apply(r.pickingColors, this.cells[i]._pickingColor);
@@ -7494,7 +7511,7 @@ vxlMesh.prototype.updateRenderableColors = function(){
  
 /**
  * Determines if this mesh contains the cell indicated by the parameter cellUID
- * @param {string} cellUID the unique identifier of a cell
+ * @param {String} cellUID the unique identifier of a cell
  */
 vxlMesh.prototype.hasCell = function(cellUID){
   for(var i=0, count= this.cells.length; i < count; i+=1){
@@ -7507,7 +7524,7 @@ vxlMesh.prototype.hasCell = function(cellUID){
 
 /**
  * Determines if this mesh contains the cell indicated by the parameter cellUID
- * @param {string} cellUID the unique identifier of a cell
+ * @param {String} cellUID the unique identifier of a cell
  */
 vxlMesh.prototype.getCell = function(cellUID){
   for(var i=0, count= this.cells.length; i < count; i+=1){
@@ -7528,9 +7545,10 @@ vxlMesh.prototype.removeCell = function(cellUID){
       }
   }
   if (idx !=-1) {
-   this.cells.splice(idx,1);
-   //Now update the renderable model if there is one
+        this.cells.splice(idx,1);
+        this.createRenderableModel();
    }
+
    
 };  
 
@@ -7548,12 +7566,12 @@ vxlMesh.prototype.intersect = function(camera, angle){
     
     selection = [];
 
-    for(var i=0;i<this.normals.length; i+=1){
+    /*for(var i=0;i<this.normals.length; i+=1){
         var dp = Math.acos(vec3.dot(ray, this.normals[i])) * vxl.def.rad2deg;
         if (Math.abs(dp) <= angle){
             selection = selection.concat(this.indices[i]);
         }  
-    }
+    }*/
     return selection;
 };/*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
@@ -8268,7 +8286,6 @@ vxlPicker.prototype.query = function(color){
     var distance = 100;
     var closest_uid = undefined;
     var results = {}
-    var v = 2;
     
     if (this._hmap[color[0]][color[1]][color[2]] != null){
         results.uid = this._hmap[color[0]][color[1]][color[2]];
@@ -8276,18 +8293,19 @@ vxlPicker.prototype.query = function(color){
         return results;
     }
     
-        
-    for (var i=-v;i<=v;i+=1){
-        for (var j=-v;j<=v;j+=1){
-            for (var k=-v;k<=v;k+=1){
-                if (color[0]+i<0 || color[0]+i>256 || 
-                    color[1]+j<0 || color[1]+j>256 || 
-                    color[2]+k<0 || color[2]+k>256) continue;
-                var closest_uid = this._hmap[color[0]+i][color[1]+j][color[2]+k];
-                if (closest_uid != null){
-                    results.uid = closest_uid;
-                    results.color = [color[0]+i,color[1]+j,color[2]+k];
-                    return results;
+    for (var v = 1; v<=2; v+=1)  {  
+        for (var i=-v;i<=v;i+=1){
+            for (var j=-v;j<=v;j+=1){
+                for (var k=-v;k<=v;k+=1){
+                    if (color[0]+i<0 || color[0]+i>256 || 
+                        color[1]+j<0 || color[1]+j>256 || 
+                        color[2]+k<0 || color[2]+k>256) continue;
+                    var closest_uid = this._hmap[color[0]+i][color[1]+j][color[2]+k];
+                    if (closest_uid != null){
+                        results.uid = closest_uid;
+                        results.color = [color[0]+i,color[1]+j,color[2]+k];
+                        return results;
+                    }
                 }
             }
         }
@@ -8445,9 +8463,7 @@ vxlRenderStrategy.prototype._reallocateActor = function(actor){
     
     //Index Buffer
     if (model.indices != undefined){    
-    //Cleaning up
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+  
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices), gl.STATIC_DRAW);
     }
@@ -8830,7 +8846,7 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
     
     /******************************************/
     // THIS IS THE MAGIC TA DA!
-    r = actor.mesh.renderable;
+    r = actor.mesh._renderable;
     if (r == undefined) {
         
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
@@ -8931,7 +8947,7 @@ vxlRenderStrategy.prototype._renderPickingBuffer = function(actor){
         
         /******************************************/
         // THIS IS THE MAGIC TA DA!
-         r = actor.mesh.renderable;
+         r = actor.mesh._renderable;
          if (r == undefined) return; 
         /******************************************/
         
@@ -8964,7 +8980,6 @@ vxlRenderStrategy.prototype._renderPickingBuffer = function(actor){
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(r.indices), gl.STATIC_DRAW);
         gl.drawElements(gl.TRIANGLES, r.indices.length, gl.UNSIGNED_SHORT,0);
-    
     }
     else if (actor._picking == vxl.def.actor.picking.OBJECT){
         

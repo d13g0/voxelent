@@ -104,7 +104,6 @@ vxlPicker.prototype.query = function(color){
     var distance = 100;
     var closest_uid = undefined;
     var results = {}
-    var v = 2;
     
     if (this._hmap[color[0]][color[1]][color[2]] != null){
         results.uid = this._hmap[color[0]][color[1]][color[2]];
@@ -112,18 +111,19 @@ vxlPicker.prototype.query = function(color){
         return results;
     }
     
-        
-    for (var i=-v;i<=v;i+=1){
-        for (var j=-v;j<=v;j+=1){
-            for (var k=-v;k<=v;k+=1){
-                if (color[0]+i<0 || color[0]+i>256 || 
-                    color[1]+j<0 || color[1]+j>256 || 
-                    color[2]+k<0 || color[2]+k>256) continue;
-                var closest_uid = this._hmap[color[0]+i][color[1]+j][color[2]+k];
-                if (closest_uid != null){
-                    results.uid = closest_uid;
-                    results.color = [color[0]+i,color[1]+j,color[2]+k];
-                    return results;
+    for (var v = 1; v<=2; v+=1)  {  
+        for (var i=-v;i<=v;i+=1){
+            for (var j=-v;j<=v;j+=1){
+                for (var k=-v;k<=v;k+=1){
+                    if (color[0]+i<0 || color[0]+i>256 || 
+                        color[1]+j<0 || color[1]+j>256 || 
+                        color[2]+k<0 || color[2]+k>256) continue;
+                    var closest_uid = this._hmap[color[0]+i][color[1]+j][color[2]+k];
+                    if (closest_uid != null){
+                        results.uid = closest_uid;
+                        results.color = [color[0]+i,color[1]+j,color[2]+k];
+                        return results;
+                    }
                 }
             }
         }

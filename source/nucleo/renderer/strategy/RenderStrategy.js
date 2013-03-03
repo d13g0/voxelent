@@ -141,9 +141,7 @@ vxlRenderStrategy.prototype._reallocateActor = function(actor){
     
     //Index Buffer
     if (model.indices != undefined){    
-    //Cleaning up
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+  
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices), gl.STATIC_DRAW);
     }
@@ -526,7 +524,7 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
     
     /******************************************/
     // THIS IS THE MAGIC TA DA!
-    r = actor.mesh.renderable;
+    r = actor.mesh._renderable;
     if (r == undefined) {
         
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
@@ -627,7 +625,7 @@ vxlRenderStrategy.prototype._renderPickingBuffer = function(actor){
         
         /******************************************/
         // THIS IS THE MAGIC TA DA!
-         r = actor.mesh.renderable;
+         r = actor.mesh._renderable;
          if (r == undefined) return; 
         /******************************************/
         
@@ -660,7 +658,6 @@ vxlRenderStrategy.prototype._renderPickingBuffer = function(actor){
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(r.indices), gl.STATIC_DRAW);
         gl.drawElements(gl.TRIANGLES, r.indices.length, gl.UNSIGNED_SHORT,0);
-    
     }
     else if (actor._picking == vxl.def.actor.picking.OBJECT){
         
