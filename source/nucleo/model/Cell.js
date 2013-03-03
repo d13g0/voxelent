@@ -44,9 +44,6 @@ vxlCell.prototype._calculateNormal = function(){
  * [[a,b,c],[d,e,f],[g,h,i]] --> [a,b,c,d,e,f,g,h,i]
  */
 vxlCell.prototype.getFlattenVertices = function(){
-    var vertices = [];
-    for (var i=0, count= this.vertices.length; i<count; i+=1){
-        vertices = vertices.concat(this.vertices[i]);
-    }
-    return vertices;
-}
+    var v = this.vertices;
+    return [v[0][0],v[0][1],v[0][2],v[1][0],v[1][1],v[1][2],v[2][0],v[2][1],v[2][2]];
+};

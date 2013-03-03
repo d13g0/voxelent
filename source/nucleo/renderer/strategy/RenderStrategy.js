@@ -132,8 +132,6 @@ vxlRenderStrategy.prototype._allocateActor = function(actor){
  */
 vxlRenderStrategy.prototype._reallocateActor = function(actor){
    
-    
-    vxlRenderStrategy
     var gl = this.renderer.gl;
     var model = actor.model;
     var buffers = this._gl_buffers[actor.UID];
@@ -530,6 +528,7 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
     // THIS IS THE MAGIC TA DA!
     r = actor.mesh.renderable;
     if (r == undefined) {
+        
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
         prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
