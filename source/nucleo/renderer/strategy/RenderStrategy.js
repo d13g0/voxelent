@@ -350,7 +350,7 @@ vxlRenderStrategy.prototype._enableColors = function(actor){
     var buffers = this._gl_buffers[actor.UID];
     var glsl    = vxl.def.glsl; 
     
-    if (actor.colors && actor.colors.length == actor.model.vertices.length){    
+    if (actor.material.colors && actor.material.colors.length == actor.model.vertices.length){    
         try{
             prg.setUniform("uUseVertexColors", true);
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);

@@ -16,22 +16,20 @@
 <title>Voxelent - Blender House</title>
 <script type='text/javascript' id='code-js'>
 
-
+    
     
     function runVoxApp(){
         
         vxl.go.notifier.subscribe(vxl.events.MODELS_LOADED, this);
-    
         vxl.api.setup('view-1');  
-        
         var gui = new vxlGUI(vxl.c.view); 
-
         vxl.api.loadSequence('part',1,203,'assets/models/house');
-        
         vxl.c.view.start();
+        
     }
     
     function handleEvent(event, src){
+       vxl.api.setUniform("uLightAmbient",[0.05,0.05,0.05,1.0]);
        vxl.api.boundingBoxON();
        var c = vxl.c.camera;
        c.setPosition(15.26,30.53,21.67);
@@ -71,7 +69,7 @@
     background: rgba(100,100,100,0.5);
     padding: 10px;
     width: 170px;
-    height: 30%;
+    height: 40%;
     position: absolute;
     top: 5px;
     right: 5px;
@@ -92,7 +90,7 @@
 <body onload='runVoxApp()'>
     
      
-<div><img src="css/img/voxelent.png" /></div>
+
 <div class='show'>
 <canvas id = 'view-1' width='1200' height='400'>
     <p>
@@ -104,9 +102,12 @@
       <p><b>t</b> Tracking mode</p>
       <p><b>f</b> Fullscreen</p>
       <p><b>double click</b> long shot</p>
+      <p><button class='ui-button-success' id='toggleMesh'> Show Wireframe</button></p>
       <p>
-      <button class='ui-button-success' id='toggleMesh'> Show Wireframe</button>
-      </p> 
+      <button class='ui-button-primary' id='btnBed'>Bedroom</button>
+      <button class='ui-button-primary' id='btnLiving'>Living Room</button>
+      <button class='ui-button-primary' id='btnBird'> Bird Eye</button>
+      </p>
       <p>
           Field of View: <div id='op-slider-id'> </div>
       </p>
@@ -130,6 +131,35 @@ $('#toggleMesh').button().click(
     }
 );
 
+$('#btnBed').button().click(
+    function(){
+       var c = vxl.c.camera;
+       c.setType(vxl.def.camera.type.TRACKING);
+       c.setPosition([0.34,8.9,-1.54]);
+       c.setFocalPoint([-6.03,5.08,6.73]);     
+    }
+);
+
+
+$('#btnLiving').button().click(
+    function(){
+        var c = vxl.c.camera;
+        c.setType(vxl.def.camera.type.TRACKING);
+        c.setPosition(6.95,0.43,7.32);
+        c.setFocalPoint(1.81,-1.67,1.32);
+    }
+);
+
+
+$("#btnBird").button().click(
+    function(){
+       var c = vxl.c.camera;
+       c.setPosition(15.26,30.53,21.67);
+       c.setFocalPoint(-6.03,5.08,6.73);
+       c.setType(vxl.def.camera.type.ORBITING);
+    }
+);
+       
 function changeFOV(){
     var v = $('#op-slider-id').slider('value');
     vxl.c.camera.setFieldOfView(v);
