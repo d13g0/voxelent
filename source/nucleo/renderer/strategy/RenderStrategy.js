@@ -417,7 +417,9 @@ vxlRenderStrategy.prototype._renderPoints = function(actor){
     var glsl    = vxl.def.glsl; 
     
     prg.setUniform("uUseShading", false);
+    
     prg.setUniform("uPointSize", 5);//TODO: this can be an actor property?
+    this._enableColors(actor);
     gl.drawArrays(gl.POINTS,0, model.vertices.length/3);
 };
 
@@ -432,6 +434,7 @@ vxlRenderStrategy.prototype._renderLines = function(actor){
     var glsl    = vxl.def.glsl;
     
     prg.setUniform("uUseShading", false);
+    this._enableColors(actor);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
     gl.drawElements(gl.LINES, actor.model.indices.length, gl.UNSIGNED_SHORT,0); 
 };
