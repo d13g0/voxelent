@@ -490,7 +490,7 @@ vxlRenderStrategy.prototype._renderBoundingBoxAndSolid = function(actor){    var
  */
 vxlRenderStrategy.prototype._renderWiredAndSolid = function(actor){
    
-var model   = actor.model;
+    var model   = actor.model;
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
     var prg     = this.renderer.prg;
@@ -508,11 +508,15 @@ var model   = actor.model;
 };
 
 /**
+ * This method will create a mesh for the actor if it does not exist one already
+ * Instead of waiting for the mesh to be ready, it will render a wireframe
+ * of the actor while it is ready.
+ * 
  * @private
  */
 vxlRenderStrategy.prototype._renderFlat = function(actor){
     
-    var model   = actor.model;
+   
     var buffers = this._gl_buffers[actor.UID];
     var texture = this._gl_textures[actor.UID]; 
     var gl      = this.renderer.gl;
@@ -520,16 +524,13 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
     var glsl    = vxl.def.glsl;
     
     if (actor.mesh == undefined){
-        //here it is necessary as there is not previous call for this .. for now.
-        actor.mesh = new vxlMesh(actor.model); 
+        actor.mesh = new vxlMesh(actor.model);
+        
     }
     
-    
-    /******************************************/
-    // THIS IS THE MAGIC TA DA!
-    r = actor.mesh._model;
-    if (r == undefined) {
-        
+    if (actor.mesh._model == undefined) {
+        //mesh not ready yet. Render actor wireframe in the mean time
+        var model = actor.model;
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
         prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
@@ -541,14 +542,10 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
         this._renderWireframe(actor);
         return;
     } 
-    
-    
-     
-    /******************************************/
-   
+
     prg.setUniform("uUseShading",true);
-    
-    var parts = actor.mesh._renderable.parts;
+
+    var parts = actor.mesh._model.renderable.parts;
     
     for(var i=0, N = parts.length; i<N; i+=1){
         
@@ -577,7 +574,13 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
             throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
         }
         
-       if (part.colors && part.colors.length > 0){    
+       if (part.colors && part.colors.length > 0){ 
+           
+                if (buffers.colors == undefined){
+                    //when switching to parts this might not be defined
+                    buffers.color = gl.createBuffer();
+                }
+              
                 try{
                     prg.setUniform("uUseVertexColors", true);
                     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
@@ -630,18 +633,13 @@ vxlRenderStrategy.prototype._renderPickingBuffer = function(actor){
     if (actor._picking == vxl.def.actor.picking.CELL){
     
       
-        if (actor.mesh == undefined){
+        if (actor.mesh == undefined || actor.mesh._model == undefined){
             return; // we just fail safely. We will render it whenever the actor is ready ;-)
                     // the mesh is generated inside actor.setPicker (see actor.setPicker method)
         }
         
-        /******************************************/
-        // THIS IS THE MAGIC TA DA!
-         r = actor.mesh._model;
-         if (r == undefined) return; 
-        /******************************************/
-        
-        var parts = actor.mesh._renderable.parts;
+      
+        var parts = actor.mesh._model.renderable.parts;
     
         for(var i=0, N = parts.length; i<N; i+=1){
         
@@ -657,7 +655,13 @@ vxlRenderStrategy.prototype._renderPickingBuffer = function(actor){
                 throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
             }
             
-            if (part.pickingColors && part.pickingColors.length == part.vertices.length){    
+            if (part.pickingColors && part.pickingColors.length == part.vertices.length){
+                
+                if (buffers.colors == undefined){
+                    //when switching to parts this might not be defined
+                    buffers.color = gl.createBuffer();
+                }
+                  
                 try{
                     prg.setUniform("uUseVertexColors", true);
                     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
@@ -877,4 +881,12 @@ vxlRenderStrategy.prototype.disableOffscreen = function(){
     this._offscreen = false;
     this._target = undefined;
 };
+
+/**
+ * Returns true if the offscreen rendering does not have any target.
+ * @returns {true\false}
+ */
+vxlRenderStrategy.prototype.isOffscreenEnabled = function(){
+    return (this._target != undefined);    
+}
 

@@ -144,8 +144,17 @@ def : {
                          /**
                           * Maximum number of indices per model (Unsigned Short range) 
                           */
-                         maxNumIndices: 65535
+                         MAX_NUM_INDICES: 65535,
+                         /**
+                          * Types of models
+                          * <ul>
+                          * <li><code>SIMPLE</code>: The model is rendered at all once
+                          * <li><code>MESH</code>: This model represents a mesh (no shared triangles). Flat shading is required
+                          * <li><code>BIG_DATA</code>: This model is complex and it may required several rendering cycles.
+                          */
+                         type :{SIMPLE:'SIMPLE', MESH:'MESH', BIG_DATA:'BIG DATA'}
 					},
+
     material        : {
                        /**
                         * Diffuse color used by default when a model does 
@@ -6965,7 +6974,10 @@ vxlRenderer.prototype.reallocate = function(){
   this.strategy.allocate(this.view.scene);  
 };
 
-
+/**
+ * Disables offscreen rendering
+ *  
+ */
 vxlRenderer.prototype.disableOffscreen = function(){
     this.strategy.disableOffscreen();
 };
@@ -6977,6 +6989,13 @@ vxlRenderer.prototype.disableOffscreen = function(){
 vxlRenderer.prototype.enableOffscreen = function(){
     this._renderTarget = new vxlRenderTarget(this);
     this.strategy.enableOffscreen(this._renderTarget);    
+};
+
+/**
+ * Returns true if the offscreen rendering is enabled. False otherwise. 
+ */
+vxlRenderer.prototype.isOffscreenEnabled = function(){
+    return this.strategy.isOffscreenEnabled();  
 };
 
 /*-------------------------------------------------------------------------
@@ -7102,11 +7121,41 @@ function vxlModel(name, JSON_OBJECT){
 	this.image      = undefined;
 	this.uri        = undefined;
 	this.colors     = undefined;
+	this.type       = vxl.def.model.type.SIMPLE;
+	this.renderable = undefined;
    
     if (JSON_OBJECT != undefined){
         this.load(this.name, JSON_OBJECT);
     }
-}
+    
+    this.setType(this.type);
+};
+
+/**
+ * Sets the type of model. A renderable object is created and associated
+ * with this model in case the type is MESH or BIG_DATA
+ * 
+ * @param {vxl.def.model.type} type the type of model
+ */
+vxlModel.prototype.setType = function(type){
+    
+    if (this.indices.length > vxl.def.model.MAX_NUM_INDICES && 
+        type == vxl.def.model.type.BIG_DATA){
+            throw('The model is not big enough to be of BIG_DATA type Num Indices['+this.indices.length+']');
+        }
+    
+    
+    switch(type){
+        case vxl.def.model.type.MESH:
+        case vxl.def.model.type.BIG_DATA:
+             this.type = type;
+             this.renderable = new vxlRenderable(this);
+             break;
+        case vxl.def.model.type.SIMPLE:
+             this.type = type;
+             this.renderable = undefined;
+    }    
+};
 
 /**
  * Indices to draw the bounding box. The vertices in this case will correspond
@@ -7114,6 +7163,7 @@ function vxlModel(name, JSON_OBJECT){
  * @static
  */
 vxlModel.BB_INDICES = [0,1,1,2,2,3,3,0,0,4,4,5,5,6,6,7,7,4,1,5,2,6,3,7];
+
 
 /**
  * Populates this model with the JSON_OBJECT (JSON object)
@@ -7164,6 +7214,13 @@ vxlModel.prototype.update = function(){
     }
     
     this.computeBoundingBox();
+    
+    
+    if (this.type == vxl.def.model.type.BIG_DATA ||
+        this.type == vxl.def.model.type.MESH){
+            this.renderable.update();
+        }
+    
 };
 
 /**
@@ -7341,13 +7398,16 @@ vxlModel.prototype.getBoundingBoxVertices = function(){
  * @constructor
  * @author Diego Cantor
  */
-function vxlCell(vertices){ 
+function vxlCell(index, vertices, color){
+    
     this.UID = vxl.util.generateUID();
-    this.color = [0.8,0.8,0.8];
-    this._pickingColor  = vxl.go.picker.getColorFor(this); 
+    
+    this.index = index;
     this.vertices = vertices;
+    this.color = color==undefined?[0.8,0.8,0.8]:color;
     this.normal = undefined; //cell normal
     this._calculateNormal();
+    this._pickingColor  = vxl.go.picker.getColorFor(this);
 };
 
 /**
@@ -7390,16 +7450,20 @@ vxlCell.prototype.getFlattenVertices = function(){
  * 
  * @class Provides cell by cell operations on models
  * @constructor 
- * @param {vxlModel} model the model for this mesh
+ * @param {vxlModel} prior the model for this mesh
  * @author Diego Cantor
  */
-function vxlMesh(model){
-    this.name = model.name;
+function vxlMesh(prior){
+    
+    if (prior == undefined){
+        throw('vxlMesh: the model passed as parameter cannot be undefined');
+    }
+    
+    this.name = prior.name +'-mesh';
     this.cells = [];
     this.color = [0.8,0.8,0.8]; 
     this._model = undefined;                  //internal representation of the mesh
-    this._renderable = new vxlRenderable(this);   //dividing the internal representation into renderable chunks
-    this._init(model);
+    this._createMesh(prior);
 };
 
 
@@ -7408,19 +7472,25 @@ function vxlMesh(model){
  * Identifies the cells existing in the 
  * @private
  */
-vxlMesh.prototype._init = function(model){
+vxlMesh.prototype._createMesh = function(prior){
     
-    var ver = model.vertices;
-    var ind = model.indices;
+    var ver = prior.vertices;
+    var ind = prior.indices;
     
     var self = this;
-    
     this.cells = [];
     
-    function initMesh(){
+    function buildMesh(){
         var start = new Date().getTime();
         
-        //Creates triangular cells using the original index array
+        var cellIndex = 0;
+        
+        //@TODO: assign colors if they exist. Should we give the option to change luts here?
+        // probably not. Every time the actor changes its LUT the mesh should react and update its colors  
+
+        var meshColor = [self.color[0], self.color[1], self.color[2]];
+        
+        //1. CREATE CELLS
         for(var i=0, L = ind.length; i<L; i+=3){ 
             idx  = ind[i];
             var triangle = [],x,y,z,idx;
@@ -7443,57 +7513,53 @@ vxlMesh.prototype._init = function(model){
             triangle.push([x,y,z]);
 
             
-            self.cells.push(new vxlCell(triangle));
+            self.cells.push(new vxlCell(cellIndex, triangle, meshColor));
+            cellIndex += 1;
         }
         
-        //@TODO: assign colors if they exist. Should we give the option to change luts here?
-        // probably not. Every time the actor changes its LUT the mesh should react and update its colors  
-        var col = [self.color[0], self.color[1], self.color[2]];
-        for (var i=0, L =self.cells.length; i<L; i+=1){
-            
-            self.cells[i].color = col; //BEWARE FLOATARRAYS DONT TRANSLATE WELL
-        }
         
-        self._createModel();
+        self._createInternalModel();
+        
         var elapsed = new Date().getTime() - start;
-        console.info('Mesh ['+ model.name +'] generated in '+elapsed+ ' ms');
+        console.info('Mesh ['+ self.name +'] generated in '+elapsed+ ' ms');
     };
     
     //because this operation is time consuming it is deferred here.
-    //this causes that the renderable object is not available in the renderer until this op finishes.
-   setTimeout(function(){initMesh()},0);
+    //this causes that the mesh is not available for rendering until this operation finishes.
+   setTimeout(function(){buildMesh()},0);
 };
 
 
 /**
- * Based on the mesh information it creates an renderable model of the mesh.
- * A renderable mesh model is used when the vxl.def.actor.mode.FLAT mode is the actor visualization mode.
- * Also, a renderable mesh model is used for cell picking.
+ * Based on the mesh information it creates an internal model of the mesh.
  * @private
  * 
  */
-vxlMesh.prototype._createModel = function(){
+vxlMesh.prototype._createInternalModel = function(){
     
-    this._model = new vxlModel(this.name+'-mesh');
-    var r = this._model;
+    this._model = new vxlModel(this.name+'-model');
     
-    r.colors = [];
-    r.pickingColors = [];
+    var model = this._model;
+    
+    model.colors = [];
+    model.pickingColors = [];
+    
     for(var i=0, count = this.cells.length; i<count; i +=1){
-            r.indices.push.apply(r.indices,[i*3, i*3+1, i*3+2]);
-            r.vertices.push.apply(r.vertices,this.cells[i].getFlattenVertices());
+            model.indices.push.apply(model.indices,[i*3, i*3+1, i*3+2]);
+            model.vertices.push.apply(model.vertices,this.cells[i].getFlattenVertices());
+            
             for (var j = 0; j<3;j+=1){
-                r.colors.push.apply(r.colors,this.cells[i].color);
-                r.pickingColors.push.apply(r.pickingColors, this.cells[i]._pickingColor);
+                model.colors.push.apply(model.colors,this.cells[i].color);
+                model.pickingColors.push.apply(model.pickingColors, this.cells[i]._pickingColor);
             }
     }
     
-    r.computeNormals();  
-    this._renderable.update();
+    model.computeNormals();
+    
+    model.setType(vxl.def.model.type.MESH);
 };
 
 /**
- * Sets the color for the renderable mesh model
  * @param {vec3} color the new color
  * @private
  */
@@ -7501,17 +7567,17 @@ vxlMesh.prototype._setModelColor = function(color){
     
     if (this._model == undefined) return;
     
-    var r = this._model;
-    r.colors = [];
+    var model = this._model;
+    model.colors = [];
     
     for(var i=0, count = this.cells.length; i<count; i +=1){
             this.cells[i].color = [color[0], color[1], color[2]];
             for (var j = 0; j<3;j+=1){
-                r.colors.push.apply(r.colors,this.cells[i].color);
+                model.colors.push.apply(model.colors,this.cells[i].color);
             }
     }
     
-    this._renderable.update();
+    model.update();
 };
 
 /**
@@ -7526,19 +7592,19 @@ vxlMesh.prototype.updateColorUsingVertexColors = function(vcolors){
  * Update the mesh colors based on the current cell colors
  */
 vxlMesh.prototype.updateColor = function(){
-    var r = this._model;
+    var model = this._model;
     
-    r.colors = [];
-    r.pickingColors = [];
+    model.colors = [];
+    model.pickingColors = [];
     for(var i=0, count = this.cells.length; i<count; i +=1){
            
             for (var j = 0; j<3;j+=1){
-                r.colors.push.apply(r.colors,this.cells[i].color);
-                r.pickingColors.push.apply(r.pickingColors, this.cells[i]._pickingColor);
+                model.colors.push.apply(model.colors,this.cells[i].color);
+                model.pickingColors.push.apply(model.pickingColors, this.cells[i]._pickingColor);
             }
     }
     
-    this._renderable.update();
+    model.update();
 };
 
 /**
@@ -7587,7 +7653,7 @@ vxlMesh.prototype.removeCell = function(cellUID){
   }
   if (idx !=-1) {
         this.cells.splice(idx,1);
-        this._createModel();
+        this._createInternalModel();
    }
 
    
@@ -7712,7 +7778,7 @@ function vxlActor(model){
         e.ACTOR_SCALED,
         e.ACTOR_ROTATED,
         e.ACTOR_CHANGED_COLOR,
-        e.ACTOR_CHANGED_SHADING
+        e.ACTOR_CHANGED_SHADING,
       ], this);
 };
 
@@ -8206,17 +8272,31 @@ vxlActor.prototype.setPicker = function(type, callback){
             break;
         
         case vxl.def.actor.picking.CELL: 
+            
             if (this.mesh == undefined){
                 this.mesh = new vxlMesh(this.model); 
-                this.mesh.setColor(this.material.diffuse);           
+                this.mesh.setColor(this.material.diffuse);
+                this.setVisualizationMode(vxl.def.actor.mode.FLAT);           
             };
-            this._pickingCallback = callback; 
+            
+            this._pickingCallback = callback;
+             
             break;
         case vxl.def.actor.picking.OBJECT:
             this._pickingColor = vxl.go.picker.getColorFor(this);
             this._pickingCallback = callback;
             break;
     }
+    
+    if (this.isPickable()){
+        for(var i=0, N = this.scene.views.length; i<N; i+=1){
+            var r = this.scene.views[i].renderer;
+            if(!r.isOffscreenEnabled()){
+                r.enableOffscreen();
+            }
+        }
+    }
+    //@TODO: Disable when there are no pickable actors in the scene.
 };
 
 /**
@@ -8227,6 +8307,12 @@ vxlActor.prototype.isPickable = function(){
     return (this._picking  != vxl.def.actor.picking.DISABLED);  
 };
 
+/**
+ * Returns the picking type 
+ */
+vxlActor.prototype.getPickingType = function(){
+    return this._picking;  
+};
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
@@ -8859,7 +8945,7 @@ vxlRenderStrategy.prototype._renderBoundingBoxAndSolid = function(actor){    var
  */
 vxlRenderStrategy.prototype._renderWiredAndSolid = function(actor){
    
-var model   = actor.model;
+    var model   = actor.model;
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
     var prg     = this.renderer.prg;
@@ -8877,11 +8963,15 @@ var model   = actor.model;
 };
 
 /**
+ * This method will create a mesh for the actor if it does not exist one already
+ * Instead of waiting for the mesh to be ready, it will render a wireframe
+ * of the actor while it is ready.
+ * 
  * @private
  */
 vxlRenderStrategy.prototype._renderFlat = function(actor){
     
-    var model   = actor.model;
+   
     var buffers = this._gl_buffers[actor.UID];
     var texture = this._gl_textures[actor.UID]; 
     var gl      = this.renderer.gl;
@@ -8889,16 +8979,13 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
     var glsl    = vxl.def.glsl;
     
     if (actor.mesh == undefined){
-        //here it is necessary as there is not previous call for this .. for now.
-        actor.mesh = new vxlMesh(actor.model); 
+        actor.mesh = new vxlMesh(actor.model);
+        
     }
     
-    
-    /******************************************/
-    // THIS IS THE MAGIC TA DA!
-    r = actor.mesh._model;
-    if (r == undefined) {
-        
+    if (actor.mesh._model == undefined) {
+        //mesh not ready yet. Render actor wireframe in the mean time
+        var model = actor.model;
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
         prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
@@ -8910,14 +8997,10 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
         this._renderWireframe(actor);
         return;
     } 
-    
-    
-     
-    /******************************************/
-   
+
     prg.setUniform("uUseShading",true);
-    
-    var parts = actor.mesh._renderable.parts;
+
+    var parts = actor.mesh._model.renderable.parts;
     
     for(var i=0, N = parts.length; i<N; i+=1){
         
@@ -8946,7 +9029,13 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
             throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
         }
         
-       if (part.colors && part.colors.length > 0){    
+       if (part.colors && part.colors.length > 0){ 
+           
+                if (buffers.colors == undefined){
+                    //when switching to parts this might not be defined
+                    buffers.color = gl.createBuffer();
+                }
+              
                 try{
                     prg.setUniform("uUseVertexColors", true);
                     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
@@ -8999,18 +9088,13 @@ vxlRenderStrategy.prototype._renderPickingBuffer = function(actor){
     if (actor._picking == vxl.def.actor.picking.CELL){
     
       
-        if (actor.mesh == undefined){
+        if (actor.mesh == undefined || actor.mesh._model == undefined){
             return; // we just fail safely. We will render it whenever the actor is ready ;-)
                     // the mesh is generated inside actor.setPicker (see actor.setPicker method)
         }
         
-        /******************************************/
-        // THIS IS THE MAGIC TA DA!
-         r = actor.mesh._model;
-         if (r == undefined) return; 
-        /******************************************/
-        
-        var parts = actor.mesh._renderable.parts;
+      
+        var parts = actor.mesh._model.renderable.parts;
     
         for(var i=0, N = parts.length; i<N; i+=1){
         
@@ -9026,7 +9110,13 @@ vxlRenderStrategy.prototype._renderPickingBuffer = function(actor){
                 throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
             }
             
-            if (part.pickingColors && part.pickingColors.length == part.vertices.length){    
+            if (part.pickingColors && part.pickingColors.length == part.vertices.length){
+                
+                if (buffers.colors == undefined){
+                    //when switching to parts this might not be defined
+                    buffers.color = gl.createBuffer();
+                }
+                  
                 try{
                     prg.setUniform("uUseVertexColors", true);
                     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
@@ -9246,6 +9336,14 @@ vxlRenderStrategy.prototype.disableOffscreen = function(){
     this._offscreen = false;
     this._target = undefined;
 };
+
+/**
+ * Returns true if the offscreen rendering does not have any target.
+ * @returns {true\false}
+ */
+vxlRenderStrategy.prototype.isOffscreenEnabled = function(){
+    return (this._target != undefined);    
+}
 
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
@@ -12850,92 +12948,135 @@ vxlMaterial.prototype.getFrom = function(model){
 
 
 /**
- * A Renderable is an intermediary object between a mesh and a model that allows rendering
+ * @class A Renderable is an intermediary object between a model and the rendering strategy that allows rendering
  * very complex models.
  * 
- * Think of this scenario. You have a model that has more than 16K number of vertices.
+ * Think of this scenario. You have a model that has more than 65K number of vertices.
  * Yes, it is going to happen eventually.
  * 
- * In WebGL you can't do more than 16K indices per draw call. So, such a model could not be
- * rendered at once.
+ * In WebGL you can't do more than 65K indices per draw call. This is because the type of the WebGL index array is unsigned short. 
+ * So, a model with more than 65K indices could not be rendered at once.
  * 
  * In previous Voxelent versions (<0.89.3) it was required that a complex model was broken down in several
- * json files. This was a way to make sure that each 'part' did not get so big as to be unable to render it.
+ * JSON files. This was a way to make sure that each 'part' did not get so big as to be unable to render it.
  * This is, each part had an index array of at most 16k elements.
  * 
- * The VTK to JSON importer handles this situation and produces parts with index arrays of length = 16K.
+ * For example, the VTK to JSON importer (vtk2json) handles this situation and produces parts with index arrays of length = 65K.
  * 
  * However, since version 0.89.2, it is possible to create flat shading models and also to do cell based 
  * picking. This requires generating models where triangles are not shared (so we can do flat shading).
- * Now, if triangles are not shared, then most likely, very complex models are going to surpass the 16K 
+ * Now, if triangles are not shared, then most likely, very complex models are going to surpass the 65K 
  * limit for their index array. 
  * 
- * The renderable object encapsulates a complex model and delivers parts that abide by the 16K rule.
+ * The renderable object encapsulates a complex model and delivers parts that abide by the 65K index rule.
  * 
- * The renderables are internally handled by vxlRenderStrategy whenever the model needs to be represented
- * with flat shading, or when we need to do cell based picking. In both cases renderables are generated or queried
- * if they already exist for the given actor.
+ * The renderables are requested internally by vxlRenderStrategy whenever a model of BIG_OBJECT or  MESH types
+ * need to be rendered.
+ * 
+ * 
+ * 
+ * @constructor A Renderable is an intermediary object between a model and the rendering strategy that allows rendering
+ * very complex models.
+ * 
+ * @param{vxlModel} model the model to be decomposed into renderable parts
+  *  
+ * @author Diego Cantor
  */
 
-function vxlRenderable(mesh){
-    this.mesh = mesh;
+function vxlRenderable(model){
+    
+    
+    if (model == undefined){
+        throw('vxlRenderable: the model can not be undefined');
+    }
+    
+    var type = model.type;
+    
+    
+    if (type == undefined){
+        if (type != vxl.def.model.type.BIG_DATA && 
+            type != vxl.def.model.type.MESH){
+            throw('vxlRenderable: the type of renderable is unknown');
+        }
+        else if (type == vxl.def.model.type.SIMPLE){
+            throw('vxlRenderable: simple models do not require renderables!');
+        }
+    }
+    
+    this._model = model;
+    
     this.parts = [];    
+    
+    this.update();
 }
 
+
 /**
- * This methods creates renderable parts from a mesh. The implementation is straight forward
- * given that a mesh does not share triangles for rendering (so we can do flat shading and cell picking)
- * @param {vxlMesh} mesh
+ *  Updates the renderable based on changes in the underlying model. After updating, the 
+ *  renderable parts will contain any changes to the geometry, colors or other model attributes
  */
 vxlRenderable.prototype.update = function(){
     
+    //clear parts
     this.parts = [];
     
-    var model = this.mesh._model;
+    switch(this._model.type){
+        case vxl.def.model.type.MESH:      this._processMesh();    break;
+        case vxl.def.model.type.BIG_DATA : this._processBigData(); break;
+    }
     
-    var size = vxl.def.model.maxNumIndices;
+    return this.parts;
+};
+
+/**
+ * This methods creates renderable parts from a mesh. The implementation is straight forward
+ * given that a mesh does not share triangles. This is what we need to do flat shading and therefore
+ * to perform cell color based picking.
+ * 
+ * 
+ */
+vxlRenderable.prototype._processMesh = function(){
+    
+    var model = this._model;
+    
+    var size = vxl.def.model.MAX_NUM_INDICES;
     
     var N = Math.floor(model.indices.length / size), R = model.indices.length % size;
     
     for (var i=0; i<N; i +=1){
+        
         var part = new vxlModel(model.name+'-renderable-part-'+i);
+        
         part.indices = this._reindex(model.indices.slice(i*size,i*size + size));
         part.vertices = model.vertices.slice(i*size*3, (i+1)*size*3 );
         
-        if (model.normals){
-            part.normals  = model.normals.slice(i*size*3, (i+1)*size*3);
-        }
-        
-        if (model.colors){
-            part.colors = model.colors.slice(i*size*3, (i+1)*size*3);
-        }
+        if (model.normals && model.normals.length >0){ part.normals  = model.normals.slice(i*size*3, (i+1)*size*3);  }
+        if (model.colors  && model.colors.length >0) { part.colors = model.colors.slice(i*size*3, (i+1)*size*3);     }
         
         if (model.pickingColors){
             part.pickingColors = model.pickingColors.slice(i*size*3, (i+1)*size*3);
         }
+        
         part.update();
   
         this.parts.push(part);
     }
     
     if (R > 0){
+        
         var part = new vxlModel(model.name+'-renderable-part-'+N);
+        
         part.indices = this._reindex(model.indices.slice(N*size,N*size+R));
         part.vertices = model.vertices.slice(N*size*3, N*size*3+R*3);
         
-        if (model.normals){
-            part.normals = model.normals.slice(N*size*3, N*size*3+R*3);
-        }
-        
-        if (model.colors){
-            part.colors = model.colors.slice(N*size*3, N*size*3+R*3)
-        }
-        
+        if (model.normals && model.normals.length >0 ){ part.normals = model.normals.slice(N*size*3, N*size*3+R*3); }
+        if (model.colors  && model.colors.length > 0) { part.colors  = model.colors.slice(N*size*3, N*size*3+R*3);  }
         if (model.pickingColors){
             part.pickingColors = model.pickingColors.slice(N*size*3, N*size*3+R*3);
         }
         
         part.update();
+        
         this.parts.push(part);
     }
      
@@ -12952,3 +13093,7 @@ vxlRenderable.prototype._reindex = function(indices){
     }
     return indices;
 }
+
+vxlRenderable.prototype._processBigData = function(){
+    
+};

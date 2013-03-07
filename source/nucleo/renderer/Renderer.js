@@ -295,7 +295,10 @@ vxlRenderer.prototype.reallocate = function(){
   this.strategy.allocate(this.view.scene);  
 };
 
-
+/**
+ * Disables offscreen rendering
+ *  
+ */
 vxlRenderer.prototype.disableOffscreen = function(){
     this.strategy.disableOffscreen();
 };
@@ -307,5 +310,12 @@ vxlRenderer.prototype.disableOffscreen = function(){
 vxlRenderer.prototype.enableOffscreen = function(){
     this._renderTarget = new vxlRenderTarget(this);
     this.strategy.enableOffscreen(this._renderTarget);    
+};
+
+/**
+ * Returns true if the offscreen rendering is enabled. False otherwise. 
+ */
+vxlRenderer.prototype.isOffscreenEnabled = function(){
+    return this.strategy.isOffscreenEnabled();  
 };
 

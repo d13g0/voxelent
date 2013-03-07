@@ -20,13 +20,16 @@
  * @constructor
  * @author Diego Cantor
  */
-function vxlCell(vertices){ 
+function vxlCell(index, vertices, color){
+    
     this.UID = vxl.util.generateUID();
-    this.color = [0.8,0.8,0.8];
-    this._pickingColor  = vxl.go.picker.getColorFor(this); 
+    
+    this.index = index;
     this.vertices = vertices;
+    this.color = color==undefined?[0.8,0.8,0.8]:color;
     this.normal = undefined; //cell normal
     this._calculateNormal();
+    this._pickingColor  = vxl.go.picker.getColorFor(this);
 };
 
 /**

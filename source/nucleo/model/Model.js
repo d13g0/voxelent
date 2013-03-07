@@ -40,11 +40,41 @@ function vxlModel(name, JSON_OBJECT){
 	this.image      = undefined;
 	this.uri        = undefined;
 	this.colors     = undefined;
+	this.type       = vxl.def.model.type.SIMPLE;
+	this.renderable = undefined;
    
     if (JSON_OBJECT != undefined){
         this.load(this.name, JSON_OBJECT);
     }
-}
+    
+    this.setType(this.type);
+};
+
+/**
+ * Sets the type of model. A renderable object is created and associated
+ * with this model in case the type is MESH or BIG_DATA
+ * 
+ * @param {vxl.def.model.type} type the type of model
+ */
+vxlModel.prototype.setType = function(type){
+    
+    if (this.indices.length > vxl.def.model.MAX_NUM_INDICES && 
+        type == vxl.def.model.type.BIG_DATA){
+            throw('The model is not big enough to be of BIG_DATA type Num Indices['+this.indices.length+']');
+        }
+    
+    
+    switch(type){
+        case vxl.def.model.type.MESH:
+        case vxl.def.model.type.BIG_DATA:
+             this.type = type;
+             this.renderable = new vxlRenderable(this);
+             break;
+        case vxl.def.model.type.SIMPLE:
+             this.type = type;
+             this.renderable = undefined;
+    }    
+};
 
 /**
  * Indices to draw the bounding box. The vertices in this case will correspond
@@ -52,6 +82,7 @@ function vxlModel(name, JSON_OBJECT){
  * @static
  */
 vxlModel.BB_INDICES = [0,1,1,2,2,3,3,0,0,4,4,5,5,6,6,7,7,4,1,5,2,6,3,7];
+
 
 /**
  * Populates this model with the JSON_OBJECT (JSON object)
@@ -102,6 +133,13 @@ vxlModel.prototype.update = function(){
     }
     
     this.computeBoundingBox();
+    
+    
+    if (this.type == vxl.def.model.type.BIG_DATA ||
+        this.type == vxl.def.model.type.MESH){
+            this.renderable.update();
+        }
+    
 };
 
 /**

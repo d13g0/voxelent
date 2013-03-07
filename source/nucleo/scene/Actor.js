@@ -94,7 +94,7 @@ function vxlActor(model){
         e.ACTOR_SCALED,
         e.ACTOR_ROTATED,
         e.ACTOR_CHANGED_COLOR,
-        e.ACTOR_CHANGED_SHADING
+        e.ACTOR_CHANGED_SHADING,
       ], this);
 };
 
@@ -588,17 +588,31 @@ vxlActor.prototype.setPicker = function(type, callback){
             break;
         
         case vxl.def.actor.picking.CELL: 
+            
             if (this.mesh == undefined){
                 this.mesh = new vxlMesh(this.model); 
-                this.mesh.setColor(this.material.diffuse);           
+                this.mesh.setColor(this.material.diffuse);
+                this.setVisualizationMode(vxl.def.actor.mode.FLAT);           
             };
-            this._pickingCallback = callback; 
+            
+            this._pickingCallback = callback;
+             
             break;
         case vxl.def.actor.picking.OBJECT:
             this._pickingColor = vxl.go.picker.getColorFor(this);
             this._pickingCallback = callback;
             break;
     }
+    
+    if (this.isPickable()){
+        for(var i=0, N = this.scene.views.length; i<N; i+=1){
+            var r = this.scene.views[i].renderer;
+            if(!r.isOffscreenEnabled()){
+                r.enableOffscreen();
+            }
+        }
+    }
+    //@TODO: Disable when there are no pickable actors in the scene.
 };
 
 /**
@@ -609,3 +623,9 @@ vxlActor.prototype.isPickable = function(){
     return (this._picking  != vxl.def.actor.picking.DISABLED);  
 };
 
+/**
+ * Returns the picking type 
+ */
+vxlActor.prototype.getPickingType = function(){
+    return this._picking;  
+};

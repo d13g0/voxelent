@@ -20,16 +20,20 @@
  * 
  * @class Provides cell by cell operations on models
  * @constructor 
- * @param {vxlModel} model the model for this mesh
+ * @param {vxlModel} prior the model for this mesh
  * @author Diego Cantor
  */
-function vxlMesh(model){
-    this.name = model.name;
+function vxlMesh(prior){
+    
+    if (prior == undefined){
+        throw('vxlMesh: the model passed as parameter cannot be undefined');
+    }
+    
+    this.name = prior.name +'-mesh';
     this.cells = [];
     this.color = [0.8,0.8,0.8]; 
     this._model = undefined;                  //internal representation of the mesh
-    this._renderable = new vxlRenderable(this);   //dividing the internal representation into renderable chunks
-    this._init(model);
+    this._createMesh(prior);
 };
 
 
@@ -38,19 +42,25 @@ function vxlMesh(model){
  * Identifies the cells existing in the 
  * @private
  */
-vxlMesh.prototype._init = function(model){
+vxlMesh.prototype._createMesh = function(prior){
     
-    var ver = model.vertices;
-    var ind = model.indices;
+    var ver = prior.vertices;
+    var ind = prior.indices;
     
     var self = this;
-    
     this.cells = [];
     
-    function initMesh(){
+    function buildMesh(){
         var start = new Date().getTime();
         
-        //Creates triangular cells using the original index array
+        var cellIndex = 0;
+        
+        //@TODO: assign colors if they exist. Should we give the option to change luts here?
+        // probably not. Every time the actor changes its LUT the mesh should react and update its colors  
+
+        var meshColor = [self.color[0], self.color[1], self.color[2]];
+        
+        //1. CREATE CELLS
         for(var i=0, L = ind.length; i<L; i+=3){ 
             idx  = ind[i];
             var triangle = [],x,y,z,idx;
@@ -73,57 +83,53 @@ vxlMesh.prototype._init = function(model){
             triangle.push([x,y,z]);
 
             
-            self.cells.push(new vxlCell(triangle));
+            self.cells.push(new vxlCell(cellIndex, triangle, meshColor));
+            cellIndex += 1;
         }
         
-        //@TODO: assign colors if they exist. Should we give the option to change luts here?
-        // probably not. Every time the actor changes its LUT the mesh should react and update its colors  
-        var col = [self.color[0], self.color[1], self.color[2]];
-        for (var i=0, L =self.cells.length; i<L; i+=1){
-            
-            self.cells[i].color = col; //BEWARE FLOATARRAYS DONT TRANSLATE WELL
-        }
         
-        self._createModel();
+        self._createInternalModel();
+        
         var elapsed = new Date().getTime() - start;
-        console.info('Mesh ['+ model.name +'] generated in '+elapsed+ ' ms');
+        console.info('Mesh ['+ self.name +'] generated in '+elapsed+ ' ms');
     };
     
     //because this operation is time consuming it is deferred here.
-    //this causes that the renderable object is not available in the renderer until this op finishes.
-   setTimeout(function(){initMesh()},0);
+    //this causes that the mesh is not available for rendering until this operation finishes.
+   setTimeout(function(){buildMesh()},0);
 };
 
 
 /**
- * Based on the mesh information it creates an renderable model of the mesh.
- * A renderable mesh model is used when the vxl.def.actor.mode.FLAT mode is the actor visualization mode.
- * Also, a renderable mesh model is used for cell picking.
+ * Based on the mesh information it creates an internal model of the mesh.
  * @private
  * 
  */
-vxlMesh.prototype._createModel = function(){
+vxlMesh.prototype._createInternalModel = function(){
     
-    this._model = new vxlModel(this.name+'-mesh');
-    var r = this._model;
+    this._model = new vxlModel(this.name+'-model');
     
-    r.colors = [];
-    r.pickingColors = [];
+    var model = this._model;
+    
+    model.colors = [];
+    model.pickingColors = [];
+    
     for(var i=0, count = this.cells.length; i<count; i +=1){
-            r.indices.push.apply(r.indices,[i*3, i*3+1, i*3+2]);
-            r.vertices.push.apply(r.vertices,this.cells[i].getFlattenVertices());
+            model.indices.push.apply(model.indices,[i*3, i*3+1, i*3+2]);
+            model.vertices.push.apply(model.vertices,this.cells[i].getFlattenVertices());
+            
             for (var j = 0; j<3;j+=1){
-                r.colors.push.apply(r.colors,this.cells[i].color);
-                r.pickingColors.push.apply(r.pickingColors, this.cells[i]._pickingColor);
+                model.colors.push.apply(model.colors,this.cells[i].color);
+                model.pickingColors.push.apply(model.pickingColors, this.cells[i]._pickingColor);
             }
     }
     
-    r.computeNormals();  
-    this._renderable.update();
+    model.computeNormals();
+    
+    model.setType(vxl.def.model.type.MESH);
 };
 
 /**
- * Sets the color for the renderable mesh model
  * @param {vec3} color the new color
  * @private
  */
@@ -131,17 +137,17 @@ vxlMesh.prototype._setModelColor = function(color){
     
     if (this._model == undefined) return;
     
-    var r = this._model;
-    r.colors = [];
+    var model = this._model;
+    model.colors = [];
     
     for(var i=0, count = this.cells.length; i<count; i +=1){
             this.cells[i].color = [color[0], color[1], color[2]];
             for (var j = 0; j<3;j+=1){
-                r.colors.push.apply(r.colors,this.cells[i].color);
+                model.colors.push.apply(model.colors,this.cells[i].color);
             }
     }
     
-    this._renderable.update();
+    model.update();
 };
 
 /**
@@ -156,19 +162,19 @@ vxlMesh.prototype.updateColorUsingVertexColors = function(vcolors){
  * Update the mesh colors based on the current cell colors
  */
 vxlMesh.prototype.updateColor = function(){
-    var r = this._model;
+    var model = this._model;
     
-    r.colors = [];
-    r.pickingColors = [];
+    model.colors = [];
+    model.pickingColors = [];
     for(var i=0, count = this.cells.length; i<count; i +=1){
            
             for (var j = 0; j<3;j+=1){
-                r.colors.push.apply(r.colors,this.cells[i].color);
-                r.pickingColors.push.apply(r.pickingColors, this.cells[i]._pickingColor);
+                model.colors.push.apply(model.colors,this.cells[i].color);
+                model.pickingColors.push.apply(model.pickingColors, this.cells[i]._pickingColor);
             }
     }
     
-    this._renderable.update();
+    model.update();
 };
 
 /**
@@ -217,7 +223,7 @@ vxlMesh.prototype.removeCell = function(cellUID){
   }
   if (idx !=-1) {
         this.cells.splice(idx,1);
-        this._createModel();
+        this._createInternalModel();
    }
 
    

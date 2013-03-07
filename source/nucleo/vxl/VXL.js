@@ -144,8 +144,17 @@ def : {
                          /**
                           * Maximum number of indices per model (Unsigned Short range) 
                           */
-                         maxNumIndices: 65535
+                         MAX_NUM_INDICES: 65535,
+                         /**
+                          * Types of models
+                          * <ul>
+                          * <li><code>SIMPLE</code>: The model is rendered at all once
+                          * <li><code>MESH</code>: This model represents a mesh (no shared triangles). Flat shading is required
+                          * <li><code>BIG_DATA</code>: This model is complex and it may required several rendering cycles.
+                          */
+                         type :{SIMPLE:'SIMPLE', MESH:'MESH', BIG_DATA:'BIG DATA'}
 					},
+
     material        : {
                        /**
                         * Diffuse color used by default when a model does 
