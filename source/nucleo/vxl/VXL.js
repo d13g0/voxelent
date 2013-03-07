@@ -54,7 +54,7 @@ var vxl = {
 */
 version : 
 {
-    number: '0.89.2',
+    number: '0.89.3',
    	codename : 'c4n314',
    	plugins  : []
 },
@@ -68,6 +68,7 @@ version :
  * 
  */
 def : {
+  
     /**
      * Pi divided by 2
      */
@@ -139,7 +140,11 @@ def : {
                          * 
                          * These modes can be used with {@link vxl.api.load} and with {@link vxlScene.setLoadingMode}
                          */
-                         loadingMode     : { LIVE:'LIVE', LATER:'LATER', DETACHED:'DETACHED'}
+                         loadingMode     : { LIVE:'LIVE', LATER:'LATER', DETACHED:'DETACHED'},
+                         /**
+                          * Maximum number of indices per model (Unsigned Short range) 
+                          */
+                         maxNumIndices: 65535
 					},
     material        : {
                        /**

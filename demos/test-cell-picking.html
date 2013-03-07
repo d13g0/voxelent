@@ -12,7 +12,7 @@
 
 <script src="lib/jquery.js" type="text/javascript"> </script>
 <script src="lib/jquery-ui.js" type="text/javascript"> </script>
-<script type='text/javascript' src='lib/voxelent_v0.89.2.js'> </script>
+<script type='text/javascript' src='lib/voxelent_v0.89.3.js'> </script>
 
 <script type='text/javascript'>
 
@@ -55,7 +55,7 @@ function pickingCallback(actor, uid){
     if (angle <=90){
     	
         cell.color = [0.2,0.5,0.0];
-        actor.mesh.updateRenderableColors();
+        actor.mesh.updateColor();
         //actor.mesh.removeCell(uid);
 	    vxl.c.camera.refresh();
     }

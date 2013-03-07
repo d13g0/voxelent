@@ -33,7 +33,7 @@ function vxlScene()
 	this.normalsFlipped 		= false;
 	this.lutID 					= null;
 	this.timerID				= null;
-	this.dispatchRate 			= 500;
+	//this.dispatchRate 			= 500;
 	this.scalarMIN 				= Number.MAX_VALUE;
 	this.scalarMAX 				= Number.MIN_VALUE;
 	this.bb 					= [0, 0, 0, 0, 0, 0];

@@ -500,6 +500,10 @@ vxlActor.prototype.setLookupTable = function(lutID,min,max){
 	function scheduledSetLookupTable(scalars){
         var lut = vxl.go.lookupTableManager.get(lutID);
         self.material.colors  = lut.getColors(self.model.scalars,min,max);
+        
+        //if(this.mesh){
+        //    this.mesh. //update mesh with vertex colors it may require access to the original index array
+       // }
 	}
 	
 	//Given that obtaining the colors can be a time consume op, it is deferred here.

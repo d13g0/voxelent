@@ -527,7 +527,7 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
     
     /******************************************/
     // THIS IS THE MAGIC TA DA!
-    r = actor.mesh._renderable;
+    r = actor.mesh._model;
     if (r == undefined) {
         
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
@@ -541,52 +541,61 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
         this._renderWireframe(actor);
         return;
     } 
+    
+    
      
     /******************************************/
    
     prg.setUniform("uUseShading",true);
     
-    try{
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(r.normals), gl.STATIC_DRAW);
-            
-            prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
-            prg.setAttributePointer(glsl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
-            
-        }
-        catch(err){
-            alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
-            throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
-        }
-        
-    try{
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(r.vertices), gl.STATIC_DRAW);
-        prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
-    }
-    catch(err){
-        alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
-        throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
-    }
+    var parts = actor.mesh._renderable.parts;
     
-   if (r.colors){    
-            try{
-                prg.setUniform("uUseVertexColors", true);
-                gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
-                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(r.colors), gl.STATIC_DRAW);
+    for(var i=0, N = parts.length; i<N; i+=1){
+        
+        var part = parts[i];
+    
+        try{
+                gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.normals), gl.STATIC_DRAW);
                 
-                prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
-                prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+                prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
+                prg.setAttributePointer(glsl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
+                
             }
             catch(err){
-                alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
-                throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+                alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
+                throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
             }
+            
+        try{
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.vertices), gl.STATIC_DRAW);
+            prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+        }
+        catch(err){
+            alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
+            throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
+        }
+        
+       if (part.colors && part.colors.length > 0){    
+                try{
+                    prg.setUniform("uUseVertexColors", true);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
+                    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.colors), gl.STATIC_DRAW);
+                    
+                    prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
+                    prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+                }
+                catch(err){
+                    alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+                    throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+                }
+        }
+        
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(part.indices), gl.STATIC_DRAW);
+        gl.drawElements(gl.TRIANGLES, part.indices.length, gl.UNSIGNED_SHORT,0);
     }
-    
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(r.indices), gl.STATIC_DRAW);
-    gl.drawElements(gl.TRIANGLES, r.indices.length, gl.UNSIGNED_SHORT,0);
      
 };
 
@@ -602,8 +611,8 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
  * if the object picking method is OBJECT then the same object is rendered but using
  * the picking color (actor._pickingColor) as the diffuse material uniform. 
  *
- * Otherwise, when the object picking mode is CELL, then the mesh renderable is rendered. 
- * The mesh renderable colors every cell differently (drawback in performance)
+ * Otherwise, when the object picking mode is CELL, then the mesh model is rendered. 
+ * The mesh model colors every cell differently (drawback in performance)
  *    
  * @private
  */
@@ -628,39 +637,49 @@ vxlRenderStrategy.prototype._renderPickingBuffer = function(actor){
         
         /******************************************/
         // THIS IS THE MAGIC TA DA!
-         r = actor.mesh._renderable;
+         r = actor.mesh._model;
          if (r == undefined) return; 
         /******************************************/
         
+        var parts = actor.mesh._renderable.parts;
+    
+        for(var i=0, N = parts.length; i<N; i+=1){
         
-        try{
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(r.vertices), gl.STATIC_DRAW);
-            prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
-        }
-        catch(err){
-            alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
-            throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
-        }
+        var part = parts[i];
         
-        if (r.pickingColors && r.pickingColors.length == r.vertices.length){    
             try{
-                prg.setUniform("uUseVertexColors", true);
-                gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
-                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(r.pickingColors), gl.STATIC_DRAW);
-                
-                prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
-                prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+                gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.vertices), gl.STATIC_DRAW);
+                prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
             }
             catch(err){
-                alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
-                throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+                alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
+                throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
             }
+            
+            if (part.pickingColors && part.pickingColors.length == part.vertices.length){    
+                try{
+                    prg.setUniform("uUseVertexColors", true);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
+                    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.pickingColors), gl.STATIC_DRAW);
+                    
+                    prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
+                    prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+                }
+                catch(err){
+                    alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+                    throw('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+                }
+            }
+            else{
+                alert('The object '+part.name+' does not have picking colors assigned.');
+                throw('The object '+part.name+' does not have picking colors assigned.')
+            }
+            
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(part.indices), gl.STATIC_DRAW);
+            gl.drawElements(gl.TRIANGLES, part.indices.length, gl.UNSIGNED_SHORT,0);
         }
-        
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(r.indices), gl.STATIC_DRAW);
-        gl.drawElements(gl.TRIANGLES, r.indices.length, gl.UNSIGNED_SHORT,0);
     }
     else if (actor._picking == vxl.def.actor.picking.OBJECT){
         

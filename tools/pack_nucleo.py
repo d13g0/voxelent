@@ -69,7 +69,8 @@ def pack(VOX_VERSION_NUMBER):
              'FrameAnimation',
              'VTKReader',
              'Texture',
-             'Material' 
+             'Material',
+             'Renderable' 
     ]
     
     

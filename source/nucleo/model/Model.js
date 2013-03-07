@@ -27,20 +27,20 @@ function vxlModel(name, JSON_OBJECT){
 	this.name       = name;
 	this.indices 	= [];
 	this.vertices 	= [];
-	this.scalars 	= null;
-	this.diffuse	= null;
-	this.ambient    = null;
-	this.specular   = null;
-	this.shininness = null;
-	this.normals 	= null;
-	this.wireframe 	= null;
-	this.centre 	= null;
-	this.bb     	= null;
-	this.mode       = null;
-	this.image      = null;
-	this.uri        = null;
-	this.colors     = [];
-	    
+	this.scalars 	= undefined;
+	this.diffuse	= undefined;
+	this.ambient    = undefined;
+	this.specular   = undefined;
+	this.shininness = undefined;
+	this.normals 	= undefined;
+	this.wireframe 	= undefined;
+	this.bb         = [0,0,0,0,0,0];
+    this.centre     = [0,0,0,0,0,0];
+	this.mode       = vxl.def.actor.mode.SOLID
+	this.image      = undefined;
+	this.uri        = undefined;
+	this.colors     = undefined;
+   
     if (JSON_OBJECT != undefined){
         this.load(this.name, JSON_OBJECT);
     }
@@ -69,31 +69,39 @@ vxlModel.prototype.load = function(nm,JSON_OBJECT){
 		this[i] = JSON_OBJECT[i];
 	}
 	
-	//Now minimal checks
-	if (this.vertices == undefined){
-		alert('The model '+ this.name+' does not have vertices. Impossible to render!');
-	}
-	
+	this.update();
 
-	if(this.normals == undefined && this.indices != undefined){
-		this.computeNormals();
-	}
-	
-	
-	
-	if (this.wireframe == undefined){
-		this.computeWireframeIndices();
-	}
-	
-	if (this.mode == undefined){
-		this.mode = vxl.def.actor.mode.SOLID;
-	}
-	
-	if (this.texture != undefined){
-	    this.mode = vxl.def.actor.mode.TEXTURED;
-	}
-	
-	this.computeBoundingBox();
+};
+
+/**
+ * Update model state when the model has changed (changes in vertices or indices) 
+ */
+vxlModel.prototype.update = function(){
+        //Now minimal checks
+    if (this.vertices == undefined){
+        alert('The model '+ this.name+' does not have vertices. Impossible to render!');
+    }
+    
+
+    if(this.normals == undefined && this.indices != undefined){
+        this.computeNormals();
+    }
+    
+    
+    
+    if (this.wireframe == undefined){
+        this.computeWireframeIndices();
+    }
+    
+    if (this.mode == undefined){
+        this.mode = vxl.def.actor.mode.SOLID;
+    }
+    
+    if (this.texture != undefined){
+        this.mode = vxl.def.actor.mode.TEXTURED;
+    }
+    
+    this.computeBoundingBox();
 };
 
 /**
@@ -248,3 +256,4 @@ vxlModel.prototype.getBoundingBoxVertices = function(){
         b[3], b[1], b[5] 
         ];
 };
+

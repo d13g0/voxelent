@@ -24,20 +24,15 @@
  * @author Diego Cantor
  */
 function vxlMesh(model){
-    
+    this.name = model.name;
     this.cells = [];
     this.color = [0.8,0.8,0.8]; 
-    this._renderable = undefined;
+    this._model = undefined;                  //internal representation of the mesh
+    this._renderable = new vxlRenderable(this);   //dividing the internal representation into renderable chunks
     this._init(model);
 };
 
-/**
- * Sets the mesh color
- */
-vxlMesh.prototype.setColor = function(color){
-    this.color = color;
-    this.setRenderableColor(this.color);
-};
+
 
 /**
  * Identifies the cells existing in the 
@@ -50,10 +45,13 @@ vxlMesh.prototype._init = function(model){
     
     var self = this;
     
+    this.cells = [];
     
     function initMesh(){
         var start = new Date().getTime();
-        for(var i=0, L = ind.length; i<L; i+=3){ //for all indices
+        
+        //Creates triangular cells using the original index array
+        for(var i=0, L = ind.length; i<L; i+=3){ 
             idx  = ind[i];
             var triangle = [],x,y,z,idx;
 
@@ -77,13 +75,16 @@ vxlMesh.prototype._init = function(model){
             
             self.cells.push(new vxlCell(triangle));
         }
+        
+        //@TODO: assign colors if they exist. Should we give the option to change luts here?
+        // probably not. Every time the actor changes its LUT the mesh should react and update its colors  
         var col = [self.color[0], self.color[1], self.color[2]];
         for (var i=0, L =self.cells.length; i<L; i+=1){
             
             self.cells[i].color = col; //BEWARE FLOATARRAYS DONT TRANSLATE WELL
         }
         
-        self.createRenderableModel();
+        self._createModel();
         var elapsed = new Date().getTime() - start;
         console.info('Mesh ['+ model.name +'] generated in '+elapsed+ ' ms');
     };
@@ -98,12 +99,13 @@ vxlMesh.prototype._init = function(model){
  * Based on the mesh information it creates an renderable model of the mesh.
  * A renderable mesh model is used when the vxl.def.actor.mode.FLAT mode is the actor visualization mode.
  * Also, a renderable mesh model is used for cell picking.
+ * @private
  * 
  */
-vxlMesh.prototype.createRenderableModel = function(){
+vxlMesh.prototype._createModel = function(){
     
-    this._renderable = new vxlModel();
-    var r = this._renderable;
+    this._model = new vxlModel(this.name+'-mesh');
+    var r = this._model;
     
     r.colors = [];
     r.pickingColors = [];
@@ -116,19 +118,20 @@ vxlMesh.prototype.createRenderableModel = function(){
             }
     }
     
-    r.computeNormals();
-    return r;
+    r.computeNormals();  
+    this._renderable.update();
 };
 
 /**
  * Sets the color for the renderable mesh model
  * @param {vec3} color the new color
+ * @private
  */
-vxlMesh.prototype.setRenderableColor = function(color){
+vxlMesh.prototype._setModelColor = function(color){
     
-    if (this._renderable == undefined) return;
+    if (this._model == undefined) return;
     
-    var r = this._renderable;
+    var r = this._model;
     r.colors = [];
     
     for(var i=0, count = this.cells.length; i<count; i +=1){
@@ -137,10 +140,23 @@ vxlMesh.prototype.setRenderableColor = function(color){
                 r.colors.push.apply(r.colors,this.cells[i].color);
             }
     }
+    
+    this._renderable.update();
 };
 
-vxlMesh.prototype.updateRenderableColors = function(){
-    var r = this._renderable;
+/**
+ * Receives an array with vertex colors (one color per vertex) 
+ * interpolates these colors and assign cell colors
+ */
+vxlMesh.prototype.updateColorUsingVertexColors = function(vcolors){
+    
+};
+
+/**
+ * Update the mesh colors based on the current cell colors
+ */
+vxlMesh.prototype.updateColor = function(){
+    var r = this._model;
     
     r.colors = [];
     r.pickingColors = [];
@@ -151,7 +167,18 @@ vxlMesh.prototype.updateRenderableColors = function(){
                 r.pickingColors.push.apply(r.pickingColors, this.cells[i]._pickingColor);
             }
     }
+    
+    this._renderable.update();
 };
+
+/**
+ * Sets the mesh color
+ */
+vxlMesh.prototype.setColor = function(color){
+    this.color = color;
+    this._setModelColor(this.color);
+};
+
  
 /**
  * Determines if this mesh contains the cell indicated by the parameter cellUID
@@ -190,7 +217,7 @@ vxlMesh.prototype.removeCell = function(cellUID){
   }
   if (idx !=-1) {
         this.cells.splice(idx,1);
-        this.createRenderableModel();
+        this._createModel();
    }
 
    
@@ -218,3 +245,4 @@ vxlMesh.prototype.intersect = function(camera, angle){
     }*/
     return selection;
 };
+
