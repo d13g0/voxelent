@@ -1,7 +1,31 @@
 -------------------------------------------------------------------------------------------
 VERSION 0.89.3 - COMPLEX RENDERING: Renderables
 -------------------------------------------------------------------------------------------
-Enabling flat shading and cell picking for high-res models.
+
+
+1. Enabling flat shading and fast cell picking for high-res models.
+
+Models can be of the type vxl.def.model.type:SIMPLE, MESH, BIG_DATA
+This type identifies how much information has the model and how it should be treated by voxelent.
+
+vxlRenderStrategy will use this type to determine if there are needs for renderable parts (vxlRenderable)
+
+2. vxlCell now requires a reference to the vxlMesh it belongs and an index. This enables
+fast updating of the vxlMesh model (for instance to change the color of a cell)
+
+3. Some actor operations (property setters) now return the actor instance. This allows the chain of commands pattern:
+
+for example:
+
+var actor = vxl.c.scene.getActorByName('sphere');
+actor.setColor(0.4,0.4,0.5).setPosition(3,3,3).setOpacity(0.5);
+
+
+
+
+
+
+
 
 -------------------------------------------------------------------------------------------
 VERSION 0.89.2 - UPDATES

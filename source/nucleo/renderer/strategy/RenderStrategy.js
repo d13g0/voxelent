@@ -101,7 +101,7 @@ vxlRenderStrategy.prototype._allocateActor = function(actor){
 	
 	//Color Buffer for scalars
 	if (model.scalars != undefined || model.colors != undefined){
-		buffers.color = gl.createBuffer(); //we don't BIND values or use the buffers until the lut is loaded and available
+		buffers.colors = gl.createBuffer(); //we don't BIND values or use the buffers until the lut is loaded and available
 	}
 	
 	//Wireframe Buffer 
@@ -154,7 +154,7 @@ vxlRenderStrategy.prototype._reallocateActor = function(actor){
     
     //Color Buffer for scalars
     if (model.scalars != undefined || model.colors != undefined){
-        buffers.color = gl.createBuffer(); //we don't BIND values or use the buffers until the lut is loaded and available
+        buffers.colors = gl.createBuffer(); //we don't BIND values or use the buffers until the lut is loaded and available
     }
     
     //Wireframe Buffer 
@@ -353,7 +353,7 @@ vxlRenderStrategy.prototype._enableColors = function(actor){
     if (actor.material.colors && actor.material.colors.length == actor.model.vertices.length){    
         try{
             prg.setUniform("uUseVertexColors", true);
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.material.colors), gl.STATIC_DRAW);
             
             prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
@@ -576,14 +576,14 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
         
        if (part.colors && part.colors.length > 0){ 
            
-                if (buffers.colors == undefined){
+                if (buffers.colorss == undefined){
                     //when switching to parts this might not be defined
-                    buffers.color = gl.createBuffer();
+                    buffers.colors = gl.createBuffer();
                 }
               
                 try{
                     prg.setUniform("uUseVertexColors", true);
-                    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors);
                     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.colors), gl.STATIC_DRAW);
                     
                     prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
@@ -657,14 +657,14 @@ vxlRenderStrategy.prototype._renderPickingBuffer = function(actor){
             
             if (part.pickingColors && part.pickingColors.length == part.vertices.length){
                 
-                if (buffers.colors == undefined){
+                if (buffers.colorss == undefined){
                     //when switching to parts this might not be defined
-                    buffers.color = gl.createBuffer();
+                    buffers.colors = gl.createBuffer();
                 }
                   
                 try{
                     prg.setUniform("uUseVertexColors", true);
-                    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors);
                     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.pickingColors), gl.STATIC_DRAW);
                     
                     prg.enableAttribute(glsl.COLOR_ATTRIBUTE);

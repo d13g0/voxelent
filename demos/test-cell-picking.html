@@ -51,12 +51,7 @@ function pickingCallback(actor, uid){
     var angle = Math.acos(vec3.dot(cell.normal, vxl.c.camera._normal)) * vxl.def.rad2deg;
     
     if (angle <=90){
-    	var start = new Date().getTime();
-        cell.color = [0.2,0.5,0.0];
-        actor.mesh.updateColor();
-        var elapsed = new Date().getTime() - start;
-        console.info('Color changed in '+elapsed+ ' ms');
-        //actor.mesh.removeCell(uid);
+        cell.setColor(0.2,0.5,0.0);
 	    vxl.c.camera.refresh();
     }
 };

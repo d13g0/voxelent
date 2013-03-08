@@ -32,11 +32,116 @@ function vxlMesh(prior){
     this.name = prior.name +'-mesh';
     this.cells = [];
     this.color = [0.8,0.8,0.8]; 
-    this._model = undefined;                  //internal representation of the mesh
+    
+    this._model = undefined;   //internal representation of the mesh
     this._createMesh(prior);
 };
 
+/**
+ * Sets the mesh color
+ */
+vxlMesh.prototype.setColor = function(color){
+    this.color = color;
+    this._setModelColor(this.color);
+};
 
+/**
+ * Receives an array with vertex colors (one color per vertex) 
+ * interpolates these colors and assign cell colors
+ */
+vxlMesh.prototype.scalarsToCellColors = function(scalars, lut){
+    
+};
+
+/**
+ * Update the mesh colors based on the current cell colors
+ */
+vxlMesh.prototype.updateColor = function(){
+    var model = this._model;
+    
+    model.colors = [];
+    model.pickingColors = [];
+    for(var i=0, count = this.cells.length; i<count; i +=1){
+           
+            for (var j = 0; j<3;j+=1){
+                model.colors.push.apply(model.colors,this.cells[i].color);
+                model.pickingColors.push.apply(model.pickingColors, this.cells[i]._pickingColor);
+            }
+    }
+    
+    model.update();
+};
+
+
+
+ 
+/**
+ * Determines if this mesh contains the cell indicated by the parameter cellUID
+ * @param {String} cellUID the unique identifier of a cell
+ */
+vxlMesh.prototype.hasCell = function(cellUID){
+  for(var i=0, count= this.cells.length; i < count; i+=1){
+      if (this.cells[i].UID == cellUID){
+          return true;
+      }
+  } 
+  return false; 
+};  
+
+/**
+ * Determines if this mesh contains the cell indicated by the parameter cellUID
+ * @param {String} cellUID the unique identifier of a cell
+ */
+vxlMesh.prototype.getCell = function(cellUID){
+  for(var i=0, count= this.cells.length; i < count; i+=1){
+      if (this.cells[i].UID == cellUID){
+          return this.cells[i];
+      }
+  } 
+  return null; 
+};
+
+    
+     
+
+vxlMesh.prototype.removeCell = function(cellUID){
+  var idx = -1;
+  for(var i=0, count= this.cells.length; i < count; i+=1){
+      if (this.cells[i].UID == cellUID){
+          idx = i;
+          break;
+      }
+  }
+  if (idx !=-1) {
+        this.cells.splice(idx,1);
+        //TODO: is this efficient?
+        this._createModel();
+   }
+   
+};  
+
+/**
+ * This is just an experimental method. Determines what cells are facing the camera. 
+ * May be this can be used for anything? I don't know! 
+ * Maybe to see through a surface??
+ *
+ * @param {Object} camera
+ * @param {Object} angle
+ */
+vxlMesh.prototype.intersect = function(camera, angle){
+    
+    var ray = camera._normal;
+    
+    selection = [];
+
+    /*for(var i=0;i<this.normals.length; i+=1){
+        var dp = Math.acos(vec3.dot(ray, this.normals[i])) * vxl.def.rad2deg;
+        if (Math.abs(dp) <= angle){
+            selection = selection.concat(this.indices[i]);
+        }  
+    }*/
+    return selection;
+};
 
 /**
  * Identifies the cells existing in the 
@@ -50,7 +155,7 @@ vxlMesh.prototype._createMesh = function(prior){
     var self = this;
     this.cells = [];
     
-    function buildMesh(){
+    function createMeshTask(){
         var start = new Date().getTime();
         
         var cellIndex = 0;
@@ -83,12 +188,12 @@ vxlMesh.prototype._createMesh = function(prior){
             triangle.push([x,y,z]);
 
             
-            self.cells.push(new vxlCell(cellIndex, triangle, meshColor));
+            self.cells.push(new vxlCell(self, cellIndex, triangle, meshColor));
             cellIndex += 1;
         }
         
         
-        self._createInternalModel();
+        self._createModel();
         
         var elapsed = new Date().getTime() - start;
         console.info('Mesh ['+ self.name +'] generated in '+elapsed+ ' ms');
@@ -96,7 +201,7 @@ vxlMesh.prototype._createMesh = function(prior){
     
     //because this operation is time consuming it is deferred here.
     //this causes that the mesh is not available for rendering until this operation finishes.
-   setTimeout(function(){buildMesh()},0);
+   setTimeout(function(){createMeshTask()},0);
 };
 
 
@@ -105,11 +210,9 @@ vxlMesh.prototype._createMesh = function(prior){
  * @private
  * 
  */
-vxlMesh.prototype._createInternalModel = function(){
+vxlMesh.prototype._createModel = function(){
     
-    this._model = new vxlModel(this.name+'-model');
-    
-    var model = this._model;
+    var model = new vxlModel(this.name+'-model');
     
     model.colors = [];
     model.pickingColors = [];
@@ -125,8 +228,10 @@ vxlMesh.prototype._createInternalModel = function(){
     }
     
     model.computeNormals();
-    
     model.setType(vxl.def.model.type.MESH);
+    
+    this._model = model;
+    
 };
 
 /**
@@ -151,104 +256,19 @@ vxlMesh.prototype._setModelColor = function(color){
 };
 
 /**
- * Receives an array with vertex colors (one color per vertex) 
- * interpolates these colors and assign cell colors
+ * @private
+ * @param {Object} cell the cell to be updated
  */
-vxlMesh.prototype.updateColorUsingVertexColors = function(vcolors){
+vxlMesh.prototype._updateCellColor = function(index){
     
-};
-
-/**
- * Update the mesh colors based on the current cell colors
- */
-vxlMesh.prototype.updateColor = function(){
-    var model = this._model;
+    var color = this.cells[index].color;
     
-    model.colors = [];
-    model.pickingColors = [];
-    for(var i=0, count = this.cells.length; i<count; i +=1){
-           
-            for (var j = 0; j<3;j+=1){
-                model.colors.push.apply(model.colors,this.cells[i].color);
-                model.pickingColors.push.apply(model.pickingColors, this.cells[i]._pickingColor);
-            }
+    for(var i = index*9, N = index*9+9; i<N; i+=3){
+        this._model.colors[i] = color[0];
+        this._model.colors[i+1] = color[1];
+        this._model.colors[i+2] = color[2];
     }
     
-    model.update();
-};
-
-/**
- * Sets the mesh color
- */
-vxlMesh.prototype.setColor = function(color){
-    this.color = color;
-    this._setModelColor(this.color);
-};
-
- 
-/**
- * Determines if this mesh contains the cell indicated by the parameter cellUID
- * @param {String} cellUID the unique identifier of a cell
- */
-vxlMesh.prototype.hasCell = function(cellUID){
-  for(var i=0, count= this.cells.length; i < count; i+=1){
-      if (this.cells[i].UID == cellUID){
-          return true;
-      }
-  } 
-  return false; 
-};  
-
-/**
- * Determines if this mesh contains the cell indicated by the parameter cellUID
- * @param {String} cellUID the unique identifier of a cell
- */
-vxlMesh.prototype.getCell = function(cellUID){
-  for(var i=0, count= this.cells.length; i < count; i+=1){
-      if (this.cells[i].UID == cellUID){
-          return this.cells[i];
-      }
-  } 
-  return null; 
-};
-
-
-vxlMesh.prototype.removeCell = function(cellUID){
-  var idx = -1;
-  for(var i=0, count= this.cells.length; i < count; i+=1){
-      if (this.cells[i].UID == cellUID){
-          idx = i;
-          break;
-      }
-  }
-  if (idx !=-1) {
-        this.cells.splice(idx,1);
-        this._createInternalModel();
-   }
-
-   
-};  
-
-/**
- * This is just an experimental method. Determines what cells are facing the camera. 
- * May be this can be used for anything? I don't know! 
- * Maybe to see through a surface??
- *
- * @param {Object} camera
- * @param {Object} angle
- */
-vxlMesh.prototype.intersect = function(camera, angle){
+    this._model.update();
     
-    var ray = camera._normal;
-    
-    selection = [];
-
-    /*for(var i=0;i<this.normals.length; i+=1){
-        var dp = Math.acos(vec3.dot(ray, this.normals[i])) * vxl.def.rad2deg;
-        if (Math.abs(dp) <= angle){
-            selection = selection.concat(this.indices[i]);
-        }  
-    }*/
-    return selection;
 };
-

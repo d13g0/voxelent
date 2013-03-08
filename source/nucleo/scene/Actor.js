@@ -129,6 +129,8 @@ vxlActor.prototype.setPosition = function (x,y,z){
     this._computeBoundingBox();
     this._notifyTrackingCameras();
     vxl.go.notifier.fire(vxl.events.ACTOR_MOVED, this);
+    
+    return this;
 };
 
 
@@ -148,6 +150,8 @@ vxlActor.prototype.translate = function (x,y,z){
     this._computeBoundingBox();
     this._notifyTrackingCameras();
     vxl.go.notifier.fire(vxl.events.ACTOR_MOVED, this);
+    
+    return this;
 };
 
 
@@ -162,6 +166,8 @@ vxlActor.prototype.rotateX = function (angle){
     mat4.rotateX(m,a);
     this._computeBoundingBox();
     vxl.go.notifier.fire(vxl.events.ACTOR_ROTATED, this);
+    
+    return this;
 };
 
 /**
@@ -175,6 +181,8 @@ vxlActor.prototype.rotateY = function (angle){
     mat4.rotateY(m,a);
     this._computeBoundingBox();
     vxl.go.notifier.fire(vxl.events.ACTOR_ROTATED, this);
+    
+    return this;
 };
 
 
@@ -189,6 +197,8 @@ vxlActor.prototype.rotateZ = function (angle){
     mat4.rotateZ(m,a);
     this._computeBoundingBox();
     vxl.go.notifier.fire(vxl.events.ACTOR_ROTATED, this);
+    
+    return this;
 };
 
 /**
@@ -211,6 +221,8 @@ vxlActor.prototype.setScale = function(s,a,b){
     mat4.scale(m,this._scale);
     this._computeBoundingBox();
     vxl.go.notifier.fire(vxl.events.ACTOR_SCALED, this);
+    
+    return this;
 };
 
 /**
@@ -334,9 +346,11 @@ vxlActor.prototype.getHeight = function(){
 vxlActor.prototype.setColor = function (r,g,b){
 	this.material.diffuse = vxl.util.createVec3(r,g,b);
 	if (this.mesh){
-	    this.mesh.setColor(this.color);
+	    this.mesh.setColor(this.material.diffuse);
 	} 
 	vxl.go.notifier.fire(vxl.events.ACTOR_CHANGED_COLOR, this);
+	
+	return this;
 };
 
 
@@ -350,6 +364,8 @@ vxlActor.prototype.setOpacity = function(o){
 		this.material.opacity = o;
 	} 
 	else throw 'The opacity value is not valid';
+	
+	return this;
 };
 
 
@@ -359,6 +375,8 @@ vxlActor.prototype.setOpacity = function(o){
  */
 vxlActor.prototype.setShininess = function(s){
     this.material.shininess = s;
+    
+    return this;
 };
 
 /**
@@ -366,7 +384,9 @@ vxlActor.prototype.setShininess = function(s){
  * @param {String} uri the location of the texture to load 
  */
 vxlActor.prototype.setTexture = function(uri){
-    this.material.texture = new vxlTexture(uri);    
+    this.material.texture = new vxlTexture(uri);  
+    
+    return this;  
 }
 
 /**
@@ -403,6 +423,8 @@ vxlActor.prototype.setProperty = function(property, value, scope){
 		throw('vxlActor.setProperty. Scope:' + scope +' is not valid');
 	}
 	
+	return this;
+	
 };
 
 /**
@@ -414,7 +436,8 @@ vxlActor.prototype.setProperty = function(property, value, scope){
 vxlActor.prototype.setShading = function(flag){
     this.material.shading = flag;
     vxl.go.notifier.fire(vxl.events.ACTOR_CHANGED_SHADING, this);
-}
+    return this;
+};
 
 /**
  * Returns an actor property if that property exists in the actor. Otherwise it will search 
@@ -472,6 +495,8 @@ vxlActor.prototype.computePosition = function(){
 */
 vxlActor.prototype.setVisualizationMode = function(mode){
 	this.mode = mode;
+	
+	return this;
 };
 
 /**
@@ -481,6 +506,8 @@ vxlActor.prototype.setVisualizationMode = function(mode){
  */
 vxlActor.prototype.cullFace = function(face){
     this.cull = face;
+    
+    return this;
 };
 
 
@@ -507,7 +534,9 @@ vxlActor.prototype.setLookupTable = function(lutID,min,max){
 	}
 	
 	//Given that obtaining the colors can be a time consume op, it is deferred here.
-	setTimeout(function(){scheduledSetLookupTable()},0); 
+	setTimeout(function(){scheduledSetLookupTable()},0);
+	
+	return this; 
 };
 
 /**
@@ -516,6 +545,8 @@ vxlActor.prototype.setLookupTable = function(lutID,min,max){
 */
 vxlActor.prototype.flipNormals = function(){
 	this.model.flipNormals();
+	
+	return this;
 };
 
 /**
@@ -524,6 +555,8 @@ vxlActor.prototype.flipNormals = function(){
 */
 vxlActor.prototype.setVisible = function(flag){
     this.visible = flag;
+    
+    return this;
 };
 
 /**
@@ -613,6 +646,8 @@ vxlActor.prototype.setPicker = function(type, callback){
         }
     }
     //@TODO: Disable when there are no pickable actors in the scene.
+    
+    return this;
 };
 
 /**

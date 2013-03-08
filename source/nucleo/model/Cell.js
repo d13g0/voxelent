@@ -20,10 +20,10 @@
  * @constructor
  * @author Diego Cantor
  */
-function vxlCell(index, vertices, color){
+function vxlCell(mesh, index, vertices, color){
     
     this.UID = vxl.util.generateUID();
-    
+    this.mesh  = mesh;
     this.index = index;
     this.vertices = vertices;
     this.color = color==undefined?[0.8,0.8,0.8]:color;
@@ -50,3 +50,17 @@ vxlCell.prototype.getFlattenVertices = function(){
     var v = this.vertices;
     return [v[0][0],v[0][1],v[0][2],v[1][0],v[1][1],v[1][2],v[2][0],v[2][1],v[2][2]];
 };
+
+
+/**
+ * Updates the cell color. 
+ * @param {Object} r
+ * @param {Object} g
+ * @param {Object} b
+ */
+vxlCell.prototype.setColor = function(r,g,b){
+    this.color = vxl.util.createArr3(r,g,b);
+    
+    this.mesh._updateCellColor(this.index);
+    
+}
