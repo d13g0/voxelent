@@ -20,21 +20,21 @@
  * 
  * @class Provides cell by cell operations on models
  * @constructor 
- * @param {vxlModel} prior the model for this mesh
+ * @param {vxlActor} prior the model for this mesh
  * @author Diego Cantor
  */
-function vxlMesh(prior){
+function vxlMesh(actor){
     
-    if (prior == undefined){
+    if (actor == undefined){
         throw('vxlMesh: the model passed as parameter cannot be undefined');
     }
     
-    this.name = prior.name +'-mesh';
+    this.name = actor.name +'-mesh';
     this.cells = [];
     this.color = [0.8,0.8,0.8]; 
-    
-    this._model = undefined;   //internal representation of the mesh
-    this._createMesh(prior);
+    this.actor = actor;
+    this.model = undefined;   //internal representation of the mesh
+    this._createMesh(actor);
 };
 
 /**
@@ -57,7 +57,7 @@ vxlMesh.prototype.scalarsToCellColors = function(scalars, lut){
  * Update the mesh colors based on the current cell colors
  */
 vxlMesh.prototype.updateColor = function(){
-    var model = this._model;
+    var model = this.model;
     
     model.colors = [];
     model.pickingColors = [];
@@ -69,7 +69,7 @@ vxlMesh.prototype.updateColor = function(){
             }
     }
     
-    model.update();
+    this.actor.updateRenderable();
 };
 
 
@@ -130,7 +130,7 @@ vxlMesh.prototype.removeCell = function(cellUID){
  */
 vxlMesh.prototype.intersect = function(camera, angle){
     
-    var ray = camera._normal;
+    var ray = camera._forward;
     
     selection = [];
 
@@ -147,8 +147,8 @@ vxlMesh.prototype.intersect = function(camera, angle){
  * Identifies the cells existing in the 
  * @private
  */
-vxlMesh.prototype._createMesh = function(prior){
-    
+vxlMesh.prototype._createMesh = function(actor){
+    var prior = actor.model;
     var ver = prior.vertices;
     var ind = prior.indices;
     
@@ -197,6 +197,7 @@ vxlMesh.prototype._createMesh = function(prior){
         
         var elapsed = new Date().getTime() - start;
         console.info('Mesh ['+ self.name +'] generated in '+elapsed+ ' ms');
+        
     };
     
     //because this operation is time consuming it is deferred here.
@@ -230,7 +231,8 @@ vxlMesh.prototype._createModel = function(){
     model.computeNormals();
     model.setType(vxl.def.model.type.MESH);
     
-    this._model = model;
+    this.model = model;
+    this.actor.updateRenderable();
     
 };
 
@@ -240,9 +242,9 @@ vxlMesh.prototype._createModel = function(){
  */
 vxlMesh.prototype._setModelColor = function(color){
     
-    if (this._model == undefined) return;
+    if (this.model == undefined) return;
     
-    var model = this._model;
+    var model = this.model;
     model.colors = [];
     
     for(var i=0, count = this.cells.length; i<count; i +=1){
@@ -252,7 +254,7 @@ vxlMesh.prototype._setModelColor = function(color){
             }
     }
     
-    model.update();
+    this.actor.updateRenderable();
 };
 
 /**
@@ -264,11 +266,11 @@ vxlMesh.prototype._updateCellColor = function(index){
     var color = this.cells[index].color;
     
     for(var i = index*9, N = index*9+9; i<N; i+=3){
-        this._model.colors[i] = color[0];
-        this._model.colors[i+1] = color[1];
-        this._model.colors[i+2] = color[2];
+        this.model.colors[i] = color[0];
+        this.model.colors[i+1] = color[1];
+        this.model.colors[i+2] = color[2];
     }
     
-    this._model.update();
+    this.actor.updateRenderable();
     
 };

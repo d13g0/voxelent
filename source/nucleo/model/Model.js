@@ -58,22 +58,12 @@ function vxlModel(name, JSON_OBJECT){
  */
 vxlModel.prototype.setType = function(type){
     
-    if (this.indices.length > vxl.def.model.MAX_NUM_INDICES && 
+    if (this.indices.max() < vxl.def.model.MAX_NUM_INDICES && 
         type == vxl.def.model.type.BIG_DATA){
-            throw('The model is not big enough to be of BIG_DATA type Num Indices['+this.indices.length+']');
+            throw('The model is not big enough to be of BIG_DATA type. Max index found: '+this.indices.max());
         }
     
-    
-    switch(type){
-        case vxl.def.model.type.MESH:
-        case vxl.def.model.type.BIG_DATA:
-             this.type = type;
-             this.renderable = new vxlRenderable(this);
-             break;
-        case vxl.def.model.type.SIMPLE:
-             this.type = type;
-             this.renderable = undefined;
-    }    
+    this.type = type;  
 };
 
 /**
@@ -114,12 +104,15 @@ vxlModel.prototype.update = function(){
     }
     
 
-    if(this.normals == undefined && this.indices != undefined){
+    if(
+        (this.normals == undefined || 
+            (this.normals != undefined && this.normals.length == 0))
+        && this.indices != undefined)
+    {
         this.computeNormals();
     }
     
-    
-    
+     
     if (this.wireframe == undefined){
         this.computeWireframeIndices();
     }
@@ -135,10 +128,9 @@ vxlModel.prototype.update = function(){
     this.computeBoundingBox();
     
     
-    if (this.type == vxl.def.model.type.BIG_DATA ||
-        this.type == vxl.def.model.type.MESH){
-            this.renderable.update();
-        }
+    if (this.type == vxl.def.model.type.SIMPLE && this.indices.max() > vxl.def.model.MAX_NUM_INDICES){
+        this.setType(vxl.def.model.type.BIG_DATA);
+    }
     
 };
 

@@ -63,7 +63,7 @@
     
 	    var cell = actor.mesh.getCell(uid);
 	    
-	    var angle = Math.acos(vec3.dot(cell.normal, vxl.c.camera._normal)) * vxl.def.rad2deg;
+	    var angle = Math.acos(vec3.dot(cell.normal, vxl.c.camera._forward)) * vxl.def.rad2deg;
 	    
 	    if (angle <=90){
             cell.setColor(0.2,0.5,0.0);

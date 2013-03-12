@@ -315,6 +315,76 @@ vxlRenderStrategy.prototype._handlePicking = function(actors){
 /**
  * @private
  */
+vxlRenderStrategy.prototype._enablePartVertices = function(actor,part){
+    
+    var gl = this.renderer.gl;
+    var prg = this.renderer.prg;
+    var buffers = this._gl_buffers[actor.UID];
+    var glsl    = vxl.def.glsl; 
+                
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.vertices), gl.STATIC_DRAW);
+    prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0); 
+};
+
+/**
+ * @private
+ */
+vxlRenderStrategy.prototype._enablePartNormals = function(actor,part){
+    
+  var gl = this.renderer.gl;
+  var prg = this.renderer.prg;
+  var buffers = this._gl_buffers[actor.UID];
+  var glsl    = vxl.def.glsl; 
+  
+  if (part.normals != undefined && part.normals.length>0){
+        try{
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.normals), gl.STATIC_DRAW);
+            
+            prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
+            prg.setAttributePointer(glsl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
+            
+        }
+        catch(err){
+            alert('There was a problem while rendering a BIG DATA part ['+part.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
+            throw('There was a problem while rendering a BIG DATA part ['+part.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
+        }
+  }
+    
+};
+
+/**
+ * @private
+ */
+vxlRenderStrategy.prototype._enablePartColors = function(actor,part){
+    
+  var gl = this.renderer.gl;
+  var prg = this.renderer.prg;
+  var buffers = this._gl_buffers[actor.UID];
+  var glsl    = vxl.def.glsl; 
+  
+  if (part.colors != undefined && part.colors.length>0){
+      try{
+            prg.setUniform("uUseVertexColors", true);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.colors), gl.STATIC_DRAW);
+        
+            prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
+            prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+          
+        }
+        catch(err){
+            alert('There was a problem while rendering a BIG DATA part ['+part.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+            throw('There was a problem while rendering a BIG DATA part ['+part.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+        }
+    
+    }  
+};
+
+/**
+ * @private
+ */
 vxlRenderStrategy.prototype._enableNormals = function(actor){
     
     var model = actor.model;
@@ -374,14 +444,39 @@ vxlRenderStrategy.prototype._renderSolid = function(actor){
     
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
+    var prg     = this.renderer.prg;
+    var glsl    = vxl.def.glsl;
     
-    this._enableNormals(actor);
-    this._enableColors(actor);    
-
+    if (actor.renderable){
+        
+        parts = actor.renderable.parts;
+        
+        for (var i=0, N = parts.length; i<N; i+=1){
+             var part = parts[i];
+             try{
+                 
+                this._enablePartVertices(actor,part)
+                this._enablePartColors(actor,part);
+                this._enablePartNormals(actor,part);
+                
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(part.indices), gl.STATIC_DRAW);
+                gl.drawElements(gl.TRIANGLES, part.indices.length, gl.UNSIGNED_SHORT,0);
+            }
+            catch(err){
+                alert('Error rendering BIG DATA: There was a problem while rendering the part ['+part.name+']. ' +err.description);
+                throw('Error rendering BIG DATA: There was a problem while rendering the part ['+part.name+']. ' +err.description);
+            }
+        }
+    }
+    else{
     
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(actor.model.indices), gl.STATIC_DRAW);
-    gl.drawElements(gl.TRIANGLES, actor.model.indices.length, gl.UNSIGNED_SHORT,0);
+        this._enableNormals(actor);
+        this._enableColors(actor);    
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(actor.model.indices), gl.STATIC_DRAW);
+        gl.drawElements(gl.TRIANGLES, actor.model.indices.length, gl.UNSIGNED_SHORT,0);
+    }
 };
 
 /**
@@ -525,10 +620,11 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
     
     if (actor.mesh == undefined){
         actor.mesh = new vxlMesh(actor.model);
+        actor.renderable = new vxlRenderable(actor);
         
     }
     
-    if (actor.mesh._model == undefined) {
+    if (actor.mesh.model == undefined) {
         //mesh not ready yet. Render actor wireframe in the mean time
         var model = actor.model;
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
@@ -545,7 +641,7 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
 
     prg.setUniform("uUseShading",true);
 
-    var parts = actor.mesh._model.renderable.parts;
+    var parts = actor.renderable.parts;
     
     for(var i=0, N = parts.length; i<N; i+=1){
         
@@ -633,13 +729,13 @@ vxlRenderStrategy.prototype._renderPickingBuffer = function(actor){
     if (actor._picking == vxl.def.actor.picking.CELL){
     
       
-        if (actor.mesh == undefined || actor.mesh._model == undefined){
+        if (actor.mesh == undefined || actor.mesh.model == undefined){
             return; // we just fail safely. We will render it whenever the actor is ready ;-)
                     // the mesh is generated inside actor.setPicker (see actor.setPicker method)
         }
         
       
-        var parts = actor.mesh._model.renderable.parts;
+        var parts = actor.renderable.parts;
     
         for(var i=0, N = parts.length; i<N; i+=1){
         
@@ -828,7 +924,7 @@ vxlRenderStrategy.prototype._renderActor = function(actor){
     }
     
         
-    if (actor.mode != vxl.def.actor.mode.FLAT){
+    if (actor.mode != vxl.def.actor.mode.FLAT && actor.model.type != vxl.def.model.type.BIG_DATA){
         try{
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);

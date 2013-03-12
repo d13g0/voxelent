@@ -20,6 +20,8 @@
  * Implements a basic rendering strategy that works with the following programs:
  * 
  * vxl.def.glsl.bake
+ * TODO: Does not deal with model scalars well...
+ * 
  */
 function vxlBakeStrategy(renderer){
     this.renderer = renderer;
@@ -61,29 +63,8 @@ function vxlBakeStrategy(renderer){
         SCALE:    "aScale",
         SHADING:  "aShading"
     });
-    
-    var e = vxl.events;
-    vxl.go.notifier.subscribe([
-        e.ACTOR_MOVED,
-        e.ACTOR_SCALED,
-        e.ACTOR_CHANGED_SHADING,
-        e.ACTOR_CHANGED_COLOR
-    ], this);
-};
 
-/**
- * Handle voxelent events
- */
-vxlBakeStrategy.prototype.handleEvent = function(event, actor){
-    
-    switch(event){
-        case vxl.events.ACTOR_MOVED:            this._updateActorPosition(actor);   break;
-        case vxl.events.ACTOR_SCALED:           this._updateActorScale(actor);      break;
-        case vxl.events.ACTOR_CHANGED_SHADING:  this._updateActorShading(actor);    break;
-        case vxl.events.ACTOR_CHANGED_COLOR:    this._updateActorColor(actor);      break;
-    }
 };
- 
 
 
 /**
@@ -146,8 +127,8 @@ vxlBakeStrategy.prototype._allocateActor = function(actor){
     var color = [], normal = [];
     
     //Taking care of colors
-    if (actor.color) {
-        color = this._populate(actor.color, NUM_VERTICES/3);
+    if (actor.material.diffuse) {
+        color = this._populate(actor.material.diffuse, NUM_VERTICES/3);
     }
     else{
         color = this._populate([0.7,0.7,0.7], NUM_VERTICES/3);
@@ -184,13 +165,8 @@ vxlBakeStrategy.prototype._allocateActor = function(actor){
     
     data.position = data.position.concat(this._populate(actor._position, NUM_VERTICES/3));
     data.scale    = data.scale.concat(this._populate(actor._scale, NUM_VERTICES/3));
+    data.shading = data.shading.concat(this._populate(actor.material.opacity, NUM_VERTICES/3));
     
-    if (actor.shading){
-        data.shading = data.shading.concat(this._populate(1.0, NUM_VERTICES/3));
-    }
-    else{
-        data.shading = data.shading.concat(this._populate(0.0, NUM_VERTICES/3));
-    }
 
     var ind = model.indices.slice(0);
     if (data.index.length > 0){
@@ -255,9 +231,9 @@ vxlBakeStrategy.prototype._updateActorColor = function(actor){
     
     var LEN = (actor.model.vertices.length*3) + offset;
     for(var i =offset;i<LEN;i+=9){
-        data.baked[i+6] = actor.color[0];
-        data.baked[i+7] = actor.color[1];
-        data.baked[i+8] = actor.color[2];
+        data.baked[i+6] = actor.material.diffuse[0];
+        data.baked[i+7] = actor.material.diffuse[1];
+        data.baked[i+8] = actor.material.diffuse[2];
     }
 };
 
@@ -273,7 +249,7 @@ vxlBakeStrategy.prototype._updateActorShading = function(actor){
     var LEN = (actor.model.vertices.length/3) + offset;
     var val = 0.0;
     
-    if (actor.shading){
+    if (actor.material.opacity){
         val = 1.0;
     }
     
@@ -373,6 +349,15 @@ vxlBakeStrategy.prototype.render = function(scene){
     prg.setUniform(glsl.MODEL_VIEW_MATRIX,  trx.mvMatrix);
     prg.setUniform(glsl.NORMAL_MATRIX,      trx.nMatrix);
     prg.setUniform(glsl.MVP_MATRIX,         trx.mvpMatrix);
+    
+    for(var i = 0, N = scene._actors.length; i<N; i+=1){
+        var actor = scene._actors[i];
+        this._updateActorPosition(actor);   
+        this._updateActorScale(actor);     
+        this._updateActorShading(actor);  
+        this._updateActorColor(actor);     
+    }
+    
     
     gl.drawElements(gl.TRIANGLES, data.index.length, gl.UNSIGNED_SHORT,0);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);

@@ -12,7 +12,7 @@
 
 <script src="lib/jquery.js" type="text/javascript"> </script>
 <script src="lib/jquery-ui.js" type="text/javascript"> </script>
-<script type='text/javascript' src='lib/voxelent_v0.89.2.js'> </script>
+<script type='text/javascript' src='lib/voxelent_v0.89.3.js'> </script>
 <script type='text/javascript' src='lib/vox-gui_v0.1.js'> </script>
 
 
@@ -56,6 +56,7 @@ function createCubes(cube){
                 clon = cube.clone();
                 clon.setPosition(i*1.5,j*1.5,k*1.5);
                 clon.setShading(false);
+                clon.setScale(Math.random()*3);
                 cubes.push(clon);
                 //add it to the current scene
                 view.scene.addActor(clon);
@@ -171,6 +172,7 @@ function animate(){
     }
     t += 1;
     t %= 360;
+    $('#view-1-fps').html(view.getFPS());
 };
 
 </script>
@@ -222,7 +224,7 @@ function animate(){
 </style> 
 </head>
 <body onload='runVoxApp()'>
-	<div><img src="css/img/voxelent.png" /></div>
+
 	<div class='show'>
 	<canvas id = 'view-1' width=800 height=650 >
 		<p>

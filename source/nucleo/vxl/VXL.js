@@ -289,18 +289,19 @@ def : {
 	camera          : {
                         
                         /** 
-                         * Camera types available
+                         * Camera type available
                          * 
-                         * <p>The camera types can be:
+                         * <p>The camera type can be:
                          * <ul>
                          * <li><code>ORBITING</code>: Orbiting Camera - Around the World</li>
+                         * <li><code>DYNAMIC</code>: Camera axes are updated on every rotation</li> 
                          * <li><code>TRACKING</code>: Tracking Camera - First Person Camera</li> 
                          * </ul>
                          * </p>
                          * 
                          * <p> These modes can be used with the {@link vxlCamera vxlCamera constructor} or with its {@link vxlCamera#setType setType} method</p>
                          */
-    					type      : { ORBITING: 'ORBITING', TRACKING : 'TRACKING'},
+    					type      : { ORBITING: 'ORBITING', TRACKING : 'TRACKING', EXPLORING: 'EXPLORING'},
     					/**
     					 * Right vector constant: [1,0,0] 
     					 */

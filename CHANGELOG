@@ -20,6 +20,44 @@ for example:
 var actor = vxl.c.scene.getActorByName('sphere');
 actor.setColor(0.4,0.4,0.5).setPosition(3,3,3).setOpacity(0.5);
 
+CAMERA UPDATES
+
+
+1. The normal axis of the vxlCamera has been replaced by the forward axis. This is just a change
+in syntax not in behaviour. This means that the internal property ._normal has been replaced by
+the internal proeprty ._forward.
+
+2. Previous to this version, the camera object could not pass an elevation of 90 or -90 but instead
+the movement was restricted to avoid 'oscliations' due to the inability to determine the up direction
+this problem has been fixed by changing the code of the rotate method. The rotation now occurs
+with respect to the current camera coordinates and every time the camera axes are recalculated. 
+
+This mode of operation is captured by the vxl.def.camera.type.EXPLORING type which is now the mode
+by default.
+
+
+
+TRACKER INTERACTOR UPDATES
+
+1. Now it is possible to use the Command key in Mac to perform dollying (zoom). It was tricky
+to use the control key on mac because in some cases it triggers a pop up depending on the
+browser version on Mac.
+
+From this version on, if you have a Mac, you can use Command key + mouse drag to perform dollying.
+
+RENDERABLES
+
+1. Renderables belong now to the vxlActor class. The idea behind it is to make sure that
+the actor representation on screen is different from the model This way we can have several actors
+based on the same model. Each one with different properties. For instance, two actors based on the
+same model but each one using a different lookup table. To achieve this, it is necessary that the colors are stored in the material
+of the actor (vxlMaterial) instead of using the vxlModel colors (which are used initially if they exist)
+
+The vxlRenderable reads the model information from vxlMesh model if the actor has one
+or from the actor model if it is of type big data.
+
+
+
 
 
 

@@ -110,6 +110,8 @@ vxlNotifier.prototype._addSource = function(event,src){
  */
 vxlNotifier.prototype.fire = function(event, src){
     
+    if (this.targetList[event].length == 0) return; //quick and simple
+    
     var self = this;
     
     function processEvent(){

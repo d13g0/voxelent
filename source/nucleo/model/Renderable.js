@@ -1,5 +1,5 @@
 /**
- * @class A Renderable is an intermediary object between a model and the rendering strategy that allows rendering
+ * @class A Renderable is an intermediary object between an actor and the rendering strategy that allows rendering
  * very complex models.
  * 
  * Think of this scenario. You have a model that has more than 65K number of vertices.
@@ -26,38 +26,24 @@
  * 
  * 
  * 
- * @constructor A Renderable is an intermediary object between a model and the rendering strategy that allows rendering
+ * @constructor A Renderable is an intermediary object between an actor and the rendering strategy that allows rendering
  * very complex models.
  * 
- * @param{vxlModel} model the model to be decomposed into renderable parts
+ * @param{vxlActor} model the actor to be decomposed into renderable parts
   *  
  * @author Diego Cantor
  */
 
-function vxlRenderable(model){
+function vxlRenderable(actor){
     
     
-    if (model == undefined){
-        throw('vxlRenderable: the model can not be undefined');
+    if (actor == undefined){
+        throw('vxlRenderable: the actor can not be undefined');
     }
+   
     
-    var type = model.type;
-    
-    
-    if (type == undefined){
-        if (type != vxl.def.model.type.BIG_DATA && 
-            type != vxl.def.model.type.MESH){
-            throw('vxlRenderable: the type of renderable is unknown');
-        }
-        else if (type == vxl.def.model.type.SIMPLE){
-            throw('vxlRenderable: simple models do not require renderables!');
-        }
-    }
-    
-    this._model = model;
-    
+    this.actor = actor;
     this.parts = [];    
-    
     this.update();
 }
 
@@ -71,12 +57,15 @@ vxlRenderable.prototype.update = function(){
     //clear parts
     this.parts = [];
     
-    switch(this._model.type){
-        case vxl.def.model.type.MESH:      this._processMesh();    break;
-        case vxl.def.model.type.BIG_DATA : this._processBigData(); break;
-    }
+    var model  = this.actor.getRenderableModel();
     
-    return this.parts;
+    if (model == undefined) return;
+    
+    switch(model.type){
+        case vxl.def.model.type.MESH: this._processMesh(model); break;
+        case vxl.def.model.type.BIG_DATA: this._processBigData(model); break;
+    }
+   
 };
 
 /**
@@ -86,10 +75,10 @@ vxlRenderable.prototype.update = function(){
  * 
  * 
  */
-vxlRenderable.prototype._processMesh = function(){
+vxlRenderable.prototype._processMesh = function(model){
     
-    var model = this._model;
-    
+  
+
     var size = vxl.def.model.MAX_NUM_INDICES;
     
     var N = Math.floor(model.indices.length / size), R = model.indices.length % size;
@@ -127,7 +116,6 @@ vxlRenderable.prototype._processMesh = function(){
         }
         
         part.update();
-        
         this.parts.push(part);
     }
      
@@ -145,6 +133,107 @@ vxlRenderable.prototype._reindex = function(indices){
     return indices;
 }
 
-vxlRenderable.prototype._processBigData = function(){
+
+/***
+ * Processing big data 
+ * 
+ * The idea here is read chunks of size 65K from the model index array. Then obtain vertex, normal, and color
+ * arrays for each index in the chunk.
+ * After that, the new part index is generated
+ * 
+ * 
+ */
+vxlRenderable.prototype._processBigData = function(model){
+    
+    
+    
+    var bigDataIndex = model.indices;
+    
+    var size = vxl.def.model.MAX_NUM_INDICES;
+    
+    var N = Math.floor(model.indices.length / size);
+    var R = model.indices.length % size;
+    
+    var material = this.actor.material;
+    
+    //TODO: Be more clever about the partitioning. The arrays don't need to have 65K in lenght
+    //what the specs means is that the max element in the array index is 65K.
+    //this is because the index range goes up to 65535 as the highest index.
+    
+    for (var i=0; i<=N; i +=1){
+        
+        var part = new vxlModel(model.name+'-renderable-part-'+i);    
+        var indexMap = [], localIndexArray = [], globalIndexArray = [], innerIndex = 0;
+        
+        if (i == N) {
+            if ( R > 0){
+                globalIndexArray = bigDataIndex.slice(i*size,i*size+R);
+             }
+             else{
+                 break;
+             }
+        }
+        else{
+            globalIndexArray = bigDataIndex.slice(i*size,(i+1)*size);
+        }
+        
+        if (material.colors && material.colors.length>0)  {  part.colors = [];   }   
+        
+        if (model.normals && model.normals.length>0){  part.normals = [];  }
+        
+        if (model.scalars && model.scalars.length>0){  part.scalars = [];  }
+        
+        for(var k=0,K = globalIndexArray.length; k<K; k+=1){
+            //Get an index from the global index
+            var outerIndex  = globalIndexArray[k];
+            
+            //if it has not been processed then process it.
+            //Processing consist into adding data to the respective part arrays
+            if (indexMap[outerIndex] == undefined){
+                indexMap[outerIndex] = innerIndex;
+                
+                vertexInfo = this._getBigDataVertexInfo(outerIndex);
+                part.vertices.push.apply(part.vertices, vertexInfo.coords);
+                if (model.normals && model.normals.length>0){
+ 
+                    part.normals.push.apply(part.normals, vertexInfo.normal);
+                }
+                if (material.colors && material.colors.length>0){
+                    part.colors.push.apply(part.colors, vertexInfo.color);
+                }
+                if (model.scalars && model.scalars.length>0){
+                    part.scalars.push(vertexInfo.scalar);
+                }
+                innerIndex +=1;
+            }
+            //write the new index to the part index array
+            part.indices.push(indexMap[outerIndex]);
+            
+        }
+        part.update();
+        this.parts.push(part);
+    }   
+};
+
+/**
+ * Unlike meshes, Big Data models do not have picking colors associated
+ * @param {Object} index
+ * @private
+ */
+vxlRenderable.prototype._getBigDataVertexInfo = function(index){
+    
+    var material = this.actor.material;
+    var model = this.actor.model;
+    
+    var vertexInfo = {};
+    
+    vertexInfo.coords = model.vertices.slice(index*3, index*3+3);
+    
+    if (model.normals){ vertexInfo.normal = model.normals.slice(index*3, index*3+3);}
+    if (material.colors){  vertexInfo.color = material.colors.slice(index*3, index*3+3);}
+    if (model.scalars){  vertexInfo.scalar = model.scalars[index];}
+    
+    return vertexInfo;
+    
     
 };

@@ -289,18 +289,19 @@ def : {
 	camera          : {
                         
                         /** 
-                         * Camera types available
+                         * Camera type available
                          * 
-                         * <p>The camera types can be:
+                         * <p>The camera type can be:
                          * <ul>
                          * <li><code>ORBITING</code>: Orbiting Camera - Around the World</li>
+                         * <li><code>DYNAMIC</code>: Camera axes are updated on every rotation</li> 
                          * <li><code>TRACKING</code>: Tracking Camera - First Person Camera</li> 
                          * </ul>
                          * </p>
                          * 
                          * <p> These modes can be used with the {@link vxlCamera vxlCamera constructor} or with its {@link vxlCamera#setType setType} method</p>
                          */
-    					type      : { ORBITING: 'ORBITING', TRACKING : 'TRACKING'},
+    					type      : { ORBITING: 'ORBITING', TRACKING : 'TRACKING', EXPLORING: 'EXPLORING'},
     					/**
     					 * Right vector constant: [1,0,0] 
     					 */
@@ -796,6 +797,8 @@ vxlNotifier.prototype._addSource = function(event,src){
  * @param {Object} src
  */
 vxlNotifier.prototype.fire = function(event, src){
+    
+    if (this.targetList[event].length == 0) return; //quick and simple
     
     var self = this;
     
@@ -4254,6 +4257,10 @@ vxlLandmark.prototype.retrieve = function() {
  * A vxlCamera object requires a vxlView to be created. Having said that, a vxlView can be associated with 
  * multiple cameras.
  * 
+ * The azimuth, elevation and roll operations occur with respect to the standard coordinate system:
+ * right =[1,0,0], up = [0,1,0] and normal 
+ * of 
+ * 
  * @class Like a real camera it moves around the 3D scene displaying the current point of view in the browser
  * @constructor Creates a vxlCamera. 
  * @param {vxlView} vw
@@ -4271,7 +4278,7 @@ function vxlCamera(vw,t) {
     this._matrix 	      = mat4.identity();
     this._right 		  = vec3.createFrom(1, 0, 0);
 	this._up              = vec3.createFrom(0, 1, 0);
-	this._normal          = vec3.createFrom(0, 0, 1);	
+	this._forward          = vec3.createFrom(0, 0, 1);	
 	this._position        = vec3.createFrom(0, 0, 1);
 	this._focalPoint      = vec3.createFrom(0, 0, 0);
 	this._distanceVector  = vec3.createFrom(0, 0, 0);
@@ -4294,7 +4301,7 @@ function vxlCamera(vw,t) {
         this.type = t;
     }
     else {
-        this.type = vxl.def.camera.type.ORBITING;
+        this.type = vxl.def.camera.type.EXPLORING;
     }
     
 };
@@ -4308,9 +4315,11 @@ function vxlCamera(vw,t) {
  */
 vxlCamera.prototype.setType = function(type, trackingMode){
     
-    if (type != vxl.def.camera.type.ORBITING && type != vxl.def.camera.type.TRACKING) {
-        console.error('vxlCamera.setType ERROR type'+ type +' unknown. Setting camera to ORBITING type.');
-        this.type = vxl.def.camera.type.ORBITING;
+    if (type != vxl.def.camera.type.ORBITING && 
+        type != vxl.def.camera.type.TRACKING &&
+        type != vxl.def.camera.type.EXPLORING) {
+        console.error('vxlCamera.setType ERROR type'+ type +' unknown. Setting camera to EXPLORING type.');
+        this.type = vxl.def.camera.type.EXPLORING;
     }
     else {
         this.type = type
@@ -4322,8 +4331,8 @@ vxlCamera.prototype.setType = function(type, trackingMode){
 };
 
 /**
- * Sets the tracking mode of this camera when it follows an actor
- * <p> to set the tracking mode of the camera <code>myCamera</code> you should make sure that your camera is of tracking type with:
+ * Sets the tracking type of this camera when it follows an actor
+ * <p> to set the tracking type of the camera <code>myCamera</code> you should make sure that your camera is of tracking type with:
  *  <code>myCamera.setType(vxl.def.camera.type.TRACKING)</code>.
  *  For instance:
  * </p>
@@ -4344,20 +4353,24 @@ vxlCamera.prototype.setType = function(type, trackingMode){
  * @see vxlCamera#follow, vxlCamera#setTrackingMode
  */
 vxlCamera.prototype.setTrackingMode = function(mode){
+    if (this.type != vxl.def.camera.type.TRACKING){
+        alert("Impossible to set a tracking mode if the camera is not of tracking type");
+        throw("Impossible to set a tracking mode if the camera is not of tracking type");
+    }
     if (mode == undefined) return;
     this._trackingMode = mode;
 };
 
 /**
  * Follows a given actor. If this operation is called on an ORBITING camera,
- * the camera type will change to be a TRACKING camera.
+ * the camera mode will change to be a TRACKING camera.
  * 
  * @param {vxlActor} actor actor to track
- * @param {String} trackingMode one of the possible values of <code>vxl.def.camera.tracking</code>
+ * @param {String} trackingType one of the possible values of <code>vxl.def.camera.tracking</code>
  * @see {vxlCamera#setType, vxl.def.camera.tracking}
  */
-vxlCamera.prototype.follow = function(actor, trackingMode){
-    this.setType(vxl.def.camera.type.TRACKING, trackingMode);
+vxlCamera.prototype.follow = function(actor, trackingType){
+    this.setType(vxl.def.camera.type.TRACKING, trackingType);
     if (actor == undefined || actor == null){
         alert("vxlCamera.follow: Unable to follow undefined/null actor");
         console.error("vxlCamera.follow: Unable to follow undefined/null actor");
@@ -4471,7 +4484,7 @@ vxlCamera.prototype.setDistance = function(d) {
     var pos = vec3.create();
     
     var d = this._distance;
-    var n = this._normal;
+    var n = this._forward;
     var f = this._focalPoint;
     
     pos[0] = d*n[0] + f[0];
@@ -4514,7 +4527,7 @@ vxlCamera.prototype.setAzimuth = function(az){
     this._computeMatrix();
     
     this._getAxes();
-    if (this.type == vxl.def.camera.type.ORBITING){
+    if (this.type == vxl.def.camera.type.ORBITING || this.type == vxl.def.camera.type.EXPLORING){
         this._getPosition();
     }
     else if (this.type == vxl.def.camera.type.TRACKING){
@@ -4531,7 +4544,7 @@ vxlCamera.prototype.setElevation = function(el){
     this._computeMatrix();
     
     this._getAxes();
-    if (this.type == vxl.def.camera.type.ORBITING){
+    if (this.type == vxl.def.camera.type.ORBITING || this.type == vxl.def.camera.type.EXPLORING){
         this._getPosition();
     }
     else if (this.type == vxl.def.camera.type.TRACKING){
@@ -4549,7 +4562,7 @@ vxlCamera.prototype.setRoll = function(angle){
     this._computeMatrix();
        
     this._getAxes();
-    if (this.type == vxl.def.camera.type.ORBITING){
+    if (this.type == vxl.def.camera.type.ORBITING || this.type == vxl.def.camera.type.EXPLORING){
         this._getPosition();
     }
     else if (this.type == vxl.def.camera.type.TRACKING){
@@ -4561,34 +4574,56 @@ vxlCamera.prototype.setRoll = function(angle){
  * Changes the azimuth and elevation with respect to the current camera axes
  * @param {Number} azimuth the relative azimuth
  * @param {Number} elevation the relative elevation
+ * @param {Number} roll the relative roll
  */
 vxlCamera.prototype.rotate = function(azimuth,elevation,roll){
-    
-    if (Math.abs(this._elevation + elevation) > 90) return; //don't allow
-    
-    this._relElevation = this._getAngle(elevation);
-    this._relAzimuth   = this._getAngle(azimuth);
-    this._relRoll      = this._getAngle(roll);
-    
-    this._elevation += this._relElevation;
-    this._azimuth   += this._relAzimuth;
-    this._roll      += this._relRoll;
-    
-    this._computeMatrix();
    
+    if (this.type == vxl.def.camera.type.EXPLORING){ 
+        
+        azimuth   = this._getAngle(azimuth);
+        elevation = this._getAngle(elevation);
+        roll      = this._getAngle(roll);
+        var rotX  = quat4.fromAngleAxis(elevation * vxl.def.deg2rad, [1,0,0]);
+        var rotY  = quat4.fromAngleAxis(azimuth   * vxl.def.deg2rad, [0,1,0]);
+        var rotZ  = quat4.fromAngleAxis(roll      * vxl.def.deg2rad, [0,0,1]); 
+        var rotQ = quat4.multiply(rotY, rotX, quat4.create());
+        rotQ = quat4.multiply(rotQ, rotZ, quat4.create());
+        var rotMatrix = quat4.toMat4(rotQ);
+        mat4.translate(this._matrix, [0,0,-this._distance]);
+        mat4.multiply(this._matrix, rotMatrix);
+        mat4.translate(this._matrix, [0,0,this._distance]);
+    }
+    else {
+        if (Math.abs(this._elevation + elevation) > 90) return; //don't allow
+        this._relElevation = this._getAngle(elevation);
+        this._relAzimuth = this._getAngle(azimuth);
+        this._relRoll = this._getAngle(roll);
+        
+        if (this.type == vxl.def.camera.type.TRACKING){
+            this._relElevation = -this._relElevation;
+            this._relAzimuth   = -this._relAzimuth;
+            this._relRoll      = -this._relRoll;
+        }
+        
+        this._elevation += this._relElevation;
+        this._azimuth += this._relAzimuth;
+        this._roll += this._relRoll;
+        
+         this._computeMatrix();
+    }
+    
        
     this._getAxes();
-    if (this.type == vxl.def.camera.type.ORBITING){
+    if (this.type == vxl.def.camera.type.ORBITING || this.type == vxl.def.camera.type.EXPLORING){
         this._getPosition();
     }
     else if (this.type == vxl.def.camera.type.TRACKING){
         this._getFocalPoint();
     }
     
-    
-    
    this._update();
 };
+
 
 /**
  * Performs the dollying operation in the direction indicated by the camera normal axis.
@@ -4601,7 +4636,7 @@ vxlCamera.prototype.rotate = function(azimuth,elevation,roll){
  */
 vxlCamera.prototype.dolly = function(value) {
     
-	var    n =  this._normal; 
+	var    n =  this._forward; 
     var pos = vec3.create(this._position);
     var step = value*this._dollyingStep;
     pos[0] += step*n[0];
@@ -4609,7 +4644,7 @@ vxlCamera.prototype.dolly = function(value) {
     pos[2] += step*n[2];
     
     this._setPosition(pos);
-    if (this.type == vxl.def.camera.type.ORBITING){
+    if (this.type == vxl.def.camera.type.ORBITING || this.type == vxl.def.camera.type.DYNAMIC){
         this._getDistance();
     }
     else if (this.type == vxl.def.camera.type.TRACKING){
@@ -4639,12 +4674,12 @@ vxlCamera.prototype.translate = function(x,y,z){
     
     vec3.add(pos, vec3.scale(this._right  ,x, vec3.create()));
     vec3.add(pos, vec3.scale(this._up     ,y, vec3.create()));    
-    vec3.add(pos, vec3.scale(this._normal ,z, vec3.create()));
+    vec3.add(pos, vec3.scale(this._forward ,z, vec3.create()));
     
     var fp  = vec3.create(this._focalPoint);
     vec3.add(fp, vec3.scale(this._right  ,x, vec3.create()));
     vec3.add(fp, vec3.scale(this._up     ,y, vec3.create()));    
-    vec3.add(fp, vec3.scale(this._normal ,z, vec3.create()));
+    vec3.add(fp, vec3.scale(this._forward ,z, vec3.create()));
     
     this._setPosition(pos);
     this.setFocalPoint(fp);
@@ -4803,7 +4838,7 @@ vxlCamera.prototype.status = function() {
 	console.info('       type: ' + this.type);
     console.info('      right: ' + vxl.util.format(this._right, 2)); 
     console.info('         up: ' + vxl.util.format(this._up, 2));   
-    console.info('     normal: ' + vxl.util.format(this._normal,2));           
+    console.info('    forward: ' + vxl.util.format(this._forward,2));           
     console.info('   position: ' + vxl.util.format(this._position,2));
     console.info('focal point: ' + vxl.util.format(this._focalPoint,2));
     console.info('   d vector: ' + vxl.util.format(this._distanceVector,2));
@@ -4845,7 +4880,7 @@ vxlCamera.prototype._computeMatrix = function(){
     rotQ = quat4.multiply(rotQ, rotZ, quat4.create());
     var rotMatrix = quat4.toMat4(rotQ);
     
-    if (this.type ==  vxl.def.camera.type.ORBITING){
+    if (this.type ==  vxl.def.camera.type.ORBITING || this.type == vxl.def.camera.type.EXPLORING){
         mat4.translate(this._matrix, this._focalPoint);
         mat4.multiply(this._matrix, rotMatrix);
         mat4.translate(this._matrix, [0,0,this._distance]);
@@ -4856,13 +4891,12 @@ vxlCamera.prototype._computeMatrix = function(){
     }
 };
 
-/**
+/*
  * Updates the camera matrix. Used on rotate to avoid gimbal lock
  * @private
  */
 /*vxlCamera.prototype._updateMatrix = function(){
-    
-    
+   
     var rotX  = quat4.fromAngleAxis(this._relElevation * vxl.def.deg2rad, [1,0,0]);
     var rotY  = quat4.fromAngleAxis(this._relAzimuth   * vxl.def.deg2rad, [0,1,0]);
     var rotZ  = quat4.fromAngleAxis(this._relRoll      * vxl.def.deg2rad, [0,0,1]); 
@@ -4906,10 +4940,10 @@ vxlCamera.prototype._getAxes = function(){
     var m       = this._matrix;
     vec3.set(mat4.multiplyVec4(m, [1, 0, 0, 0]), this._right);
     vec3.set(mat4.multiplyVec4(m, [0, 1, 0, 0]), this._up);
-    vec3.set(mat4.multiplyVec4(m, [0, 0, 1, 0]), this._normal);
+    vec3.set(mat4.multiplyVec4(m, [0, 0, 1, 0]), this._forward);
     vec3.normalize(this._right);
     vec3.normalize(this._up);
-    vec3.normalize(this._normal);
+    vec3.normalize(this._forward);
 };
 
 /**
@@ -5298,6 +5332,7 @@ function vxlTrackerInteractor(){
 	this.button = -1;
 	this.dragging = false;
 	this.dragndrop = false;
+	this.isMac = navigator.platform.toUpperCase().indexOf("MAC") != -1;
 	
 };
 
@@ -5391,14 +5426,17 @@ vxlTrackerInteractor.prototype.onMouseMove = function(ev){
     if (this.button !=0) return;  
 	
 	this.ctrlPressed 	= ev.ctrlKey;
+	
+	if (this.isMac && ev.metaKey){
+	    this.ctrlPressed = true;
+	}
+	
 	this.altPressed 	= ev.altKey;
 	this.shiftPressed 	= ev.shiftKey;
 	
 	var rx = this.x - this.lastX;
 	var ry = this.y - this.lastY;
-	
-	
-	 
+		 
     if (this.ctrlPressed && !this.shiftPressed){ 
 		this.dolly(ry);
 	}
@@ -5409,6 +5447,7 @@ vxlTrackerInteractor.prototype.onMouseMove = function(ev){
 	    this.roll(ry);
 	}
 	else {
+
         this.rotate(rx,ry);
     }
 	
@@ -5520,9 +5559,18 @@ vxlTrackerInteractor.prototype.rotate = function(rx, ry){
 	var canvas = this.camera.view.canvas;
 	var dx = -20.0 / canvas.height;
 	var dy = -20.0 / canvas.width;
-	var rotX = rx * dx * this.MOTION_FACTOR;
-	var rotY = ry * dy * this.MOTION_FACTOR;
-
+	var motionFactorX = this.MOTION_FACTOR;
+	var motionFactorY = this.MOTION_FACTOR;
+	if (rx*rx > 2 * ry *ry){
+	    motionFactorY *= 0.5;
+	}
+	else if (ry*ry > 2* rx*rx){
+	    motionFactorX *= 0.5;
+	}
+	
+	var rotX = rx * dx * motionFactorX;
+	var rotY = ry * dy * motionFactorY;
+	
 	this.camera.rotate(rotX, rotY);
 };
 
@@ -7139,22 +7187,12 @@ function vxlModel(name, JSON_OBJECT){
  */
 vxlModel.prototype.setType = function(type){
     
-    if (this.indices.length > vxl.def.model.MAX_NUM_INDICES && 
+    if (this.indices.max() < vxl.def.model.MAX_NUM_INDICES && 
         type == vxl.def.model.type.BIG_DATA){
-            throw('The model is not big enough to be of BIG_DATA type Num Indices['+this.indices.length+']');
+            throw('The model is not big enough to be of BIG_DATA type. Max index found: '+this.indices.max());
         }
     
-    
-    switch(type){
-        case vxl.def.model.type.MESH:
-        case vxl.def.model.type.BIG_DATA:
-             this.type = type;
-             this.renderable = new vxlRenderable(this);
-             break;
-        case vxl.def.model.type.SIMPLE:
-             this.type = type;
-             this.renderable = undefined;
-    }    
+    this.type = type;  
 };
 
 /**
@@ -7195,12 +7233,15 @@ vxlModel.prototype.update = function(){
     }
     
 
-    if(this.normals == undefined && this.indices != undefined){
+    if(
+        (this.normals == undefined || 
+            (this.normals != undefined && this.normals.length == 0))
+        && this.indices != undefined)
+    {
         this.computeNormals();
     }
     
-    
-    
+     
     if (this.wireframe == undefined){
         this.computeWireframeIndices();
     }
@@ -7216,10 +7257,9 @@ vxlModel.prototype.update = function(){
     this.computeBoundingBox();
     
     
-    if (this.type == vxl.def.model.type.BIG_DATA ||
-        this.type == vxl.def.model.type.MESH){
-            this.renderable.update();
-        }
+    if (this.type == vxl.def.model.type.SIMPLE && this.indices.max() > vxl.def.model.MAX_NUM_INDICES){
+        this.setType(vxl.def.model.type.BIG_DATA);
+    }
     
 };
 
@@ -7464,21 +7504,21 @@ vxlCell.prototype.setColor = function(r,g,b){
  * 
  * @class Provides cell by cell operations on models
  * @constructor 
- * @param {vxlModel} prior the model for this mesh
+ * @param {vxlActor} prior the model for this mesh
  * @author Diego Cantor
  */
-function vxlMesh(prior){
+function vxlMesh(actor){
     
-    if (prior == undefined){
+    if (actor == undefined){
         throw('vxlMesh: the model passed as parameter cannot be undefined');
     }
     
-    this.name = prior.name +'-mesh';
+    this.name = actor.name +'-mesh';
     this.cells = [];
     this.color = [0.8,0.8,0.8]; 
-    
-    this._model = undefined;   //internal representation of the mesh
-    this._createMesh(prior);
+    this.actor = actor;
+    this.model = undefined;   //internal representation of the mesh
+    this._createMesh(actor);
 };
 
 /**
@@ -7501,7 +7541,7 @@ vxlMesh.prototype.scalarsToCellColors = function(scalars, lut){
  * Update the mesh colors based on the current cell colors
  */
 vxlMesh.prototype.updateColor = function(){
-    var model = this._model;
+    var model = this.model;
     
     model.colors = [];
     model.pickingColors = [];
@@ -7513,7 +7553,7 @@ vxlMesh.prototype.updateColor = function(){
             }
     }
     
-    model.update();
+    this.actor.updateRenderable();
 };
 
 
@@ -7574,7 +7614,7 @@ vxlMesh.prototype.removeCell = function(cellUID){
  */
 vxlMesh.prototype.intersect = function(camera, angle){
     
-    var ray = camera._normal;
+    var ray = camera._forward;
     
     selection = [];
 
@@ -7591,8 +7631,8 @@ vxlMesh.prototype.intersect = function(camera, angle){
  * Identifies the cells existing in the 
  * @private
  */
-vxlMesh.prototype._createMesh = function(prior){
-    
+vxlMesh.prototype._createMesh = function(actor){
+    var prior = actor.model;
     var ver = prior.vertices;
     var ind = prior.indices;
     
@@ -7641,6 +7681,7 @@ vxlMesh.prototype._createMesh = function(prior){
         
         var elapsed = new Date().getTime() - start;
         console.info('Mesh ['+ self.name +'] generated in '+elapsed+ ' ms');
+        
     };
     
     //because this operation is time consuming it is deferred here.
@@ -7674,7 +7715,8 @@ vxlMesh.prototype._createModel = function(){
     model.computeNormals();
     model.setType(vxl.def.model.type.MESH);
     
-    this._model = model;
+    this.model = model;
+    this.actor.updateRenderable();
     
 };
 
@@ -7684,9 +7726,9 @@ vxlMesh.prototype._createModel = function(){
  */
 vxlMesh.prototype._setModelColor = function(color){
     
-    if (this._model == undefined) return;
+    if (this.model == undefined) return;
     
-    var model = this._model;
+    var model = this.model;
     model.colors = [];
     
     for(var i=0, count = this.cells.length; i<count; i +=1){
@@ -7696,7 +7738,7 @@ vxlMesh.prototype._setModelColor = function(color){
             }
     }
     
-    model.update();
+    this.actor.updateRenderable();
 };
 
 /**
@@ -7708,12 +7750,12 @@ vxlMesh.prototype._updateCellColor = function(index){
     var color = this.cells[index].color;
     
     for(var i = index*9, N = index*9+9; i<N; i+=3){
-        this._model.colors[i] = color[0];
-        this._model.colors[i+1] = color[1];
-        this._model.colors[i+2] = color[2];
+        this.model.colors[i] = color[0];
+        this.model.colors[i+1] = color[1];
+        this.model.colors[i+2] = color[2];
     }
     
-    this._model.update();
+    this.actor.updateRenderable();
     
 };
 /*-------------------------------------------------------------------------
@@ -7792,6 +7834,7 @@ function vxlActor(model){
   this.mesh         = undefined;
   
   this.material     = new vxlMaterial();
+  this.renderable   = undefined;
   
   if (model){
   	this.model 	    = model;
@@ -7800,6 +7843,10 @@ function vxlActor(model){
   	this._bb        = model.bb.slice(0);
   	this._centre    = vec3.set(model.centre, vec3.create());
   	this.material.getFrom(model);
+  	
+  	if (model.type == vxl.def.model.type.BIG_DATA){
+  	    this.renderable = new vxlRenderable(this);
+  	}
   }
   else{
       this.model = new vxlModel();
@@ -8249,6 +8296,10 @@ vxlActor.prototype.setLookupTable = function(lutID,min,max){
         //if(this.mesh){
         //    this.mesh. //update mesh with vertex colors it may require access to the original index array
        // }
+       
+       if (self.model.type == vxl.def.model.type.BIG_DATA){
+           self.renderable.update();
+       }
 	}
 	
 	//Given that obtaining the colors can be a time consume op, it is deferred here.
@@ -8335,14 +8386,18 @@ vxlActor.prototype.setPicker = function(type, callback){
     
     switch(type){
         case vxl.def.actor.picking.DISABLED: 
-            this._pickingCallback = undefined; 
+            this._pickingCallback = undefined;
+            this.mesh = undefined;
+            this.renderable = undefined;
+            this.setVisualizationMode(vxl.def.actor.mode.SOLID); 
             break;
         
         case vxl.def.actor.picking.CELL: 
             
             if (this.mesh == undefined){
-                this.mesh = new vxlMesh(this.model); 
+                this.mesh = new vxlMesh(this); 
                 this.mesh.setColor(this.material.diffuse);
+                this.renderable = new vxlRenderable(this);
                 this.setVisualizationMode(vxl.def.actor.mode.FLAT);           
             };
             
@@ -8382,6 +8437,27 @@ vxlActor.prototype.isPickable = function(){
 vxlActor.prototype.getPickingType = function(){
     return this._picking;  
 };
+
+/**
+ * 
+ */
+vxlActor.prototype.getRenderableModel = function(){
+    if (this.mesh && this.mesh.model){
+        return this.mesh.model;
+    }
+    else if (this.model.type == vxl.def.model.type.BIG_DATA){
+        return this.model;
+    }
+    else return undefined;
+    
+};
+
+/**
+ * 
+ */
+vxlActor.prototype.updateRenderable = function(){
+    this.renderable.update();
+}
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
@@ -8839,6 +8915,76 @@ vxlRenderStrategy.prototype._handlePicking = function(actors){
 /**
  * @private
  */
+vxlRenderStrategy.prototype._enablePartVertices = function(actor,part){
+    
+    var gl = this.renderer.gl;
+    var prg = this.renderer.prg;
+    var buffers = this._gl_buffers[actor.UID];
+    var glsl    = vxl.def.glsl; 
+                
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.vertices), gl.STATIC_DRAW);
+    prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0); 
+};
+
+/**
+ * @private
+ */
+vxlRenderStrategy.prototype._enablePartNormals = function(actor,part){
+    
+  var gl = this.renderer.gl;
+  var prg = this.renderer.prg;
+  var buffers = this._gl_buffers[actor.UID];
+  var glsl    = vxl.def.glsl; 
+  
+  if (part.normals != undefined && part.normals.length>0){
+        try{
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.normals), gl.STATIC_DRAW);
+            
+            prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
+            prg.setAttributePointer(glsl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
+            
+        }
+        catch(err){
+            alert('There was a problem while rendering a BIG DATA part ['+part.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
+            throw('There was a problem while rendering a BIG DATA part ['+part.name+']. The problem happened while handling the normal buffer. Error =' +err.description);
+        }
+  }
+    
+};
+
+/**
+ * @private
+ */
+vxlRenderStrategy.prototype._enablePartColors = function(actor,part){
+    
+  var gl = this.renderer.gl;
+  var prg = this.renderer.prg;
+  var buffers = this._gl_buffers[actor.UID];
+  var glsl    = vxl.def.glsl; 
+  
+  if (part.colors != undefined && part.colors.length>0){
+      try{
+            prg.setUniform("uUseVertexColors", true);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.colors), gl.STATIC_DRAW);
+        
+            prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
+            prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+          
+        }
+        catch(err){
+            alert('There was a problem while rendering a BIG DATA part ['+part.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+            throw('There was a problem while rendering a BIG DATA part ['+part.name+']. The problem happened while handling the color buffer. Error =' +err.description);
+        }
+    
+    }  
+};
+
+/**
+ * @private
+ */
 vxlRenderStrategy.prototype._enableNormals = function(actor){
     
     var model = actor.model;
@@ -8898,14 +9044,39 @@ vxlRenderStrategy.prototype._renderSolid = function(actor){
     
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
+    var prg     = this.renderer.prg;
+    var glsl    = vxl.def.glsl;
     
-    this._enableNormals(actor);
-    this._enableColors(actor);    
-
+    if (actor.renderable){
+        
+        parts = actor.renderable.parts;
+        
+        for (var i=0, N = parts.length; i<N; i+=1){
+             var part = parts[i];
+             try{
+                 
+                this._enablePartVertices(actor,part)
+                this._enablePartColors(actor,part);
+                this._enablePartNormals(actor,part);
+                
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(part.indices), gl.STATIC_DRAW);
+                gl.drawElements(gl.TRIANGLES, part.indices.length, gl.UNSIGNED_SHORT,0);
+            }
+            catch(err){
+                alert('Error rendering BIG DATA: There was a problem while rendering the part ['+part.name+']. ' +err.description);
+                throw('Error rendering BIG DATA: There was a problem while rendering the part ['+part.name+']. ' +err.description);
+            }
+        }
+    }
+    else{
     
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(actor.model.indices), gl.STATIC_DRAW);
-    gl.drawElements(gl.TRIANGLES, actor.model.indices.length, gl.UNSIGNED_SHORT,0);
+        this._enableNormals(actor);
+        this._enableColors(actor);    
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(actor.model.indices), gl.STATIC_DRAW);
+        gl.drawElements(gl.TRIANGLES, actor.model.indices.length, gl.UNSIGNED_SHORT,0);
+    }
 };
 
 /**
@@ -9049,10 +9220,11 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
     
     if (actor.mesh == undefined){
         actor.mesh = new vxlMesh(actor.model);
+        actor.renderable = new vxlRenderable(actor);
         
     }
     
-    if (actor.mesh._model == undefined) {
+    if (actor.mesh.model == undefined) {
         //mesh not ready yet. Render actor wireframe in the mean time
         var model = actor.model;
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
@@ -9069,7 +9241,7 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
 
     prg.setUniform("uUseShading",true);
 
-    var parts = actor.mesh._model.renderable.parts;
+    var parts = actor.renderable.parts;
     
     for(var i=0, N = parts.length; i<N; i+=1){
         
@@ -9157,13 +9329,13 @@ vxlRenderStrategy.prototype._renderPickingBuffer = function(actor){
     if (actor._picking == vxl.def.actor.picking.CELL){
     
       
-        if (actor.mesh == undefined || actor.mesh._model == undefined){
+        if (actor.mesh == undefined || actor.mesh.model == undefined){
             return; // we just fail safely. We will render it whenever the actor is ready ;-)
                     // the mesh is generated inside actor.setPicker (see actor.setPicker method)
         }
         
       
-        var parts = actor.mesh._model.renderable.parts;
+        var parts = actor.renderable.parts;
     
         for(var i=0, N = parts.length; i<N; i+=1){
         
@@ -9352,7 +9524,7 @@ vxlRenderStrategy.prototype._renderActor = function(actor){
     }
     
         
-    if (actor.mode != vxl.def.actor.mode.FLAT){
+    if (actor.mode != vxl.def.actor.mode.FLAT && actor.model.type != vxl.def.model.type.BIG_DATA){
         try{
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
@@ -9606,6 +9778,8 @@ vxlBlenderStrategy.prototype._renderActor = function(actor){
  * Implements a basic rendering strategy that works with the following programs:
  * 
  * vxl.def.glsl.bake
+ * TODO: Does not deal with model scalars well...
+ * 
  */
 function vxlBakeStrategy(renderer){
     this.renderer = renderer;
@@ -9647,29 +9821,8 @@ function vxlBakeStrategy(renderer){
         SCALE:    "aScale",
         SHADING:  "aShading"
     });
-    
-    var e = vxl.events;
-    vxl.go.notifier.subscribe([
-        e.ACTOR_MOVED,
-        e.ACTOR_SCALED,
-        e.ACTOR_CHANGED_SHADING,
-        e.ACTOR_CHANGED_COLOR
-    ], this);
-};
 
-/**
- * Handle voxelent events
- */
-vxlBakeStrategy.prototype.handleEvent = function(event, actor){
-    
-    switch(event){
-        case vxl.events.ACTOR_MOVED:            this._updateActorPosition(actor);   break;
-        case vxl.events.ACTOR_SCALED:           this._updateActorScale(actor);      break;
-        case vxl.events.ACTOR_CHANGED_SHADING:  this._updateActorShading(actor);    break;
-        case vxl.events.ACTOR_CHANGED_COLOR:    this._updateActorColor(actor);      break;
-    }
 };
- 
 
 
 /**
@@ -9732,8 +9885,8 @@ vxlBakeStrategy.prototype._allocateActor = function(actor){
     var color = [], normal = [];
     
     //Taking care of colors
-    if (actor.color) {
-        color = this._populate(actor.color, NUM_VERTICES/3);
+    if (actor.material.diffuse) {
+        color = this._populate(actor.material.diffuse, NUM_VERTICES/3);
     }
     else{
         color = this._populate([0.7,0.7,0.7], NUM_VERTICES/3);
@@ -9770,13 +9923,8 @@ vxlBakeStrategy.prototype._allocateActor = function(actor){
     
     data.position = data.position.concat(this._populate(actor._position, NUM_VERTICES/3));
     data.scale    = data.scale.concat(this._populate(actor._scale, NUM_VERTICES/3));
+    data.shading = data.shading.concat(this._populate(actor.material.opacity, NUM_VERTICES/3));
     
-    if (actor.shading){
-        data.shading = data.shading.concat(this._populate(1.0, NUM_VERTICES/3));
-    }
-    else{
-        data.shading = data.shading.concat(this._populate(0.0, NUM_VERTICES/3));
-    }
 
     var ind = model.indices.slice(0);
     if (data.index.length > 0){
@@ -9841,9 +9989,9 @@ vxlBakeStrategy.prototype._updateActorColor = function(actor){
     
     var LEN = (actor.model.vertices.length*3) + offset;
     for(var i =offset;i<LEN;i+=9){
-        data.baked[i+6] = actor.color[0];
-        data.baked[i+7] = actor.color[1];
-        data.baked[i+8] = actor.color[2];
+        data.baked[i+6] = actor.material.diffuse[0];
+        data.baked[i+7] = actor.material.diffuse[1];
+        data.baked[i+8] = actor.material.diffuse[2];
     }
 };
 
@@ -9859,7 +10007,7 @@ vxlBakeStrategy.prototype._updateActorShading = function(actor){
     var LEN = (actor.model.vertices.length/3) + offset;
     var val = 0.0;
     
-    if (actor.shading){
+    if (actor.material.opacity){
         val = 1.0;
     }
     
@@ -9959,6 +10107,15 @@ vxlBakeStrategy.prototype.render = function(scene){
     prg.setUniform(glsl.MODEL_VIEW_MATRIX,  trx.mvMatrix);
     prg.setUniform(glsl.NORMAL_MATRIX,      trx.nMatrix);
     prg.setUniform(glsl.MVP_MATRIX,         trx.mvpMatrix);
+    
+    for(var i = 0, N = scene._actors.length; i<N; i+=1){
+        var actor = scene._actors[i];
+        this._updateActorPosition(actor);   
+        this._updateActorScale(actor);     
+        this._updateActorShading(actor);  
+        this._updateActorColor(actor);     
+    }
+    
     
     gl.drawElements(gl.TRIANGLES, data.index.length, gl.UNSIGNED_SHORT,0);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
@@ -10719,7 +10876,7 @@ vxlBoundingBox.prototype.constructor = vxlBoundingBox;
  */
 function vxlBoundingBox() {
 	vxlActor.call(this, vxl.def.model.boundingBox);
-	this.bb 		= [];
+	this.bb 		= this.setBoundingBox([-1,-1,-1,1,1,1]);
     this.mode 		= vxl.def.actor.mode.WIREFRAME;
     this.visible 	= false;
     this.toy    	= true;
@@ -13017,7 +13174,7 @@ vxlMaterial.prototype.getFrom = function(model){
 
 
 /**
- * @class A Renderable is an intermediary object between a model and the rendering strategy that allows rendering
+ * @class A Renderable is an intermediary object between an actor and the rendering strategy that allows rendering
  * very complex models.
  * 
  * Think of this scenario. You have a model that has more than 65K number of vertices.
@@ -13044,38 +13201,24 @@ vxlMaterial.prototype.getFrom = function(model){
  * 
  * 
  * 
- * @constructor A Renderable is an intermediary object between a model and the rendering strategy that allows rendering
+ * @constructor A Renderable is an intermediary object between an actor and the rendering strategy that allows rendering
  * very complex models.
  * 
- * @param{vxlModel} model the model to be decomposed into renderable parts
+ * @param{vxlActor} model the actor to be decomposed into renderable parts
   *  
  * @author Diego Cantor
  */
 
-function vxlRenderable(model){
+function vxlRenderable(actor){
     
     
-    if (model == undefined){
-        throw('vxlRenderable: the model can not be undefined');
+    if (actor == undefined){
+        throw('vxlRenderable: the actor can not be undefined');
     }
+   
     
-    var type = model.type;
-    
-    
-    if (type == undefined){
-        if (type != vxl.def.model.type.BIG_DATA && 
-            type != vxl.def.model.type.MESH){
-            throw('vxlRenderable: the type of renderable is unknown');
-        }
-        else if (type == vxl.def.model.type.SIMPLE){
-            throw('vxlRenderable: simple models do not require renderables!');
-        }
-    }
-    
-    this._model = model;
-    
+    this.actor = actor;
     this.parts = [];    
-    
     this.update();
 }
 
@@ -13089,12 +13232,15 @@ vxlRenderable.prototype.update = function(){
     //clear parts
     this.parts = [];
     
-    switch(this._model.type){
-        case vxl.def.model.type.MESH:      this._processMesh();    break;
-        case vxl.def.model.type.BIG_DATA : this._processBigData(); break;
-    }
+    var model  = this.actor.getRenderableModel();
     
-    return this.parts;
+    if (model == undefined) return;
+    
+    switch(model.type){
+        case vxl.def.model.type.MESH: this._processMesh(model); break;
+        case vxl.def.model.type.BIG_DATA: this._processBigData(model); break;
+    }
+   
 };
 
 /**
@@ -13104,10 +13250,10 @@ vxlRenderable.prototype.update = function(){
  * 
  * 
  */
-vxlRenderable.prototype._processMesh = function(){
+vxlRenderable.prototype._processMesh = function(model){
     
-    var model = this._model;
-    
+  
+
     var size = vxl.def.model.MAX_NUM_INDICES;
     
     var N = Math.floor(model.indices.length / size), R = model.indices.length % size;
@@ -13145,7 +13291,6 @@ vxlRenderable.prototype._processMesh = function(){
         }
         
         part.update();
-        
         this.parts.push(part);
     }
      
@@ -13163,6 +13308,107 @@ vxlRenderable.prototype._reindex = function(indices){
     return indices;
 }
 
-vxlRenderable.prototype._processBigData = function(){
+
+/***
+ * Processing big data 
+ * 
+ * The idea here is read chunks of size 65K from the model index array. Then obtain vertex, normal, and color
+ * arrays for each index in the chunk.
+ * After that, the new part index is generated
+ * 
+ * 
+ */
+vxlRenderable.prototype._processBigData = function(model){
+    
+    
+    
+    var bigDataIndex = model.indices;
+    
+    var size = vxl.def.model.MAX_NUM_INDICES;
+    
+    var N = Math.floor(model.indices.length / size);
+    var R = model.indices.length % size;
+    
+    var material = this.actor.material;
+    
+    //TODO: Be more clever about the partitioning. The arrays don't need to have 65K in lenght
+    //what the specs means is that the max element in the array index is 65K.
+    //this is because the index range goes up to 65535 as the highest index.
+    
+    for (var i=0; i<=N; i +=1){
+        
+        var part = new vxlModel(model.name+'-renderable-part-'+i);    
+        var indexMap = [], localIndexArray = [], globalIndexArray = [], innerIndex = 0;
+        
+        if (i == N) {
+            if ( R > 0){
+                globalIndexArray = bigDataIndex.slice(i*size,i*size+R);
+             }
+             else{
+                 break;
+             }
+        }
+        else{
+            globalIndexArray = bigDataIndex.slice(i*size,(i+1)*size);
+        }
+        
+        if (material.colors && material.colors.length>0)  {  part.colors = [];   }   
+        
+        if (model.normals && model.normals.length>0){  part.normals = [];  }
+        
+        if (model.scalars && model.scalars.length>0){  part.scalars = [];  }
+        
+        for(var k=0,K = globalIndexArray.length; k<K; k+=1){
+            //Get an index from the global index
+            var outerIndex  = globalIndexArray[k];
+            
+            //if it has not been processed then process it.
+            //Processing consist into adding data to the respective part arrays
+            if (indexMap[outerIndex] == undefined){
+                indexMap[outerIndex] = innerIndex;
+                
+                vertexInfo = this._getBigDataVertexInfo(outerIndex);
+                part.vertices.push.apply(part.vertices, vertexInfo.coords);
+                if (model.normals && model.normals.length>0){
+ 
+                    part.normals.push.apply(part.normals, vertexInfo.normal);
+                }
+                if (material.colors && material.colors.length>0){
+                    part.colors.push.apply(part.colors, vertexInfo.color);
+                }
+                if (model.scalars && model.scalars.length>0){
+                    part.scalars.push(vertexInfo.scalar);
+                }
+                innerIndex +=1;
+            }
+            //write the new index to the part index array
+            part.indices.push(indexMap[outerIndex]);
+            
+        }
+        part.update();
+        this.parts.push(part);
+    }   
+};
+
+/**
+ * Unlike meshes, Big Data models do not have picking colors associated
+ * @param {Object} index
+ * @private
+ */
+vxlRenderable.prototype._getBigDataVertexInfo = function(index){
+    
+    var material = this.actor.material;
+    var model = this.actor.model;
+    
+    var vertexInfo = {};
+    
+    vertexInfo.coords = model.vertices.slice(index*3, index*3+3);
+    
+    if (model.normals){ vertexInfo.normal = model.normals.slice(index*3, index*3+3);}
+    if (material.colors){  vertexInfo.color = material.colors.slice(index*3, index*3+3);}
+    if (model.scalars){  vertexInfo.scalar = model.scalars[index];}
+    
+    return vertexInfo;
+    
     
 };

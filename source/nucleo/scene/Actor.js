@@ -74,6 +74,7 @@ function vxlActor(model){
   this.mesh         = undefined;
   
   this.material     = new vxlMaterial();
+  this.renderable   = undefined;
   
   if (model){
   	this.model 	    = model;
@@ -82,6 +83,10 @@ function vxlActor(model){
   	this._bb        = model.bb.slice(0);
   	this._centre    = vec3.set(model.centre, vec3.create());
   	this.material.getFrom(model);
+  	
+  	if (model.type == vxl.def.model.type.BIG_DATA){
+  	    this.renderable = new vxlRenderable(this);
+  	}
   }
   else{
       this.model = new vxlModel();
@@ -531,6 +536,10 @@ vxlActor.prototype.setLookupTable = function(lutID,min,max){
         //if(this.mesh){
         //    this.mesh. //update mesh with vertex colors it may require access to the original index array
        // }
+       
+       if (self.model.type == vxl.def.model.type.BIG_DATA){
+           self.renderable.update();
+       }
 	}
 	
 	//Given that obtaining the colors can be a time consume op, it is deferred here.
@@ -617,14 +626,18 @@ vxlActor.prototype.setPicker = function(type, callback){
     
     switch(type){
         case vxl.def.actor.picking.DISABLED: 
-            this._pickingCallback = undefined; 
+            this._pickingCallback = undefined;
+            this.mesh = undefined;
+            this.renderable = undefined;
+            this.setVisualizationMode(vxl.def.actor.mode.SOLID); 
             break;
         
         case vxl.def.actor.picking.CELL: 
             
             if (this.mesh == undefined){
-                this.mesh = new vxlMesh(this.model); 
+                this.mesh = new vxlMesh(this); 
                 this.mesh.setColor(this.material.diffuse);
+                this.renderable = new vxlRenderable(this);
                 this.setVisualizationMode(vxl.def.actor.mode.FLAT);           
             };
             
@@ -664,3 +677,24 @@ vxlActor.prototype.isPickable = function(){
 vxlActor.prototype.getPickingType = function(){
     return this._picking;  
 };
+
+/**
+ * 
+ */
+vxlActor.prototype.getRenderableModel = function(){
+    if (this.mesh && this.mesh.model){
+        return this.mesh.model;
+    }
+    else if (this.model.type == vxl.def.model.type.BIG_DATA){
+        return this.model;
+    }
+    else return undefined;
+    
+};
+
+/**
+ * 
+ */
+vxlActor.prototype.updateRenderable = function(){
+    this.renderable.update();
+}

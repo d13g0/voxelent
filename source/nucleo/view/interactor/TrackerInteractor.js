@@ -39,6 +39,7 @@ function vxlTrackerInteractor(){
 	this.button = -1;
 	this.dragging = false;
 	this.dragndrop = false;
+	this.isMac = navigator.platform.toUpperCase().indexOf("MAC") != -1;
 	
 };
 
@@ -132,14 +133,17 @@ vxlTrackerInteractor.prototype.onMouseMove = function(ev){
     if (this.button !=0) return;  
 	
 	this.ctrlPressed 	= ev.ctrlKey;
+	
+	if (this.isMac && ev.metaKey){
+	    this.ctrlPressed = true;
+	}
+	
 	this.altPressed 	= ev.altKey;
 	this.shiftPressed 	= ev.shiftKey;
 	
 	var rx = this.x - this.lastX;
 	var ry = this.y - this.lastY;
-	
-	
-	 
+		 
     if (this.ctrlPressed && !this.shiftPressed){ 
 		this.dolly(ry);
 	}
@@ -150,6 +154,7 @@ vxlTrackerInteractor.prototype.onMouseMove = function(ev){
 	    this.roll(ry);
 	}
 	else {
+
         this.rotate(rx,ry);
     }
 	
@@ -261,9 +266,18 @@ vxlTrackerInteractor.prototype.rotate = function(rx, ry){
 	var canvas = this.camera.view.canvas;
 	var dx = -20.0 / canvas.height;
 	var dy = -20.0 / canvas.width;
-	var rotX = rx * dx * this.MOTION_FACTOR;
-	var rotY = ry * dy * this.MOTION_FACTOR;
-
+	var motionFactorX = this.MOTION_FACTOR;
+	var motionFactorY = this.MOTION_FACTOR;
+	if (rx*rx > 2 * ry *ry){
+	    motionFactorY *= 0.5;
+	}
+	else if (ry*ry > 2* rx*rx){
+	    motionFactorX *= 0.5;
+	}
+	
+	var rotX = rx * dx * motionFactorX;
+	var rotY = ry * dy * motionFactorY;
+	
 	this.camera.rotate(rotX, rotY);
 };
 

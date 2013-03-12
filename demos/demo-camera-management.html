@@ -10,7 +10,7 @@
 
 <script type="text/javascript" src="lib/jquery.js" ></script>
 <script type="text/javascript" src="lib/jquery-ui.js" ></script>
-<script type='text/javascript' src='lib/voxelent_v0.89.2.js'> </script>
+<script type='text/javascript' src='lib/voxelent_v0.89.3.js'> </script>
 
 <link rel='stylesheet' type='text/css' href='css/jquery-ui/theme-1.css'/>
 
@@ -87,19 +87,20 @@ function handleEvent(event){
  
     //Setup cameras
     cam0 = vxl.c.camera;
-    cam0.setType(vxl.def.camera.type.TRACKING);
+    cam0.setType(vxl.def.camera.type.ORBITING);
     cam0.setPosition(0,53,213);
     
     cam1 = view.cameraman.create(vxl.def.camera.type.ORBITING);
     cam1.setDistance(160);
-    cam1.setElevation(-10);
-    cam1.setAzimuth(10);
+    cam1.setElevation(-50);
+    cam1.setAzimuth(25);
+    cam1.setType(vxl.def.camera.type.TRACKING);
     
     
-    cam2 = view.cameraman.create(vxl.def.camera.type.ORBITING);
-    cam2.setDistance(160);
-    cam2.setAzimuth(-70);
-    cam2.setElevation(-40);
+    cam2 = view.cameraman.create(vxl.def.camera.type.EXPLORING);
+    cam2.setDistance(158);
+    cam2.setAzimuth(62);
+    cam2.setElevation(-39);
     
     createScene();
     $('#overlay-div').fadeIn(3000);
@@ -157,9 +158,9 @@ function handleEvent(event){
     
     <div id = 'overlay-div' class='overlay'>
       <p><a href='#' id='btnGenerateScene'>Generate Random Scene</a></p>
-      <p><a href='#' id='btnCam0'>Camera 0 - Tracking </a></p>
-      <p><a href='#' id='btnCam1'>Camera 1 - Orbiting</a></p>
-      <p><a href='#' id='btnCam2'>Camera 2 - Orbiting</a></p>
+      <p><a href='#' id='btnCam0'>Camera 0 - Orbiting </a></p>
+      <p><a href='#' id='btnCam1'>Camera 1 - Tracking</a></p>
+      <p><a href='#' id='btnCam2'>Camera 2 - Exploring</a></p>
     </div>  
     
     </div>

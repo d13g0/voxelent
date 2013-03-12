@@ -35,7 +35,7 @@ vxlBoundingBox.prototype.constructor = vxlBoundingBox;
  */
 function vxlBoundingBox() {
 	vxlActor.call(this, vxl.def.model.boundingBox);
-	this.bb 		= [];
+	this.bb 		= this.setBoundingBox([-1,-1,-1,1,1,1]);
     this.mode 		= vxl.def.actor.mode.WIREFRAME;
     this.visible 	= false;
     this.toy    	= true;

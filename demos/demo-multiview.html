@@ -10,25 +10,31 @@
 		<meta name='robots' content='all'>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name='keywords' content='webgl, webgl platform, medical imaging, webgl api'>
-		<script src="lib/jquery.js" type="text/javascript"></script>
-		<script type='text/javascript' src='lib/voxelent_v0.89.2.js'> </script>
+		
+
+		<link rel='stylesheet' type='text/css' href='css/jquery-ui-bs/theme.css'/>
+		
+		<script src="lib/jquery.js" type="text/javascript"> </script>
+		<script src="lib/jquery-ui.js" type="text/javascript"> </script>
+		<script type='text/javascript' src='lib/voxelent_v0.89.3.js'> </script>
+		<script type='text/javascript' src='lib/vox-gui_v0.1.js'> </script>
 
 		<title>Voxelent - MultiView Demo</title>
 		<script type='text/javascript' id='code-js'>
-			var view, scene, animation, view2;
+			var view, scene, animation, view2, gui1, gui2;
 
 			function runVoxApp() {
 
-				var e = vxl.events;
-				var ntf = vxl.go.notifier;
-				ntf.subscribe([e.MODELS_LOADED, e.SCENE_UPDATED], this);
+			
+				vxl.go.notifier.subscribe(vxl.events.MODELS_LOADED, this);
 
 				//1. Setup the view
 				view = vxl.api.setup('view-1',null,false);
+				 gui1 = new vxlGUI(view);
 				scene = view.scene;
 				
 				view2 = vxl.api.setup('view-2',scene,false);
-				
+				 gui2 = new vxlGUI(view2);
 
 				//2. Load assets
 				var list = ["MYO_01.vtk", "RAV_01.vtk", "LAA_01.vtk", 
@@ -93,7 +99,7 @@
 				var cam1 = view.cameraman.active;
 				var cam2 = view2.cameraman.active;
 				
-				if (event == vxl.events.MODELS_LOADED) {
+				
 					
 					//Set up camera #1
 					cam1.setPosition([0, 0, 500]);
@@ -106,17 +112,20 @@
 					//Start the animation at 100ms per frame
 					animation.start(100);
 
-					$('#status').html('DONE').fadeOut(600);
 					
-				} else if (event == vxl.events.SCENE_UPDATED) {
-					var loaded = src.actors.length;
-					$('#status').html('Objects loaded: ' + loaded + ' out of 60');
-				}
+					
+				
 			}
 		</script>
 
 <style type="text/css">
-
+p {
+	
+   height: 30px;
+   font-size:16px;
+   font-family: Arial,Helvetica;
+   text-align:center;
+}
 .show1 {
 	 width: 400px;
 	 height:400px;
@@ -138,9 +147,7 @@
 
 </head>
 <body onload='runVoxApp()'>
-	<div><img src="css/img/voxelent.png" /></div>
-	<p id='status'>Message</p>
-	
+
 	<div class='show1'>
 	<p>View 1</p>
 	<canvas id = 'view-1' width=400 height=400 >
