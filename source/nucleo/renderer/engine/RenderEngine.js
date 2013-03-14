@@ -20,7 +20,7 @@
  * Implements the default rendering strategy 
  * 
  * 
- * A vxlRenderStrategy object is selected by default as the strategy that an actor
+ * A vxlRenderEngine object is selected by default as the strategy that an actor
  * will use for rendering.
  * 
  * A rendering strategy allows decoupling rendering specific code (i.e. code that access and 
@@ -28,7 +28,7 @@
  * @author Diego Cantor
  * 
  */
-function vxlRenderStrategy(renderer){
+function vxlRenderEngine(renderer){
 	this.renderer = renderer;
 	this._gl_buffers  = {};
 	this._gl_textures = {};
@@ -53,7 +53,7 @@ function vxlRenderStrategy(renderer){
  * Implements basic allocation of memory. Creates the WebGL buffers for the actor
  * @param {vxlScene} scene the scene to allocate memory for
   */
-vxlRenderStrategy.prototype.allocate = function(scene){
+vxlRenderEngine.prototype.allocate = function(scene){
     var elements = scene._actors.concat(scene.toys.list);
     var NUM = elements.length;
     
@@ -65,14 +65,14 @@ vxlRenderStrategy.prototype.allocate = function(scene){
 /**
  * @param {vxlScene} scene the scene to deallocate memory from
  */
-vxlRenderStrategy.prototype.deallocate = function(scene){
+vxlRenderEngine.prototype.deallocate = function(scene){
     //DO NOTHING. THE DESCENDANTS WILL.
 };
 
 /**
  * Receives one actor and returns the GL buffers
  */
-vxlRenderStrategy.prototype._allocateActor = function(actor){
+vxlRenderEngine.prototype._allocateActor = function(actor){
    
     if (this._gl_buffers[actor.UID] != undefined){
         if (actor.dirty){ //@TODO: hmmmm frowning on dirty property this is a hack
@@ -130,7 +130,7 @@ vxlRenderStrategy.prototype._allocateActor = function(actor){
 /**
  * Receives one actor and returns the GL buffers
  */
-vxlRenderStrategy.prototype._reallocateActor = function(actor){
+vxlRenderEngine.prototype._reallocateActor = function(actor){
    
     var gl = this.renderer.gl;
     var model = actor.model;
@@ -196,7 +196,7 @@ vxlRenderStrategy.prototype._reallocateActor = function(actor){
  * the actor position,scale and rotation.
  * @private
  */
-vxlRenderStrategy.prototype._applyActorTransform = function(actor){
+vxlRenderEngine.prototype._applyActorTransform = function(actor){
     
     var r		= this.renderer;
     var trx 	= r.transforms
@@ -224,7 +224,7 @@ vxlRenderStrategy.prototype._applyActorTransform = function(actor){
  * the actor position,scale and rotation.
  * @private
  */
-vxlRenderStrategy.prototype._applyGlobalTransform = function(){
+vxlRenderEngine.prototype._applyGlobalTransform = function(){
     
     var r       = this.renderer;
     var trx     = r.transforms
@@ -244,7 +244,7 @@ vxlRenderStrategy.prototype._applyGlobalTransform = function(){
  * Renders the actors one by one
  * @param {vxlScene} scene the scene to render
  */
-vxlRenderStrategy.prototype.render = function(scene){
+vxlRenderEngine.prototype.render = function(scene){
 
     //Updates the perspective matrix and passes it to the program
     var r       = this.renderer,
@@ -283,7 +283,7 @@ vxlRenderStrategy.prototype.render = function(scene){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._handlePicking = function(actors){
+vxlRenderEngine.prototype._handlePicking = function(actors){
     
     if (this._target == undefined) return; //quick fail if the target has not been defined
     
@@ -315,7 +315,7 @@ vxlRenderStrategy.prototype._handlePicking = function(actors){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._enablePartVertices = function(actor,part){
+vxlRenderEngine.prototype._enablePartVertices = function(actor,part){
     
     var gl = this.renderer.gl;
     var prg = this.renderer.prg;
@@ -330,7 +330,7 @@ vxlRenderStrategy.prototype._enablePartVertices = function(actor,part){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._enablePartNormals = function(actor,part){
+vxlRenderEngine.prototype._enablePartNormals = function(actor,part){
     
   var gl = this.renderer.gl;
   var prg = this.renderer.prg;
@@ -357,7 +357,7 @@ vxlRenderStrategy.prototype._enablePartNormals = function(actor,part){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._enablePartColors = function(actor,part){
+vxlRenderEngine.prototype._enablePartColors = function(actor,part){
     
   var gl = this.renderer.gl;
   var prg = this.renderer.prg;
@@ -385,7 +385,7 @@ vxlRenderStrategy.prototype._enablePartColors = function(actor,part){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._enableNormals = function(actor){
+vxlRenderEngine.prototype._enableNormals = function(actor){
     
     var model = actor.model;
     var gl = this.renderer.gl;
@@ -412,7 +412,7 @@ vxlRenderStrategy.prototype._enableNormals = function(actor){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._enableColors = function(actor){
+vxlRenderEngine.prototype._enableColors = function(actor){
     
     var model = actor.model;
     var gl = this.renderer.gl;
@@ -440,7 +440,7 @@ vxlRenderStrategy.prototype._enableColors = function(actor){
  * Renders a solid actor
  * @private
  */
-vxlRenderStrategy.prototype._renderSolid = function(actor){
+vxlRenderEngine.prototype._renderSolid = function(actor){
     
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
@@ -482,7 +482,7 @@ vxlRenderStrategy.prototype._renderSolid = function(actor){
 /**
  * Renders an actor as a wireframe
  */
-vxlRenderStrategy.prototype._renderWireframe = function(actor){
+vxlRenderEngine.prototype._renderWireframe = function(actor){
     
 
     var buffers = this._gl_buffers[actor.UID];
@@ -504,7 +504,7 @@ vxlRenderStrategy.prototype._renderWireframe = function(actor){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._renderPoints = function(actor){
+vxlRenderEngine.prototype._renderPoints = function(actor){
     
     var model   = actor.model;
     var gl      = this.renderer.gl;
@@ -521,7 +521,7 @@ vxlRenderStrategy.prototype._renderPoints = function(actor){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._renderLines = function(actor){
+vxlRenderEngine.prototype._renderLines = function(actor){
     
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
@@ -537,7 +537,7 @@ vxlRenderStrategy.prototype._renderLines = function(actor){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._renderBoundingBox = function(actor){
+vxlRenderEngine.prototype._renderBoundingBox = function(actor){
     
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
@@ -557,7 +557,7 @@ vxlRenderStrategy.prototype._renderBoundingBox = function(actor){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._renderBoundingBoxAndSolid = function(actor){    var model   = actor.model;
+vxlRenderEngine.prototype._renderBoundingBoxAndSolid = function(actor){    var model   = actor.model;
     
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
@@ -583,7 +583,7 @@ vxlRenderStrategy.prototype._renderBoundingBoxAndSolid = function(actor){    var
 /**
  * @private
  */
-vxlRenderStrategy.prototype._renderWiredAndSolid = function(actor){
+vxlRenderEngine.prototype._renderWiredAndSolid = function(actor){
    
     var model   = actor.model;
     var buffers = this._gl_buffers[actor.UID];
@@ -609,7 +609,7 @@ vxlRenderStrategy.prototype._renderWiredAndSolid = function(actor){
  * 
  * @private
  */
-vxlRenderStrategy.prototype._renderFlat = function(actor){
+vxlRenderEngine.prototype._renderFlat = function(actor){
     
    
     var buffers = this._gl_buffers[actor.UID];
@@ -715,7 +715,7 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
  *    
  * @private
  */
-vxlRenderStrategy.prototype._renderPickingBuffer = function(actor){
+vxlRenderEngine.prototype._renderPickingBuffer = function(actor){
     
     var model   = actor.model;
     var buffers = this._gl_buffers[actor.UID];
@@ -807,7 +807,7 @@ vxlRenderStrategy.prototype._renderPickingBuffer = function(actor){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._renderTextured = function(actor){
+vxlRenderEngine.prototype._renderTextured = function(actor){
     
     var model   = actor.model;
     var buffers = this._gl_buffers[actor.UID];
@@ -854,7 +854,7 @@ vxlRenderStrategy.prototype._renderTextured = function(actor){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._handleCulling = function(actor){
+vxlRenderEngine.prototype._handleCulling = function(actor){
     var gl = this.renderer.gl;
     
     gl.disable(gl.CULL_FACE);
@@ -872,7 +872,7 @@ vxlRenderStrategy.prototype._handleCulling = function(actor){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._renderActor = function(actor){
+vxlRenderEngine.prototype._renderActor = function(actor){
 
     if (!actor.visible) return; //Quick and simple
 
@@ -964,7 +964,7 @@ vxlRenderStrategy.prototype._renderActor = function(actor){
  * Sets up the offscreen rendering variant
  * @param {vxlRenderTarget} target the render target
  */
-vxlRenderStrategy.prototype.enableOffscreen = function(target){
+vxlRenderEngine.prototype.enableOffscreen = function(target){
     this._offscreen = true;
     this._target = target;
 };
@@ -973,7 +973,7 @@ vxlRenderStrategy.prototype.enableOffscreen = function(target){
  * Sets up the offscreen rendering variant
  * @param {vxlRenderTarget} target the render target
  */
-vxlRenderStrategy.prototype.disableOffscreen = function(){
+vxlRenderEngine.prototype.disableOffscreen = function(){
     this._offscreen = false;
     this._target = undefined;
 };
@@ -982,7 +982,7 @@ vxlRenderStrategy.prototype.disableOffscreen = function(){
  * Returns true if the offscreen rendering does not have any target.
  * @returns {true\false}
  */
-vxlRenderStrategy.prototype.isOffscreenEnabled = function(){
+vxlRenderEngine.prototype.isOffscreenEnabled = function(){
     return (this._target != undefined);    
 }
 

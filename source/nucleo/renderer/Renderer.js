@@ -35,14 +35,14 @@ function vxlRenderer(vw){
     this.transforms 	= new vxlTransforms(vw);
     this.fps            = 0;
     this.currentProgram = undefined;
-    this.strategy 		= undefined;
+    this.engine 		= undefined;
     
     this._time          = 0;
     this._startDate     = 0;
     this._running       = false;
     this._clearColor    = undefined;
     this._renderTarget  = undefined;
-    this.setProgram(vxl.def.glsl.lambert, vxlRenderStrategy);
+    this.setProgram(vxl.def.glsl.lambert, vxlRenderEngine);
     
 }
 
@@ -98,11 +98,11 @@ vxlRenderer.prototype._initializeGLContext = function(gl){
 /**
  * Tries to add a new program definition to this renderer
  * @param {Object} program JSON program definition.
- * @param {vxlRenderStrategy} strategy 
+ * @param {vxlRenderEngine} engine 
  * @see {vxl.def.glsl.phong}
  * @see {vxl.def.glsl.lambert}
  */
-vxlRenderer.prototype.setProgram = function(program,strategy){
+vxlRenderer.prototype.setProgram = function(program,engine){
     
     if(this.currentProgram != undefined && this.currentProgram == program){
         return;
@@ -122,24 +122,24 @@ vxlRenderer.prototype.setProgram = function(program,strategy){
 	
 	this.currentProgram = program;
 	
-	if (strategy != undefined){
-	   this.setStrategy(strategy);
+	if (engine != undefined){
+	   this.setEngine(engine);
 	}
 };
 
 /**
- * Sets the current rendering strategy. If the strat parameter is null or undefined, this method will check if 
+ * Sets the current rendering engine. If the engine parameter is null or undefined, this method will check if 
  * the current strategy is null and in that case sets the strategy as an instance of <code>vxlBasicStrategy</code>
  * 
- * @param {function} strat The strategy to be used. This parameter 
- * corresponds to the constructor of the strategy that should be used.  
+ * @param {function} engine The engine to be used. This parameter 
+ * corresponds to the constructor of the engine that should be used.  
  */
-vxlRenderer.prototype.setStrategy = function(strat){
-    if (strat != null && strat != undefined){
-        this.strategy = new strat(this);
+vxlRenderer.prototype.setEngine = function(engine){
+    if (engine != null && engine != undefined){
+        this.engine = new engine(this);
     }
-    else if (this.strategy == undefined){
-        this.strategy = new vxlRenderStrategy(this);
+    else if (this.engine == undefined){
+        this.engine = new vxlRenderEngine(this);
     }
 }
 
@@ -266,19 +266,19 @@ vxlRenderer.prototype.clearDepth = function(d){
 };
 
 /**
- * Renders the scene according to the currently set strategy
+ * Renders the scene using the current engine
  */
 vxlRenderer.prototype.render = function(){
-    var strategy = this.strategy, scene = this.view.scene, start = undefined, elapsed = undefined;
+    var engine = this.engine, scene = this.view.scene, start = undefined, elapsed = undefined;
     
     this.clear();                   //clear the canvas
-    strategy.allocate(scene);	    //allocate memory for actors added since last rendering
+    engine.allocate(scene);	    //allocate memory for actors added since last rendering
     
     start = new Date().getTime();
-    strategy.render(scene);
+    engine.render(scene);
     elapsed = new Date().getTime() - start;
     
-    strategy.deallocate(scene);     //deallocate memory if necessary
+    engine.deallocate(scene);     //deallocate memory if necessary
     
     // calculating FPS metric
     if(elapsed >0){
@@ -292,7 +292,7 @@ vxlRenderer.prototype.render = function(){
  * to update the GL buffers for dirty actors. 
  */
 vxlRenderer.prototype.reallocate = function(){
-  this.strategy.allocate(this.view.scene);  
+  this.engine.allocate(this.view.scene);  
 };
 
 /**
@@ -300,7 +300,7 @@ vxlRenderer.prototype.reallocate = function(){
  *  
  */
 vxlRenderer.prototype.disableOffscreen = function(){
-    this.strategy.disableOffscreen();
+    this.engine.disableOffscreen();
 };
 
 
@@ -309,13 +309,13 @@ vxlRenderer.prototype.disableOffscreen = function(){
  */
 vxlRenderer.prototype.enableOffscreen = function(){
     this._renderTarget = new vxlRenderTarget(this);
-    this.strategy.enableOffscreen(this._renderTarget);    
+    this.engine.enableOffscreen(this._renderTarget);    
 };
 
 /**
  * Returns true if the offscreen rendering is enabled. False otherwise. 
  */
 vxlRenderer.prototype.isOffscreenEnabled = function(){
-    return this.strategy.isOffscreenEnabled();  
+    return this.engine.isOffscreenEnabled();  
 };
 

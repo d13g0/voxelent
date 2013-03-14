@@ -38,7 +38,7 @@
         
         
         view = vxl.api.setup('view-1');
-        vxl.api.setProgram(view, vxl.def.glsl.phong , vxlPhongStrategy);
+        vxl.api.setProgram(view, vxl.def.glsl.phong);
         
         list = ['part1.json','part2.json','part3.json','part4.json','part5.json','part6.json','part7.json']
         vxl.api.load(list,'assets/models/texture/phone');
@@ -80,14 +80,14 @@
     <script>
     $('#btnPhong').button().click(
       function(){
-          vxl.api.setProgram(view, vxl.def.glsl.phong, vxlPhongStrategy);
+          vxl.api.setProgram(view, vxl.def.glsl.phong);
           vxl.api.setUniform('uLightDirection',[0.0,0.0,-1.0])
       }  
     );
     
     $('#btnLambert').button().click(
       function(){
-          vxl.api.setProgram(view, vxl.def.glsl.lambert, vxlLambertStrategy);
+          vxl.api.setProgram(view, vxl.def.glsl.lambert);
       }  
     );
     </script>

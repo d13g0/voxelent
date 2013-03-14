@@ -474,8 +474,8 @@ vxlCamera.prototype.lookAt = function(actor){
     if (actor instanceof vxlActor){
           this.setFocalPoint(actor._position);
     }
-    else if (typeof(x) == 'string'){
-        var actor = this.view.scene.getActorByName(actorName);
+    else if (typeof(actor) == 'string'){
+        var actor = this.view.scene.getActorByName(actor);
         if (actor == undefined){
             throw 'vxlCamera.lookAt ERROR: The actor '+actorName+' does not exist'
         }
@@ -495,8 +495,8 @@ vxlCamera.prototype.closeUp = function(actor){
 	if (actor instanceof vxlActor){
         this._shot(actor._bb);
     }
-    else if (typeof(x) == 'string'){
-        var actor = this.view.scene.getActorByName(actorName);
+    else if (typeof(actor) == 'string'){
+        var actor = this.view.scene.getActorByName(actor);
         if (actor == undefined){
             throw 'vxlCamera.lookAt ERROR: The actor '+actorName+' does not exist'
         }

@@ -673,11 +673,11 @@ wireframeON :  function(){
   * Loads a program
   * @param{vxlView} view the view to configure
   * @param{Object} program a JSON object that defines the progrma to execute
-  * @param{vxlRenderStrategy} strategy (optional) the strategy that the renderer should follow to communicate with the program. T
+  * @param{vxlRenderEngine} engine (optional) the engine that the renderer should use to communicate with the program. T
   *                        
   */
- setProgram :  function(view,program,strategy){
-    view.renderer.setProgram(program,strategy);
+ setProgram :  function(view,program,engine){
+    view.renderer.setProgram(program,engine);
     
  },
  /**

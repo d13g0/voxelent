@@ -70,6 +70,7 @@ vxlVTKReader.prototype.read = function(file){
         throw 'vxlVTKReader.read: the file '+file+' is not a VTK file';
     }
     
+    modelname = filename.replace(/\.[^/.]+$/, "");
     var reader = new FileReader();
      
     reader.onload = function(event){
@@ -77,12 +78,29 @@ vxlVTKReader.prototype.read = function(file){
         var contents = event.target.result.trim();
         var lines = contents.split(/\r\n|\r|\n/);
         vtkReader._parse(lines);  
-        vtkReader._processIndexBlocks(filename);
+        vtkReader._processIndexBlocks(modelname);
         vxl.go.notifier.fire(vxl.events.READER_DONE, vtkReader);
     };
     
     document.body.style.cursor = 'wait';
     reader.readAsText(file);
+};
+
+
+/**
+ * If the VTK file exists in memory as a String (text) then we can
+ * use this method to parse it. 
+ * 
+ * @param {String} name the name of the object
+ * @param {String} text the retrieved object contents
+ */
+vxlVTKReader.prototype.parseText = function(name, text){
+    document.body.style.cursor = 'wait'; 
+    var lines = text.split(/\r\n|\r|\n/);
+    this._parse(lines);  
+    this._processIndexBlocks(name);
+    vxl.go.notifier.fire(vxl.events.READER_DONE, this);
+    document.body.style.cursor = 'default';
 };
 
 /**

@@ -17,7 +17,7 @@ function runVoxApp(){
 	 vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
      
      view = vxl.api.setup('view-1');
-     vxl.api.setProgram(view, vxl.def.glsl.blender, vxlBlenderStrategy);
+     vxl.api.setProgram(view, vxl.def.glsl.blender, vxlBlenderEngine);
      view.setBackgroundColor(0,0,0);
      view.start();
      

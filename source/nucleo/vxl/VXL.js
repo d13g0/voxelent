@@ -82,7 +82,7 @@ def : {
      */
     rad2deg : 180 / Math.PI,
     /**
-     * Used mainly by <code>vxlRenderStrategy</code> and its descendents
+     * Used mainly by <code>vxlRenderEngine</code> and its descendents
      * @namespace GLSL constants
      * @property {String} VERTEX_SHADER Vertex Shader Id
      * @property {String} FRAGMENT_SHADER Fragment Shader Id
@@ -511,6 +511,10 @@ c : {
  * 
  */
 util : {
+    
+    isMac: function(){
+        return navigator.platform.toUpperCase().indexOf("MAC") != -1;
+    },
     /**
      *Returns a RGB color based on an integer (0..16 millions?) 
      */
@@ -635,7 +639,18 @@ util : {
 };
 
 Array.prototype.max = function(){
-	return Math.max.apply(null, this);
+    if (this.length > 65535){
+       var max = this[0];
+       for(var i=0,N = this.length; i <N; i+=1){
+           if (this[i] > max){
+               max = this[i];
+           }
+       }
+       return max; 
+    }
+    else{
+	   return Math.max.apply(null, this);
+	}
 };
 
 Array.prototype.min = function(){

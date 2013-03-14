@@ -39,7 +39,7 @@ function vxlTrackerInteractor(){
 	this.button = -1;
 	this.dragging = false;
 	this.dragndrop = false;
-	this.isMac = navigator.platform.toUpperCase().indexOf("MAC") != -1;
+	this.isMac = vxl.util.isMac();
 	
 };
 

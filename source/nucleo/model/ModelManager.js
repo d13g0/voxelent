@@ -52,48 +52,74 @@ vxlModelManager.prototype.handleEvent = function(event,source){
 
 /**
  * Uses a JSON/Ajax mechanism to load models from a Web Server.
- * @param {String} filename The name of the file that will be loaded. 
+ * @param {String} uri The path to the file that will be loaded. 
  * @param {vxlScene} scene The scene that will create an actor for this model. This parameter is optional.
  */  
-vxlModelManager.prototype.load = function(filename, scene) {
+vxlModelManager.prototype.load = function(uri, scene) {
     var manager = this;
     
-    var name = filename.replace(/^.*[\\\/]/, '');
+    var filename = uri.replace(/^.*[\\\/]/, '');
+    var modelname = filename.split('.')[0];
+    var extension = filename.split('.')[1];
 	
-	if (manager.isModelLoaded(name)) return;
+	var dtype = 'json';
 	
-	filename = filename +'?nocache=' + (new Date()).getTime();
+	if (manager.isModelLoaded(modelname)) return;
 	
-	vxl.go.console('ModelManager.load: Requesting '+filename+'...');
+	
+	if (extension == 'vtk'){
+	    dtype ='text';
+	}
+	else if (extension == 'json'){
+	    dtype = 'json'
+	}
+	else{
+	    alert ('vxlManager.load ERROR: Unknown filetype ['+extension+']');
+	    throw ('vxlManager.load ERROR: Unknown filetype ['+extension+']');
+	}
+	   
+	nocacheuri = uri +'?nocache=' + (new Date()).getTime();
+	
+	
+	vxl.go.console('ModelManager.load: Requesting '+uri+'...');
 	vxl.go.notifier.fire(vxl.events.MODELS_LOADING, this);
 	
 	var successHandler = function(manager,name,scene){
-		return function(json, textStatus){
-		    json.uri = filename;
-		    json.path = vxl.util.getPath(filename)
-			manager.add(json,name,scene);
-		}
+	    switch(extension){
+	    case 'json':
+    		return function(json, textStatus){
+    		    json.uri = filename;
+    		    json.path = vxl.util.getPath(uri)
+    			manager.add(json,modelname,scene);
+    		}
+    		break;
+    	case 'vtk':
+		    return function(data){
+		        reader = new vxlVTKReader(scene)
+		        reader.parseText(modelname, data)
+		    }
+		 }
 	};
 	
-	var errorHandler = function(filename){
+	var errorHandler = function(uri){
 		return function(request, status, error){
 			
 			if(error.code = 1012){
-				alert('The file '+filename+' could not be accessed. \n\n'+
+				alert('The file '+uri+' could not be accessed. \n\n'+
     			'Please make sure that the path is correct and that you have the right pemissions');
 			}
 			else{
-				alert ('There was a problem loading the file '+filename+'. HTTP error code:'+request.status);
+				alert ('There was a problem loading the file '+uri+'. HTTP error code:'+request.status);
 			}		
 		}
 	};
 	
 	var request  = $.ajax({
-		url			:filename,
+		url			: nocacheuri,
 		type		:"GET",
-		dataType	:"json",
+		dataType	: dtype,
 		success 	: successHandler(manager,name,scene),
-		error		: errorHandler(filename)
+		error		: errorHandler(uri)
 	});    
 };
 

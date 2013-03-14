@@ -21,12 +21,12 @@
  * 
  * The renderable object encapsulates a complex model and delivers parts that abide by the 65K index rule.
  * 
- * The renderables are requested internally by vxlRenderStrategy whenever a model of BIG_OBJECT or  MESH types
+ * The renderables are requested internally by vxlRenderEngine whenever a model of BIG_OBJECT or  MESH types
  * need to be rendered.
  * 
  * 
  * 
- * @constructor A Renderable is an intermediary object between an actor and the rendering strategy that allows rendering
+ * @constructor A Renderable is an intermediary object between an actor and the rendering engine that allows rendering
  * very complex models.
  * 
  * @param{vxlActor} model the actor to be decomposed into renderable parts

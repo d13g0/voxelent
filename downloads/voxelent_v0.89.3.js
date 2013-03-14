@@ -82,7 +82,7 @@ def : {
      */
     rad2deg : 180 / Math.PI,
     /**
-     * Used mainly by <code>vxlRenderStrategy</code> and its descendents
+     * Used mainly by <code>vxlRenderEngine</code> and its descendents
      * @namespace GLSL constants
      * @property {String} VERTEX_SHADER Vertex Shader Id
      * @property {String} FRAGMENT_SHADER Fragment Shader Id
@@ -511,6 +511,10 @@ c : {
  * 
  */
 util : {
+    
+    isMac: function(){
+        return navigator.platform.toUpperCase().indexOf("MAC") != -1;
+    },
     /**
      *Returns a RGB color based on an integer (0..16 millions?) 
      */
@@ -635,7 +639,18 @@ util : {
 };
 
 Array.prototype.max = function(){
-	return Math.max.apply(null, this);
+    if (this.length > 65535){
+       var max = this[0];
+       for(var i=0,N = this.length; i <N; i+=1){
+           if (this[i] > max){
+               max = this[i];
+           }
+       }
+       return max; 
+    }
+    else{
+	   return Math.max.apply(null, this);
+	}
 };
 
 Array.prototype.min = function(){
@@ -4706,8 +4721,8 @@ vxlCamera.prototype.lookAt = function(actor){
     if (actor instanceof vxlActor){
           this.setFocalPoint(actor._position);
     }
-    else if (typeof(x) == 'string'){
-        var actor = this.view.scene.getActorByName(actorName);
+    else if (typeof(actor) == 'string'){
+        var actor = this.view.scene.getActorByName(actor);
         if (actor == undefined){
             throw 'vxlCamera.lookAt ERROR: The actor '+actorName+' does not exist'
         }
@@ -4727,8 +4742,8 @@ vxlCamera.prototype.closeUp = function(actor){
 	if (actor instanceof vxlActor){
         this._shot(actor._bb);
     }
-    else if (typeof(x) == 'string'){
-        var actor = this.view.scene.getActorByName(actorName);
+    else if (typeof(actor) == 'string'){
+        var actor = this.view.scene.getActorByName(actor);
         if (actor == undefined){
             throw 'vxlCamera.lookAt ERROR: The actor '+actorName+' does not exist'
         }
@@ -5332,7 +5347,7 @@ function vxlTrackerInteractor(){
 	this.button = -1;
 	this.dragging = false;
 	this.dragndrop = false;
-	this.isMac = navigator.platform.toUpperCase().indexOf("MAC") != -1;
+	this.isMac = vxl.util.isMac();
 	
 };
 
@@ -6762,14 +6777,14 @@ function vxlRenderer(vw){
     this.transforms 	= new vxlTransforms(vw);
     this.fps            = 0;
     this.currentProgram = undefined;
-    this.strategy 		= undefined;
+    this.engine 		= undefined;
     
     this._time          = 0;
     this._startDate     = 0;
     this._running       = false;
     this._clearColor    = undefined;
     this._renderTarget  = undefined;
-    this.setProgram(vxl.def.glsl.lambert, vxlRenderStrategy);
+    this.setProgram(vxl.def.glsl.lambert, vxlRenderEngine);
     
 }
 
@@ -6825,11 +6840,11 @@ vxlRenderer.prototype._initializeGLContext = function(gl){
 /**
  * Tries to add a new program definition to this renderer
  * @param {Object} program JSON program definition.
- * @param {vxlRenderStrategy} strategy 
+ * @param {vxlRenderEngine} engine 
  * @see {vxl.def.glsl.phong}
  * @see {vxl.def.glsl.lambert}
  */
-vxlRenderer.prototype.setProgram = function(program,strategy){
+vxlRenderer.prototype.setProgram = function(program,engine){
     
     if(this.currentProgram != undefined && this.currentProgram == program){
         return;
@@ -6849,24 +6864,24 @@ vxlRenderer.prototype.setProgram = function(program,strategy){
 	
 	this.currentProgram = program;
 	
-	if (strategy != undefined){
-	   this.setStrategy(strategy);
+	if (engine != undefined){
+	   this.setEngine(engine);
 	}
 };
 
 /**
- * Sets the current rendering strategy. If the strat parameter is null or undefined, this method will check if 
+ * Sets the current rendering engine. If the engine parameter is null or undefined, this method will check if 
  * the current strategy is null and in that case sets the strategy as an instance of <code>vxlBasicStrategy</code>
  * 
- * @param {function} strat The strategy to be used. This parameter 
- * corresponds to the constructor of the strategy that should be used.  
+ * @param {function} engine The engine to be used. This parameter 
+ * corresponds to the constructor of the engine that should be used.  
  */
-vxlRenderer.prototype.setStrategy = function(strat){
-    if (strat != null && strat != undefined){
-        this.strategy = new strat(this);
+vxlRenderer.prototype.setEngine = function(engine){
+    if (engine != null && engine != undefined){
+        this.engine = new engine(this);
     }
-    else if (this.strategy == undefined){
-        this.strategy = new vxlRenderStrategy(this);
+    else if (this.engine == undefined){
+        this.engine = new vxlRenderEngine(this);
     }
 }
 
@@ -6993,19 +7008,19 @@ vxlRenderer.prototype.clearDepth = function(d){
 };
 
 /**
- * Renders the scene according to the currently set strategy
+ * Renders the scene using the current engine
  */
 vxlRenderer.prototype.render = function(){
-    var strategy = this.strategy, scene = this.view.scene, start = undefined, elapsed = undefined;
+    var engine = this.engine, scene = this.view.scene, start = undefined, elapsed = undefined;
     
     this.clear();                   //clear the canvas
-    strategy.allocate(scene);	    //allocate memory for actors added since last rendering
+    engine.allocate(scene);	    //allocate memory for actors added since last rendering
     
     start = new Date().getTime();
-    strategy.render(scene);
+    engine.render(scene);
     elapsed = new Date().getTime() - start;
     
-    strategy.deallocate(scene);     //deallocate memory if necessary
+    engine.deallocate(scene);     //deallocate memory if necessary
     
     // calculating FPS metric
     if(elapsed >0){
@@ -7019,7 +7034,7 @@ vxlRenderer.prototype.render = function(){
  * to update the GL buffers for dirty actors. 
  */
 vxlRenderer.prototype.reallocate = function(){
-  this.strategy.allocate(this.view.scene);  
+  this.engine.allocate(this.view.scene);  
 };
 
 /**
@@ -7027,7 +7042,7 @@ vxlRenderer.prototype.reallocate = function(){
  *  
  */
 vxlRenderer.prototype.disableOffscreen = function(){
-    this.strategy.disableOffscreen();
+    this.engine.disableOffscreen();
 };
 
 
@@ -7036,14 +7051,14 @@ vxlRenderer.prototype.disableOffscreen = function(){
  */
 vxlRenderer.prototype.enableOffscreen = function(){
     this._renderTarget = new vxlRenderTarget(this);
-    this.strategy.enableOffscreen(this._renderTarget);    
+    this.engine.enableOffscreen(this._renderTarget);    
 };
 
 /**
  * Returns true if the offscreen rendering is enabled. False otherwise. 
  */
 vxlRenderer.prototype.isOffscreenEnabled = function(){
-    return this.strategy.isOffscreenEnabled();  
+    return this.engine.isOffscreenEnabled();  
 };
 
 /*-------------------------------------------------------------------------
@@ -8620,7 +8635,7 @@ vxl.go.picker = new vxlPicker();
  * Implements the default rendering strategy 
  * 
  * 
- * A vxlRenderStrategy object is selected by default as the strategy that an actor
+ * A vxlRenderEngine object is selected by default as the strategy that an actor
  * will use for rendering.
  * 
  * A rendering strategy allows decoupling rendering specific code (i.e. code that access and 
@@ -8628,7 +8643,7 @@ vxl.go.picker = new vxlPicker();
  * @author Diego Cantor
  * 
  */
-function vxlRenderStrategy(renderer){
+function vxlRenderEngine(renderer){
 	this.renderer = renderer;
 	this._gl_buffers  = {};
 	this._gl_textures = {};
@@ -8653,7 +8668,7 @@ function vxlRenderStrategy(renderer){
  * Implements basic allocation of memory. Creates the WebGL buffers for the actor
  * @param {vxlScene} scene the scene to allocate memory for
   */
-vxlRenderStrategy.prototype.allocate = function(scene){
+vxlRenderEngine.prototype.allocate = function(scene){
     var elements = scene._actors.concat(scene.toys.list);
     var NUM = elements.length;
     
@@ -8665,14 +8680,14 @@ vxlRenderStrategy.prototype.allocate = function(scene){
 /**
  * @param {vxlScene} scene the scene to deallocate memory from
  */
-vxlRenderStrategy.prototype.deallocate = function(scene){
+vxlRenderEngine.prototype.deallocate = function(scene){
     //DO NOTHING. THE DESCENDANTS WILL.
 };
 
 /**
  * Receives one actor and returns the GL buffers
  */
-vxlRenderStrategy.prototype._allocateActor = function(actor){
+vxlRenderEngine.prototype._allocateActor = function(actor){
    
     if (this._gl_buffers[actor.UID] != undefined){
         if (actor.dirty){ //@TODO: hmmmm frowning on dirty property this is a hack
@@ -8730,7 +8745,7 @@ vxlRenderStrategy.prototype._allocateActor = function(actor){
 /**
  * Receives one actor and returns the GL buffers
  */
-vxlRenderStrategy.prototype._reallocateActor = function(actor){
+vxlRenderEngine.prototype._reallocateActor = function(actor){
    
     var gl = this.renderer.gl;
     var model = actor.model;
@@ -8796,7 +8811,7 @@ vxlRenderStrategy.prototype._reallocateActor = function(actor){
  * the actor position,scale and rotation.
  * @private
  */
-vxlRenderStrategy.prototype._applyActorTransform = function(actor){
+vxlRenderEngine.prototype._applyActorTransform = function(actor){
     
     var r		= this.renderer;
     var trx 	= r.transforms
@@ -8824,7 +8839,7 @@ vxlRenderStrategy.prototype._applyActorTransform = function(actor){
  * the actor position,scale and rotation.
  * @private
  */
-vxlRenderStrategy.prototype._applyGlobalTransform = function(){
+vxlRenderEngine.prototype._applyGlobalTransform = function(){
     
     var r       = this.renderer;
     var trx     = r.transforms
@@ -8844,7 +8859,7 @@ vxlRenderStrategy.prototype._applyGlobalTransform = function(){
  * Renders the actors one by one
  * @param {vxlScene} scene the scene to render
  */
-vxlRenderStrategy.prototype.render = function(scene){
+vxlRenderEngine.prototype.render = function(scene){
 
     //Updates the perspective matrix and passes it to the program
     var r       = this.renderer,
@@ -8883,7 +8898,7 @@ vxlRenderStrategy.prototype.render = function(scene){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._handlePicking = function(actors){
+vxlRenderEngine.prototype._handlePicking = function(actors){
     
     if (this._target == undefined) return; //quick fail if the target has not been defined
     
@@ -8915,7 +8930,7 @@ vxlRenderStrategy.prototype._handlePicking = function(actors){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._enablePartVertices = function(actor,part){
+vxlRenderEngine.prototype._enablePartVertices = function(actor,part){
     
     var gl = this.renderer.gl;
     var prg = this.renderer.prg;
@@ -8930,7 +8945,7 @@ vxlRenderStrategy.prototype._enablePartVertices = function(actor,part){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._enablePartNormals = function(actor,part){
+vxlRenderEngine.prototype._enablePartNormals = function(actor,part){
     
   var gl = this.renderer.gl;
   var prg = this.renderer.prg;
@@ -8957,7 +8972,7 @@ vxlRenderStrategy.prototype._enablePartNormals = function(actor,part){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._enablePartColors = function(actor,part){
+vxlRenderEngine.prototype._enablePartColors = function(actor,part){
     
   var gl = this.renderer.gl;
   var prg = this.renderer.prg;
@@ -8985,7 +9000,7 @@ vxlRenderStrategy.prototype._enablePartColors = function(actor,part){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._enableNormals = function(actor){
+vxlRenderEngine.prototype._enableNormals = function(actor){
     
     var model = actor.model;
     var gl = this.renderer.gl;
@@ -9012,7 +9027,7 @@ vxlRenderStrategy.prototype._enableNormals = function(actor){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._enableColors = function(actor){
+vxlRenderEngine.prototype._enableColors = function(actor){
     
     var model = actor.model;
     var gl = this.renderer.gl;
@@ -9040,7 +9055,7 @@ vxlRenderStrategy.prototype._enableColors = function(actor){
  * Renders a solid actor
  * @private
  */
-vxlRenderStrategy.prototype._renderSolid = function(actor){
+vxlRenderEngine.prototype._renderSolid = function(actor){
     
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
@@ -9082,7 +9097,7 @@ vxlRenderStrategy.prototype._renderSolid = function(actor){
 /**
  * Renders an actor as a wireframe
  */
-vxlRenderStrategy.prototype._renderWireframe = function(actor){
+vxlRenderEngine.prototype._renderWireframe = function(actor){
     
 
     var buffers = this._gl_buffers[actor.UID];
@@ -9104,7 +9119,7 @@ vxlRenderStrategy.prototype._renderWireframe = function(actor){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._renderPoints = function(actor){
+vxlRenderEngine.prototype._renderPoints = function(actor){
     
     var model   = actor.model;
     var gl      = this.renderer.gl;
@@ -9121,7 +9136,7 @@ vxlRenderStrategy.prototype._renderPoints = function(actor){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._renderLines = function(actor){
+vxlRenderEngine.prototype._renderLines = function(actor){
     
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
@@ -9137,7 +9152,7 @@ vxlRenderStrategy.prototype._renderLines = function(actor){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._renderBoundingBox = function(actor){
+vxlRenderEngine.prototype._renderBoundingBox = function(actor){
     
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
@@ -9157,7 +9172,7 @@ vxlRenderStrategy.prototype._renderBoundingBox = function(actor){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._renderBoundingBoxAndSolid = function(actor){    var model   = actor.model;
+vxlRenderEngine.prototype._renderBoundingBoxAndSolid = function(actor){    var model   = actor.model;
     
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
@@ -9183,7 +9198,7 @@ vxlRenderStrategy.prototype._renderBoundingBoxAndSolid = function(actor){    var
 /**
  * @private
  */
-vxlRenderStrategy.prototype._renderWiredAndSolid = function(actor){
+vxlRenderEngine.prototype._renderWiredAndSolid = function(actor){
    
     var model   = actor.model;
     var buffers = this._gl_buffers[actor.UID];
@@ -9209,7 +9224,7 @@ vxlRenderStrategy.prototype._renderWiredAndSolid = function(actor){
  * 
  * @private
  */
-vxlRenderStrategy.prototype._renderFlat = function(actor){
+vxlRenderEngine.prototype._renderFlat = function(actor){
     
    
     var buffers = this._gl_buffers[actor.UID];
@@ -9315,7 +9330,7 @@ vxlRenderStrategy.prototype._renderFlat = function(actor){
  *    
  * @private
  */
-vxlRenderStrategy.prototype._renderPickingBuffer = function(actor){
+vxlRenderEngine.prototype._renderPickingBuffer = function(actor){
     
     var model   = actor.model;
     var buffers = this._gl_buffers[actor.UID];
@@ -9407,7 +9422,7 @@ vxlRenderStrategy.prototype._renderPickingBuffer = function(actor){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._renderTextured = function(actor){
+vxlRenderEngine.prototype._renderTextured = function(actor){
     
     var model   = actor.model;
     var buffers = this._gl_buffers[actor.UID];
@@ -9454,7 +9469,7 @@ vxlRenderStrategy.prototype._renderTextured = function(actor){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._handleCulling = function(actor){
+vxlRenderEngine.prototype._handleCulling = function(actor){
     var gl = this.renderer.gl;
     
     gl.disable(gl.CULL_FACE);
@@ -9472,7 +9487,7 @@ vxlRenderStrategy.prototype._handleCulling = function(actor){
 /**
  * @private
  */
-vxlRenderStrategy.prototype._renderActor = function(actor){
+vxlRenderEngine.prototype._renderActor = function(actor){
 
     if (!actor.visible) return; //Quick and simple
 
@@ -9564,7 +9579,7 @@ vxlRenderStrategy.prototype._renderActor = function(actor){
  * Sets up the offscreen rendering variant
  * @param {vxlRenderTarget} target the render target
  */
-vxlRenderStrategy.prototype.enableOffscreen = function(target){
+vxlRenderEngine.prototype.enableOffscreen = function(target){
     this._offscreen = true;
     this._target = target;
 };
@@ -9573,7 +9588,7 @@ vxlRenderStrategy.prototype.enableOffscreen = function(target){
  * Sets up the offscreen rendering variant
  * @param {vxlRenderTarget} target the render target
  */
-vxlRenderStrategy.prototype.disableOffscreen = function(){
+vxlRenderEngine.prototype.disableOffscreen = function(){
     this._offscreen = false;
     this._target = undefined;
 };
@@ -9582,7 +9597,7 @@ vxlRenderStrategy.prototype.disableOffscreen = function(){
  * Returns true if the offscreen rendering does not have any target.
  * @returns {true\false}
  */
-vxlRenderStrategy.prototype.isOffscreenEnabled = function(){
+vxlRenderEngine.prototype.isOffscreenEnabled = function(){
     return (this._target != undefined);    
 }
 
@@ -11427,48 +11442,74 @@ vxlModelManager.prototype.handleEvent = function(event,source){
 
 /**
  * Uses a JSON/Ajax mechanism to load models from a Web Server.
- * @param {String} filename The name of the file that will be loaded. 
+ * @param {String} uri The path to the file that will be loaded. 
  * @param {vxlScene} scene The scene that will create an actor for this model. This parameter is optional.
  */  
-vxlModelManager.prototype.load = function(filename, scene) {
+vxlModelManager.prototype.load = function(uri, scene) {
     var manager = this;
     
-    var name = filename.replace(/^.*[\\\/]/, '');
+    var filename = uri.replace(/^.*[\\\/]/, '');
+    var modelname = filename.split('.')[0];
+    var extension = filename.split('.')[1];
 	
-	if (manager.isModelLoaded(name)) return;
+	var dtype = 'json';
 	
-	filename = filename +'?nocache=' + (new Date()).getTime();
+	if (manager.isModelLoaded(modelname)) return;
 	
-	vxl.go.console('ModelManager.load: Requesting '+filename+'...');
+	
+	if (extension == 'vtk'){
+	    dtype ='text';
+	}
+	else if (extension == 'json'){
+	    dtype = 'json'
+	}
+	else{
+	    alert ('vxlManager.load ERROR: Unknown filetype ['+extension+']');
+	    throw ('vxlManager.load ERROR: Unknown filetype ['+extension+']');
+	}
+	   
+	nocacheuri = uri +'?nocache=' + (new Date()).getTime();
+	
+	
+	vxl.go.console('ModelManager.load: Requesting '+uri+'...');
 	vxl.go.notifier.fire(vxl.events.MODELS_LOADING, this);
 	
 	var successHandler = function(manager,name,scene){
-		return function(json, textStatus){
-		    json.uri = filename;
-		    json.path = vxl.util.getPath(filename)
-			manager.add(json,name,scene);
-		}
+	    switch(extension){
+	    case 'json':
+    		return function(json, textStatus){
+    		    json.uri = filename;
+    		    json.path = vxl.util.getPath(uri)
+    			manager.add(json,modelname,scene);
+    		}
+    		break;
+    	case 'vtk':
+		    return function(data){
+		        reader = new vxlVTKReader(scene)
+		        reader.parseText(modelname, data)
+		    }
+		 }
 	};
 	
-	var errorHandler = function(filename){
+	var errorHandler = function(uri){
 		return function(request, status, error){
 			
 			if(error.code = 1012){
-				alert('The file '+filename+' could not be accessed. \n\n'+
+				alert('The file '+uri+' could not be accessed. \n\n'+
     			'Please make sure that the path is correct and that you have the right pemissions');
 			}
 			else{
-				alert ('There was a problem loading the file '+filename+'. HTTP error code:'+request.status);
+				alert ('There was a problem loading the file '+uri+'. HTTP error code:'+request.status);
 			}		
 		}
 	};
 	
 	var request  = $.ajax({
-		url			:filename,
+		url			: nocacheuri,
 		type		:"GET",
-		dataType	:"json",
+		dataType	: dtype,
 		success 	: successHandler(manager,name,scene),
-		error		: errorHandler(filename)
+		error		: errorHandler(uri)
 	});    
 };
 
@@ -12253,11 +12294,11 @@ wireframeON :  function(){
   * Loads a program
   * @param{vxlView} view the view to configure
   * @param{Object} program a JSON object that defines the progrma to execute
-  * @param{vxlRenderStrategy} strategy (optional) the strategy that the renderer should follow to communicate with the program. T
+  * @param{vxlRenderEngine} engine (optional) the engine that the renderer should use to communicate with the program. T
   *                        
   */
- setProgram :  function(view,program,strategy){
-    view.renderer.setProgram(program,strategy);
+ setProgram :  function(view,program,engine){
+    view.renderer.setProgram(program,engine);
     
  },
  /**
@@ -12628,6 +12669,7 @@ vxlVTKReader.prototype.read = function(file){
         throw 'vxlVTKReader.read: the file '+file+' is not a VTK file';
     }
     
+    modelname = filename.replace(/\.[^/.]+$/, "");
     var reader = new FileReader();
      
     reader.onload = function(event){
@@ -12635,12 +12677,29 @@ vxlVTKReader.prototype.read = function(file){
         var contents = event.target.result.trim();
         var lines = contents.split(/\r\n|\r|\n/);
         vtkReader._parse(lines);  
-        vtkReader._processIndexBlocks(filename);
+        vtkReader._processIndexBlocks(modelname);
         vxl.go.notifier.fire(vxl.events.READER_DONE, vtkReader);
     };
     
     document.body.style.cursor = 'wait';
     reader.readAsText(file);
+};
+
+
+/**
+ * If the VTK file exists in memory as a String (text) then we can
+ * use this method to parse it. 
+ * 
+ * @param {String} name the name of the object
+ * @param {String} text the retrieved object contents
+ */
+vxlVTKReader.prototype.parseText = function(name, text){
+    document.body.style.cursor = 'wait'; 
+    var lines = text.split(/\r\n|\r|\n/);
+    this._parse(lines);  
+    this._processIndexBlocks(name);
+    vxl.go.notifier.fire(vxl.events.READER_DONE, this);
+    document.body.style.cursor = 'default';
 };
 
 /**
@@ -13196,12 +13255,12 @@ vxlMaterial.prototype.getFrom = function(model){
  * 
  * The renderable object encapsulates a complex model and delivers parts that abide by the 65K index rule.
  * 
- * The renderables are requested internally by vxlRenderStrategy whenever a model of BIG_OBJECT or  MESH types
+ * The renderables are requested internally by vxlRenderEngine whenever a model of BIG_OBJECT or  MESH types
  * need to be rendered.
  * 
  * 
  * 
- * @constructor A Renderable is an intermediary object between an actor and the rendering strategy that allows rendering
+ * @constructor A Renderable is an intermediary object between an actor and the rendering engine that allows rendering
  * very complex models.
  * 
  * @param{vxlActor} model the actor to be decomposed into renderable parts

@@ -21,6 +21,7 @@
 	function runVoxApp(){
 		vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
 	    view  = vxl.api.setup('view-1');  
+	    var gui = new vxlGUI(vxl.c.view); //and can be used here
 	    vxl.api.load('cortex.json','assets/models/brain',vxl.def.model.loadingMode.LATER);
 	    view.start();
 	}
