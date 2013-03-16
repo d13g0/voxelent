@@ -248,8 +248,9 @@ vxlModel.prototype.computeBoundingBox = function(){
     
 	var vs = this.vertices;
 	var bbm  = [vs[0],vs[1],vs[2],vs[0],vs[1],vs[2]];
-	  
-	for(var i=0;i<vs.length;i=i+3){
+	
+	var i = vs.length;  
+	for(var i=0, N = vs.length;i<N;i=i+3){
 		bbm[0] = Math.min(bbm[0],vs[i]);
 		bbm[1] = Math.min(bbm[1],vs[i+1]);
 		bbm[2] = Math.min(bbm[2],vs[i+2]);

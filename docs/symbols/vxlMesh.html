@@ -37,7 +37,7 @@
 			<!-- begin publish.classesIndex -->
 			<div align="center"><h2><a href="../index.html">Class List</a></h2></div>
 <hr />
-<h3>Current Version:  0.89.2</h3>
+<h3>Current Version:  0.89.3</h3>
 <p>Download it <a href='http://voxelent.com/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -81,11 +81,15 @@
 	
 	<li><a href="../symbols/vxlActor.html">vxlActor</a></li>
 	
+	<li><a href="../symbols/vxlActorGroup.html">vxlActorGroup</a></li>
+	
+	<li><a href="../symbols/vxlActorGroupException.html">vxlActorGroupException</a></li>
+	
 	<li><a href="../symbols/vxlAxis.html">vxlAxis</a></li>
 	
-	<li><a href="../symbols/vxlBakeStrategy.html">vxlBakeStrategy</a></li>
+	<li><a href="../symbols/vxlBakeEngine.html">vxlBakeEngine</a></li>
 	
-	<li><a href="../symbols/vxlBlenderStrategy.html">vxlBlenderStrategy</a></li>
+	<li><a href="../symbols/vxlBlenderEngine.html">vxlBlenderEngine</a></li>
 	
 	<li><a href="../symbols/vxlBoundingBox.html">vxlBoundingBox</a></li>
 	
@@ -123,9 +127,11 @@
 	
 	<li><a href="../symbols/vxlProgram.html">vxlProgram</a></li>
 	
-	<li><a href="../symbols/vxlRenderer.html">vxlRenderer</a></li>
+	<li><a href="../symbols/vxlRenderable.html">vxlRenderable</a></li>
 	
-	<li><a href="../symbols/vxlRenderStrategy.html">vxlRenderStrategy</a></li>
+	<li><a href="../symbols/vxlRenderEngine.html">vxlRenderEngine</a></li>
+	
+	<li><a href="../symbols/vxlRenderer.html">vxlRenderer</a></li>
 	
 	<li><a href="../symbols/vxlScene.html">vxlScene</a></li>
 	
@@ -163,7 +169,7 @@
 				Provides cell by cell operations on models
 
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_model_Mesh.js.html">Mesh.js</a>.
+					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_scene_Mesh.js.html">Mesh.js</a>.
 				
 			</p>
 
@@ -175,7 +181,7 @@
 				<td class="attributes">&nbsp;</td>
 				<td class="nameDescription" >
 					<div class="fixedFont">
-						<b><a href="../symbols/vxlMesh.html#constructor">vxlMesh</a></b>(model)
+						<b><a href="../symbols/vxlMesh.html#constructor">vxlMesh</a></b>(prior)
 					</div>
 					<div class="description">In a mesh, the geometry is structured in units called cells (triangles).</div>
 				</td>
@@ -296,6 +302,28 @@
 								
 								
 								
+								<b><a href="../symbols/vxlMesh.html#scalarsToCellColors">scalarsToCellColors</a></b>
+								(scalars, lut)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
 								<b><a href="../symbols/vxlMesh.html#setColor">setColor</a></b>
 								(color)
 								</div>
@@ -318,7 +346,7 @@
 								
 								
 								
-								<b><a href="../symbols/vxlMesh.html#updateRenderableColors">updateRenderableColors</a></b>
+								<b><a href="../symbols/vxlMesh.html#updateColor">updateColor</a></b>
 								()
 								</div>
 							</td>
@@ -343,7 +371,7 @@
 				<div class='methodDetail'>
 				<div class="title">
 				<div class="fixedFont">
-						<b>vxlMesh</b>(model)
+						<b>vxlMesh</b>(prior)
 				</div>
 				</div>
 
@@ -362,10 +390,10 @@ This class provides operations on individual cells.
 						
 							<tr>
 							<td>
-								<span class="light fixedFont">{<a href="../symbols/vxlModel.html">vxlModel</a>}</span> 
+								<span class="light fixedFont">{<a href="../symbols/vxlActor.html">vxlActor</a>}</span> 
 							</td>
 							<td>	
-								 <code>model</code>
+								 <code>prior</code>
 							</td>
 							<td>
 								<p>the model for this mesh
@@ -422,7 +450,7 @@ This class provides operations on individual cells.
 							<table class="paramTable">
 							
 							<tr><td>
-									<span class="light fixedFont">{string}</span> 
+									<span class="light fixedFont">{String}</span> 
 								</td>
 								<td>
 									<code>cellUID</code>
@@ -470,7 +498,7 @@ This class provides operations on individual cells.
 							<table class="paramTable">
 							
 							<tr><td>
-									<span class="light fixedFont">{string}</span> 
+									<span class="light fixedFont">{String}</span> 
 								</td>
 								<td>
 									<code>cellUID</code>
@@ -602,6 +630,67 @@ Maybe to see through a surface??
 				</div>	
 				
 				<div class='methodDetail'>
+					<a name="scalarsToCellColors"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>scalarsToCellColors</b>(scalars, lut)
+					</div>
+					</div>
+					<div class="description">
+						Receives an array with vertex colors (one color per vertex) 
+interpolates these colors and assign cell colors
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>scalars</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>lut</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
 					<a name="setColor"> </a>
 					<div class="title">
 					<div class="fixedFont">
@@ -616,7 +705,7 @@ Maybe to see through a surface??
 					</div>
 					</div>
 					<div class="description">
-						
+						Sets the mesh color
 						
 						
 					</div>
@@ -650,7 +739,7 @@ Maybe to see through a surface??
 				</div>	
 				
 				<div class='methodDetail'>
-					<a name="updateRenderableColors"> </a>
+					<a name="updateColor"> </a>
 					<div class="title">
 					<div class="fixedFont">
 
@@ -660,11 +749,11 @@ Maybe to see through a surface??
 					
 					
 					
-					  <b>updateRenderableColors</b>()
+					  <b>updateColor</b>()
 					</div>
 					</div>
 					<div class="description">
-						
+						Update the mesh colors based on the current cell colors
 						
 						
 					</div>
@@ -692,7 +781,7 @@ Maybe to see through a surface??
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Mar 01 2013 11:46:01 GMT-0500 (EST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sat Mar 16 2013 19:02:38 GMT-0400 (EDT)
 		</div>
         </div>
         </div>

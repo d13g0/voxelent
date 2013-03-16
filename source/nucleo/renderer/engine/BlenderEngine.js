@@ -26,7 +26,7 @@
  * @param {vxlRenderer} renderer the renderer associated to this strategy
  *  
  */
-function vxlBlenderStrategy(renderer) {
+function vxlBlenderEngine(renderer) {
 	this.renderer = renderer;
 }
 
@@ -34,7 +34,7 @@ function vxlBlenderStrategy(renderer) {
  * Renders the scene
  * @param {Object} scene
  */
-vxlBlenderStrategy.prototype.render = function(scene){
+vxlBlenderEngine.prototype.render = function(scene){
     
     //Updates the perspective matrix and passes it to the program
     var r       = this.renderer;
@@ -66,7 +66,7 @@ vxlBlenderStrategy.prototype.render = function(scene){
  * the actor position,scale and rotation.
  * @private
  */
-vxlBlenderStrategy.prototype._applyActorTransform = function(actor){
+vxlBlenderEngine.prototype._applyActorTransform = function(actor){
     
     var r       = this.renderer;
     var trx     = r.transforms
@@ -92,7 +92,7 @@ vxlBlenderStrategy.prototype._applyActorTransform = function(actor){
  * @private
  * @param {Object} actor
  */
-vxlBlenderStrategy.prototype._renderActor = function(actor){
+vxlBlenderEngine.prototype._renderActor = function(actor){
 	
 	if (actor.name == 'bounding box' || actor.name == 'axis' || actor.name =='floor'){
 		return;

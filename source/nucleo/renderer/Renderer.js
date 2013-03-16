@@ -42,7 +42,9 @@ function vxlRenderer(vw){
     this._running       = false;
     this._clearColor    = undefined;
     this._renderTarget  = undefined;
-    this.setProgram(vxl.def.glsl.lambert, vxlRenderEngine);
+    this._forceProgram  = false;
+    this.setProgram(vxl.def.glsl.lambert, vxlRenderEngine, false);
+    
     
 }
 
@@ -102,11 +104,21 @@ vxlRenderer.prototype._initializeGLContext = function(gl){
  * @see {vxl.def.glsl.phong}
  * @see {vxl.def.glsl.lambert}
  */
-vxlRenderer.prototype.setProgram = function(program,engine){
+vxlRenderer.prototype.setProgram = function(program,engine, forceIt){
     
-    if(this.currentProgram != undefined && this.currentProgram == program){
+    if (forceIt != undefined && forceIt == true){
+        this._forceProgram = true;
+    }
+    else{
+        this._forceProgram = false;
+    }
+    
+    
+    if(this.currentProgram != undefined && 
+        this.currentProgram == program){
         return;
     }
+  
     
     var prg = this.prg;
 
@@ -125,6 +137,8 @@ vxlRenderer.prototype.setProgram = function(program,engine){
 	if (engine != undefined){
 	   this.setEngine(engine);
 	}
+	
+	
 };
 
 /**

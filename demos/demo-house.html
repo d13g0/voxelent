@@ -21,15 +21,16 @@
     function runVoxApp(){
         
         vxl.go.notifier.subscribe(vxl.events.MODELS_LOADED, this);
-        vxl.api.setup('view-1');  
+        var view = vxl.api.setup('view-1');  
         var gui = new vxlGUI(vxl.c.view); 
         vxl.api.loadSequence('part',1,203,'assets/models/house');
-        vxl.c.view.start();
+        view.start();
+        vxl.api.setProgram(view, vxl.def.glsl.lambert);
         
     }
     
     function handleEvent(event, src){
-       vxl.api.setUniform("uLightAmbient",[0.05,0.05,0.05,1.0]);
+       vxl.api.setUniformDefault("lambert", "uLightAmbient",[0.05,0.05,0.05,1.0]);
        vxl.api.boundingBoxON();
        var c = vxl.c.camera;
        c.setType(vxl.def.camera.type.ORBITING);

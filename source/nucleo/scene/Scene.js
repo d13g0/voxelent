@@ -28,6 +28,7 @@ function vxlScene()
 {
 	this.views  				= [];
 	this._actors 				= [];
+	this._groups                = [];
 	this.toys					= new vxlSceneToys(this);
 	this.loadingMode 			= vxl.def.model.loadingMode.LIVE;
 	this.normalsFlipped 		= false;
@@ -40,6 +41,7 @@ function vxlScene()
 	this.centre 				= [0, 0, 0];
 	this.frameAnimation			= null;
 	this.UID                    = vxl.util.generateUID();
+
 
 	if (vxl.c.scene  == null) vxl.c.scene 	= this;
 
@@ -145,9 +147,9 @@ vxlScene.prototype.computeBoundingBox = function() {
 	
 	this.centre = [0.0, 0.0, 0.0];
 	
-	var LEN = this._actors.length;
-	for(var i=0; i<LEN; i++){
-		this._updateBoundingBoxWith(this._actors[i]);
+	var i = this._actors.length;
+	while(i--){
+	   this._updateBoundingBoxWith(this._actors[i]);
 	}
 };
 
@@ -170,8 +172,8 @@ vxlScene.prototype.createActor = function(model){
  * @param models a list of models to create actors from
  */
 vxlScene.prototype.createActors = function(models){
-	vxl.go.console('Scene: Creating all the actors now');
-	for (var i = 0; i < models.length; i++){
+    var i = models.length;
+	while(i--){
 		this.createActor(models[i]);
 	}	
 };
@@ -215,7 +217,8 @@ vxlScene.prototype.updateActor = function(actor){
     if(!this.hasActor(actor)) return;
     
     actor.dirty = true;
-    for(var i = 0; i < this.views.length; i +=1){
+    var i = this.views.length;
+    while(i--){
         this.views[i].renderer.reallocate();                
     }
     actor.dirty = false;
@@ -253,7 +256,8 @@ vxlScene.prototype.hasActor = function(actor){
  * @param {Object} value the value of the property
  */
 vxlScene.prototype.setPropertyForAll = function (property, value){
-    for(var i=0; i<this._actors.length; i++){
+    var i = this._actors.length;
+    while(i--){
         this._actors[i].setProperty(property, value);
     }
 };
@@ -267,7 +271,8 @@ vxlScene.prototype.setPropertyForAll = function (property, value){
  
  */
 vxlScene.prototype.setPropertyFor = function (list, property, value){
-    for(var i=0; i<list.length; i++){
+    var i = list.length;
+    while(i--){
         if (this.hasActor(list[i])){
             var actor = undefined;
             if (typeof(list[i])=='string'){
@@ -286,7 +291,8 @@ vxlScene.prototype.setPropertyFor = function (list, property, value){
  * Updates the Scene's scalarMAX and scalarMIN properties.
  */
 vxlScene.prototype.updateScalarRange = function(){
-	for(var i=0;i<this._actors.length;i++){
+    var i = this._actors.length;
+	while(i--){
 		var actor = this._actors[i];
 		if (actor.model.scalars && actor.model.scalars.max() > this.scalarMAX) this.scalarMAX = actor.model.scalars.max();
 		if (actor.model.scalars && actor.model.scalars.min() < this.scalarMIN) this.scalarMIN = actor.model.scalars.min();
@@ -299,7 +305,8 @@ vxlScene.prototype.updateScalarRange = function(){
  */
 vxlScene.prototype.setLookupTable = function(lutID){
 	this.lutID = lutID;
-	for(var i =0, N = this._actors.length; i<N; i+=1){
+	var i = this._actors.length;
+	while(i--){
      	this._actors[i].setLookupTable(lutID,this.scalarMIN, this.scalarMAX);
 	}
 };
@@ -309,7 +316,8 @@ vxlScene.prototype.setLookupTable = function(lutID){
  * It will also set vxl.c.actor to null
  */
 vxlScene.prototype.reset = function(){
-	for(var i=0; i<this._actors.length; i++){
+    var i = this._actors.length;
+	while(i--){
 		this._actors[i] = null;
 	}
 	this._actors = [];
@@ -323,13 +331,13 @@ vxlScene.prototype.reset = function(){
  */
 vxlScene.prototype.getActorByName = function(name){
     name = name.replace(/\.[^/.]+$/, "");
-	var LEN = this._actors.length;
-    for(var i=0; i<LEN; i+=1){
+	var i = this._actors.length;
+    while(i--){
 		if(this._actors[i].name == name){
 			return this._actors[i];
 		}
 	}
-	return undefined;
+	return null;
 };
 
 
@@ -338,13 +346,25 @@ vxlScene.prototype.getActorByName = function(name){
  * @param UID the actor's UID
  */
 vxlScene.prototype.getActorByUID = function(UID){
-    var LEN = this._actors.length;
-    for(var i=0; i<LEN; i+=1){
+    var i = this._actors.length;
+    while(i--){
         if(this._actors[i].UID == UID){
             return this._actors[i];
         }
     }
-    return undefined;
+    return null;
+};
+
+/**
+ * Retrieves an actor by Name or UID 
+ */
+vxlScene.prototype.getActor = function(actorNameOrUID){
+     var actor = this.getActorByName(actorNameOrUID);
+     
+     if (actor == null){
+         actor = this.getActorByUID(actorNameOrUID);
+     }
+     return actor;
 };
 
 
@@ -359,13 +379,15 @@ vxlScene.prototype.getActorByUID = function(UID){
  */
 vxlScene.prototype.getActorsThat = function(condition){
     var idx = [];
-    for (var i=0; i<this._actors.length; i+=1){
+    var i = this._actors.length;
+    while(i--){
         if (condition(this._actors[i])) {
             idx.push(i);
         }
     }
     var results = [];
-    for (var j=0; j<idx.length;j+=1){
+    var j = idx.length;
+    while(j--){
         results.push(this._actors[idx[j]]);
     }
     return results;
@@ -379,7 +401,8 @@ vxlScene.prototype.getActorsThat = function(condition){
  */
 vxlScene.prototype.setOpacity = function(o,name){
 	if (name == null){
-		for(var i=0; i<this._actors.length; i++){
+	    var i = this._actors.length;
+		while(i--){
 			this._actors[i].setOpacity(o);
 		}
 	}
@@ -395,7 +418,8 @@ vxlScene.prototype.setOpacity = function(o,name){
  * have an immediate effect in the side of the object that it is being lit.
  */
 vxlScene.prototype.flipNormals = function(){
-	for(var i=0; i<this._actors.length; i++){
+    var i = this._actors.length;
+	while(i--){
 		this._actors[i].flipNormals();
 	}
 };
@@ -407,7 +431,8 @@ vxlScene.prototype.flipNormals = function(){
  */
 vxlScene.prototype.setVisualizationMode = function(mode){
 	if (mode == null || mode == undefined) return;
-	for(var i=0; i<this._actors.length; i++){
+	var i = this._actors.length;
+	while(i--){
 			this._actors[i].setVisualizationMode(mode);
 	}
 };
@@ -422,8 +447,8 @@ vxlScene.prototype.setAnimation = function(animation){
 	if (animation instanceof vxlFrameAnimation){
 		this.frameAnimation = animation;
 		this.frameAnimation.scene = this;
-		
-		for (var i=0;i<this.views.length;i+=1){
+		var i = this.views.length;
+		while(i--){
 			this.views[i].renderer.setMode(vxl.def.renderer.mode.ANIMFRAME);
 		}
 		
@@ -448,8 +473,9 @@ vxlScene.prototype.clearAnimation = function(){
  */
 vxlScene.prototype.getActorNames = function(){
 	var list = [];
-	for(var a=0, actorCount = this._actors.length; a < actorCount; a+=1){
-		list.push(this._actors[a].name);
+	var i = this._actors.length;
+	while(i--){
+		list.push(this._actors[i].name);
 	}
 	return list;
 };
@@ -475,10 +501,54 @@ vxlScene.prototype.getPickableActors = function(){
  */
 vxlScene.prototype.getActorByCellUID = function(UID){
     var list = [];
-    for(var a=0, actorCount = this._actors.length; a < actorCount; a+=1){
-        var actor = this._actors[a];
+    var i = this._actors.length;
+    while(i--){
+        var actor = this._actors[i];
         if (actor.mesh != undefined && actor.mesh.hasCell(UID)){
             return actor;
+        }
+    }
+    return null;
+};
+
+
+
+/**
+ * Creates an actor group 
+ * @param {Object} name name of the actor group
+ * @param {Object} list list of actors to add to the actor group. Elements in the list can be
+ * actor classes, actors UID, actor names or any combination of these.
+ * @see {vxlActorGroup}
+ */
+vxlScene.prototype.createActorGroup = function(name, list){
+    var actorGroup = undefined;
+    if(this.getActorGroup(name) != null){
+        throw('vxlScene.createActorGroup: an actor group with the name '+name+' already exists');
+    }
+    
+    try{
+        actorGroup = new vxlActorGroup(this,name,list);
+        this._groups.push(actorGroup);
+    }
+    catch(ex){
+        if (ex instanceof vxlActorGroupException){
+            alert(ex.messages);
+        }
+    }
+    finally{
+        return actorGroup;
+    }
+};
+
+/**
+ *Retrieves an actor group by name 
+ * @param {Object} name
+ */
+vxlScene.prototype.getActorGroup = function(name){
+    var i = this._groups.length;
+    while(i--){
+        if(this._groups[i].name == name){
+            return this._groups[i];
         }
     }
     return null;

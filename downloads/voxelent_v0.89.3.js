@@ -375,6 +375,13 @@ def : {
 			        mode: { TIMER:'TIMER', ANIMFRAME:'ANIFRAME'}, //EXPERIMENTAL NOT WAY TO CANCEL YET },
 			        rate : { SLOW: 10000,  NORMAL: 500 }
 	},
+	
+	renderable      :{
+	                 task :{CREATE:'CREATE', 
+	                        UPDATE_GEOMETRY:'UPDATE_GEOMETRY',
+	                        UPDATE_COLORS:'UPDATE_COLORS'}
+	    
+	},
 					
 	/**
 	 * @namespace Constants to handle textures 
@@ -654,7 +661,18 @@ Array.prototype.max = function(){
 };
 
 Array.prototype.min = function(){
-	return Math.min.apply(null, this);
+	if (this.length > 65535){
+       var min = this[0];
+       for(var i=0,N = this.length; i <N; i+=1){
+           if (this[i] < min){
+               min = this[i];
+           }
+       }
+       return min; 
+    }
+    else{
+       return Math.min.apply(null, this);
+    }
 };
 
 
@@ -4419,7 +4437,8 @@ vxlCamera.prototype.updateWithActor = function(actor){
                 this.setFocalPoint(actor._position);
                 break;
         case vxl.def.camera.tracking.TRANSLATIONAL:
-                this.translate(actor._translation);        
+                this.translate(actor._translation);  
+                this.setFocalPoint(actor._position);      
                 break;
     }
 };
@@ -4455,6 +4474,7 @@ vxlCamera.prototype.setPosition = function(x,y,z) {
 vxlCamera.prototype.setFocalPoint = function(x,y,z) {
     
     var up = vec3.create([0,1,0]);
+    //var up = vec3.create(this._up);
     this._focalPoint = vxl.util.createVec3(x,y,z);
     
     if (this._trackingMode == vxl.def.camera.tracking.CINEMATIC){
@@ -4615,9 +4635,9 @@ vxlCamera.prototype.rotate = function(azimuth,elevation,roll){
         this._relRoll = this._getAngle(roll);
         
         if (this.type == vxl.def.camera.type.TRACKING){
-            this._relElevation = -this._relElevation;
-            this._relAzimuth   = -this._relAzimuth;
-            this._relRoll      = -this._relRoll;
+            //this._relElevation = -this._relElevation;
+            //this._relAzimuth   = -this._relAzimuth;
+            //this._relRoll      = -this._relRoll;
         }
         
         this._elevation += this._relElevation;
@@ -4685,19 +4705,23 @@ vxlCamera.prototype.pan = function(tx, ty) {
  * @param {Number} z if x is a number, then this parameter corresponds to the z-coordinate
  */
 vxlCamera.prototype.translate = function(x,y,z){
+    
+    var coords = vxl.util.createVec3(x,y,z);
     var pos = vec3.create(this._position);
     
-    vec3.add(pos, vec3.scale(this._right  ,x, vec3.create()));
-    vec3.add(pos, vec3.scale(this._up     ,y, vec3.create()));    
-    vec3.add(pos, vec3.scale(this._forward ,z, vec3.create()));
-    
-    var fp  = vec3.create(this._focalPoint);
-    vec3.add(fp, vec3.scale(this._right  ,x, vec3.create()));
-    vec3.add(fp, vec3.scale(this._up     ,y, vec3.create()));    
-    vec3.add(fp, vec3.scale(this._forward ,z, vec3.create()));
+    vec3.add(pos, vec3.scale(this._right  ,coords[0], vec3.create()));
+    vec3.add(pos, vec3.scale(this._up     ,coords[1],vec3.create()));    
+    vec3.add(pos, vec3.scale(this._forward ,coords[2], vec3.create()));
     
     this._setPosition(pos);
-    this.setFocalPoint(fp);
+    
+   /* var fp  = vec3.create(this._focalPoint);
+    vec3.add(fp, vec3.scale(this._right  ,x, vec3.create()));
+    vec3.add(fp, vec3.scale(this._up     ,y, vec3.create()));    
+    vec3.add(fp, vec3.scale(this._forward ,z, vec3.create()));*/
+    
+ 
+    //this.setFocalPoint(fp);
 };
 
 
@@ -5637,6 +5661,10 @@ vxlPickerInteractor.prototype.constructor = vxlPickerInteractor;
 function vxlPickerInteractor(){
 	vxlViewInteractor.call(this);
 	this._drag = false;
+	this.timerID = -1;
+	this.list = [];
+	this.rate = 600;
+
 };
 
 
@@ -5654,44 +5682,22 @@ vxlPickerInteractor.prototype.get2DCoords = function(ev){
                                        //this variable contains the height of the canvas and it updates dynamically
                                        //as we resize the browser window.
     //console.info('x='+x+', y='+y);
-    return {x:x,y:y};
+    return [x,y];
+    
 };
 
-/**
- * @private 
- */
-vxlPickerInteractor.prototype._findHits = function(ev){
-    var rt     = this.view.renderer._renderTarget;
-    var coords = this.get2DCoords(ev);
-    var color  = rt.readPixel(coords);
-    
-    
-    var results = vxl.go.picker.query(color);
-    
-    if (results == null) return;
-    
-    var actor  = this.view.scene.getActorByCellUID(results.uid);
-    
-    if (actor == null) { //try object UID
-        actor = this.view.scene.getActorByUID(results.uid);
-    }
-    
-    if (actor != null){
-        //console.info('vxlPickerInteractor: actor ['+actor.name+'] has been picked');
-       
-        if (actor.isPickable() && actor._pickingCallback != undefined){
-            actor._pickingCallback(actor, results.uid);
-        }
-    }
-};
 
 /**
  *  Reacts to the onmouse up event on the canvas
  * @param {Object} ev
  */
 vxlPickerInteractor.prototype.onMouseUp   = function(ev){
-    this._findHits(ev); 
-    this._drag = false;   
+    this._drag = false;
+    if (this.timerID != -1){
+        clearInterval(this.timerID);
+    }
+    
+    
 };
 
 /**
@@ -5699,35 +5705,64 @@ vxlPickerInteractor.prototype.onMouseUp   = function(ev){
  * @param {Object} ev mouse event
  */
 vxlPickerInteractor.prototype.onMouseDown = function(ev){ 
+    ev.preventDefault();
+    this.view.canvas.style.cursor = 'crosshair'
+    this.list.push(this.get2DCoords(ev));
+    this._doWork();   
     this._drag = true;
+    
+    if (this.timerID != -1){
+        clearInterval(this.timerID);
+    }
+    this.timerID = setInterval((function(self) {return function() {self._doWork();}})(this),this.rate); 
 };
 
 /**
  * Reacts to the onmouse move event on the canvas  
  * @param {Object} ev
  */
-vxlViewInteractor.prototype.onMouseMove = function(ev){ 
+vxlPickerInteractor.prototype.onMouseMove = function(ev){ 
+    ev.preventDefault();
     if (this._drag){
-        this._findHits(ev);
+        this.list.push(this.get2DCoords(ev));
     }
 };
 
-/**
- * Reacts to the key down event 
- * @param {Object} ev
- */
-vxlViewInteractor.prototype.onKeyDown   = function(ev){
+vxlPickerInteractor.prototype._doWork = function(){
+  var i = this.list.length;
+  var rt = this.view.renderer._renderTarget;
     
+  while(i--){
+        var coords = this.list.pop();
+        var color  = rt.readPixel(coords[0], coords[1]);
+
+        if (color[0] == 0 && color[1] == 0 && color[2] == 0 && color[3] ==0){
+            continue;
+        }
+        
+        var results = vxl.go.picker.query(color);
+        
+        if (results == null) continue;
+        
+        var actor  = this.view.scene.getActorByCellUID(results.uid);
+        
+        if (actor == null) { //try object UID
+            actor = this.view.scene.getActorByUID(results.uid);
+        }
+        
+        if (actor != null && actor.isPickable() && actor._pickingCallback != undefined){
+            actor._pickingCallback(actor, results.uid);
+        }
+  }
 };
 
-/**
- * Abstract method to be implemented by the descendants 
- * @param {Object} ev
- */
-vxlViewInteractor.prototype.onKeyUp     = function(ev){ 
 
-};
-
+vxlPickerInteractor.prototype.onKeyDown   = function(ev){};
+vxlPickerInteractor.prototype.onKeyUp     = function(ev){};
+vxlPickerInteractor.prototype.onDragOver     = function(ev){ };
+vxlPickerInteractor.prototype.onDragLeave     = function(ev){};
+vxlPickerInteractor.prototype.onDrop     = function(ev){};
+vxlViewInteractor.prototype.onDoubleClick     = function(ev){};
 
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
@@ -5900,7 +5935,7 @@ vxl.def.glsl.lambert = {
     "	gl_PointSize = uPointSize;",
     
     "	if (uUseVertexColors) {",
-    "		vFinalColor = vec4(aVertexColor,1.0);",
+    "		vFinalColor = vec4(aVertexColor,uMaterialDiffuse.a);",
     "	}",
     "   else {",
     "       vFinalColor = uMaterialDiffuse;",
@@ -6379,6 +6414,7 @@ function vxlProgram (gl) {
     this._currentWebGLProgram     =  null;
     this._currentProgramID        = "";
     this._currentUniformLocation  = {};
+    this._defaults         = [];
 };
 
 
@@ -6486,18 +6522,53 @@ vxlProgram.prototype.useProgram = function(ID){
  */
 vxlProgram.prototype.loadDefaults = function(){
     var code = this._codebase[this._currentProgramID];
-    
+   
     if ('DEFAULTS' in code){
-        //vxl.go.console('Program: defaults for program '+this._currentProgramID+' found. Loading..');
+    
         var defaults = code.DEFAULTS;
         for(var u in defaults){
             this.setUniform(u,defaults[u]);
-            //vxl.go.console('Program: Uniform:'+u+', Default Value:'+defaults[u]);
         }
     }
-    else{
-    	vxl.go.console('Program: WARNING: defaults for program '+this._currentProgramID+' NOT found');
+    //overriding defaults
+    var defaults = this._defaults[this._currentProgramID];
+    if (defaults != undefined){
+  
+        for (var u in defaults){
+            this.setUniform(u,defaults[u])
+        }
     }
+   
+};
+
+/**
+ * Overrides defaults by hand 
+ */
+vxlProgram.prototype.setDefault = function(programID, uniformName, value){
+    
+    if (this._defaults[programID] == undefined){
+        this._defaults[programID] = {}
+    }
+  
+    this._defaults[programID][uniformName] = value;
+    
+    //Overriding behaviour
+    if (programID == this._currentProgramID){
+        this.setUniform(uniformName, value);
+    }
+};
+
+
+/**
+ * Overrides defaults by hand 
+ */
+vxlProgram.prototype.getDefault = function(programID, uniformName){
+    
+    if (this._defaults[programID] == undefined){
+        return undefined;
+    }
+  
+    return this._defaults[programID][uniformName];
 };
 
 /**
@@ -6784,7 +6855,9 @@ function vxlRenderer(vw){
     this._running       = false;
     this._clearColor    = undefined;
     this._renderTarget  = undefined;
-    this.setProgram(vxl.def.glsl.lambert, vxlRenderEngine);
+    this._forceProgram  = false;
+    this.setProgram(vxl.def.glsl.lambert, vxlRenderEngine, false);
+    
     
 }
 
@@ -6844,11 +6917,21 @@ vxlRenderer.prototype._initializeGLContext = function(gl){
  * @see {vxl.def.glsl.phong}
  * @see {vxl.def.glsl.lambert}
  */
-vxlRenderer.prototype.setProgram = function(program,engine){
+vxlRenderer.prototype.setProgram = function(program,engine, forceIt){
     
-    if(this.currentProgram != undefined && this.currentProgram == program){
+    if (forceIt != undefined && forceIt == true){
+        this._forceProgram = true;
+    }
+    else{
+        this._forceProgram = false;
+    }
+    
+    
+    if(this.currentProgram != undefined && 
+        this.currentProgram == program){
         return;
     }
+  
     
     var prg = this.prg;
 
@@ -6867,6 +6950,8 @@ vxlRenderer.prototype.setProgram = function(program,engine){
 	if (engine != undefined){
 	   this.setEngine(engine);
 	}
+	
+	
 };
 
 /**
@@ -7132,13 +7217,17 @@ vxlRenderTarget.prototype.update = function(){
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
 };
 
-
-vxlRenderTarget.prototype.readPixel = function(coords){
+/**
+ * 
+ * @param{Number} x
+ * @param{Number} y
+ */
+vxlRenderTarget.prototype.readPixel = function(x,y){
     
     var gl = this.gl;
     var readout = new Uint8Array(1 * 1 * 4);
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
-    gl.readPixels(coords.x,coords.y,1,1,gl.RGBA,gl.UNSIGNED_BYTE,readout);
+    gl.readPixels(x,y,1,1,gl.RGBA,gl.UNSIGNED_BYTE,readout);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     return readout;
 }
@@ -7392,8 +7481,9 @@ vxlModel.prototype.computeBoundingBox = function(){
     
 	var vs = this.vertices;
 	var bbm  = [vs[0],vs[1],vs[2],vs[0],vs[1],vs[2]];
-	  
-	for(var i=0;i<vs.length;i=i+3){
+	
+	var i = vs.length;  
+	for(var i=0, N = vs.length;i<N;i=i+3){
 		bbm[0] = Math.min(bbm[0],vs[i]);
 		bbm[1] = Math.min(bbm[1],vs[i+1]);
 		bbm[2] = Math.min(bbm[2],vs[i+2]);
@@ -7461,10 +7551,19 @@ function vxlCell(mesh, index, vertices, color){
     this.vertices = vertices;
     this.color = color==undefined?[0.8,0.8,0.8]:color;
     this.normal = undefined; //cell normal
+    this.position = [0,0,0];
+    this._calculatePosition();
     this._calculateNormal();
     this._pickingColor  = vxl.go.picker.getColorFor(this);
 };
 
+vxlCell.prototype._calculatePosition = function(){
+    this.position[0] = (this.vertices[0][0] + this.vertices[1][0] + this.vertices[2][0])/3;
+    this.position[1] = (this.vertices[0][1] + this.vertices[1][1] + this.vertices[2][1])/3;
+    this.position[2] = (this.vertices[0][2] + this.vertices[1][2] + this.vertices[2][2])/3;
+};
+    
+    
 /**
  * Calculates the cell normal
  * @private
@@ -7535,6 +7634,8 @@ function vxlMesh(actor){
     this.model = undefined;   //internal representation of the mesh
     this._createMesh(actor);
 };
+
+
 
 /**
  * Sets the mesh color
@@ -7731,7 +7832,7 @@ vxlMesh.prototype._createModel = function(){
     model.setType(vxl.def.model.type.MESH);
     
     this.model = model;
-    this.actor.updateRenderable();
+    this.actor.updateRenderable(vxl.def.renderable.task.CREATE);
     
 };
 
@@ -7753,7 +7854,7 @@ vxlMesh.prototype._setModelColor = function(color){
             }
     }
     
-    this.actor.updateRenderable();
+    this.actor.updateRenderable(vxl.def.renderable.task.CREATE);
 };
 
 /**
@@ -7770,7 +7871,7 @@ vxlMesh.prototype._updateCellColor = function(index){
         this.model.colors[i+2] = color[2];
     }
     
-    this.actor.updateRenderable();
+    this.actor.updateRenderable(vxl.def.renderable.task.UPDATE_COLORS);
     
 };
 /*-------------------------------------------------------------------------
@@ -8468,10 +8569,10 @@ vxlActor.prototype.getRenderableModel = function(){
 };
 
 /**
- * 
+ * @param {String} task type of update
  */
-vxlActor.prototype.updateRenderable = function(){
-    this.renderable.update();
+vxlActor.prototype.updateRenderable = function(task){
+    this.renderable.update(task);
 }
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
@@ -8510,9 +8611,15 @@ function vxlPicker(){
                 this._hmap[i][j][k] = null;
                 }
         }
-    }    
+    }
+    
+ 
 };
 
+/**
+ * @static 
+ */
+vxlPicker.RESOLUTION = 1/255; // 1 / (2^8-1) for unsigned byte according to WebGL reference
 
 /**
  * Generates a color that has not been assigned to any object or cell in the scene
@@ -8520,24 +8627,22 @@ function vxlPicker(){
 vxlPicker.prototype._getColor = function(){
     
     function getN(){
-        var x =  Math.floor(Math.random()*256);
+        var x =  Math.floor(Math.random()*255);
         if (x == 0) 
             return getN();
         else
             return x;
     };
-    
- 
-    return [getN(), getN(), getN()];
+   return [getN(), getN(), getN()];
 };
   
 /**
  * 
  */
 vxlPicker.prototype.color2decimal = function(color){
-    r = Math.round((color[0]/256)*100)/100;
-    g = Math.round((color[1]/256)*100)/100;
-    b = Math.round((color[2]/256)*100)/100;
+    r = color[0] * vxlPicker.RESOLUTION;
+    g = color[1] * vxlPicker.RESOLUTION;
+    b = color[2] * vxlPicker.RESOLUTION;
     return [r,g,b];
 }  
 
@@ -8585,27 +8690,7 @@ vxlPicker.prototype.query = function(color){
         results.color = color;
         return results;
     }
-    
-    for (var v = 1; v<=2; v+=1)  {  
-        for (var i=-v;i<=v;i+=1){
-            for (var j=-v;j<=v;j+=1){
-                for (var k=-v;k<=v;k+=1){
-                    if (color[0]+i<0 || color[0]+i>256 || 
-                        color[1]+j<0 || color[1]+j>256 || 
-                        color[2]+k<0 || color[2]+k>256) continue;
-                    var closest_uid = this._hmap[color[0]+i][color[1]+j][color[2]+k];
-                    if (closest_uid != null){
-                        results.uid = closest_uid;
-                        results.color = [color[0]+i,color[1]+j,color[2]+k];
-                        return results;
-                    }
-                }
-            }
-        }
-    }
     return null;
-            
-
 };
 
 /**
@@ -8670,9 +8755,9 @@ function vxlRenderEngine(renderer){
   */
 vxlRenderEngine.prototype.allocate = function(scene){
     var elements = scene._actors.concat(scene.toys.list);
-    var NUM = elements.length;
+    var i = elements.length;
     
-    for(var i = 0; i < NUM; i+=1){
+    while(i--){
         this._allocateActor(elements[i]);
     }
 };
@@ -8873,8 +8958,7 @@ vxlRenderEngine.prototype.render = function(scene){
     
     
     var elements = scene._actors.concat(scene.toys.list);
-    var NUM = elements.length;
-    
+   
     //is this supposed to be here?
     //----------------------------------------------------//
     if (scene.frameAnimation != undefined){
@@ -8889,9 +8973,9 @@ vxlRenderEngine.prototype.render = function(scene){
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     };
     
-
-    for(var i = 0; i < NUM; i+=1){
-            this._renderActor(elements[i]);
+    var i = elements.length;
+    while(i--){
+        this._renderActor(elements[i]);
     }
 };
 
@@ -8914,7 +8998,8 @@ vxlRenderEngine.prototype._handlePicking = function(actors){
         gl.clearColor(0,0,0,1);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         
-        for(var i = 0, NUM = actors.length; i < NUM; i+=1){
+        var i = actors.length;
+        while(i--){
             if (actors[i].isPickable()){
                 this._renderActor(actors[i]);
             }
@@ -9065,8 +9150,8 @@ vxlRenderEngine.prototype._renderSolid = function(actor){
     if (actor.renderable){
         
         parts = actor.renderable.parts;
-        
-        for (var i=0, N = parts.length; i<N; i+=1){
+        var i = parts.length;
+        while(i--){
              var part = parts[i];
              try{
                  
@@ -9257,8 +9342,8 @@ vxlRenderEngine.prototype._renderFlat = function(actor){
     prg.setUniform("uUseShading",true);
 
     var parts = actor.renderable.parts;
-    
-    for(var i=0, N = parts.length; i<N; i+=1){
+    var i = parts.length;
+    while(i--){
         
         var part = parts[i];
     
@@ -9351,10 +9436,10 @@ vxlRenderEngine.prototype._renderPickingBuffer = function(actor){
         
       
         var parts = actor.renderable.parts;
-    
-        for(var i=0, N = parts.length; i<N; i+=1){
+        var i = parts.length;
+        while(i--){
         
-        var part = parts[i];
+            var part = parts[i];
         
             try{
                 gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
@@ -9502,17 +9587,20 @@ vxlRenderEngine.prototype._renderActor = function(actor){
                    actor.material.diffuse[1], 
                    actor.material.diffuse[2],
                    actor.material.opacity];
-    
-    
+                   
     /**
-     * Setting the program has to be done BEFORE setting ANY uniform or attribute
+     * If the renderer is not forcing his program, then give the actors
+     * a chance to decide which program they want to use to be rendered
      */
-    if(actor.shininess > 0){
-        this.renderer.setProgram(vxl.def.glsl.phong);
-        prg.setUniform("uShininess", actor.material.shininess);
-    }
-    else{
-        this.renderer.setProgram(vxl.def.glsl.lambert);
+    if (!this.renderer._forceProgram){
+        if(actor.material.shininess > 0){
+            this.renderer.setProgram(vxl.def.glsl.phong);
+            prg.setUniform("uShininess", actor.material.shininess);
+            prg.setUniform("uMaterialSpecular", actor.material.specular);
+        }
+        else{
+            this.renderer.setProgram(vxl.def.glsl.lambert);
+        }
     }
     
     
@@ -9629,7 +9717,7 @@ vxlRenderEngine.prototype.isOffscreenEnabled = function(){
  * @param {vxlRenderer} renderer the renderer associated to this strategy
  *  
  */
-function vxlBlenderStrategy(renderer) {
+function vxlBlenderEngine(renderer) {
 	this.renderer = renderer;
 }
 
@@ -9637,7 +9725,7 @@ function vxlBlenderStrategy(renderer) {
  * Renders the scene
  * @param {Object} scene
  */
-vxlBlenderStrategy.prototype.render = function(scene){
+vxlBlenderEngine.prototype.render = function(scene){
     
     //Updates the perspective matrix and passes it to the program
     var r       = this.renderer;
@@ -9669,7 +9757,7 @@ vxlBlenderStrategy.prototype.render = function(scene){
  * the actor position,scale and rotation.
  * @private
  */
-vxlBlenderStrategy.prototype._applyActorTransform = function(actor){
+vxlBlenderEngine.prototype._applyActorTransform = function(actor){
     
     var r       = this.renderer;
     var trx     = r.transforms
@@ -9695,7 +9783,7 @@ vxlBlenderStrategy.prototype._applyActorTransform = function(actor){
  * @private
  * @param {Object} actor
  */
-vxlBlenderStrategy.prototype._renderActor = function(actor){
+vxlBlenderEngine.prototype._renderActor = function(actor){
 	
 	if (actor.name == 'bounding box' || actor.name == 'axis' || actor.name =='floor'){
 		return;
@@ -9796,7 +9884,7 @@ vxlBlenderStrategy.prototype._renderActor = function(actor){
  * TODO: Does not deal with model scalars well...
  * 
  */
-function vxlBakeStrategy(renderer){
+function vxlBakeEngine(renderer){
     this.renderer = renderer;
     
     var gl = renderer.gl;
@@ -9844,7 +9932,7 @@ function vxlBakeStrategy(renderer){
  * Creates an array of a defined size populated with the indicated value
  * @private
  */
-vxlBakeStrategy.prototype._populate = function(value, size){
+vxlBakeEngine.prototype._populate = function(value, size){
     var a = [];
     
     for (var i = 0; i < size; i+=1){
@@ -9865,7 +9953,7 @@ vxlBakeStrategy.prototype._populate = function(value, size){
  * Computes the number of required calls to render one scene
  * @private
  */
-vxlBakeStrategy.prototype._computeRequiredCalls = function(scene){
+vxlBakeEngine.prototype._computeRequiredCalls = function(scene){
 
     var elements    = scene._actors; //.concat(scene.toys.list);
     var NUM         = elements.length;
@@ -9887,7 +9975,7 @@ vxlBakeStrategy.prototype._computeRequiredCalls = function(scene){
  * Receives one actor and returns the GL buffers
  * @private
  */
-vxlBakeStrategy.prototype._allocateActor = function(actor){
+vxlBakeEngine.prototype._allocateActor = function(actor){
     
     if (this._allocated.indexOf(actor.UID) != -1) return; //this actor has been allocated
     var data            = this._data;
@@ -9960,7 +10048,7 @@ vxlBakeStrategy.prototype._allocateActor = function(actor){
 /**
  * @private
  */
-vxlBakeStrategy.prototype._updateActorPosition = function(actor){
+vxlBakeEngine.prototype._updateActorPosition = function(actor){
     
     var data = this._data;
     var offset = this._offsets.position[actor.UID];
@@ -9978,7 +10066,7 @@ vxlBakeStrategy.prototype._updateActorPosition = function(actor){
 /**
  * @private
  */
-vxlBakeStrategy.prototype._updateActorScale = function(actor){
+vxlBakeEngine.prototype._updateActorScale = function(actor){
     var data = this._data;
     var offset = this._offsets.scale[actor.UID];
     
@@ -9996,7 +10084,7 @@ vxlBakeStrategy.prototype._updateActorScale = function(actor){
 /**
  * @private
  */
-vxlBakeStrategy.prototype._updateActorColor = function(actor){
+vxlBakeEngine.prototype._updateActorColor = function(actor){
     var data = this._data;
     var offset = this._offsets.baked[actor.UID];
     
@@ -10013,7 +10101,7 @@ vxlBakeStrategy.prototype._updateActorColor = function(actor){
 /**
  * @private
  */
-vxlBakeStrategy.prototype._updateActorShading = function(actor){
+vxlBakeEngine.prototype._updateActorShading = function(actor){
     var data = this._data;
     var offset = this._offsets.shading[actor.UID];
     
@@ -10035,7 +10123,7 @@ vxlBakeStrategy.prototype._updateActorShading = function(actor){
 /**
  * @param {vxlScene} scene the scene to deallocate memory from
  */
-vxlBakeStrategy.prototype.deallocate = function(scene){
+vxlBakeEngine.prototype.deallocate = function(scene){
 
 };
 
@@ -10045,7 +10133,7 @@ vxlBakeStrategy.prototype.deallocate = function(scene){
  * @param {vxlScene} scene the scene to allocate memory for
  * @returns an object that contains the allocated WebGL buffers
  */
-vxlBakeStrategy.prototype.allocate = function(scene){
+vxlBakeEngine.prototype.allocate = function(scene){
     
     if (this._computeRequiredCalls(scene) > 1) {
         throw 'Not renderable yet. Working on it. The number of indices exceeds the 65K limit';
@@ -10106,7 +10194,7 @@ vxlBakeStrategy.prototype.allocate = function(scene){
  * Renders the actors one by one
  * @param {vxlScene} scene the scene to render
  */
-vxlBakeStrategy.prototype.render = function(scene){
+vxlBakeEngine.prototype.render = function(scene){
 
     //Updates the perspective matrix and passes it to the program
     var r       = this.renderer;
@@ -10168,6 +10256,7 @@ function vxlScene()
 {
 	this.views  				= [];
 	this._actors 				= [];
+	this._groups                = [];
 	this.toys					= new vxlSceneToys(this);
 	this.loadingMode 			= vxl.def.model.loadingMode.LIVE;
 	this.normalsFlipped 		= false;
@@ -10180,6 +10269,7 @@ function vxlScene()
 	this.centre 				= [0, 0, 0];
 	this.frameAnimation			= null;
 	this.UID                    = vxl.util.generateUID();
+
 
 	if (vxl.c.scene  == null) vxl.c.scene 	= this;
 
@@ -10285,9 +10375,9 @@ vxlScene.prototype.computeBoundingBox = function() {
 	
 	this.centre = [0.0, 0.0, 0.0];
 	
-	var LEN = this._actors.length;
-	for(var i=0; i<LEN; i++){
-		this._updateBoundingBoxWith(this._actors[i]);
+	var i = this._actors.length;
+	while(i--){
+	   this._updateBoundingBoxWith(this._actors[i]);
 	}
 };
 
@@ -10310,8 +10400,8 @@ vxlScene.prototype.createActor = function(model){
  * @param models a list of models to create actors from
  */
 vxlScene.prototype.createActors = function(models){
-	vxl.go.console('Scene: Creating all the actors now');
-	for (var i = 0; i < models.length; i++){
+    var i = models.length;
+	while(i--){
 		this.createActor(models[i]);
 	}	
 };
@@ -10355,7 +10445,8 @@ vxlScene.prototype.updateActor = function(actor){
     if(!this.hasActor(actor)) return;
     
     actor.dirty = true;
-    for(var i = 0; i < this.views.length; i +=1){
+    var i = this.views.length;
+    while(i--){
         this.views[i].renderer.reallocate();                
     }
     actor.dirty = false;
@@ -10393,7 +10484,8 @@ vxlScene.prototype.hasActor = function(actor){
  * @param {Object} value the value of the property
  */
 vxlScene.prototype.setPropertyForAll = function (property, value){
-    for(var i=0; i<this._actors.length; i++){
+    var i = this._actors.length;
+    while(i--){
         this._actors[i].setProperty(property, value);
     }
 };
@@ -10407,7 +10499,8 @@ vxlScene.prototype.setPropertyForAll = function (property, value){
  
  */
 vxlScene.prototype.setPropertyFor = function (list, property, value){
-    for(var i=0; i<list.length; i++){
+    var i = list.length;
+    while(i--){
         if (this.hasActor(list[i])){
             var actor = undefined;
             if (typeof(list[i])=='string'){
@@ -10426,7 +10519,8 @@ vxlScene.prototype.setPropertyFor = function (list, property, value){
  * Updates the Scene's scalarMAX and scalarMIN properties.
  */
 vxlScene.prototype.updateScalarRange = function(){
-	for(var i=0;i<this._actors.length;i++){
+    var i = this._actors.length;
+	while(i--){
 		var actor = this._actors[i];
 		if (actor.model.scalars && actor.model.scalars.max() > this.scalarMAX) this.scalarMAX = actor.model.scalars.max();
 		if (actor.model.scalars && actor.model.scalars.min() < this.scalarMIN) this.scalarMIN = actor.model.scalars.min();
@@ -10439,7 +10533,8 @@ vxlScene.prototype.updateScalarRange = function(){
  */
 vxlScene.prototype.setLookupTable = function(lutID){
 	this.lutID = lutID;
-	for(var i =0, N = this._actors.length; i<N; i+=1){
+	var i = this._actors.length;
+	while(i--){
      	this._actors[i].setLookupTable(lutID,this.scalarMIN, this.scalarMAX);
 	}
 };
@@ -10449,7 +10544,8 @@ vxlScene.prototype.setLookupTable = function(lutID){
  * It will also set vxl.c.actor to null
  */
 vxlScene.prototype.reset = function(){
-	for(var i=0; i<this._actors.length; i++){
+    var i = this._actors.length;
+	while(i--){
 		this._actors[i] = null;
 	}
 	this._actors = [];
@@ -10463,13 +10559,13 @@ vxlScene.prototype.reset = function(){
  */
 vxlScene.prototype.getActorByName = function(name){
     name = name.replace(/\.[^/.]+$/, "");
-	var LEN = this._actors.length;
-    for(var i=0; i<LEN; i+=1){
+	var i = this._actors.length;
+    while(i--){
 		if(this._actors[i].name == name){
 			return this._actors[i];
 		}
 	}
-	return undefined;
+	return null;
 };
 
 
@@ -10478,13 +10574,25 @@ vxlScene.prototype.getActorByName = function(name){
  * @param UID the actor's UID
  */
 vxlScene.prototype.getActorByUID = function(UID){
-    var LEN = this._actors.length;
-    for(var i=0; i<LEN; i+=1){
+    var i = this._actors.length;
+    while(i--){
         if(this._actors[i].UID == UID){
             return this._actors[i];
         }
     }
-    return undefined;
+    return null;
+};
+
+/**
+ * Retrieves an actor by Name or UID 
+ */
+vxlScene.prototype.getActor = function(actorNameOrUID){
+     var actor = this.getActorByName(actorNameOrUID);
+     
+     if (actor == null){
+         actor = this.getActorByUID(actorNameOrUID);
+     }
+     return actor;
 };
 
 
@@ -10499,13 +10607,15 @@ vxlScene.prototype.getActorByUID = function(UID){
  */
 vxlScene.prototype.getActorsThat = function(condition){
     var idx = [];
-    for (var i=0; i<this._actors.length; i+=1){
+    var i = this._actors.length;
+    while(i--){
         if (condition(this._actors[i])) {
             idx.push(i);
         }
     }
     var results = [];
-    for (var j=0; j<idx.length;j+=1){
+    var j = idx.length;
+    while(j--){
         results.push(this._actors[idx[j]]);
     }
     return results;
@@ -10519,7 +10629,8 @@ vxlScene.prototype.getActorsThat = function(condition){
  */
 vxlScene.prototype.setOpacity = function(o,name){
 	if (name == null){
-		for(var i=0; i<this._actors.length; i++){
+	    var i = this._actors.length;
+		while(i--){
 			this._actors[i].setOpacity(o);
 		}
 	}
@@ -10535,7 +10646,8 @@ vxlScene.prototype.setOpacity = function(o,name){
  * have an immediate effect in the side of the object that it is being lit.
  */
 vxlScene.prototype.flipNormals = function(){
-	for(var i=0; i<this._actors.length; i++){
+    var i = this._actors.length;
+	while(i--){
 		this._actors[i].flipNormals();
 	}
 };
@@ -10547,7 +10659,8 @@ vxlScene.prototype.flipNormals = function(){
  */
 vxlScene.prototype.setVisualizationMode = function(mode){
 	if (mode == null || mode == undefined) return;
-	for(var i=0; i<this._actors.length; i++){
+	var i = this._actors.length;
+	while(i--){
 			this._actors[i].setVisualizationMode(mode);
 	}
 };
@@ -10562,8 +10675,8 @@ vxlScene.prototype.setAnimation = function(animation){
 	if (animation instanceof vxlFrameAnimation){
 		this.frameAnimation = animation;
 		this.frameAnimation.scene = this;
-		
-		for (var i=0;i<this.views.length;i+=1){
+		var i = this.views.length;
+		while(i--){
 			this.views[i].renderer.setMode(vxl.def.renderer.mode.ANIMFRAME);
 		}
 		
@@ -10588,8 +10701,9 @@ vxlScene.prototype.clearAnimation = function(){
  */
 vxlScene.prototype.getActorNames = function(){
 	var list = [];
-	for(var a=0, actorCount = this._actors.length; a < actorCount; a+=1){
-		list.push(this._actors[a].name);
+	var i = this._actors.length;
+	while(i--){
+		list.push(this._actors[i].name);
 	}
 	return list;
 };
@@ -10615,14 +10729,59 @@ vxlScene.prototype.getPickableActors = function(){
  */
 vxlScene.prototype.getActorByCellUID = function(UID){
     var list = [];
-    for(var a=0, actorCount = this._actors.length; a < actorCount; a+=1){
-        var actor = this._actors[a];
+    var i = this._actors.length;
+    while(i--){
+        var actor = this._actors[i];
         if (actor.mesh != undefined && actor.mesh.hasCell(UID)){
             return actor;
         }
     }
     return null;
-};/*-------------------------------------------------------------------------
+};
+
+
+
+/**
+ * Creates an actor group 
+ * @param {Object} name name of the actor group
+ * @param {Object} list list of actors to add to the actor group. Elements in the list can be
+ * actor classes, actors UID, actor names or any combination of these.
+ * @see {vxlActorGroup}
+ */
+vxlScene.prototype.createActorGroup = function(name, list){
+    var actorGroup = undefined;
+    if(this.getActorGroup(name) != null){
+        throw('vxlScene.createActorGroup: an actor group with the name '+name+' already exists');
+    }
+    
+    try{
+        actorGroup = new vxlActorGroup(this,name,list);
+        this._groups.push(actorGroup);
+    }
+    catch(ex){
+        if (ex instanceof vxlActorGroupException){
+            alert(ex.messages);
+        }
+    }
+    finally{
+        return actorGroup;
+    }
+};
+
+/**
+ *Retrieves an actor group by name 
+ * @param {Object} name
+ */
+vxlScene.prototype.getActorGroup = function(name){
+    var i = this._groups.length;
+    while(i--){
+        if(this._groups[i].name == name){
+            return this._groups[i];
+        }
+    }
+    return null;
+};
+/*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
     Nucleo is free software: you can redistribute it and/or modify
@@ -12042,7 +12201,7 @@ wireframeON :  function(){
  getActor: function(actorNameOrUID, scene){
      var actor = this.getActorByName(actorNameOrUID, scene);
      
-     if (actor == undefined){
+     if (actor == null){
          actor = this.getActorByUID(actorNameOrUID, scene);
      }
      return actor;
@@ -12290,15 +12449,22 @@ wireframeON :  function(){
  //use JQuery here.
  //}
  
- /**
-  * Loads a program
+
+ //TODO: Wwork in progress... sorry for the mess.
+ //buildProgramFromDOM: function(id,VERTEX_SHADER_DOM_ID,FRAGMENT_SHADER_DOM_ID){
+ //       var vshader= document.getElementById(VERTEX_SHADER_DOM_ID);
+        
+     
+ //},
+  /**
+  * Forces the renderer to use a specific program
   * @param{vxlView} view the view to configure
   * @param{Object} program a JSON object that defines the progrma to execute
   * @param{vxlRenderEngine} engine (optional) the engine that the renderer should use to communicate with the program. T
   *                        
   */
  setProgram :  function(view,program,engine){
-    view.renderer.setProgram(program,engine);
+    view.renderer.setProgram(program,engine,true);
     
  },
  /**
@@ -12314,26 +12480,34 @@ wireframeON :  function(){
          throw ('vxl.api.getProgram: please indicate a view');
      }
      return view.renderer.prg._currentProgramID;
- }, 
- //TODO: Wwork in progress... sorry for the mess.
- //buildProgramFromDOM: function(id,VERTEX_SHADER_DOM_ID,FRAGMENT_SHADER_DOM_ID){
- //       var vshader= document.getElementById(VERTEX_SHADER_DOM_ID);
-        
-     
- //},
- 
+ },
  /**
-  * Sets a uniform
+  * Sets the default value for an uniform
   */
-  setUniform: function(uniformID, value,hint){
-      vxl.c.view.renderer.prg.setUniform(uniformID, value,hint);
+  setUniformDefault: function(programID, uniformID, value){
+      vxl.c.view.renderer.prg.setDefault(programID, uniformID, value)
+  },
+  
+  setUniform: function(uniformID, value){
+      vxl.c.view.renderer.prg.setUniform(uniformID, value)
+  },
+  
+  /**
+   * Gets the default value for an uniform 
+   */
+  getUniformDefault: function(programID, uniformID){
+      vxl.c.view.renderer.prg.getDefault(programID, uniformID);
   },
   
   /**
    * Return the uniform names of the current program
    */
-  getUniformNames: function(){
+  getUniformList: function(){
       return vxl.c.view.renderer.prg._uniformList[vxl.c.view.renderer.prg._currentProgramID].slice(0);
+  },
+  
+  getUniform : function(uniformID){
+     return vxl.c.view.renderer.prg.getUniform(uniformID);  
   },
   
   /**
@@ -13278,26 +13452,29 @@ function vxlRenderable(actor){
     
     this.actor = actor;
     this.parts = [];    
-    this.update();
+    this.update(vxl.def.renderable.task.CREATE);
 }
 
 
 /**
  *  Updates the renderable based on changes in the underlying model. After updating, the 
  *  renderable parts will contain any changes to the geometry, colors or other model attributes
+ *  @param {Boolean} reslice if true, it will recreate the parts. Otherwise will use the current parts
  */
-vxlRenderable.prototype.update = function(){
+vxlRenderable.prototype.update = function(task){
     
-    //clear parts
-    this.parts = [];
-    
+    if (task == undefined){
+        throw ("vxlRenderable.update: Please specify a task");
+    }
+
+  
     var model  = this.actor.getRenderableModel();
     
     if (model == undefined) return;
     
     switch(model.type){
-        case vxl.def.model.type.MESH: this._processMesh(model); break;
-        case vxl.def.model.type.BIG_DATA: this._processBigData(model); break;
+        case vxl.def.model.type.MESH: this._processMesh(model,task); break;
+        case vxl.def.model.type.BIG_DATA: this._processBigData(model,task); break;
     }
    
 };
@@ -13309,48 +13486,75 @@ vxlRenderable.prototype.update = function(){
  * 
  * 
  */
-vxlRenderable.prototype._processMesh = function(model){
+vxlRenderable.prototype._processMesh = function(model,task){
     
   
 
     var size = vxl.def.model.MAX_NUM_INDICES;
-    
     var N = Math.floor(model.indices.length / size), R = model.indices.length % size;
     
-    for (var i=0; i<N; i +=1){
+    if (task == vxl.def.renderable.task.CREATE){
         
-        var part = new vxlModel(model.name+'-renderable-part-'+i);
+        this.parts = [];
         
-        part.indices = this._reindex(model.indices.slice(i*size,i*size + size));
-        part.vertices = model.vertices.slice(i*size*3, (i+1)*size*3 );
-        
-        if (model.normals && model.normals.length >0){ part.normals  = model.normals.slice(i*size*3, (i+1)*size*3);  }
-        if (model.colors  && model.colors.length >0) { part.colors = model.colors.slice(i*size*3, (i+1)*size*3);     }
-        
-        if (model.pickingColors){
-            part.pickingColors = model.pickingColors.slice(i*size*3, (i+1)*size*3);
+        for (var i=0; i<=N; i +=1){
+            
+            var part = new vxlModel(model.name+'-renderable-part-'+i);
+            var startIndex = i*size;
+            var endIndex = startIndex + size;
+            var start = i * size * 3;
+            var end   = start + size *3;
+            
+            if (i == N) {
+                startIndex = N*size;
+                endIndex = startIndex + R;
+                start = N * size * 3;
+                end   = start + R *3;
+                
+                if (R==0){
+                    break;
+                }
+            }
+            
+            part.indices = this._reindex(model.indices.slice(startIndex,endIndex));
+            part.vertices = model.vertices.slice(start, end);
+            
+            
+            if (model.normals && model.normals.length >0){ part.normals  = model.normals.slice(start, end);  }
+            if (model.colors  && model.colors.length >0) { part.colors = model.colors.slice(start, end);     }
+            
+            if (model.pickingColors){
+                part.pickingColors = model.pickingColors.slice(start, end);
+            }
+            
+            part.update();
+      
+            this.parts.push(part);
         }
-        
-        part.update();
-  
-        this.parts.push(part);
     }
     
-    if (R > 0){
-        
-        var part = new vxlModel(model.name+'-renderable-part-'+N);
-        
-        part.indices = this._reindex(model.indices.slice(N*size,N*size+R));
-        part.vertices = model.vertices.slice(N*size*3, N*size*3+R*3);
-        
-        if (model.normals && model.normals.length >0 ){ part.normals = model.normals.slice(N*size*3, N*size*3+R*3); }
-        if (model.colors  && model.colors.length > 0) { part.colors  = model.colors.slice(N*size*3, N*size*3+R*3);  }
-        if (model.pickingColors){
-            part.pickingColors = model.pickingColors.slice(N*size*3, N*size*3+R*3);
+    
+    
+    else if (task == vxl.def.renderable.task.UPDATE_COLORS){
+        for (var i=0; i<=N; i +=1){
+            
+            var part = this.parts[i];
+            var start = i * size * 3;
+            var end   = start + size *3;
+            
+            if (i == N) {
+
+                start = N * size * 3;
+                end   = start + R *3;
+                
+                if (R==0){
+                    break;
+                }
+            }
+          
+            if (model.colors  && model.colors.length >0) { part.colors = model.colors.slice(start, end);  }
+
         }
-        
-        part.update();
-        this.parts.push(part);
     }
      
 };
@@ -13377,7 +13581,7 @@ vxlRenderable.prototype._reindex = function(indices){
  * 
  * 
  */
-vxlRenderable.prototype._processBigData = function(model){
+vxlRenderable.prototype._processBigData = function(model,reslice){
     
     
     
@@ -13470,4 +13674,296 @@ vxlRenderable.prototype._getBigDataVertexInfo = function(index){
     return vertexInfo;
     
     
+};/*-------------------------------------------------------------------------
+    This file is part of Voxelent's Nucleo
+
+    Nucleo is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation version 3.
+
+    Nucleo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------------------------------------------*/
+
+/**
+*  Sometimes it makes sense to associate actors in a scene to perform operations as a unit.
+*  For instance you can have a bicycle composed by several actors and you want to change 
+*  its color or its position on the scene. You could accomplish that calling the respective
+*  methods for each one of the actors that make part of the bicycle or you can create an
+*  actor group named bycicle and call just the setColor and translate operations on the actor group.
+* 
+*  @class
+*  @constructor
+*  @author Diego Cantor
+*/
+function vxlActorGroup(scene, name, list){
+    this.scene = scene;
+    this.name = name;
+    this.list = [];
+    this.addList(list);
+};
+
+/**
+ *  Add a list of actors to the actor group
+ * @param {Object} list a list of actors
+ */
+vxlActorGroup.prototype.addList = function(list){
+    var messages = [];
+    
+    for(var i=0, N = list.length; i <N; i+=1){
+        var actor = list[i];
+        if (actor instanceof vxlActor && actor.scene == this.scene){
+            this.list.push(actor);
+        }
+        else if (typeof(actor) == 'string'){
+            var actorObject  = this.scene.getActor(actor);
+            if (actorObject != null){
+                this.list.push(actorObject);
+            }
+            else{
+                messages.push("Could not find actor: "+actor);
+            }
+        }
+        else{
+            messages.push("The object "+actor+" is not of the expected type (vxlActor, string)");
+        }
+    }
+    
+    if (messages.length != 0){
+        this.list = [];
+        throw new vxlActorGroupException(messages);
+    }
+    
+}
+
+/**
+* Adds one actor to the actor group
+* @param {vxlActor} actor the actor to be added
+*/
+vxlActorGroup.prototype.add = function(actor){
+    var messages = [];
+
+    if (actor instanceof vxlActor && actor.scene == this.scene){
+        this.list.push(actor);
+    }
+    else if (typeof(actor) == 'string'){
+        var actorObject  = this.scene.getActor(actor);
+        if (actorObject != null){
+            this.list.push(actorObject);
+        }
+        else{
+            messages.push("Could not find actor: "+actor);
+        }
+    }
+    else{
+        messages.push("The object "+actor+" is not of the expected type (vxlActor, string)");
+    }
+    
+    if (messages.length != 0){
+        this.list = [];
+        throw new vxlActorGroupException(messages);
+    }
+};
+
+/**
+ * Returns true if the actor is associated to this actor group. False otherwise
+ */
+vxlActorGroup.prototype.hasActor = function(actor){
+    if (actor instanceof vxlActor){
+        return (this.list.indexOf(actor)!=-1)
+    }
+    else if (typeof(actor)=='string'){
+        var actorObject = this.scene.getActor(actor);
+        return (actorObject != null);
+    }
+    
+    else return false;
+}
+
+vxlActorGroup.prototype.remove = function(actor){
+    var index = -1;
+    if (actor instanceof vxlActor){
+        index = this.list.indexOf(actor);
+        
+    }
+    else if (typeof(actor)=='string'){
+        actorObject = this.scene.getActor(actor);
+        index = this.list.indexOf(actorObject);
+    }   
+   
+    if (index !=1){
+        this.list.splice(index,1);
+    }
+    else{
+        throw new vxlActorGroupException(['the actor '+actor+' was not found in the group '+this.name]);
+    }
+};
+
+
+/**
+ * Returns the size of the actor group
+ * @returns {Number} the lenght of the actor group
+ */
+vxlActorGroup.prototype.size = function(){
+    return this.list.length;
+};
+
+/**
+ * Set a property for actors in the group. Please notice that by design actor groups only 
+ * set actor level properties instead of model level properties.
+ * 
+ */
+vxlActorGroup.prototype.setProperty = function(property, value){
+    for(var i=0, N = this.list.length; i<N; i+=1){
+        this.list[i].setProperty(property,value,vxl.def.actor);
+    }
+    
+    return this;
+};
+
+/**
+ * Invoke an operation on the actors belonging to this group
+ * @param {function} operation from vxlActor.prototype
+ * @param {list} parameters
+ */
+vxlActorGroup.prototype._apply = function(operation, parameters){
+   for(var i=0, N = this.list.length; i<N; i+=1){
+        operation.apply(this.list[i], parameters);
+    };
+    
+    return this;
+};
+
+/**
+ * Flip normals
+ */
+vxlActorGroup.prototype.flipNormals = function(){
+    return this._apply(vxlActor.prototype.flipNormals);
+};
+
+/**
+ * Rotation on the X axis
+ * @param {float} angle angle in degrees
+ */
+vxlActorGroup.prototype.rotateX = function(angle){
+    return this._apply(vxlActor.prototype.rotateX, [angle]);
+};
+
+/**
+ * Rotation on the Y axis
+ * @param {float} angle angle in degrees
+ */
+vxlActorGroup.prototype.rotateY = function(angle){
+    return this._apply(vxlActor.prototype.rotateY, [angle]);
+};
+
+/**
+ * Rotation on the Z axis
+ * @param {float} angle angle in degrees
+ */
+vxlActorGroup.prototype.rotateZ = function(angle){
+    return this._apply(vxlActor.prototype.rotateZ, [angle]);
+};
+
+/**
+ * Translation by a given vector
+ */
+vxlActorGroup.prototype.translate = function(x,y,z){
+    return this._apply(vxlActor.prototype.translate, [x,y,z]);
+};
+
+/**
+ * Sets the material diffuse color of the group
+ * @param {list} color in rgb decimal format
+ */
+vxlActorGroup.prototype.setColor = function(color){
+    return this.setProperty('color',color);
+};
+
+/**
+ * Sets the lookup table for this group
+ */
+vxlActorGroup.prototype.setLookupTable = function(lutID, min, max){
+    return this._apply(vxlActor.prototype.setLookupTable, [lutID, min,max]);
+};
+
+/**
+ * Sets the opacity for this group
+ */
+vxlActorGroup.prototype.setOpacity = function(opacity){
+    return this.setProperty('opacity', opacity);
+};
+
+/**
+ * Sets the picker for this group
+ * @see {vxlActor#setPicker}
+ */
+vxlActorGroup.prototype.setPicker = function(type, callback){
+    return this._apply(vxlActor.prototype.setPicker,[type,callback]);
+};
+
+/**
+ * Sets the position for this group
+ * @see {vxlActor#setPosition}
+ */
+vxlActorGroup.prototype.setPosition = function(x,y,z){
+    return this._apply(vxlActor.prototype.setPosition,[x,y,z]);
+};
+
+/**
+ * Sets the scale for this group
+ * @see {vxlActor#setScale}
+ */
+vxlActorGroup.prototype.setScale = function(x,y,z){
+    return this._apply(vxlActor.prototype.setScale,[x,y,z]);
+};
+
+/**
+ * Sets the shininess for this group
+ * @see {vxlActor#setShininess}
+ */
+vxlActorGroup.prototype.setShininess = function(shine){
+    return this.setProperty('shininess', shine);
+};
+
+/**
+ * Sets the visibility for this group
+ * @see {vxlActor#setVisibility}
+ */
+vxlActorGroup.prototype.setVisible = function(visible){
+    return this.setProperty('visible', visible);
+};
+
+
+/**
+ *  Sets the shading for this group
+ * @see {vxlActor#setShading}
+ */
+vxlActorGroup.prototype.setShading = function(shading){
+    return this.setProperty('shading', shading);
+};
+
+/**
+ * Sets the visualization mode for this group
+ * @see {vxlActor#setVisualizationMode}
+ */
+vxlActorGroup.prototype.setVisualizationMode = function(mode){
+    return this._apply(vxlActor.prototype.setVisualizationMode, [mode]);
+};
+
+
+
+
+/**
+ * Contains the explanation of why the actor group could not be created
+ * @class
+ * @author Diego Cantor
+ */
+function vxlActorGroupException(messages){
+    this.messages = messages;
 };

@@ -70,7 +70,9 @@ def pack(VOX_VERSION_NUMBER):
              'VTKReader',
              'Texture',
              'Material',
-             'Renderable' 
+             'Renderable',
+             'ActorGroup'
+              
     ]
     
     

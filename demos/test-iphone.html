@@ -13,7 +13,7 @@
 
 <script src="lib/jquery.js" type="text/javascript"> </script>
 <script src="lib/jquery-ui.js" type="text/javascript"> </script>
-<script type='text/javascript' src='lib/voxelent_v0.89.2.js'> </script>
+<script type='text/javascript' src='lib/voxelent_v0.89.3.js'> </script>
 <script type='text/javascript' src='lib/vox-gui_v0.1.js'> </script>
 <script type='text/javascript' src='lib/colorpicker.js'></script>
 
@@ -27,14 +27,14 @@
         vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
 
         view = vxl.api.setup('view-1');
-        vxl.api.setProgram(view, vxl.def.glsl.phong);
+       
         
         list = ['part1.json','part2.json','part3.json','part4.json','part5.json','part6.json','part7.json']
         vxl.api.load(list,'assets/models/texture/phone');
       	view.setBackgroundColor(0.2, 0.2, 0.2);
         view.start();
         view.cameraman.active.setPosition(0,0,8);
-        vxl.api.setUniform('uLightDirection',[0.0,0.0,-1.0])
+        vxl.api.setUniformDefault(vxl.def.glsl.phong.ID, "uLightDirection",[0,0,-1]);
         $('#toggleView').click();
         
     }
@@ -45,6 +45,10 @@
         var back = vxl.api.getActorByName('part4.json');
         body.setColor([54/256,145/256,194/256]);
         back.setColor([54/256,145/256,194/256]);
+        body.setShininess(330);
+        body.material.specular = [0.4,0.4,0.4,1.0];
+        back.setShininess(330);
+        back.material.specular = [0.4,0.4,0.4,1.0];
          $('#overlay-div').fadeIn(1);
     }
     

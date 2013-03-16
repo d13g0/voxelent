@@ -73,7 +73,7 @@ vxl.def.glsl.lambert = {
     "	gl_PointSize = uPointSize;",
     
     "	if (uUseVertexColors) {",
-    "		vFinalColor = vec4(aVertexColor,1.0);",
+    "		vFinalColor = vec4(aVertexColor,uMaterialDiffuse.a);",
     "	}",
     "   else {",
     "       vFinalColor = uMaterialDiffuse;",

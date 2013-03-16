@@ -29,10 +29,10 @@ function runVoxApp(){
 }
 
 
-var dx_cone = 0.15;
+var dx_cone = 0.55;
 var pos_cone = 0;
  
-var frequency = 5;
+var frequency = 10;
 var elapsedTime = undefined;
 var initialTime = undefined;
 var timerID = -1;
@@ -50,6 +50,7 @@ function onFrame(){
     elapsedTime = (new Date).getTime() - initialTime;
     if (elapsedTime < frequency) return; //come back later!
     var steps = Math.floor(elapsedTime / frequency);
+    console.info(steps);
     while(steps > 0){
         animate();
         steps -= 1;
@@ -59,7 +60,7 @@ function onFrame(){
  
 function startAnimation(){
     initialTime = (new Date).getTime();
-    timerID = setInterval(onFrame,frequency/1000);
+    timerID = setInterval(onFrame,frequency);
 }
 
 function handleEvent(event){

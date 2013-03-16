@@ -41,6 +41,7 @@ function vxlProgram (gl) {
     this._currentWebGLProgram     =  null;
     this._currentProgramID        = "";
     this._currentUniformLocation  = {};
+    this._defaults         = [];
 };
 
 
@@ -148,18 +149,53 @@ vxlProgram.prototype.useProgram = function(ID){
  */
 vxlProgram.prototype.loadDefaults = function(){
     var code = this._codebase[this._currentProgramID];
-    
+   
     if ('DEFAULTS' in code){
-        //vxl.go.console('Program: defaults for program '+this._currentProgramID+' found. Loading..');
+    
         var defaults = code.DEFAULTS;
         for(var u in defaults){
             this.setUniform(u,defaults[u]);
-            //vxl.go.console('Program: Uniform:'+u+', Default Value:'+defaults[u]);
         }
     }
-    else{
-    	vxl.go.console('Program: WARNING: defaults for program '+this._currentProgramID+' NOT found');
+    //overriding defaults
+    var defaults = this._defaults[this._currentProgramID];
+    if (defaults != undefined){
+  
+        for (var u in defaults){
+            this.setUniform(u,defaults[u])
+        }
     }
+   
+};
+
+/**
+ * Overrides defaults by hand 
+ */
+vxlProgram.prototype.setDefault = function(programID, uniformName, value){
+    
+    if (this._defaults[programID] == undefined){
+        this._defaults[programID] = {}
+    }
+  
+    this._defaults[programID][uniformName] = value;
+    
+    //Overriding behaviour
+    if (programID == this._currentProgramID){
+        this.setUniform(uniformName, value);
+    }
+};
+
+
+/**
+ * Overrides defaults by hand 
+ */
+vxlProgram.prototype.getDefault = function(programID, uniformName){
+    
+    if (this._defaults[programID] == undefined){
+        return undefined;
+    }
+  
+    return this._defaults[programID][uniformName];
 };
 
 /**

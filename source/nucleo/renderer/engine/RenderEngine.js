@@ -55,9 +55,9 @@ function vxlRenderEngine(renderer){
   */
 vxlRenderEngine.prototype.allocate = function(scene){
     var elements = scene._actors.concat(scene.toys.list);
-    var NUM = elements.length;
+    var i = elements.length;
     
-    for(var i = 0; i < NUM; i+=1){
+    while(i--){
         this._allocateActor(elements[i]);
     }
 };
@@ -258,8 +258,7 @@ vxlRenderEngine.prototype.render = function(scene){
     
     
     var elements = scene._actors.concat(scene.toys.list);
-    var NUM = elements.length;
-    
+   
     //is this supposed to be here?
     //----------------------------------------------------//
     if (scene.frameAnimation != undefined){
@@ -274,9 +273,9 @@ vxlRenderEngine.prototype.render = function(scene){
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     };
     
-
-    for(var i = 0; i < NUM; i+=1){
-            this._renderActor(elements[i]);
+    var i = elements.length;
+    while(i--){
+        this._renderActor(elements[i]);
     }
 };
 
@@ -299,7 +298,8 @@ vxlRenderEngine.prototype._handlePicking = function(actors){
         gl.clearColor(0,0,0,1);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         
-        for(var i = 0, NUM = actors.length; i < NUM; i+=1){
+        var i = actors.length;
+        while(i--){
             if (actors[i].isPickable()){
                 this._renderActor(actors[i]);
             }
@@ -450,8 +450,8 @@ vxlRenderEngine.prototype._renderSolid = function(actor){
     if (actor.renderable){
         
         parts = actor.renderable.parts;
-        
-        for (var i=0, N = parts.length; i<N; i+=1){
+        var i = parts.length;
+        while(i--){
              var part = parts[i];
              try{
                  
@@ -642,8 +642,8 @@ vxlRenderEngine.prototype._renderFlat = function(actor){
     prg.setUniform("uUseShading",true);
 
     var parts = actor.renderable.parts;
-    
-    for(var i=0, N = parts.length; i<N; i+=1){
+    var i = parts.length;
+    while(i--){
         
         var part = parts[i];
     
@@ -736,10 +736,10 @@ vxlRenderEngine.prototype._renderPickingBuffer = function(actor){
         
       
         var parts = actor.renderable.parts;
-    
-        for(var i=0, N = parts.length; i<N; i+=1){
+        var i = parts.length;
+        while(i--){
         
-        var part = parts[i];
+            var part = parts[i];
         
             try{
                 gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
@@ -887,17 +887,20 @@ vxlRenderEngine.prototype._renderActor = function(actor){
                    actor.material.diffuse[1], 
                    actor.material.diffuse[2],
                    actor.material.opacity];
-    
-    
+                   
     /**
-     * Setting the program has to be done BEFORE setting ANY uniform or attribute
+     * If the renderer is not forcing his program, then give the actors
+     * a chance to decide which program they want to use to be rendered
      */
-    if(actor.shininess > 0){
-        this.renderer.setProgram(vxl.def.glsl.phong);
-        prg.setUniform("uShininess", actor.material.shininess);
-    }
-    else{
-        this.renderer.setProgram(vxl.def.glsl.lambert);
+    if (!this.renderer._forceProgram){
+        if(actor.material.shininess > 0){
+            this.renderer.setProgram(vxl.def.glsl.phong);
+            prg.setUniform("uShininess", actor.material.shininess);
+            prg.setUniform("uMaterialSpecular", actor.material.specular);
+        }
+        else{
+            this.renderer.setProgram(vxl.def.glsl.lambert);
+        }
     }
     
     

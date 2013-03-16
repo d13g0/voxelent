@@ -172,7 +172,8 @@ vxlCamera.prototype.updateWithActor = function(actor){
                 this.setFocalPoint(actor._position);
                 break;
         case vxl.def.camera.tracking.TRANSLATIONAL:
-                this.translate(actor._translation);        
+                this.translate(actor._translation);  
+                this.setFocalPoint(actor._position);      
                 break;
     }
 };
@@ -208,6 +209,7 @@ vxlCamera.prototype.setPosition = function(x,y,z) {
 vxlCamera.prototype.setFocalPoint = function(x,y,z) {
     
     var up = vec3.create([0,1,0]);
+    //var up = vec3.create(this._up);
     this._focalPoint = vxl.util.createVec3(x,y,z);
     
     if (this._trackingMode == vxl.def.camera.tracking.CINEMATIC){
@@ -368,9 +370,9 @@ vxlCamera.prototype.rotate = function(azimuth,elevation,roll){
         this._relRoll = this._getAngle(roll);
         
         if (this.type == vxl.def.camera.type.TRACKING){
-            this._relElevation = -this._relElevation;
-            this._relAzimuth   = -this._relAzimuth;
-            this._relRoll      = -this._relRoll;
+            //this._relElevation = -this._relElevation;
+            //this._relAzimuth   = -this._relAzimuth;
+            //this._relRoll      = -this._relRoll;
         }
         
         this._elevation += this._relElevation;
@@ -438,19 +440,23 @@ vxlCamera.prototype.pan = function(tx, ty) {
  * @param {Number} z if x is a number, then this parameter corresponds to the z-coordinate
  */
 vxlCamera.prototype.translate = function(x,y,z){
+    
+    var coords = vxl.util.createVec3(x,y,z);
     var pos = vec3.create(this._position);
     
-    vec3.add(pos, vec3.scale(this._right  ,x, vec3.create()));
-    vec3.add(pos, vec3.scale(this._up     ,y, vec3.create()));    
-    vec3.add(pos, vec3.scale(this._forward ,z, vec3.create()));
-    
-    var fp  = vec3.create(this._focalPoint);
-    vec3.add(fp, vec3.scale(this._right  ,x, vec3.create()));
-    vec3.add(fp, vec3.scale(this._up     ,y, vec3.create()));    
-    vec3.add(fp, vec3.scale(this._forward ,z, vec3.create()));
+    vec3.add(pos, vec3.scale(this._right  ,coords[0], vec3.create()));
+    vec3.add(pos, vec3.scale(this._up     ,coords[1],vec3.create()));    
+    vec3.add(pos, vec3.scale(this._forward ,coords[2], vec3.create()));
     
     this._setPosition(pos);
-    this.setFocalPoint(fp);
+    
+   /* var fp  = vec3.create(this._focalPoint);
+    vec3.add(fp, vec3.scale(this._right  ,x, vec3.create()));
+    vec3.add(fp, vec3.scale(this._up     ,y, vec3.create()));    
+    vec3.add(fp, vec3.scale(this._forward ,z, vec3.create()));*/
+    
+ 
+    //this.setFocalPoint(fp);
 };
 
 

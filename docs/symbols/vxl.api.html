@@ -37,7 +37,7 @@
 			<!-- begin publish.classesIndex -->
 			<div align="center"><h2><a href="../index.html">Class List</a></h2></div>
 <hr />
-<h3>Current Version:  0.89.2</h3>
+<h3>Current Version:  0.89.3</h3>
 <p>Download it <a href='http://voxelent.com/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -81,11 +81,15 @@
 	
 	<li><a href="../symbols/vxlActor.html">vxlActor</a></li>
 	
+	<li><a href="../symbols/vxlActorGroup.html">vxlActorGroup</a></li>
+	
+	<li><a href="../symbols/vxlActorGroupException.html">vxlActorGroupException</a></li>
+	
 	<li><a href="../symbols/vxlAxis.html">vxlAxis</a></li>
 	
-	<li><a href="../symbols/vxlBakeStrategy.html">vxlBakeStrategy</a></li>
+	<li><a href="../symbols/vxlBakeEngine.html">vxlBakeEngine</a></li>
 	
-	<li><a href="../symbols/vxlBlenderStrategy.html">vxlBlenderStrategy</a></li>
+	<li><a href="../symbols/vxlBlenderEngine.html">vxlBlenderEngine</a></li>
 	
 	<li><a href="../symbols/vxlBoundingBox.html">vxlBoundingBox</a></li>
 	
@@ -123,9 +127,11 @@
 	
 	<li><a href="../symbols/vxlProgram.html">vxlProgram</a></li>
 	
-	<li><a href="../symbols/vxlRenderer.html">vxlRenderer</a></li>
+	<li><a href="../symbols/vxlRenderable.html">vxlRenderable</a></li>
 	
-	<li><a href="../symbols/vxlRenderStrategy.html">vxlRenderStrategy</a></li>
+	<li><a href="../symbols/vxlRenderEngine.html">vxlRenderEngine</a></li>
+	
+	<li><a href="../symbols/vxlRenderer.html">vxlRenderer</a></li>
 	
 	<li><a href="../symbols/vxlScene.html">vxlScene</a></li>
 	
@@ -608,7 +614,51 @@
 								vxl.api.
 								
 								
-								<b><a href="../symbols/vxl.api.html#.getUniformNames">getUniformNames</a></b>
+								<b><a href="../symbols/vxl.api.html#.getUniform">getUniform</a></b>
+								(uniformID)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&lt;static&gt;&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								vxl.api.
+								
+								
+								<b><a href="../symbols/vxl.api.html#.getUniformDefault">getUniformDefault</a></b>
+								(programID, uniformID)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&lt;static&gt;&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								vxl.api.
+								
+								
+								<b><a href="../symbols/vxl.api.html#.getUniformList">getUniformList</a></b>
 								()
 								</div>
 							</td>
@@ -1049,7 +1099,7 @@
 								
 								
 								<b><a href="../symbols/vxl.api.html#.setProgram">setProgram</a></b>
-								(view, program, strategy)
+								(view, program, engine)
 								</div>
 							</td>
 							
@@ -1159,7 +1209,29 @@
 								
 								
 								<b><a href="../symbols/vxl.api.html#.setUniform">setUniform</a></b>
-								(uniformID, value, hint)
+								(uniformID, value)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&lt;static&gt;&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								vxl.api.
+								
+								
+								<b><a href="../symbols/vxl.api.html#.setUniformDefault">setUniformDefault</a></b>
+								(programID, uniformID, value)
 								</div>
 							</td>
 							
@@ -2165,7 +2237,7 @@
 				</div>	
 				
 				<div class='methodDetail'>
-					<a name=".getUniformNames"> </a>
+					<a name=".getUniform"> </a>
 					<div class="title">
 					<div class="fixedFont">&lt;static&gt; 
 
@@ -2177,7 +2249,119 @@
 					
 					     <span class="light">vxl.api.</span>
 					
-					  <b>getUniformNames</b>()
+					  <b>getUniform</b>(uniformID)
+					</div>
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>uniformID</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name=".getUniformDefault"> </a>
+					<div class="title">
+					<div class="fixedFont">&lt;static&gt; 
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					     <span class="light">vxl.api.</span>
+					
+					  <b>getUniformDefault</b>(programID, uniformID)
+					</div>
+					</div>
+					<div class="description">
+						Gets the default value for an uniform
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>programID</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>uniformID</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name=".getUniformList"> </a>
+					<div class="title">
+					<div class="fixedFont">&lt;static&gt; 
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					     <span class="light">vxl.api.</span>
+					
+					  <b>getUniformList</b>()
 					</div>
 					</div>
 					<div class="description">
@@ -3233,11 +3417,11 @@
 					
 					     <span class="light">vxl.api.</span>
 					
-					  <b>setProgram</b>(view, program, strategy)
+					  <b>setProgram</b>(view, program, engine)
 					</div>
 					</div>
 					<div class="description">
-						Loads a program
+						Forces the renderer to use a specific program
 						
 						
 					</div>
@@ -3276,7 +3460,7 @@
 									
 								</td>
 								<td>
-									<code>strategy</code>
+									<code>engine</code>
 								</td>	
 								<td><p>
 								
@@ -3584,11 +3768,11 @@
 					
 					     <span class="light">vxl.api.</span>
 					
-					  <b>setUniform</b>(uniformID, value, hint)
+					  <b>setUniform</b>(uniformID, value)
 					</div>
 					</div>
 					<div class="description">
-						Sets a uniform
+						
 						
 						
 					</div>
@@ -3623,11 +3807,73 @@
 								</td>
 							</tr>	
 							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name=".setUniformDefault"> </a>
+					<div class="title">
+					<div class="fixedFont">&lt;static&gt; 
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					     <span class="light">vxl.api.</span>
+					
+					  <b>setUniformDefault</b>(programID, uniformID, value)
+					</div>
+					</div>
+					<div class="description">
+						Sets the default value for an uniform
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
 							<tr><td>
 									
 								</td>
 								<td>
-									<code>hint</code>
+									<code>programID</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>uniformID</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>value</code>
 								</td>	
 								<td><p>
 								
@@ -3983,7 +4229,7 @@
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Mar 01 2013 11:46:01 GMT-0500 (EST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sat Mar 16 2013 19:02:37 GMT-0400 (EDT)
 		</div>
         </div>
         </div>

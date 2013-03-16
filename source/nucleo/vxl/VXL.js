@@ -375,6 +375,13 @@ def : {
 			        mode: { TIMER:'TIMER', ANIMFRAME:'ANIFRAME'}, //EXPERIMENTAL NOT WAY TO CANCEL YET },
 			        rate : { SLOW: 10000,  NORMAL: 500 }
 	},
+	
+	renderable      :{
+	                 task :{CREATE:'CREATE', 
+	                        UPDATE_GEOMETRY:'UPDATE_GEOMETRY',
+	                        UPDATE_COLORS:'UPDATE_COLORS'}
+	    
+	},
 					
 	/**
 	 * @namespace Constants to handle textures 
@@ -654,7 +661,18 @@ Array.prototype.max = function(){
 };
 
 Array.prototype.min = function(){
-	return Math.min.apply(null, this);
+	if (this.length > 65535){
+       var min = this[0];
+       for(var i=0,N = this.length; i <N; i+=1){
+           if (this[i] < min){
+               min = this[i];
+           }
+       }
+       return min; 
+    }
+    else{
+       return Math.min.apply(null, this);
+    }
 };
 
 

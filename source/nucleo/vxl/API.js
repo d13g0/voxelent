@@ -421,7 +421,7 @@ wireframeON :  function(){
  getActor: function(actorNameOrUID, scene){
      var actor = this.getActorByName(actorNameOrUID, scene);
      
-     if (actor == undefined){
+     if (actor == null){
          actor = this.getActorByUID(actorNameOrUID, scene);
      }
      return actor;
@@ -669,15 +669,22 @@ wireframeON :  function(){
  //use JQuery here.
  //}
  
- /**
-  * Loads a program
+
+ //TODO: Wwork in progress... sorry for the mess.
+ //buildProgramFromDOM: function(id,VERTEX_SHADER_DOM_ID,FRAGMENT_SHADER_DOM_ID){
+ //       var vshader= document.getElementById(VERTEX_SHADER_DOM_ID);
+        
+     
+ //},
+  /**
+  * Forces the renderer to use a specific program
   * @param{vxlView} view the view to configure
   * @param{Object} program a JSON object that defines the progrma to execute
   * @param{vxlRenderEngine} engine (optional) the engine that the renderer should use to communicate with the program. T
   *                        
   */
  setProgram :  function(view,program,engine){
-    view.renderer.setProgram(program,engine);
+    view.renderer.setProgram(program,engine,true);
     
  },
  /**
@@ -693,26 +700,34 @@ wireframeON :  function(){
          throw ('vxl.api.getProgram: please indicate a view');
      }
      return view.renderer.prg._currentProgramID;
- }, 
- //TODO: Wwork in progress... sorry for the mess.
- //buildProgramFromDOM: function(id,VERTEX_SHADER_DOM_ID,FRAGMENT_SHADER_DOM_ID){
- //       var vshader= document.getElementById(VERTEX_SHADER_DOM_ID);
-        
-     
- //},
- 
+ },
  /**
-  * Sets a uniform
+  * Sets the default value for an uniform
   */
-  setUniform: function(uniformID, value,hint){
-      vxl.c.view.renderer.prg.setUniform(uniformID, value,hint);
+  setUniformDefault: function(programID, uniformID, value){
+      vxl.c.view.renderer.prg.setDefault(programID, uniformID, value)
+  },
+  
+  setUniform: function(uniformID, value){
+      vxl.c.view.renderer.prg.setUniform(uniformID, value)
+  },
+  
+  /**
+   * Gets the default value for an uniform 
+   */
+  getUniformDefault: function(programID, uniformID){
+      vxl.c.view.renderer.prg.getDefault(programID, uniformID);
   },
   
   /**
    * Return the uniform names of the current program
    */
-  getUniformNames: function(){
+  getUniformList: function(){
       return vxl.c.view.renderer.prg._uniformList[vxl.c.view.renderer.prg._currentProgramID].slice(0);
+  },
+  
+  getUniform : function(uniformID){
+     return vxl.c.view.renderer.prg.getUniform(uniformID);  
   },
   
   /**

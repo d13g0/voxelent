@@ -74,7 +74,7 @@
     background: rgba(100,100,100,0.5);
     padding: 10px;
     width: 190px;
-    height:30%;
+    height:40%;
     position: absolute;
     top: 5px;
     right: 5px;
@@ -141,13 +141,13 @@ function changeOpacity(){
         gl.enable(gl.BLEND);
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);
-        vxl.api.setUniform('uLightDiffuse',[0.5,0.5,0.5,1.0]);
+        vxl.api.setUniformDefault('lambert','uLightDiffuse',[0.5,0.5,0.5,1.0]);
     }
     else{
         //gl.enable(gl.DEPTH_TEST);
         gl.disable(gl.BLEND);
         gl.disable(gl.CULL_FACE);
-        vxl.api.setUniform('uLightDiffuse',[1.0,1.0,1.0,1.0]);
+        vxl.api.setUniformDefault('lambert','uLightDiffuse',[1.0,1.0,1.0,1.0]);
     }
     
     vxl.api.setPropertyForAll('opacity', v);    

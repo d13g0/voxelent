@@ -41,6 +41,7 @@
 
 	    vxl.api.load(list,'assets/models/brain',vxl.def.model.loadingMode.LATER);
 	    view.start();
+	    vxl.api.setProgram(view, vxl.def.glsl.lambert);
     	pickerInteractor = new vxlPickerInteractor();
     	defaultInteractor = view.interactor;
 	}
@@ -67,7 +68,7 @@
 	    
 	    if (angle <=90){
             cell.setColor(0.2,0.5,0.0);
-		    vxl.c.camera.refresh();
+		    //vxl.c.camera.refresh();
 	    }
 	};
 	
@@ -78,12 +79,19 @@
 	    if (charCode == 112 || charCode  == 80) {
 	        if ( view.interactor.UID == pickerInteractor.UID){
 	            view.setInteractor(defaultInteractor);
+	             view.canvas.style.cursor = 'default'
 	            console.info('default interactor active');
 	        }
 	        else{
 	            view.setInteractor(pickerInteractor);
+	            
+	             view.canvas.style.cursor = 'crosshair'
 	            console.info('picker interactor active');
 	        }    
+	    }
+	    
+	    if (charCode == 98){
+	    	vxl.c.view.renderer.engine._debug_picking_flag = !vxl.c.view.renderer.engine._debug_picking_flag;
 	    }
 	};
 </script>
@@ -103,7 +111,7 @@
     background: rgba(100,100,100,0.5);
     padding: 10px;
     width: 170px;
-    height: 25%;
+    height: 45%;
     position: absolute;
     top: 5px;
     right: 5px;
@@ -160,24 +168,19 @@ $('#toggleMesh').button().click(
 
 function changeOpacity(){
     var v = $('#op-slider-id').slider('value');
-    
-    var gl = vxl.c.view.renderer.gl;
+    vxl.api.setPropertyForAll('opacity', v);    
+  
     
     if (v < 1){
-        //gl.disable(gl.DEPTH_TEST);
-        gl.enable(gl.BLEND);
-        gl.enable(gl.CULL_FACE);
-        gl.cullFace(gl.BACK);
+        vxl.api.setPropertyForAll('cull',vxl.def.actor.cull.BACK);
         vxl.api.setUniform('uLightDiffuse',[0.5,0.5,0.5,1.0]);
     }
     else{
-        //gl.enable(gl.DEPTH_TEST);
-        gl.disable(gl.BLEND);
-        gl.disable(gl.CULL_FACE);
-        vxl.api.setUniform('uLightDiffuse',[1.0,1.0,1.0,1.0]);
+        vxl.api.setPropertyForAll('cull',vxl.def.actor.cull.NONE);
+        vxl.api.setUniformDefault('lambert','uLightDiffuse',[1.0,1.0,1.0,1.0]);
     }
     
-    vxl.api.setPropertyForAll('opacity', v);    
+    
 }
 
 $('#op-slider-id').slider({max:1, min:0, step:0.05, value:1, slide: changeOpacity, change: changeOpacity});

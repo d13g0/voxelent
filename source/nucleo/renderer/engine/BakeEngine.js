@@ -23,7 +23,7 @@
  * TODO: Does not deal with model scalars well...
  * 
  */
-function vxlBakeStrategy(renderer){
+function vxlBakeEngine(renderer){
     this.renderer = renderer;
     
     var gl = renderer.gl;
@@ -71,7 +71,7 @@ function vxlBakeStrategy(renderer){
  * Creates an array of a defined size populated with the indicated value
  * @private
  */
-vxlBakeStrategy.prototype._populate = function(value, size){
+vxlBakeEngine.prototype._populate = function(value, size){
     var a = [];
     
     for (var i = 0; i < size; i+=1){
@@ -92,7 +92,7 @@ vxlBakeStrategy.prototype._populate = function(value, size){
  * Computes the number of required calls to render one scene
  * @private
  */
-vxlBakeStrategy.prototype._computeRequiredCalls = function(scene){
+vxlBakeEngine.prototype._computeRequiredCalls = function(scene){
 
     var elements    = scene._actors; //.concat(scene.toys.list);
     var NUM         = elements.length;
@@ -114,7 +114,7 @@ vxlBakeStrategy.prototype._computeRequiredCalls = function(scene){
  * Receives one actor and returns the GL buffers
  * @private
  */
-vxlBakeStrategy.prototype._allocateActor = function(actor){
+vxlBakeEngine.prototype._allocateActor = function(actor){
     
     if (this._allocated.indexOf(actor.UID) != -1) return; //this actor has been allocated
     var data            = this._data;
@@ -187,7 +187,7 @@ vxlBakeStrategy.prototype._allocateActor = function(actor){
 /**
  * @private
  */
-vxlBakeStrategy.prototype._updateActorPosition = function(actor){
+vxlBakeEngine.prototype._updateActorPosition = function(actor){
     
     var data = this._data;
     var offset = this._offsets.position[actor.UID];
@@ -205,7 +205,7 @@ vxlBakeStrategy.prototype._updateActorPosition = function(actor){
 /**
  * @private
  */
-vxlBakeStrategy.prototype._updateActorScale = function(actor){
+vxlBakeEngine.prototype._updateActorScale = function(actor){
     var data = this._data;
     var offset = this._offsets.scale[actor.UID];
     
@@ -223,7 +223,7 @@ vxlBakeStrategy.prototype._updateActorScale = function(actor){
 /**
  * @private
  */
-vxlBakeStrategy.prototype._updateActorColor = function(actor){
+vxlBakeEngine.prototype._updateActorColor = function(actor){
     var data = this._data;
     var offset = this._offsets.baked[actor.UID];
     
@@ -240,7 +240,7 @@ vxlBakeStrategy.prototype._updateActorColor = function(actor){
 /**
  * @private
  */
-vxlBakeStrategy.prototype._updateActorShading = function(actor){
+vxlBakeEngine.prototype._updateActorShading = function(actor){
     var data = this._data;
     var offset = this._offsets.shading[actor.UID];
     
@@ -262,7 +262,7 @@ vxlBakeStrategy.prototype._updateActorShading = function(actor){
 /**
  * @param {vxlScene} scene the scene to deallocate memory from
  */
-vxlBakeStrategy.prototype.deallocate = function(scene){
+vxlBakeEngine.prototype.deallocate = function(scene){
 
 };
 
@@ -272,7 +272,7 @@ vxlBakeStrategy.prototype.deallocate = function(scene){
  * @param {vxlScene} scene the scene to allocate memory for
  * @returns an object that contains the allocated WebGL buffers
  */
-vxlBakeStrategy.prototype.allocate = function(scene){
+vxlBakeEngine.prototype.allocate = function(scene){
     
     if (this._computeRequiredCalls(scene) > 1) {
         throw 'Not renderable yet. Working on it. The number of indices exceeds the 65K limit';
@@ -333,7 +333,7 @@ vxlBakeStrategy.prototype.allocate = function(scene){
  * Renders the actors one by one
  * @param {vxlScene} scene the scene to render
  */
-vxlBakeStrategy.prototype.render = function(scene){
+vxlBakeEngine.prototype.render = function(scene){
 
     //Updates the perspective matrix and passes it to the program
     var r       = this.renderer;

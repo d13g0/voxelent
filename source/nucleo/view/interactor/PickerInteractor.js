@@ -27,6 +27,10 @@ vxlPickerInteractor.prototype.constructor = vxlPickerInteractor;
 function vxlPickerInteractor(){
 	vxlViewInteractor.call(this);
 	this._drag = false;
+	this.timerID = -1;
+	this.list = [];
+	this.rate = 600;
+
 };
 
 
@@ -44,44 +48,22 @@ vxlPickerInteractor.prototype.get2DCoords = function(ev){
                                        //this variable contains the height of the canvas and it updates dynamically
                                        //as we resize the browser window.
     //console.info('x='+x+', y='+y);
-    return {x:x,y:y};
+    return [x,y];
+    
 };
 
-/**
- * @private 
- */
-vxlPickerInteractor.prototype._findHits = function(ev){
-    var rt     = this.view.renderer._renderTarget;
-    var coords = this.get2DCoords(ev);
-    var color  = rt.readPixel(coords);
-    
-    
-    var results = vxl.go.picker.query(color);
-    
-    if (results == null) return;
-    
-    var actor  = this.view.scene.getActorByCellUID(results.uid);
-    
-    if (actor == null) { //try object UID
-        actor = this.view.scene.getActorByUID(results.uid);
-    }
-    
-    if (actor != null){
-        //console.info('vxlPickerInteractor: actor ['+actor.name+'] has been picked');
-       
-        if (actor.isPickable() && actor._pickingCallback != undefined){
-            actor._pickingCallback(actor, results.uid);
-        }
-    }
-};
 
 /**
  *  Reacts to the onmouse up event on the canvas
  * @param {Object} ev
  */
 vxlPickerInteractor.prototype.onMouseUp   = function(ev){
-    this._findHits(ev); 
-    this._drag = false;   
+    this._drag = false;
+    if (this.timerID != -1){
+        clearInterval(this.timerID);
+    }
+    
+    
 };
 
 /**
@@ -89,33 +71,62 @@ vxlPickerInteractor.prototype.onMouseUp   = function(ev){
  * @param {Object} ev mouse event
  */
 vxlPickerInteractor.prototype.onMouseDown = function(ev){ 
+    ev.preventDefault();
+    this.view.canvas.style.cursor = 'crosshair'
+    this.list.push(this.get2DCoords(ev));
+    this._doWork();   
     this._drag = true;
+    
+    if (this.timerID != -1){
+        clearInterval(this.timerID);
+    }
+    this.timerID = setInterval((function(self) {return function() {self._doWork();}})(this),this.rate); 
 };
 
 /**
  * Reacts to the onmouse move event on the canvas  
  * @param {Object} ev
  */
-vxlViewInteractor.prototype.onMouseMove = function(ev){ 
+vxlPickerInteractor.prototype.onMouseMove = function(ev){ 
+    ev.preventDefault();
     if (this._drag){
-        this._findHits(ev);
+        this.list.push(this.get2DCoords(ev));
     }
 };
 
-/**
- * Reacts to the key down event 
- * @param {Object} ev
- */
-vxlViewInteractor.prototype.onKeyDown   = function(ev){
+vxlPickerInteractor.prototype._doWork = function(){
+  var i = this.list.length;
+  var rt = this.view.renderer._renderTarget;
     
+  while(i--){
+        var coords = this.list.pop();
+        var color  = rt.readPixel(coords[0], coords[1]);
+
+        if (color[0] == 0 && color[1] == 0 && color[2] == 0 && color[3] ==0){
+            continue;
+        }
+        
+        var results = vxl.go.picker.query(color);
+        
+        if (results == null) continue;
+        
+        var actor  = this.view.scene.getActorByCellUID(results.uid);
+        
+        if (actor == null) { //try object UID
+            actor = this.view.scene.getActorByUID(results.uid);
+        }
+        
+        if (actor != null && actor.isPickable() && actor._pickingCallback != undefined){
+            actor._pickingCallback(actor, results.uid);
+        }
+  }
 };
 
-/**
- * Abstract method to be implemented by the descendants 
- * @param {Object} ev
- */
-vxlViewInteractor.prototype.onKeyUp     = function(ev){ 
 
-};
-
+vxlPickerInteractor.prototype.onKeyDown   = function(ev){};
+vxlPickerInteractor.prototype.onKeyUp     = function(ev){};
+vxlPickerInteractor.prototype.onDragOver     = function(ev){ };
+vxlPickerInteractor.prototype.onDragLeave     = function(ev){};
+vxlPickerInteractor.prototype.onDrop     = function(ev){};
+vxlViewInteractor.prototype.onDoubleClick     = function(ev){};
 

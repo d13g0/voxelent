@@ -693,8 +693,8 @@ vxlActor.prototype.getRenderableModel = function(){
 };
 
 /**
- * 
+ * @param {String} task type of update
  */
-vxlActor.prototype.updateRenderable = function(){
-    this.renderable.update();
+vxlActor.prototype.updateRenderable = function(task){
+    this.renderable.update(task);
 }

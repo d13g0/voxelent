@@ -35,9 +35,15 @@ function vxlPicker(){
                 this._hmap[i][j][k] = null;
                 }
         }
-    }    
+    }
+    
+ 
 };
 
+/**
+ * @static 
+ */
+vxlPicker.RESOLUTION = 1/255; // 1 / (2^8-1) for unsigned byte according to WebGL reference
 
 /**
  * Generates a color that has not been assigned to any object or cell in the scene
@@ -45,24 +51,22 @@ function vxlPicker(){
 vxlPicker.prototype._getColor = function(){
     
     function getN(){
-        var x =  Math.floor(Math.random()*256);
+        var x =  Math.floor(Math.random()*255);
         if (x == 0) 
             return getN();
         else
             return x;
     };
-    
- 
-    return [getN(), getN(), getN()];
+   return [getN(), getN(), getN()];
 };
   
 /**
  * 
  */
 vxlPicker.prototype.color2decimal = function(color){
-    r = Math.round((color[0]/256)*100)/100;
-    g = Math.round((color[1]/256)*100)/100;
-    b = Math.round((color[2]/256)*100)/100;
+    r = color[0] * vxlPicker.RESOLUTION;
+    g = color[1] * vxlPicker.RESOLUTION;
+    b = color[2] * vxlPicker.RESOLUTION;
     return [r,g,b];
 }  
 
@@ -110,27 +114,7 @@ vxlPicker.prototype.query = function(color){
         results.color = color;
         return results;
     }
-    
-    for (var v = 1; v<=2; v+=1)  {  
-        for (var i=-v;i<=v;i+=1){
-            for (var j=-v;j<=v;j+=1){
-                for (var k=-v;k<=v;k+=1){
-                    if (color[0]+i<0 || color[0]+i>256 || 
-                        color[1]+j<0 || color[1]+j>256 || 
-                        color[2]+k<0 || color[2]+k>256) continue;
-                    var closest_uid = this._hmap[color[0]+i][color[1]+j][color[2]+k];
-                    if (closest_uid != null){
-                        results.uid = closest_uid;
-                        results.color = [color[0]+i,color[1]+j,color[2]+k];
-                        return results;
-                    }
-                }
-            }
-        }
-    }
     return null;
-            
-
 };
 
 /**

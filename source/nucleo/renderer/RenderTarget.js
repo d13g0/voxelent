@@ -69,13 +69,17 @@ vxlRenderTarget.prototype.update = function(){
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
 };
 
-
-vxlRenderTarget.prototype.readPixel = function(coords){
+/**
+ * 
+ * @param{Number} x
+ * @param{Number} y
+ */
+vxlRenderTarget.prototype.readPixel = function(x,y){
     
     var gl = this.gl;
     var readout = new Uint8Array(1 * 1 * 4);
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
-    gl.readPixels(coords.x,coords.y,1,1,gl.RGBA,gl.UNSIGNED_BYTE,readout);
+    gl.readPixels(x,y,1,1,gl.RGBA,gl.UNSIGNED_BYTE,readout);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     return readout;
 }
