@@ -10751,6 +10751,7 @@ vxlScene.prototype.getActorByCellUID = function(UID){
 vxlScene.prototype.createActorGroup = function(name, list){
     var actorGroup = undefined;
     if(this.getActorGroup(name) != null){
+        alert('vxlScene.createActorGroup: an actor group with the name '+name+' already exists');
         throw('vxlScene.createActorGroup: an actor group with the name '+name+' already exists');
     }
     
@@ -12190,6 +12191,17 @@ wireframeON :  function(){
         }
     }
     return _scene.getActorNames();
+ },
+ 
+ /**
+  *Creates an actor group for the current scene
+  * @param {String} name name of the actor group
+  * @param {List} list list of actors to add to the actor group
+  * @returns {vxlActorGroup} the actor group
+  * @see {vxlScene#createActorGroup} 
+  */
+ createActorGroup: function(name, list){
+     return vxl.c.scene.createActorGroup(name, list);
  },
  
  /**

@@ -17,7 +17,7 @@
 <script type='text/javascript' id='code-js'>
 
 
-  var view, pickerInteractor, currentInteractor;
+  var view, pickerInteractor, currentInteractor, list, brain;
     
 	function runVoxApp(){
 		
@@ -31,7 +31,7 @@
 	    var gui = new vxlGUI(vxl.c.view); //and can be used here
 	    
 	    
-	    var list = ["part1.json",
+	        list = ["part1.json",
 	    			"part2.json",
 	    			"part3.json",
 	    			"part4.json",
@@ -50,12 +50,27 @@
 	    if (event == vxl.events.MODELS_LOADED){
         	vxl.api.setLookupTable('default');
         	vxl.c.camera.longShot();
-        	vxl.api.boundingBoxON();
+        	
         	$('#overlay-div').fadeIn(3000);
         	
-        	part2 = vxl.c.scene.getActorByName("part2").
-        	setPicker(vxl.def.actor.picking.CELL, pickingCallback);
+  
+        	brain = vxl.api.createActorGroup('brain', list);
+        	var actors = brain.list;
+        	var index = 0;
         	
+        	function setPicker(){
+        		if (index < actors.length){
+        			actors[index].setPicker(vxl.def.actor.picking.CELL, pickingCallback);
+        		}
+        		else{
+        			return;
+        		}
+        		index ++;
+        		setTimeout(arguments.callee,100);
+        	}
+
+        	setTimeout(function(){setPicker()},100);
+
     	}
 	}
 	

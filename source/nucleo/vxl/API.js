@@ -413,6 +413,17 @@ wireframeON :  function(){
  },
  
  /**
+  *Creates an actor group for the current scene
+  * @param {String} name name of the actor group
+  * @param {List} list list of actors to add to the actor group
+  * @returns {vxlActorGroup} the actor group
+  * @see {vxlScene#createActorGroup} 
+  */
+ createActorGroup: function(name, list){
+     return vxl.c.scene.createActorGroup(name, list);
+ },
+ 
+ /**
   *Retrieves an actor by name or UID
   * @param {String} actorNameOrUID actor name or UID
   * @param {vxlScene} scene looks in the specified scene. This parameter is optional. 
