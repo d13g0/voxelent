@@ -1,0 +1,1928 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="generator" content="JsDoc Toolkit" />
+		
+		<title>Voxelent Code Docs - vxlActorGroup</title>
+		<link rel='stylesheet' type='text/css' href='../style/style.css'/>
+		<link rel="stylesheet" type="text/css" href="../style/prettify.css"/>
+		<script type="text/javascript" src="../style/prettify.js"></script>
+	</head>
+
+	<body onload="prettyPrint()">
+<!-- ============================== header ================================= -->
+		<!-- begin static/header.html -->
+		<header>
+<div class="col-width clearfix header-inner">
+
+<div class='site-logo'>    
+<a href='http://voxelent.com'>
+    <img src="http://voxelent.com/html/docs/style/img/voxelent.png" /></a>
+</div>    
+
+<div class="shadow"></div>
+</div>
+<div class="header-shadow"></div>
+</header>
+
+
+
+		<!-- end static/header.html -->
+
+<!-- ============================== classes index ============================ -->
+		<div id="wrap">
+        <div id="index">
+			<!-- begin publish.classesIndex -->
+			<div align="center"><h2><a href="../index.html">Class List</a></h2></div>
+<hr />
+<h3>Current Version:  0.89.3</h3>
+<p>Download it <a href='http://voxelent.com/downloads/'>here</a></p>
+<ul class="classList">
+	
+	<li><i><a href="../symbols/_global_.html">_global_</a></i></li>
+	
+	<li><a href="../symbols/Array.html">Array</a></li>
+	
+	<li><a href="../symbols/vxl.html">vxl</a></li>
+	
+	<li><a href="../symbols/vxl.api.html">vxl.api</a></li>
+	
+	<li><a href="../symbols/vxl.c.html">vxl.c</a></li>
+	
+	<li><a href="../symbols/vxl.def.html">vxl.def</a></li>
+	
+	<li><a href="../symbols/vxl.def.actor.html">vxl.def.actor</a></li>
+	
+	<li><a href="../symbols/vxl.def.camera.html">vxl.def.camera</a></li>
+	
+	<li><a href="../symbols/vxl.def.glsl.html">vxl.def.glsl</a></li>
+	
+	<li><a href="../symbols/vxl.def.interactor.html">vxl.def.interactor</a></li>
+	
+	<li><a href="../symbols/vxl.def.lut.html">vxl.def.lut</a></li>
+	
+	<li><a href="../symbols/vxl.def.model.html">vxl.def.model</a></li>
+	
+	<li><a href="../symbols/vxl.def.renderer.html">vxl.def.renderer</a></li>
+	
+	<li><a href="../symbols/vxl.def.texture.html">vxl.def.texture</a></li>
+	
+	<li><a href="../symbols/vxl.def.view.html">vxl.def.view</a></li>
+	
+	<li><a href="../symbols/vxl.events.html">vxl.events</a></li>
+	
+	<li><a href="../symbols/vxl.go.html">vxl.go</a></li>
+	
+	<li><a href="../symbols/vxl.util.html">vxl.util</a></li>
+	
+	<li><a href="../symbols/vxl.version.html">vxl.version</a></li>
+	
+	<li><a href="../symbols/vxlActor.html">vxlActor</a></li>
+	
+	<li><a href="../symbols/vxlActorGroup.html">vxlActorGroup</a></li>
+	
+	<li><a href="../symbols/vxlActorGroupException.html">vxlActorGroupException</a></li>
+	
+	<li><a href="../symbols/vxlAxis.html">vxlAxis</a></li>
+	
+	<li><a href="../symbols/vxlBakeEngine.html">vxlBakeEngine</a></li>
+	
+	<li><a href="../symbols/vxlBlenderEngine.html">vxlBlenderEngine</a></li>
+	
+	<li><a href="../symbols/vxlBoundingBox.html">vxlBoundingBox</a></li>
+	
+	<li><a href="../symbols/vxlCamera.html">vxlCamera</a></li>
+	
+	<li><a href="../symbols/vxlCameraManager.html">vxlCameraManager</a></li>
+	
+	<li><a href="../symbols/vxlCell.html">vxlCell</a></li>
+	
+	<li><a href="../symbols/vxlFloor.html">vxlFloor</a></li>
+	
+	<li><a href="../symbols/vxlFrameAnimation.html">vxlFrameAnimation</a></li>
+	
+	<li><a href="../symbols/vxlLandmark.html">vxlLandmark</a></li>
+	
+	<li><a href="../symbols/vxlLookupTable.html">vxlLookupTable</a></li>
+	
+	<li><a href="../symbols/vxlLookupTableManager.html">vxlLookupTableManager</a></li>
+	
+	<li><a href="../symbols/vxlMesh.html">vxlMesh</a></li>
+	
+	<li><a href="../symbols/vxlModel.html">vxlModel</a></li>
+	
+	<li><a href="../symbols/vxlModelManager.html">vxlModelManager</a></li>
+	
+	<li><a href="../symbols/vxlNotifier.html">vxlNotifier</a></li>
+	
+	<li><a href="../symbols/vxlPicker.html">vxlPicker</a></li>
+	
+	<li><a href="../symbols/vxlPickerInteractor.html">vxlPickerInteractor</a></li>
+	
+	<li><a href="../symbols/vxlProgram.html">vxlProgram</a></li>
+	
+	<li><a href="../symbols/vxlRenderable.html">vxlRenderable</a></li>
+	
+	<li><a href="../symbols/vxlRenderEngine.html">vxlRenderEngine</a></li>
+	
+	<li><a href="../symbols/vxlRenderer.html">vxlRenderer</a></li>
+	
+	<li><a href="../symbols/vxlScene.html">vxlScene</a></li>
+	
+	<li><a href="../symbols/vxlSceneToys.html">vxlSceneToys</a></li>
+	
+	<li><a href="../symbols/vxlTexture.html">vxlTexture</a></li>
+	
+	<li><a href="../symbols/vxlTrackerInteractor.html">vxlTrackerInteractor</a></li>
+	
+	<li><a href="../symbols/vxlTransforms.html">vxlTransforms</a></li>
+	
+	<li><a href="../symbols/vxlView.html">vxlView</a></li>
+	
+	<li><a href="../symbols/vxlViewInteractor.html">vxlViewInteractor</a></li>
+	
+	<li><a href="../symbols/vxlVTKReader.html">vxlVTKReader</a></li>
+	
+</ul>
+<hr />
+			<!-- end publish.classesIndex -->
+		</div>
+
+		<div id="content">
+<!-- ============================== class title ============================ -->
+			<h1 class="classTitle">
+				
+				Class  <code>vxlActorGroup</code>
+			</h1>
+
+<!-- ============================== class summary ========================== -->
+			<p class="description">
+				
+				
+
+				
+
+				
+					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_scene_ActorGroup.js.html">ActorGroup.js</a>.
+				
+			</p>
+
+<!-- ============================== constructor summary ==================== -->
+			
+			
+				<h2>Class Summary</h2>
+				<table class="summaryTable"><tr>
+				<td class="attributes">&nbsp;</td>
+				<td class="nameDescription" >
+					<div class="fixedFont">
+						<b><a href="../symbols/vxlActorGroup.html#constructor">vxlActorGroup</a></b>(scene, name, list)
+					</div>
+					<div class="description">Sometimes it makes sense to associate actors in a scene to perform operations as a unit.</div>
+				</td>
+				</tr>
+				</table>
+			
+
+<!-- ============================== properties summary ===================== -->
+			
+
+<!-- ============================== methods summary ======================== -->
+			
+				
+				
+				<h2>Method Summary</h2>
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class vxlActorGroup.">
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#add">add</a></b>
+								(actor)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#addList">addList</a></b>
+								(list)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#flipNormals">flipNormals</a></b>
+								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#hasActor">hasActor</a></b>
+								(actor)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#remove">remove</a></b>
+								(actor)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#rotateX">rotateX</a></b>
+								(angle)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#rotateY">rotateY</a></b>
+								(angle)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#rotateZ">rotateZ</a></b>
+								(angle)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#setColor">setColor</a></b>
+								(color)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#setLookupTable">setLookupTable</a></b>
+								(lutID, min, max)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#setOpacity">setOpacity</a></b>
+								(opacity)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#setPicker">setPicker</a></b>
+								(type, callback)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#setPosition">setPosition</a></b>
+								(x, y, z)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#setProperty">setProperty</a></b>
+								(property, value)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#setScale">setScale</a></b>
+								(x, y, z)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#setShading">setShading</a></b>
+								(shading)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#setShininess">setShininess</a></b>
+								(shine)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#setVisible">setVisible</a></b>
+								(visible)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#setVisualizationMode">setVisualizationMode</a></b>
+								(mode)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+								
+									<span><span class="light fixedFont">{Number}</span> </span>
+							    
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#size">size</a></b>
+								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActorGroup.html#translate">translate</a></b>
+								(x, y, z)
+								</div>
+							</td>
+							
+						</tr>
+					
+					</tbody>
+				</table>
+				
+
+				
+			
+<!-- ============================== events summary ======================== -->
+			
+
+<!-- ============================== constructor details ==================== -->
+			
+			<div class="details"><a name="constructor"> </a>
+				<h2>
+					Class Detail
+				</h2>
+				<div class='methodDetail'>
+				<div class="title">
+				<div class="fixedFont">
+						<b>vxlActorGroup</b>(scene, name, list)
+				</div>
+				</div>
+
+				<div class="description">
+					Sometimes it makes sense to associate actors in a scene to perform operations as a unit.
+ For instance you can have a bicycle composed by several actors and you want to change 
+ its color or its position on the scene. You could accomplish that calling the respective
+ methods for each one of the actors that make part of the bicycle or you can create an
+ actor group named bycicle and call just the setColor and translate operations on the actor group.
+					<br /><i>Author: </i>Diego Cantor.
+				</div>
+
+				
+
+
+					
+						<p class="heading">Parameters:</p>
+						<table class='paramTable'>
+						
+							<tr>
+							<td>
+								
+							</td>
+							<td>	
+								 <code>scene</code>
+							</td>
+							<td>
+								<p>
+								
+								</p>
+							</td>
+								
+						
+							<tr>
+							<td>
+								
+							</td>
+							<td>	
+								 <code>name</code>
+							</td>
+							<td>
+								<p>
+								
+								</p>
+							</td>
+								
+						
+							<tr>
+							<td>
+								
+							</td>
+							<td>	
+								 <code>list</code>
+							</td>
+							<td>
+								<p>
+								
+								</p>
+							</td>
+								
+						
+						</table>
+					
+					
+					
+					
+					
+					
+					
+				</div>
+			</div>
+			
+
+<!-- ============================== field details ========================== -->
+			
+
+<!-- ============================== method details ========================= -->
+			
+				<h2>
+					Method Detail
+				</h2>
+				
+				<div class='methodDetail'>
+					<a name="add"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>add</b>(actor)
+					</div>
+					</div>
+					<div class="description">
+						Adds one actor to the actor group
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{<a href="../symbols/vxlActor.html">vxlActor</a>}</span> 
+								</td>
+								<td>
+									<code>actor</code>
+								</td>	
+								<td><p>the actor to be added
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="addList"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>addList</b>(list)
+					</div>
+					</div>
+					<div class="description">
+						Add a list of actors to the actor group
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{Object}</span> 
+								</td>
+								<td>
+									<code>list</code>
+								</td>	
+								<td><p>a list of actors
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="flipNormals"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>flipNormals</b>()
+					</div>
+					</div>
+					<div class="description">
+						Flip normals
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="hasActor"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>hasActor</b>(actor)
+					</div>
+					</div>
+					<div class="description">
+						Returns true if the actor is associated to this actor group. False otherwise
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>actor</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="remove"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>remove</b>(actor)
+					</div>
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>actor</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="rotateX"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>rotateX</b>(angle)
+					</div>
+					</div>
+					<div class="description">
+						Rotation on the X axis
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{float}</span> 
+								</td>
+								<td>
+									<code>angle</code>
+								</td>	
+								<td><p>angle in degrees
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="rotateY"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>rotateY</b>(angle)
+					</div>
+					</div>
+					<div class="description">
+						Rotation on the Y axis
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{float}</span> 
+								</td>
+								<td>
+									<code>angle</code>
+								</td>	
+								<td><p>angle in degrees
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="rotateZ"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>rotateZ</b>(angle)
+					</div>
+					</div>
+					<div class="description">
+						Rotation on the Z axis
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{float}</span> 
+								</td>
+								<td>
+									<code>angle</code>
+								</td>	
+								<td><p>angle in degrees
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="setColor"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setColor</b>(color)
+					</div>
+					</div>
+					<div class="description">
+						Sets the material diffuse color of the group
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{list}</span> 
+								</td>
+								<td>
+									<code>color</code>
+								</td>	
+								<td><p>in rgb decimal format
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="setLookupTable"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setLookupTable</b>(lutID, min, max)
+					</div>
+					</div>
+					<div class="description">
+						Sets the lookup table for this group
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>lutID</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>min</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>max</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="setOpacity"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setOpacity</b>(opacity)
+					</div>
+					</div>
+					<div class="description">
+						Sets the opacity for this group
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>opacity</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="setPicker"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setPicker</b>(type, callback)
+					</div>
+					</div>
+					<div class="description">
+						Sets the picker for this group
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>type</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>callback</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+							<p class="heading">See:</p>
+							
+								<span></span>
+							
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="setPosition"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setPosition</b>(x, y, z)
+					</div>
+					</div>
+					<div class="description">
+						Sets the position for this group
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>x</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>y</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>z</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+							<p class="heading">See:</p>
+							
+								<span></span>
+							
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="setProperty"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setProperty</b>(property, value)
+					</div>
+					</div>
+					<div class="description">
+						Set a property for actors in the group. Please notice that by design actor groups only 
+set actor level properties instead of model level properties.
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>property</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>value</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="setScale"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setScale</b>(x, y, z)
+					</div>
+					</div>
+					<div class="description">
+						Sets the scale for this group
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>x</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>y</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>z</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+							<p class="heading">See:</p>
+							
+								<span></span>
+							
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="setShading"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setShading</b>(shading)
+					</div>
+					</div>
+					<div class="description">
+						Sets the shading for this group
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>shading</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+							<p class="heading">See:</p>
+							
+								<span></span>
+							
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="setShininess"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setShininess</b>(shine)
+					</div>
+					</div>
+					<div class="description">
+						Sets the shininess for this group
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>shine</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+							<p class="heading">See:</p>
+							
+								<span></span>
+							
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="setVisible"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setVisible</b>(visible)
+					</div>
+					</div>
+					<div class="description">
+						Sets the visibility for this group
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>visible</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+							<p class="heading">See:</p>
+							
+								<span></span>
+							
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="setVisualizationMode"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setVisualizationMode</b>(mode)
+					</div>
+					</div>
+					<div class="description">
+						Sets the visualization mode for this group
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>mode</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+							<p class="heading">See:</p>
+							
+								<span></span>
+							
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="size"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					<span class="light">
+					  {Number}
+					  </span>
+					
+					
+					
+					  <b>size</b>()
+					</div>
+					</div>
+					<div class="description">
+						Returns the size of the actor group
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+							<p class="heading">Returns:</p>
+							<table class="paramTable">
+							
+								<tr>
+								<td><span class="light fixedFont">{Number}</span> the lenght of the actor group</td></tr>
+							
+							</table>							
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="translate"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>translate</b>(x, y, z)
+					</div>
+					</div>
+					<div class="description">
+						Translation by a given vector
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>x</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>y</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>z</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+			
+
+<!-- ============================== event details ========================= -->
+			
+
+			<hr />
+		
+
+
+<!-- ============================== footer ================================= -->
+		<div style="clear:both">
+			
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Mar 17 2013 00:28:51 GMT-0400 (EDT)
+		</div>
+        </div>
+        </div>
+        <div id="footer">
+<div style="padding:30px;"></div>
+<div class="col-width clearfix footer-inner">
+<div style="padding:12px;"></div>
+Copyright &copy;2012 Voxelent Inc., Privacy Statement Terms and Conditions.
+	<div class="shadow"></div>
+</div>
+</div>   
+	</body>
+</html>

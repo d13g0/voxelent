@@ -4,8 +4,11 @@ def document(VOX_VERSION_NUMBER):
     if len(str(VOX_VERSION_NUMBER)) == 0:
         print "No version indicated"
         return
-    print '-- START DOCUMENTER --'
+   
     VERSION_TAG = ""+str(VOX_VERSION_NUMBER)+"";
+    
+    print 'Documenting Voxelent Nucleo. Version: %s'%VERSION_TAG
+    print '-- START DOCUMENTER -- '
    
     OS = platform.system()
     
@@ -14,7 +17,7 @@ def document(VOX_VERSION_NUMBER):
     else:
         SEP = '\\'
         
-    subprocess.call(['java','-jar','jsdoc-toolkit'+SEP+'jsrun.jar', 'jsdoc-toolkit'+SEP+'app'+SEP+'run.js', '-D=\"version:'+VERSION_TAG+'\"', '-t=jsdoc-toolkit'+SEP+'templates'+SEP+'jsdoc', '-a','-E=glMatrix.js' ,'-d=..'+SEP+'docs', '-r=10', '..'+SEP+'source'])
+    subprocess.call(['java','-jar','jsdoc-toolkit'+SEP+'jsrun.jar', 'jsdoc-toolkit'+SEP+'app'+SEP+'run.js', '-D=\"version:'+VERSION_TAG+'\"', '-t=jsdoc-toolkit'+SEP+'templates'+SEP+'jsdoc', '-a','-E=glMatrix.js' ,'-d=..'+SEP+'docs', '-r=10', '..'+SEP+'source'+SEP+'nucleo'])
     print ' -- END DOCUMENTER --'
     
 if __name__ == '__main__':
