@@ -11,6 +11,7 @@
 <script type="text/javascript" src="lib/jquery.js" ></script>
 <script type="text/javascript" src="lib/jquery-ui.js" ></script>
 <script type='text/javascript' src='lib/voxelent_v0.89.3.js'> </script>
+<script type='text/javascript' src='lib/vox-gui_v0.1.js'> </script>
 
 <link rel='stylesheet' type='text/css' href='css/jquery-ui/theme-1.css'/>
 
@@ -22,9 +23,15 @@ var view, cone, sphere, cylinder, cam0, cam1, cam2;
  * Main function
  */
 function runVoxApp(){
+    
     vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
+    
     view = vxl.api.setup('view-1');
+    
+    var gui = new vxlGUI(vxl.c.view);
+    
     vxl.api.load(['cone.json','sphere.json','cylinder.json'],'assets/models/geometry/',vxl.def.model.loadingMode.DETACHED);
+    
     view.start();
 };
 
@@ -147,7 +154,6 @@ function handleEvent(event){
 </style> 
 </head>
 <body onload='runVoxApp()'>
-	<div><img src="css/img/voxelent.png" /></div>
 	<div class='show'>
 	<canvas id = 'view-1' width=800 height=650 >
 		<p>

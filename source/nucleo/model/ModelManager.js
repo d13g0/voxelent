@@ -84,7 +84,7 @@ vxlModelManager.prototype.load = function(uri, scene) {
 	vxl.go.console('ModelManager.load: Requesting '+uri+'...');
 	vxl.go.notifier.fire(vxl.events.MODELS_LOADING, this);
 	
-	var successHandler = function(manager,name,scene){
+	var successHandler = function(manager,modelname,scene){
 	    switch(extension){
 	    case 'json':
     		return function(json, textStatus){
@@ -118,7 +118,7 @@ vxlModelManager.prototype.load = function(uri, scene) {
 		url			: nocacheuri,
 		type		:"GET",
 		dataType	: dtype,
-		success 	: successHandler(manager,name,scene),
+		success 	: successHandler(manager,modelname,scene),
 		error		: errorHandler(uri)
 	});    
 };
