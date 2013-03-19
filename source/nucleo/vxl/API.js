@@ -710,35 +710,35 @@ wireframeON :  function(){
      if (view == undefined){
          throw ('vxl.api.getProgram: please indicate a view');
      }
-     return view.renderer.prg._currentProgramID;
+     return view.renderer.pm._currentProgramID;
  },
  /**
   * Sets the default value for an uniform
   */
   setUniformDefault: function(programID, uniformID, value){
-      vxl.c.view.renderer.prg.setDefault(programID, uniformID, value)
+      vxl.c.view.renderer.pm.setDefault(programID, uniformID, value)
   },
   
   setUniform: function(uniformID, value){
-      vxl.c.view.renderer.prg.setUniform(uniformID, value)
+      vxl.c.view.renderer.pm.setUniform(uniformID, value)
   },
   
   /**
    * Gets the default value for an uniform 
    */
   getUniformDefault: function(programID, uniformID){
-      vxl.c.view.renderer.prg.getDefault(programID, uniformID);
+      vxl.c.view.renderer.pm.getDefault(programID, uniformID);
   },
   
   /**
    * Return the uniform names of the current program
    */
   getUniformList: function(){
-      return vxl.c.view.renderer.prg._uniformList[vxl.c.view.renderer.prg._currentProgramID].slice(0);
+      return vxl.c.view.renderer.pm._uniformList[vxl.c.view.renderer.pm._currentProgramID].slice(0);
   },
   
   getUniform : function(uniformID){
-     return vxl.c.view.renderer.prg.getUniform(uniformID);  
+     return vxl.c.view.renderer.pm.getUniform(uniformID);  
   },
   
   /**

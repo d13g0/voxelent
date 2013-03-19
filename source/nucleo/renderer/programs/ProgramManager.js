@@ -20,13 +20,13 @@
  * It also has methods to query and set uniforms and attributes belonging to the program
  * that is being currently executed in the GPU</P>
  * 
- * <p>a vxlProgram maintains a database of the programs that have been linked to the GPU. 
+ * <p>a vxlProgramManager maintains a database of the programs that have been linked to the GPU. 
  * This way, program switching is easier as it is not necessary to go through the 
  * compilation and linking process every time</p>
  * @class
  * @constructor
  */
-function vxlProgram (gl) {
+function vxlProgramManager (gl) {
     this._gl                = gl;
     this._codebase          = {};
 
@@ -38,7 +38,7 @@ function vxlProgram (gl) {
 
     this._uniform_cache     = {};
     
-    this._currentWebGLProgram     =  null;
+    this._essl     =  null;
     this._currentProgramID        = "";
     this._currentUniformLocation  = {};
     this._defaults         = [];
@@ -49,13 +49,13 @@ function vxlProgram (gl) {
  * Register a program in the database
  * @param {JSON} the program to register
  */
-vxlProgram.prototype.register = function(glslObject){
+vxlProgramManager.prototype.register = function(program){
 	/*@TODO: this method receives a JSON Object we could instead
 	 * receive a text file and parse it into JSON. This would make
 	 * the writing of shaders much easier.
 	 */
-	vxl.go.console('Registering program '+ glslObject.ID);
-    this._codebase[glslObject.ID] = glslObject;
+	vxl.go.console('Registering program '+ program.ID);
+    this._codebase[program.ID] = program;
 };
 
 /**
@@ -63,7 +63,7 @@ vxlProgram.prototype.register = function(glslObject){
  * @param {String} ID program id
  * @returns true if the program is registered, false otherwise
  */
-vxlProgram.prototype.isRegistered = function(ID){
+vxlProgramManager.prototype.isRegistered = function(ID){
 	return (this._codebase[ID] != undefined);
 };
 
@@ -71,37 +71,37 @@ vxlProgram.prototype.isRegistered = function(ID){
  * Loads a program
  * @param {String} ID the id of the program to load
  */
-vxlProgram.prototype.loadProgram = function(ID){
+vxlProgramManager.prototype.loadProgram = function(ID){
     
     var code = this._codebase[ID];
     
     var gl   = this._gl;
-    var WEB_GL_PROGRAM  = gl.createProgram();
+    var esslProgram  = gl.createProgram();
     
     
     if (code.VERTEX_SHADER){
-        var vs = this._createShader(vxl.def.glsl.VERTEX_SHADER,code.VERTEX_SHADER);
-        gl.attachShader(WEB_GL_PROGRAM, vs);
+        var vs = this._createShader(vxl.def.essl.VERTEX_SHADER,code.VERTEX_SHADER);
+        gl.attachShader(esslProgram, vs);
     }
     
     if (code.FRAGMENT_SHADER){
-        var fs = this._createShader(vxl.def.glsl.FRAGMENT_SHADER,code.FRAGMENT_SHADER);
-        gl.attachShader(WEB_GL_PROGRAM, fs);
+        var fs = this._createShader(vxl.def.essl.FRAGMENT_SHADER,code.FRAGMENT_SHADER);
+        gl.attachShader(esslProgram, fs);
     }
     
     //fix for version 0.89.2 Making sure that the vertex array is ALWAYS the attribute with location 0
-    gl.bindAttribLocation(WEB_GL_PROGRAM, 0 , vxl.def.glsl.VERTEX_ATTRIBUTE);
+    gl.bindAttribLocation(esslProgram, 0 , vxl.def.essl.VERTEX_ATTRIBUTE);
     
-    gl.linkProgram(WEB_GL_PROGRAM);
+    gl.linkProgram(esslProgram);
      
-    if (!gl.getProgramParameter(WEB_GL_PROGRAM, gl.LINK_STATUS)) {
+    if (!gl.getProgramParameter(esslProgram, gl.LINK_STATUS)) {
         alert("Program: Could not link the shading program");
     }
     else{
         //vxl.go.console("Program: the program "+ID+" has been loaded");
     }
     
-    this._program[ID] = WEB_GL_PROGRAM;
+    this._program[ID] = esslProgram;
   
 };
 
@@ -110,7 +110,7 @@ vxlProgram.prototype.loadProgram = function(ID){
  * @param {String} ID the program id
  * @returns true if the program is loaded, false otherwise
  */
-vxlProgram.prototype.isLoaded = function(ID){
+vxlProgramManager.prototype.isLoaded = function(ID){
     return (this._program[ID] != undefined);
 };
 
@@ -120,23 +120,21 @@ vxlProgram.prototype.isLoaded = function(ID){
  * @param {String} ID the program id
  * @see vxlRenderer#setProgram
  */
-vxlProgram.prototype.useProgram = function(ID){
+vxlProgramManager.prototype.useProgram = function(ID){
 
     var gl = this._gl;
-    var WEB_GL_PROGRAM = this._program[ID];
+    var esslProgram = this._program[ID];
     
-    if (WEB_GL_PROGRAM != undefined && WEB_GL_PROGRAM != null){
+    if (esslProgram != undefined && esslProgram != null){
         
-        if (WEB_GL_PROGRAM == this._currentWebGLProgram) return;
+        if (esslProgram == this._essl) return;
         
-        //gl.linkProgram(WEB_GL_PROGRAM);
-        gl.useProgram (WEB_GL_PROGRAM);
+        //gl.linkProgram(esslProgram);
+        gl.useProgram (esslProgram);
         
-        this._currentWebGLProgram = WEB_GL_PROGRAM;
+        this._essl = esslProgram;
         this._currentProgramID = ID;
         this._parseUniforms();
-        
-        //vxl.go.console('Program: the program '+ID+' has been linked and is the current program');
     }
     else{
         alert("Program: the program " + ID + " has NOT been loaded");
@@ -147,7 +145,7 @@ vxlProgram.prototype.useProgram = function(ID){
 /**
  * Loads the uniform defaults for the current program
  */
-vxlProgram.prototype.loadDefaults = function(){
+vxlProgramManager.prototype.loadDefaults = function(){
     var code = this._codebase[this._currentProgramID];
    
     if ('DEFAULTS' in code){
@@ -171,7 +169,7 @@ vxlProgram.prototype.loadDefaults = function(){
 /**
  * Overrides defaults by hand 
  */
-vxlProgram.prototype.setDefault = function(programID, uniformName, value){
+vxlProgramManager.prototype.setDefault = function(programID, uniformName, value){
     
     if (this._defaults[programID] == undefined){
         this._defaults[programID] = {}
@@ -189,7 +187,7 @@ vxlProgram.prototype.setDefault = function(programID, uniformName, value){
 /**
  * Overrides defaults by hand 
  */
-vxlProgram.prototype.getDefault = function(programID, uniformName){
+vxlProgramManager.prototype.getDefault = function(programID, uniformName){
     
     if (this._defaults[programID] == undefined){
         return undefined;
@@ -203,7 +201,7 @@ vxlProgram.prototype.getDefault = function(programID, uniformName){
  * @param {Object} an object containing uniform names and values. Every property of this object
  * will be considered a uniform
  */
-vxlProgram.prototype.setUniforms = function(obj){
+vxlProgramManager.prototype.setUniforms = function(obj){
 	for(uni in obj){
 		this.setUniform(uni,obj[uni]);
 	}
@@ -215,9 +213,9 @@ vxlProgram.prototype.setUniforms = function(obj){
  * @param {String} uniform name
  * @param {Object} the value
  */
-vxlProgram.prototype.setUniform = function(uniformID, value, hint){
+vxlProgramManager.prototype.setUniform = function(uniformID, value, hint){
     
-    var webGLProgram 		= this._currentWebGLProgram;
+    var webGLProgram 		= this._essl;
     var uniformList 		= this._uniformList[this._currentProgramID];
     var uniformLoc  		= this._currentUniformLocation;
     var uniform_cache 		= this._uniform_cache;
@@ -236,10 +234,10 @@ vxlProgram.prototype.setUniform = function(uniformID, value, hint){
 };
 
 /**
- * Returns a uniform value from the cache maintained by vxlProgram
+ * Returns a uniform value from the cache maintained by vxlProgramManager
  * @param {String} the uniform id
  */
-vxlProgram.prototype.getUniform = function(uniformID){
+vxlProgramManager.prototype.getUniform = function(uniformID){
     //TODO: Think about this
     //if(!(name in this._uniformList)){
       //  alert('Program: the uniform ' + name + ' has not been set');
@@ -254,7 +252,7 @@ vxlProgram.prototype.getUniform = function(uniformID){
  * @param {String} name name of the attribute
  * 
  */
-vxlProgram.prototype.setAttributePointer = function(name, numElements, type, norm,stride,offset){
+vxlProgramManager.prototype.setAttributePointer = function(name, numElements, type, norm,stride,offset){
     var a = this._getAttributeLocation(name);
     this._gl.vertexAttribPointer(a,numElements, type, norm, stride, offset);
 };
@@ -263,7 +261,7 @@ vxlProgram.prototype.setAttributePointer = function(name, numElements, type, nor
  * Enables a vertex attribute array
  * @param {String} name the name of the attribute array to enable
  */
-vxlProgram.prototype.enableAttribute = function(name){
+vxlProgramManager.prototype.enableAttribute = function(name){
     
    if (this._enabledAttributes.indexOf(name) != -1) return; //Speeds up
      
@@ -277,7 +275,7 @@ vxlProgram.prototype.enableAttribute = function(name){
  * @param {String} name the name of the attribute array to disable
  * 
  */
-vxlProgram.prototype.disableAttribute = function(name){
+vxlProgramManager.prototype.disableAttribute = function(name){
     
     var idx = this._enabledAttributes.indexOf(name); 
     if (idx != -1) { //so it is enabled
@@ -292,14 +290,14 @@ vxlProgram.prototype.disableAttribute = function(name){
  * 
  * @private This method is private.
  */
-vxlProgram.prototype._createShader = function(type,code){
+vxlProgramManager.prototype._createShader = function(type,code){
     var gl      = this._gl;
     var shader = null;
     
-    if (type == vxl.def.glsl.VERTEX_SHADER){
+    if (type == vxl.def.essl.VERTEX_SHADER){
         shader = gl.createShader(gl.VERTEX_SHADER);
     }
-    else if (type == vxl.def.glsl.FRAGMENT_SHADER){
+    else if (type == vxl.def.essl.FRAGMENT_SHADER){
         shader = gl.createShader(gl.FRAGMENT_SHADER);
     }
     
@@ -324,7 +322,7 @@ vxlProgram.prototype._createShader = function(type,code){
  * @private
  * 
  */
-vxlProgram.prototype._parseUniforms = function(id){
+vxlProgramManager.prototype._parseUniforms = function(id){
     
     vs = this._codebase[this._currentProgramID].VERTEX_SHADER;
     fs = this._codebase[this._currentProgramID].FRAGMENT_SHADER;
@@ -363,10 +361,10 @@ vxlProgram.prototype._parseUniforms = function(id){
  * @param {String} name
  * @private
  */
-vxlProgram.prototype._getAttributeLocation = function(name){
+vxlProgramManager.prototype._getAttributeLocation = function(name){
 
     if(!(name in this._attributeList)){
-        this._attributeList[name] = this._gl.getAttribLocation(this._currentWebGLProgram,name);
+        this._attributeList[name] = this._gl.getAttribLocation(this._essl,name);
     }
 
     return this._attributeList[name];
@@ -376,10 +374,10 @@ vxlProgram.prototype._getAttributeLocation = function(name){
  * This is one of the jewels of Voxelent. Based on the information contained in the 
  * program database, it will do the appropriate gl call to set the uniform
  * This method is private. Use setUniform instead.
- * @see vxlProgram#setUniform
+ * @see vxlProgramManager#setUniform
  * @private 
  */
-vxlProgram.prototype._setPolymorphicUniform = function(uniformID, locationID,value,hint){
+vxlProgramManager.prototype._setPolymorphicUniform = function(uniformID, locationID,value,hint){
 
 	//In the extend of what it is reasonable,
 	//We cross check GLSL type information with actual javascript variable types 

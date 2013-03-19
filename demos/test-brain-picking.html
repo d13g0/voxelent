@@ -10,7 +10,7 @@
 
 <script src="lib/jquery.js" type="text/javascript"> </script>
 <script src="lib/jquery-ui.js" type="text/javascript"> </script>
-<script type='text/javascript' src='lib/voxelent_v0.89.3.js'> </script>
+<script type='text/javascript' src='lib/voxelent_v0.89.4.js'> </script>
 <script type='text/javascript' src='lib/vox-gui_v0.1.js'> </script>
 
 <title>Voxelent - Demo Brain</title>
@@ -41,7 +41,7 @@
 
 	    vxl.api.load(list,'assets/models/brain',vxl.def.model.loadingMode.LATER);
 	    view.start();
-	    vxl.api.setProgram(view, vxl.def.glsl.lambert);
+	    vxl.api.setProgram(view, vxlLambertProgram);
     	pickerInteractor = new vxlPickerInteractor();
     	defaultInteractor = view.interactor;
 	}

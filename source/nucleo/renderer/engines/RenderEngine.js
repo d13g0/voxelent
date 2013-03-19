@@ -200,18 +200,18 @@ vxlRenderEngine.prototype._applyActorTransform = function(actor){
     
     var r		= this.renderer;
     var trx 	= r.transforms
-    var	prg 	= r.prg;
-    var glsl 	= vxl.def.glsl;
+    var	pm 	= r.pm;
+    var essl 	= vxl.def.essl;
 
     trx.push();
         mat4.multiply(trx.mvMatrix, actor._matrix);
-	    prg.setUniform(glsl.MODEL_VIEW_MATRIX,	r.transforms.mvMatrix);
+	    pm.setUniform(essl.MODEL_VIEW_MATRIX,	r.transforms.mvMatrix);
 
 	    trx.calculateModelViewPerspective();
-        prg.setUniform(glsl.MVP_MATRIX, r.transforms.mvpMatrix);
+        pm.setUniform(essl.MVP_MATRIX, r.transforms.mvpMatrix);
         
         trx.calculateNormal(); 
-        prg.setUniform(glsl.NORMAL_MATRIX, r.transforms.nMatrix);
+        pm.setUniform(essl.NORMAL_MATRIX, r.transforms.nMatrix);
     
     trx.pop();
  };
@@ -228,14 +228,14 @@ vxlRenderEngine.prototype._applyGlobalTransform = function(){
     
     var r       = this.renderer;
     var trx     = r.transforms
-    var prg     = r.prg;
-    var glsl    = vxl.def.glsl;
+    var pm     = r.pm;
+    var essl    = vxl.def.essl;
 
-    prg.setUniform(glsl.MODEL_VIEW_MATRIX,  r.transforms.mvMatrix);
+    pm.setUniform(essl.MODEL_VIEW_MATRIX,  r.transforms.mvMatrix);
     trx.calculateModelViewPerspective();
-    prg.setUniform(glsl.MVP_MATRIX, r.transforms.mvpMatrix);
+    pm.setUniform(essl.MVP_MATRIX, r.transforms.mvpMatrix);
     trx.calculateNormal(); 
-    prg.setUniform(glsl.NORMAL_MATRIX, r.transforms.nMatrix);
+    pm.setUniform(essl.NORMAL_MATRIX, r.transforms.nMatrix);
     
  };
  
@@ -249,8 +249,8 @@ vxlRenderEngine.prototype.render = function(scene){
     //Updates the perspective matrix and passes it to the program
     var r       = this.renderer,
     trx     = r.transforms,
-    prg     = r.prg,
-    glsl    = vxl.def.glsl,
+    pm     = r.pm,
+    glsl    = vxl.def.essl,
     gl      = r.gl;
     
     trx.calculatePerspective();
@@ -318,13 +318,13 @@ vxlRenderEngine.prototype._handlePicking = function(actors){
 vxlRenderEngine.prototype._enablePartVertices = function(actor,part){
     
     var gl = this.renderer.gl;
-    var prg = this.renderer.prg;
+    var pm = this.renderer.pm;
     var buffers = this._gl_buffers[actor.UID];
-    var glsl    = vxl.def.glsl; 
+    var essl    = vxl.def.essl; 
                 
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.vertices), gl.STATIC_DRAW);
-    prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0); 
+    pm.setAttributePointer(essl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0); 
 };
 
 /**
@@ -333,17 +333,17 @@ vxlRenderEngine.prototype._enablePartVertices = function(actor,part){
 vxlRenderEngine.prototype._enablePartNormals = function(actor,part){
     
   var gl = this.renderer.gl;
-  var prg = this.renderer.prg;
+  var pm = this.renderer.pm;
   var buffers = this._gl_buffers[actor.UID];
-  var glsl    = vxl.def.glsl; 
+  var essl    = vxl.def.essl; 
   
   if (part.normals != undefined && part.normals.length>0){
         try{
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.normals), gl.STATIC_DRAW);
             
-            prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
-            prg.setAttributePointer(glsl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
+            pm.enableAttribute(essl.NORMAL_ATTRIBUTE);
+            pm.setAttributePointer(essl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
             
         }
         catch(err){
@@ -360,18 +360,18 @@ vxlRenderEngine.prototype._enablePartNormals = function(actor,part){
 vxlRenderEngine.prototype._enablePartColors = function(actor,part){
     
   var gl = this.renderer.gl;
-  var prg = this.renderer.prg;
+  var pm = this.renderer.pm;
   var buffers = this._gl_buffers[actor.UID];
-  var glsl    = vxl.def.glsl; 
+  var essl    = vxl.def.essl; 
   
   if (part.colors != undefined && part.colors.length>0){
       try{
-            prg.setUniform("uUseVertexColors", true);
+            pm.setUniform("uUseVertexColors", true);
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.colors), gl.STATIC_DRAW);
         
-            prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
-            prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+            pm.enableAttribute(essl.COLOR_ATTRIBUTE);
+            pm.setAttributePointer(essl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
           
         }
         catch(err){
@@ -389,17 +389,17 @@ vxlRenderEngine.prototype._enableNormals = function(actor){
     
     var model = actor.model;
     var gl = this.renderer.gl;
-    var prg = this.renderer.prg;
+    var pm = this.renderer.pm;
     var buffers = this._gl_buffers[actor.UID];
-    var glsl    = vxl.def.glsl; 
+    var essl    = vxl.def.essl; 
     
     if(model.normals && actor.material.shading){
         try{
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals), gl.STATIC_DRAW);
             
-            prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
-            prg.setAttributePointer(glsl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
+            pm.enableAttribute(essl.NORMAL_ATTRIBUTE);
+            pm.setAttributePointer(essl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
             
         }
         catch(err){
@@ -416,18 +416,18 @@ vxlRenderEngine.prototype._enableColors = function(actor){
     
     var model = actor.model;
     var gl = this.renderer.gl;
-    var prg = this.renderer.prg;
+    var pm = this.renderer.pm;
     var buffers = this._gl_buffers[actor.UID];
-    var glsl    = vxl.def.glsl; 
+    var essl    = vxl.def.essl; 
     
     if (actor.material.colors && actor.material.colors.length == actor.model.vertices.length){    
         try{
-            prg.setUniform("uUseVertexColors", true);
+            pm.setUniform("uUseVertexColors", true);
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.material.colors), gl.STATIC_DRAW);
             
-            prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
-            prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+            pm.enableAttribute(essl.COLOR_ATTRIBUTE);
+            pm.setAttributePointer(essl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
         }
         catch(err){
             alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
@@ -444,8 +444,8 @@ vxlRenderEngine.prototype._renderSolid = function(actor){
     
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
-    var prg     = this.renderer.prg;
-    var glsl    = vxl.def.glsl;
+    var pm     = this.renderer.pm;
+    var essl    = vxl.def.essl;
     
     if (actor.renderable){
         
@@ -487,8 +487,8 @@ vxlRenderEngine.prototype._renderWireframe = function(actor){
 
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
-    var prg     = this.renderer.prg;
-    var glsl    = vxl.def.glsl;
+    var pm     = this.renderer.pm;
+    var essl    = vxl.def.essl;
     
     if (!actor.toy){
         this._enableNormals(actor);
@@ -508,12 +508,12 @@ vxlRenderEngine.prototype._renderPoints = function(actor){
     
     var model   = actor.model;
     var gl      = this.renderer.gl;
-    var prg     = this.renderer.prg;
-    var glsl    = vxl.def.glsl; 
+    var pm     = this.renderer.pm;
+    var essl    = vxl.def.essl; 
     
-    prg.setUniform("uUseShading", false);
+    pm.setUniform("uUseShading", false);
     
-    prg.setUniform("uPointSize", 5);//TODO: this can be an actor property?
+    pm.setUniform("uPointSize", 5);//TODO: this can be an actor property?
     this._enableColors(actor);
     gl.drawArrays(gl.POINTS,0, model.vertices.length/3);
 };
@@ -525,10 +525,10 @@ vxlRenderEngine.prototype._renderLines = function(actor){
     
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
-    var prg     = this.renderer.prg;
-    var glsl    = vxl.def.glsl;
+    var pm     = this.renderer.pm;
+    var essl    = vxl.def.essl;
     
-    prg.setUniform("uUseShading", false);
+    pm.setUniform("uUseShading", false);
     this._enableColors(actor);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
     gl.drawElements(gl.LINES, actor.model.indices.length, gl.UNSIGNED_SHORT,0); 
@@ -541,11 +541,11 @@ vxlRenderEngine.prototype._renderBoundingBox = function(actor){
     
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
-    var prg     = this.renderer.prg;
-    var glsl    = vxl.def.glsl; 
+    var pm     = this.renderer.pm;
+    var essl    = vxl.def.essl; 
     
-    prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
-    prg.setUniform("uUseShading", false);
+    pm.disableAttribute(essl.NORMAL_ATTRIBUTE);
+    pm.setUniform("uUseShading", false);
     
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.getBoundingBoxVertices()), gl.STATIC_DRAW);
@@ -561,8 +561,8 @@ vxlRenderEngine.prototype._renderBoundingBoxAndSolid = function(actor){    var m
     
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
-    var prg     = this.renderer.prg;
-    var glsl    = vxl.def.glsl;
+    var pm     = this.renderer.pm;
+    var essl    = vxl.def.essl;
     
     //solid
     this._renderSolid(actor);
@@ -570,8 +570,8 @@ vxlRenderEngine.prototype._renderBoundingBoxAndSolid = function(actor){    var m
     //bounding box, don't move the bb as it has been updated with the actor transform already ;-)
     this._applyGlobalTransform();
     
-    prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
-    prg.setUniform("uUseShading", false);
+    pm.disableAttribute(essl.NORMAL_ATTRIBUTE);
+    pm.setUniform("uUseShading", false);
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
     //@TODO: Review, should we be asking an actor for renderable vertices?
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.getBoundingBoxVertices()), gl.STATIC_DRAW);
@@ -588,15 +588,15 @@ vxlRenderEngine.prototype._renderWiredAndSolid = function(actor){
     var model   = actor.model;
     var buffers = this._gl_buffers[actor.UID];
     var gl      = this.renderer.gl;
-    var prg     = this.renderer.prg;
-    var glsl    = vxl.def.glsl;
+    var pm     = this.renderer.pm;
+    var essl    = vxl.def.essl;
     
     
     this._renderSolid(actor);
     
-    prg.setUniform("uUseShading",false);
-    prg.setUniform("uMaterialDiffuse",[0.9,0.9,0.9,1.0]);
-    prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
+    pm.setUniform("uUseShading",false);
+    pm.setUniform("uMaterialDiffuse",[0.9,0.9,0.9,1.0]);
+    pm.disableAttribute(essl.NORMAL_ATTRIBUTE);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.wireframe);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.wireframe), gl.STATIC_DRAW);
     gl.drawElements(gl.LINES, model.wireframe.length, gl.UNSIGNED_SHORT,0); 
@@ -615,8 +615,8 @@ vxlRenderEngine.prototype._renderFlat = function(actor){
     var buffers = this._gl_buffers[actor.UID];
     var texture = this._gl_textures[actor.UID]; 
     var gl      = this.renderer.gl;
-    var prg     = this.renderer.prg;
-    var glsl    = vxl.def.glsl;
+    var pm     = this.renderer.pm;
+    var essl    = vxl.def.essl;
     
     if (actor.mesh == undefined){
         actor.mesh = new vxlMesh(actor.model);
@@ -629,17 +629,17 @@ vxlRenderEngine.prototype._renderFlat = function(actor){
         var model = actor.model;
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
-        prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+        pm.setAttributePointer(essl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals), gl.STATIC_DRAW);
-        prg.setUniform("uUseShading",actor.material.shading);
-        prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
-        prg.setAttributePointer(glsl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
+        pm.setUniform("uUseShading",actor.material.shading);
+        pm.enableAttribute(essl.NORMAL_ATTRIBUTE);
+        pm.setAttributePointer(essl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
         this._renderWireframe(actor);
         return;
     } 
 
-    prg.setUniform("uUseShading",true);
+    pm.setUniform("uUseShading",true);
 
     var parts = actor.renderable.parts;
     var i = parts.length;
@@ -651,8 +651,8 @@ vxlRenderEngine.prototype._renderFlat = function(actor){
                 gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
                 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.normals), gl.STATIC_DRAW);
                 
-                prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
-                prg.setAttributePointer(glsl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
+                pm.enableAttribute(essl.NORMAL_ATTRIBUTE);
+                pm.setAttributePointer(essl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
                 
             }
             catch(err){
@@ -663,7 +663,7 @@ vxlRenderEngine.prototype._renderFlat = function(actor){
         try{
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.vertices), gl.STATIC_DRAW);
-            prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+            pm.setAttributePointer(essl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
         }
         catch(err){
             alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
@@ -678,12 +678,12 @@ vxlRenderEngine.prototype._renderFlat = function(actor){
                 }
               
                 try{
-                    prg.setUniform("uUseVertexColors", true);
+                    pm.setUniform("uUseVertexColors", true);
                     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors);
                     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.colors), gl.STATIC_DRAW);
                     
-                    prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
-                    prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+                    pm.enableAttribute(essl.COLOR_ATTRIBUTE);
+                    pm.setAttributePointer(essl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
                 }
                 catch(err){
                     alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
@@ -721,10 +721,10 @@ vxlRenderEngine.prototype._renderPickingBuffer = function(actor){
     var buffers = this._gl_buffers[actor.UID];
     var texture = this._gl_textures[actor.UID]; 
     var gl      = this.renderer.gl;
-    var prg     = this.renderer.prg;
-    var glsl    = vxl.def.glsl;
+    var pm     = this.renderer.pm;
+    var essl    = vxl.def.essl;
     
-    prg.setUniform("uUseShading",false);
+    pm.setUniform("uUseShading",false);
     
     if (actor._picking == vxl.def.actor.picking.CELL){
     
@@ -744,7 +744,7 @@ vxlRenderEngine.prototype._renderPickingBuffer = function(actor){
             try{
                 gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
                 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.vertices), gl.STATIC_DRAW);
-                prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+                pm.setAttributePointer(essl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
             }
             catch(err){
                 alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
@@ -759,12 +759,12 @@ vxlRenderEngine.prototype._renderPickingBuffer = function(actor){
                 }
                   
                 try{
-                    prg.setUniform("uUseVertexColors", true);
+                    pm.setUniform("uUseVertexColors", true);
                     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors);
                     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(part.pickingColors), gl.STATIC_DRAW);
                     
-                    prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
-                    prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+                    pm.enableAttribute(essl.COLOR_ATTRIBUTE);
+                    pm.setAttributePointer(essl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
                 }
                 catch(err){
                     alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the color buffer. Error =' +err.description);
@@ -783,11 +783,11 @@ vxlRenderEngine.prototype._renderPickingBuffer = function(actor){
     }
     else if (actor._picking == vxl.def.actor.picking.OBJECT){
         
-        prg.setUniform("uMaterialDiffuse",actor._pickingColor.concat(1.0));
+        pm.setUniform("uMaterialDiffuse",actor._pickingColor.concat(1.0));
         try{
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices), gl.STATIC_DRAW);
-            prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+            pm.setAttributePointer(essl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
         }
         catch(err){
             alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
@@ -813,8 +813,8 @@ vxlRenderEngine.prototype._renderTextured = function(actor){
     var buffers = this._gl_buffers[actor.UID];
     var texture = this._gl_textures[actor.UID]; 
     var gl      = this.renderer.gl;
-    var prg     = this.renderer.prg;
-    var glsl    = vxl.def.glsl;   
+    var pm     = this.renderer.pm;
+    var essl    = vxl.def.essl;   
     
     if (!actor.material.texture.loaded){
         this._renderSolid(actor);
@@ -823,11 +823,11 @@ vxlRenderEngine.prototype._renderTextured = function(actor){
     
     if (model.texcoords){
         try{
-            prg.setUniform("uUseTextures", true);
+            pm.setUniform("uUseTextures", true);
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texcoords);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.texcoords), gl.STATIC_DRAW);
-            prg.setAttributePointer(glsl.TEXCOORD_ATTRIBUTE, 2, gl.FLOAT,false, 0,0);
-            prg.enableAttribute(glsl.TEXCOORD_ATTRIBUTE);
+            pm.setAttributePointer(essl.TEXCOORD_ATTRIBUTE, 2, gl.FLOAT,false, 0,0);
+            pm.enableAttribute(essl.TEXCOORD_ATTRIBUTE);
         }
         catch(err){
             alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the texture buffer. Error =' +err.description);
@@ -845,7 +845,7 @@ vxlRenderEngine.prototype._renderTextured = function(actor){
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, actor.material.texture.getMagFilter(gl));
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, actor.material.texture.getMinFilter(gl));
-    prg.setUniform("uSampler", 0);
+    pm.setUniform("uSampler", 0);
     
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
     gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT,0);
@@ -880,8 +880,8 @@ vxlRenderEngine.prototype._renderActor = function(actor){
     var buffers = this._gl_buffers[actor.UID];
     var texture = this._gl_textures[actor.UID]; 
     var gl      = this.renderer.gl;
-    var prg     = this.renderer.prg;
-    var glsl    = vxl.def.glsl;   
+    var pm     = this.renderer.pm;
+    var essl    = vxl.def.essl;   
     var trx     = this.renderer.transforms;
     var diffuse = [actor.material.diffuse[0], 
                    actor.material.diffuse[1], 
@@ -892,29 +892,29 @@ vxlRenderEngine.prototype._renderActor = function(actor){
      * If the renderer is not forcing his program, then give the actors
      * a chance to decide which program they want to use to be rendered
      */
-    if (!this.renderer._forceProgram){
+    if (!this.renderer._enforce){
         if(actor.material.shininess > 0){
-            this.renderer.setProgram(vxl.def.glsl.phong);
-            prg.setUniform("uShininess", actor.material.shininess);
-            prg.setUniform("uMaterialSpecular", actor.material.specular);
+            this.renderer.setProgram(vxl.go.essl.phong);
+            pm.setUniform("uShininess", actor.material.shininess);
+            pm.setUniform("uMaterialSpecular", actor.material.specular);
         }
         else{
-            this.renderer.setProgram(vxl.def.glsl.lambert);
+            this.renderer.setProgram(vxl.go.essl.lambert);
         }
     }
     
     
-    prg.disableAttribute(glsl.TEXCOORD_ATTRIBUTE);
-    prg.disableAttribute(glsl.COLOR_ATTRIBUTE);
-    prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
-    prg.disableAttribute(glsl.PICKING_COLOR_ATTRIBUTE);
-    prg.enableAttribute(glsl.VERTEX_ATTRIBUTE);
+    pm.disableAttribute(essl.TEXCOORD_ATTRIBUTE);
+    pm.disableAttribute(essl.COLOR_ATTRIBUTE);
+    pm.disableAttribute(essl.NORMAL_ATTRIBUTE);
+    pm.disableAttribute(essl.PICKING_COLOR_ATTRIBUTE);
+    pm.enableAttribute(essl.VERTEX_ATTRIBUTE);
     
-    prg.setUniform(glsl.PERSPECTIVE_MATRIX, trx.pMatrix);
-    prg.setUniform("uUseVertexColors", false);
-    prg.setUniform("uUseTextures", false);
-    prg.setUniform("uUseShading",actor.material.shading);
-    prg.setUniform("uMaterialDiffuse",diffuse);
+    pm.setUniform(essl.PERSPECTIVE_MATRIX, trx.pMatrix);
+    pm.setUniform("uUseVertexColors", false);
+    pm.setUniform("uUseTextures", false);
+    pm.setUniform("uUseShading",actor.material.shading);
+    pm.setUniform("uMaterialDiffuse",diffuse);
     
     
     this._handleCulling(actor);
@@ -931,7 +931,7 @@ vxlRenderEngine.prototype._renderActor = function(actor){
         try{
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
-            prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+            pm.setAttributePointer(essl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
         }
         catch(err){
             alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);

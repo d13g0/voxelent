@@ -18,81 +18,73 @@
  * @private
  * @class
  */
-vxl.def.glsl.bake = {
-	
-	ID : 'bake',
 
-	ATTRIBUTES : [
-	"aVertexPosition", 
-	"aVertexNormal",
-	"aVertexColor",
-	"aPosition",
-	"aScale",
-	"aUseShading"
-	],
-	
-	UNIFORMS : [
-	"mModelView",
-	"mNormal",
-	"mPerspective",
-	"mModelViewPerspective",
-	"uLightDirection",
-	"uLightAmbient",
-	"uLightDiffuse",
-	"uUseLightTranslation"],
-	
-	
-    VERTEX_SHADER : [
-    "attribute vec3 aVertexPosition;",
-	"attribute vec3 aVertexNormal;",
-	"attribute vec3 aVertexColor;",
-	"attribute vec3 aPosition;",
-	"attribute vec3 aScale;",
-	"attribute float aShading;",
-	
-	"uniform mat4 mModelView;",
-	"uniform mat4 mPerspective;",
-	"uniform mat4 mNormal;",
-	"uniform mat4 mModelViewPerspective;",
+vxlBakeProgram.prototype = new vxlProgram();
+vxlBakeProgram.prototype.constructor = vxlBakeProgram;
 
-	"uniform vec3 uLightDirection;",
-	"uniform vec4 uLightAmbient;",  
-	"uniform vec4 uLightDiffuse;",
-    "uniform bool uUseLightTranslation;",
-	"varying vec4 vFinalColor;",
+function vxlBakeProgram(){
+    this.createFromJSON({
     
-    "void main(void) {",
-    "   vec3 position = (aVertexPosition * aScale) + aPosition;",
-    "	gl_Position = mModelViewPerspective * vec4(position, 1.0);",
-    "   vFinalColor = vec4(aVertexColor,1.0);",
+        ID : 'bake',
     
-    "   if (aShading == 1.0){",
-    "	   vec3 N = vec3(mNormal * vec4(aVertexNormal, 1.0));",
-	"	   vec3 L = normalize(uLightDirection);",
-	"	   if (uUseLightTranslation) { L = vec3(mNormal * vec4(L,1.0));}",
-	"	   float lambertTerm = max(dot(N,-L),0.4);",
-	"	   vec4 Ia = uLightAmbient;",
-	"	   vec4 Id = vFinalColor * uLightDiffuse * lambertTerm;",
-    "	   vFinalColor = Ia + Id;",
-	"	   vFinalColor.a = 1.0;",
-	"   }",
-	"}"].join('\n'),
+        VERTEX_SHADER : [
+        "attribute vec3 aVertexPosition;",
+        "attribute vec3 aVertexNormal;",
+        "attribute vec3 aVertexColor;",
+        "attribute vec3 aPosition;",
+        "attribute vec3 aScale;",
+        "attribute float aShading;",
+        
+        "uniform mat4 mModelView;",
+        "uniform mat4 mPerspective;",
+        "uniform mat4 mNormal;",
+        "uniform mat4 mModelViewPerspective;",
     
-    FRAGMENT_SHADER : [
-    "#ifdef GL_ES",
-    "precision highp float;",
-    "#endif",
+        "uniform vec3 uLightDirection;",
+        "uniform vec4 uLightAmbient;",  
+        "uniform vec4 uLightDiffuse;",
+        "uniform bool uUseLightTranslation;",
+        "varying vec4 vFinalColor;",
+        
+        "void main(void) {",
+        "   vec3 position = (aVertexPosition * aScale) + aPosition;",
+        "   gl_Position = mModelViewPerspective * vec4(position, 1.0);",
+        "   vFinalColor = vec4(aVertexColor,1.0);",
+        
+        "   if (aShading == 1.0){",
+        "      vec3 N = vec3(mNormal * vec4(aVertexNormal, 1.0));",
+        "      vec3 L = normalize(uLightDirection);",
+        "      if (uUseLightTranslation) { L = vec3(mNormal * vec4(L,1.0));}",
+        "      float lambertTerm = max(dot(N,-L),0.4);",
+        "      vec4 Ia = uLightAmbient;",
+        "      vec4 Id = vFinalColor * uLightDiffuse * lambertTerm;",
+        "      vFinalColor = Ia + Id;",
+        "      vFinalColor.a = 1.0;",
+        "   }",
+        "}"].join('\n'),
+        
+        FRAGMENT_SHADER : [
+        "#ifdef GL_ES",
+        "precision highp float;",
+        "#endif",
+    
+        "varying vec4  vFinalColor;",
+    
+        "void main(void)  {",
+        "       gl_FragColor = vFinalColor;",
+        "}"].join('\n'),
+        
+        DEFAULTS : {
+            "uLightDirection"   : [0.0,0.0,-1.0],
+            "uLightAmbient"     : [0.0,0.0,0.0,1.0],
+            "uLightDiffuse"     : [1.0,1.0,1.0,1.0],
+            "uUseLightTranslation" : false
+        }
+    });
+}; 
 
-    "varying vec4  vFinalColor;",
 
-    "void main(void)  {",
-    "		gl_FragColor = vFinalColor;",
-    "}"].join('\n'),
-    
-    DEFAULTS : {
-        "uLightDirection" 	: [0.0,0.0,-1.0],
-        "uLightAmbient"   	: [0.0,0.0,0.0,1.0],
-        "uLightDiffuse"   	: [1.0,1.0,1.0,1.0],
-        "uUseLightTranslation" : false
-    }
-};
+
+vxl.go.essl.bake = new vxlBakeProgram();
+
+

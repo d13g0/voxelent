@@ -31,20 +31,23 @@ function vxlRenderer(vw){
 	this.renderRate 	= vxl.def.renderer.rate.NORMAL;
 	this.mode       	= vxl.def.renderer.mode.TIMER;
     this.gl         	= this.getWebGLContext();
-    this.prg        	= new vxlProgram(this.gl);
+    this.pm        	    = new vxlProgramManager(this.gl);
     this.transforms 	= new vxlTransforms(vw);
     this.fps            = 0;
     this.currentProgram = undefined;
     this.engine 		= undefined;
+    
     
     this._time          = 0;
     this._startDate     = 0;
     this._running       = false;
     this._clearColor    = undefined;
     this._renderTarget  = undefined;
-    this._forceProgram  = false;
-    this.setProgram(vxl.def.glsl.lambert, vxlRenderEngine, false);
     
+    this._knownPrograms = {};
+    this._enforce       = false; //to enforce the program or not
+    
+    this.setProgram(vxl.go.essl.lambert, vxlRenderEngine, false);
     
 }
 
@@ -99,58 +102,73 @@ vxlRenderer.prototype._initializeGLContext = function(gl){
 
 /**
  * Tries to add a new program definition to this renderer
- * @param {Object} program JSON program definition.
- * @param {vxlRenderEngine} engine 
- * @see {vxl.def.glsl.phong}
- * @see {vxl.def.glsl.lambert}
+ * @param {vxlProgram} program an instance of a vxlProgram object or one of its descendents
+ * @param {Class} engineType (optional) a new engine class to be instantiated 
  */
-vxlRenderer.prototype.setProgram = function(program,engine, forceIt){
+vxlRenderer.prototype.setProgram = function(program,engineType, forceIt){
+    
+    
+    if (this._enforce && program.ID != this.currentProgram.ID){
+        throw new vxlRendererException("The current program is being enforced. Please use vxlRenderer.releaseProgram first");
+    }
     
     if (forceIt != undefined && forceIt == true){
-        this._forceProgram = true;
+        this._enforce = true;
     }
     else{
-        this._forceProgram = false;
+        this._enforce = false;
     }
     
     
-    if(this.currentProgram != undefined && 
-        this.currentProgram == program){
-        return;
+    //Check if the program has be instantiated before
+    if (this._knownPrograms[program.ID] == undefined || this._enforce){
+        this._knownPrograms[program.ID]= program;
     }
-  
     
-    var prg = this.prg;
+    var prg = this._knownPrograms[program.ID];
+    var pm = this.pm;
 
-	if (!prg.isRegistered(program.ID)){
-		prg.register(program);
+	if (!pm.isRegistered(prg.ID)){
+		pm.register(prg);
 	}
 	
-	if (!prg.isLoaded(program.ID)){
-		prg.loadProgram(program.ID);
+	if (!pm.isLoaded(prg.ID)){
+		pm.loadProgram(prg.ID);
 	}
-	prg.useProgram(program.ID);
-	prg.loadDefaults();
 	
-	this.currentProgram = program;
+	pm.useProgram(prg.ID);
+	pm.loadDefaults();
 	
-	if (engine != undefined){
-	   this.setEngine(engine);
+	this.currentProgram = prg;
+	
+	if (engineType != undefined){
+	   this.setupEngine(engineType);
 	}
 	
 	
 };
 
 /**
+ * When the current program is being enforced by the renderer (see setProgram), any
+ * subsequent call to setProgram will be unsuccessful. So for instance, actors
+ * who want to use a different program to be rendered would not be able to do so.
+ * 
+ * This method releases the current program from being enforced 
+ */
+vxlRenderer.prototype.releaseProgram = function(){
+    this._enforce = false;
+}
+
+/**
  * Sets the current rendering engine. If the engine parameter is null or undefined, this method will check if 
  * the current strategy is null and in that case sets the strategy as an instance of <code>vxlBasicStrategy</code>
  * 
- * @param {function} engine The engine to be used. This parameter 
+ * @param {function} engineType The engine to be used. This parameter 
  * corresponds to the constructor of the engine that should be used.  
  */
-vxlRenderer.prototype.setEngine = function(engine){
-    if (engine != null && engine != undefined){
-        this.engine = new engine(this);
+vxlRenderer.prototype.setupEngine = function(engineType){
+    if (engineType != null && engineType != undefined){
+        this.engine = new engineType(this);
     }
     else if (this.engine == undefined){
         this.engine = new vxlRenderEngine(this);
@@ -331,5 +349,14 @@ vxlRenderer.prototype.enableOffscreen = function(){
  */
 vxlRenderer.prototype.isOffscreenEnabled = function(){
     return this.engine.isOffscreenEnabled();  
+};
+
+
+/**
+ * @class  Encapsulates a renderer exception
+ * @param {Object} message
+ */
+function vxlRendererException(message){
+    this.message = message;
 };
 

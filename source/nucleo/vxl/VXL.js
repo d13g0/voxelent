@@ -54,14 +54,14 @@ var vxl = {
 */
 version : 
 {
-    number: '0.89.3',
+    number: '0.89.4',
    	codename : 'c4n314',
    	plugins  : []
 },
 
 /**
  * @namespace Voxelent Default/Definition Objects
- * @property {vxl.def.glsl}     glsl    GLSL constants
+ * @property {vxl.def.essl}     essl    ESSL constants
  * @property {vxl.def.lut}      lut     Lookup Table Definitions
  * @property {vxl.def.model}    model   Default          values for models
  * @property {vxl.def.view}     view    Default values for views 
@@ -98,7 +98,7 @@ def : {
      * @property {JSON} phong The program to render scenes with specular reflections
      * @property {JSON} bake The program that interleaves buffers for optimized rendering
      */
-	glsl			: { 
+	essl			: { 
 						VERTEX_SHADER   	: 'VERTEX_SHADER',
 						FRAGMENT_SHADER 	: 'FRAGMENT_SHADER',
 						MODEL_VIEW_MATRIX  	: 'mModelView',
@@ -446,6 +446,7 @@ go : {
     lookupTableManager  : undefined,
     views               : [],
     scenes              : [],
+    essl : {},
     renderman : {
 
 		_timid : 0,

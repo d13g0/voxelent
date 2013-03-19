@@ -19,7 +19,7 @@
  * @class
  * Implements a basic rendering strategy that works with the following programs:
  * 
- * vxl.def.glsl.bake
+ * vxl.def.essl.bake
  * TODO: Does not deal with model scalars well...
  * 
  */
@@ -58,7 +58,7 @@ function vxlBakeEngine(renderer){
     
     
     this.glsl = vxl.util.extend(
-        vxl.def.glsl,{
+        vxl.def.essl,{
         POSITION: "aPosition",
         SCALE:    "aScale",
         SHADING:  "aShading"
@@ -284,9 +284,9 @@ vxlBakeEngine.prototype.allocate = function(scene){
     var buffers     = this._gl_buffers;
     var data        = this._data;
 
-    var prg         = r.prg;
+    var pm         = r.pm;
     var gl          = r.gl;
-    var glsl        = this.glsl;
+    var essl        = this.glsl;
     var mode        = gl.STATIC_DRAW;
     
     
@@ -295,31 +295,31 @@ vxlBakeEngine.prototype.allocate = function(scene){
         this._allocateActor(elements[i]);
     }
     
-    prg.enableAttribute(glsl.VERTEX_ATTRIBUTE);
-    prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
-    prg.enableAttribute(glsl.COLOR_ATTRIBUTE);
+    pm.enableAttribute(essl.VERTEX_ATTRIBUTE);
+    pm.enableAttribute(essl.NORMAL_ATTRIBUTE);
+    pm.enableAttribute(essl.COLOR_ATTRIBUTE);
     
-    prg.enableAttribute(glsl.POSITION);
-    prg.enableAttribute(glsl.SCALE);
-    prg.enableAttribute(glsl.SHADING);
+    pm.enableAttribute(essl.POSITION);
+    pm.enableAttribute(essl.SCALE);
+    pm.enableAttribute(essl.SHADING);
     
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.baked);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data.baked), mode);
-    prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 36, 0);
-    prg.setAttributePointer(glsl.NORMAL_ATTRIBUTE, 3, gl.FLOAT, false, 36, 12);
-    prg.setAttributePointer(glsl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 36, 24);
+    pm.setAttributePointer(essl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 36, 0);
+    pm.setAttributePointer(essl.NORMAL_ATTRIBUTE, 3, gl.FLOAT, false, 36, 12);
+    pm.setAttributePointer(essl.COLOR_ATTRIBUTE, 3, gl.FLOAT, false, 36, 24);
     
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data.position), mode);
-    prg.setAttributePointer(glsl.POSITION, 3, gl.FLOAT, false,12,0);
+    pm.setAttributePointer(essl.POSITION, 3, gl.FLOAT, false,12,0);
     
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.scale);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data.scale), mode);
-    prg.setAttributePointer(glsl.SCALE, 3, gl.FLOAT, false,12,0);
+    pm.setAttributePointer(essl.SCALE, 3, gl.FLOAT, false,12,0);
     
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.shading);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data.shading), mode);
-    prg.setAttributePointer(glsl.SHADING, 1, gl.FLOAT, false,4,0);
+    pm.setAttributePointer(essl.SHADING, 1, gl.FLOAT, false,4,0);
     
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
@@ -338,17 +338,17 @@ vxlBakeEngine.prototype.render = function(scene){
     //Updates the perspective matrix and passes it to the program
     var r       = this.renderer;
     var trx     = r.transforms
-    var prg     = r.prg;
+    var pm     = r.pm;
     var gl      = r.gl;
-    var glsl    = vxl.def.glsl;
+    var essl    = vxl.def.essl;
     var data    = this._data;
     
     trx.update();
 
-    prg.setUniform(glsl.PERSPECTIVE_MATRIX, trx.pMatrix);
-    prg.setUniform(glsl.MODEL_VIEW_MATRIX,  trx.mvMatrix);
-    prg.setUniform(glsl.NORMAL_MATRIX,      trx.nMatrix);
-    prg.setUniform(glsl.MVP_MATRIX,         trx.mvpMatrix);
+    pm.setUniform(essl.PERSPECTIVE_MATRIX, trx.pMatrix);
+    pm.setUniform(essl.MODEL_VIEW_MATRIX,  trx.mvMatrix);
+    pm.setUniform(essl.NORMAL_MATRIX,      trx.nMatrix);
+    pm.setUniform(essl.MVP_MATRIX,         trx.mvpMatrix);
     
     for(var i = 0, N = scene._actors.length; i<N; i+=1){
         var actor = scene._actors[i];

@@ -39,12 +39,12 @@ vxlBlenderEngine.prototype.render = function(scene){
     //Updates the perspective matrix and passes it to the program
     var r       = this.renderer;
     var trx     = r.transforms
-    var prg     = r.prg;
-    var glsl    = vxl.def.glsl;
+    var pm     = r.pm;
+    var essl    = vxl.def.essl;
     
     trx.calculatePerspective();
     trx.calculateModelView();
-    prg.setUniform(glsl.PERSPECTIVE_MATRIX, trx.pMatrix);
+    pm.setUniform(essl.PERSPECTIVE_MATRIX, trx.pMatrix);
     
     var elements = scene._actors.concat(scene.toys.list);
     var NUM = elements.length;
@@ -70,19 +70,19 @@ vxlBlenderEngine.prototype._applyActorTransform = function(actor){
     
     var r       = this.renderer;
     var trx     = r.transforms
-    var prg     = r.prg;
-    var glsl    = vxl.def.glsl;
+    var pm     = r.pm;
+    var essl    = vxl.def.essl;
 
     trx.push();
         mat4.translate  (trx.mvMatrix, actor._position);
         mat4.scale      (trx.mvMatrix, actor._scale);
         //@TODO: IMPLEMENT ACTOR ROTATIONS
         
-        prg.setUniform(glsl.MODEL_VIEW_MATRIX,  r.transforms.mvMatrix);
+        pm.setUniform(essl.MODEL_VIEW_MATRIX,  r.transforms.mvMatrix);
     trx.pop();
     
     trx.calculateNormal(); 
-    prg.setUniform(glsl.NORMAL_MATRIX, r.transforms.nMatrix);
+    pm.setUniform(essl.NORMAL_MATRIX, r.transforms.nMatrix);
     
     
     
@@ -102,9 +102,9 @@ vxlBlenderEngine.prototype._renderActor = function(actor){
     var buffers = this._gl_buffers[actor.UID]; 
     var r  		= this.renderer;
 	var gl 		= r.gl;
-	var prg 	= r.prg;
+	var pm 	= r.pm;
 	var trx 	= r.transforms;
-	var glsl    = vxl.def.glsl;
+	var essl    = vxl.def.essl;
 	
 	gl.disable(gl.CULL_FACE);
     
@@ -119,22 +119,22 @@ vxlBlenderEngine.prototype._renderActor = function(actor){
     
 	this._applyActorTransform(actor);
 	
-	prg.disableAttribute(glsl.NORMAL_ATTRIBUTE);
-	prg.enableAttribute(glsl.VERTEX_ATTRIBUTE);
+	pm.disableAttribute(essl.NORMAL_ATTRIBUTE);
+	pm.enableAttribute(essl.VERTEX_ATTRIBUTE);
 	
-	prg.setUniform("uKa", actor.getProperty("Ka"));
-	prg.setUniform("uKd", actor.getProperty("Kd"));
-	prg.setUniform("uKs", actor.getProperty("Ks"));
-	prg.setUniform("uNs", actor.getProperty("Ns"));
-	prg.setUniform("d", actor.getProperty("opacity"));
-	prg.setUniform("illum", actor.getProperty("illum"));
+	pm.setUniform("uKa", actor.getProperty("Ka"));
+	pm.setUniform("uKd", actor.getProperty("Kd"));
+	pm.setUniform("uKs", actor.getProperty("Ks"));
+	pm.setUniform("uNs", actor.getProperty("Ns"));
+	pm.setUniform("d", actor.getProperty("opacity"));
+	pm.setUniform("illum", actor.getProperty("illum"));
 	
 	
 	try{
 		
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
-		prg.setAttributePointer(glsl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
+		pm.setAttributePointer(essl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
 	}
     catch(err){
         alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the vertex buffer. Error =' +err.description);
@@ -146,8 +146,8 @@ vxlBlenderEngine.prototype._renderActor = function(actor){
 			gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.normals.slice(0)), gl.STATIC_DRAW);
 			
-			prg.enableAttribute(glsl.NORMAL_ATTRIBUTE);
-			prg.setAttributePointer(glsl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
+			pm.enableAttribute(essl.NORMAL_ATTRIBUTE);
+			pm.setAttributePointer(essl.NORMAL_ATTRIBUTE,3,gl.FLOAT, false, 0,0);
 		}
 	    catch(err){
 	        alert('There was a problem while rendering the actor ['+actor.name+']. The problem happened while handling the normal buffer. Error =' +err.description);

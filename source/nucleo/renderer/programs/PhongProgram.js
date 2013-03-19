@@ -17,36 +17,15 @@
  * @class
  * @private
  */
-vxl.def.glsl.phong = {
+
+vxlPhongProgram.prototype = new vxlProgram();
+vxlPhongProgram.prototype.constructor = vxlPhongProgram;
+
+function vxlPhongProgram(){
+    this.createFromJSON({
 
     ID : 'phong',
     
-    ATTRIBUTES: [
-    "aVertexPosition",
-    "aVertexNormal",
-    "aVertexColor",
-    "aVertexTextureCoords"
-    ],
-    
-    UNIFORMS : [
-    "mModelView",
-    "mNormal",
-    "mPerspective",
-    "mModelViewPerspective",
-    "uShininess",
-    "uPointSize",
-    "uLightDirection",
-    "uLightAmbient",
-    "uLightDiffuse",
-    "uLightSpecular",
-    "uMaterialAmbient",
-    "uMaterialDiffuse",
-    "uMaterialSpecular",
-	"uUseVertexColors",
-	"uUseShading",
-    "uUseLightTranslation",
-    "uUseTextures",
-    "uSampler"],
     
     VERTEX_SHADER: [
     "attribute vec3 aVertexPosition;",
@@ -116,7 +95,7 @@ vxl.def.glsl.phong = {
      "  vec4 Id = vec4(0.0,0.0,0.0,1.0);",
      "  vec4 Is = vec4(0.0,0.0,0.0,1.0);",
      "  vec4 varMaterialDiffuse = uMaterialDiffuse;",
-     "	if(uUseVertexColors) {",
+     "  if(uUseVertexColors) {",
      "        varMaterialDiffuse = vFinalColor;",
      "   }",
      "  if(uUseShading){  ",
@@ -132,7 +111,7 @@ vxl.def.glsl.phong = {
      "      finalColor.a = uMaterialDiffuse.a;",
      "  } ",
      "  else {",
-     "      finalColor = varMaterialDiffuse; ",	
+     "      finalColor = varMaterialDiffuse; ", 
      "  }",
      "   if (uUseTextures){",
      "       finalColor =  texture2D(uSampler, vec2(vTextureCoords.s, vTextureCoords.t));",
@@ -150,4 +129,8 @@ vxl.def.glsl.phong = {
         "uMaterialDiffuse"  : [0.8,0.8,0.8,1.0],
         "uMaterialSpecular" : [1.0,1.0,1.0,1.0]
     }
-};
+});
+   
+}; 
+
+vxl.go.essl.phong = new vxlPhongProgram();

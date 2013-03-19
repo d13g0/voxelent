@@ -13,7 +13,7 @@
 
 <script src="lib/jquery.js" type="text/javascript"> </script>
 <script src="lib/jquery-ui.js" type="text/javascript"> </script>
-<script type='text/javascript' src='lib/voxelent_v0.89.3.js'> </script>
+<script type='text/javascript' src='lib/voxelent_v0.89.4.js'> </script>
 <script type='text/javascript' src='lib/vox-gui_v0.1.js'> </script>
 <script type='text/javascript' src='lib/colorpicker.js'></script>
 
@@ -34,7 +34,7 @@
       	view.setBackgroundColor(0.2, 0.2, 0.2);
         view.start();
         view.cameraman.active.setPosition(0,0,8);
-        vxl.api.setUniformDefault(vxl.def.glsl.phong.ID, "uLightDirection",[0,0,-1]);
+        vxl.api.setUniformDefault(vxl.go.essl.phong.ID, "uLightDirection",[0,0,-1]);
         $('#toggleView').click();
         
     }

@@ -10,7 +10,7 @@
 
 <script src="lib/jquery.js" type="text/javascript"> </script>
 <script src="lib/jquery-ui.js" type="text/javascript"> </script>
-<script type='text/javascript' src='lib/voxelent_v0.89.3.js'> </script>
+<script type='text/javascript' src='lib/voxelent_v0.89.4.js'> </script>
 <script type='text/javascript' src='lib/vox-gui_v0.1.js'> </script>
 
 <title>Voxelent - Blender House</title>
@@ -25,7 +25,7 @@
         var gui = new vxlGUI(vxl.c.view); 
         vxl.api.loadSequence('part',1,203,'assets/models/house');
         view.start();
-        vxl.api.setProgram(view, vxl.def.glsl.lambert);
+        vxl.api.setProgram(view, vxlLambertProgram);
         
     }
     

@@ -1,4 +1,29 @@
 -------------------------------------------------------------------------------------------
+VERSION 0.89.4 - INLINE SHADERS
+-------------------------------------------------------------------------------------------
+In this version we are making possible to design and use your own shaders by embedding
+ESSL code in a voxelent web page.
+
+the old vxlProgram class has been renamed to vxlProgramManager given that its operations deal
+with handling actual ESSL programs.
+
+the new class vxlProgram represents a one to one mapping between a JavaScript object and a ESSL program
+
+In code this means that the old invocation:
+
+vxl.api.setProgram(view, vxl.def.glsl.lambert)
+
+is replaced instead by:
+
+vxl.api.setProgram(view, vxlLambertProgram);
+
+where vxlLambertProgram is a proper JavaScript object instead of an untyped JSON object
+as in previous versions.
+
+Other programs available in this version are:
+vxlBlenderProgram, vxlBakeProgram, vxlPhongProgram
+
+-------------------------------------------------------------------------------------------
 VERSION 0.89.3 - COMPLEX RENDERING: Renderables
 -------------------------------------------------------------------------------------------
 

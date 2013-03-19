@@ -18,106 +18,88 @@
  * @class
  * @private
  */
-vxl.def.glsl.lambert = {
-	
-	ID : 'lambert',
+vxlLambertProgram.prototype = new vxlProgram();
+vxlLambertProgram.prototype.constructor = vxlLambertProgram;
 
-	ATTRIBUTES : [
-	"aVertexPosition", 
-	"aVertexColor", 
-	"aVertexNormal",
-	"aVertexTextureCoords"],
-	
-	UNIFORMS : [
-	"mModelView",
-	"mNormal",
-	"mPerspective",
-	"mModelViewPerspective",
-	"uPointSize",
-	"uLightDirection",
-	"uLightAmbient",
-	"uLightDiffuse",
-	"uMaterialDiffuse",
-	"uUseVertexColors",
-	"uUseShading",
-	"uUseTextures",
-	"uUseLightTranslation",
-	"uSampler"
-	],
-	
-	
-    VERTEX_SHADER : [
+function vxlLambertProgram(){
+    this.createFromJSON({
     
-    "attribute vec3 aVertexPosition;",
-	"attribute vec3 aVertexNormal;",
-	"attribute vec3 aVertexColor;",
-	"attribute vec2 aVertexTextureCoords;",
-    "uniform float uPointSize;",
-	"uniform mat4 mModelView;",
-	"uniform mat4 mPerspective;",
-	"uniform mat4 mModelViewPerspective;",
-	"uniform mat4 mNormal;",
-	"uniform vec3 uLightDirection;",
-	"uniform vec4 uLightAmbient;",  
-	"uniform vec4 uLightDiffuse;",
-	"uniform vec4 uMaterialDiffuse;",
-	"uniform bool uUseShading;",
-    "uniform bool uUseVertexColors;",
-    "uniform bool uUseLightTranslation;",
-    "uniform bool uUseTextures;",
-	"varying vec4 vFinalColor;",
-    "varying vec2 vTextureCoords;",
+        ID : 'lambert',
+        VERTEX_SHADER : [
+        "attribute vec3 aVertexPosition;",
+        "attribute vec3 aVertexNormal;",
+        "attribute vec3 aVertexColor;",
+        "attribute vec2 aVertexTextureCoords;",
+        "uniform float uPointSize;",
+        "uniform mat4 mModelView;",
+        "uniform mat4 mPerspective;",
+        "uniform mat4 mModelViewPerspective;",
+        "uniform mat4 mNormal;",
+        "uniform vec3 uLightDirection;",
+        "uniform vec4 uLightAmbient;",  
+        "uniform vec4 uLightDiffuse;",
+        "uniform vec4 uMaterialDiffuse;",
+        "uniform bool uUseShading;",
+        "uniform bool uUseVertexColors;",
+        "uniform bool uUseLightTranslation;",
+        "uniform bool uUseTextures;",
+        "varying vec4 vFinalColor;",
+        "varying vec2 vTextureCoords;",
+        
+        "void main(void) {",
+        "   gl_Position = mModelViewPerspective * vec4(aVertexPosition, 1.0);",
+        "   gl_PointSize = uPointSize;",
+        
+        "   if (uUseVertexColors) {",
+        "       vFinalColor = vec4(aVertexColor,uMaterialDiffuse.a);",
+        "   }",
+        "   else {",
+        "       vFinalColor = uMaterialDiffuse;",
+        "   }",
+        "   if (uUseShading){",
+        "       vec3 N = vec3(mNormal * vec4(aVertexNormal, 1.0));",
+        "       vec3 L = normalize(uLightDirection);",
+        "       if (uUseLightTranslation){ L = vec3(mNormal * vec4(L,1.0));}",
+        "       float lambertTerm = max(dot(N,-L),0.4);",
+        "       vec4 Ia = uLightAmbient;",
+        "       vec4 Id = vFinalColor * uLightDiffuse * lambertTerm;",
+        "       vFinalColor = Ia + Id;",
+        "       vFinalColor.a = uMaterialDiffuse.a;",
+        "   }" ,
+        "   if (uUseTextures){" ,
+        "       vTextureCoords = aVertexTextureCoords;",
+        "   }",
+        "}"].join('\n'),
+        
+        FRAGMENT_SHADER : [
+        "#ifdef GL_ES",
+        "precision highp float;",
+        "#endif",
     
-    "void main(void) {",
-    "	gl_Position = mModelViewPerspective * vec4(aVertexPosition, 1.0);",
-    "	gl_PointSize = uPointSize;",
+        "varying vec4      vFinalColor;",
+        "varying vec2      vTextureCoords;",
+        "uniform bool      uUseTextures;",
+        "uniform sampler2D uSampler;",
     
-    "	if (uUseVertexColors) {",
-    "		vFinalColor = vec4(aVertexColor,uMaterialDiffuse.a);",
-    "	}",
-    "   else {",
-    "       vFinalColor = uMaterialDiffuse;",
-    "   }",
-    "	if (uUseShading){",
-    "		vec3 N = vec3(mNormal * vec4(aVertexNormal, 1.0));",
-	"		vec3 L = normalize(uLightDirection);",
-	"		if (uUseLightTranslation){ L = vec3(mNormal * vec4(L,1.0));}",
-	"		float lambertTerm = max(dot(N,-L),0.4);",
-	"		vec4 Ia = uLightAmbient;",
-	"		vec4 Id = vFinalColor * uLightDiffuse * lambertTerm;",
-    "		vFinalColor = Ia + Id;",
-	"		vFinalColor.a = uMaterialDiffuse.a;",
-	"	}" ,
-	"   if (uUseTextures){" ,
-	"       vTextureCoords = aVertexTextureCoords;",
-    "   }",
-	"}"].join('\n'),
-    
-    FRAGMENT_SHADER : [
-    "#ifdef GL_ES",
-    "precision highp float;",
-    "#endif",
+        "void main(void)  {",
+        "   if (uUseTextures){",
+        "       gl_FragColor = texture2D(uSampler, vTextureCoords);",
+        "   }",
+        "   else{",
+        "       gl_FragColor = vFinalColor;",
+        "   }",
+        "}"].join('\n'),
+        
+        DEFAULTS : {
+            "uLightDirection"   : [0.0,0.0,-1.0],
+            "uLightAmbient"     : [0.0,0.0,0.0,1.0],
+            "uLightDiffuse"     : [1.0,1.0,1.0,1.0],
+            "uMaterialDiffuse"  : [0.9,0.9,0.9,1.0],
+            "uPointSize"        : 1.0,
+            "uUseLightTranslation" : false
+        }
+    });
+  
+}; 
 
-    "varying vec4      vFinalColor;",
-    "varying vec2      vTextureCoords;",
-    "uniform bool      uUseTextures;",
-    "uniform sampler2D uSampler;",
-
-    "void main(void)  {",
-    "   if (uUseTextures){",
-    "       gl_FragColor = texture2D(uSampler, vTextureCoords);",
-    "   }",
-    "   else{",
-    "		gl_FragColor = vFinalColor;",
-    "   }",
-    "}"].join('\n'),
-    
-    DEFAULTS : {
-        "uLightDirection" 	: [0.0,0.0,-1.0],
-        "uLightAmbient"   	: [0.0,0.0,0.0,1.0],
-        "uLightDiffuse"   	: [1.0,1.0,1.0,1.0],
-        "uMaterialDiffuse" 	: [0.9,0.9,0.9,1.0],
-        "uPointSize"		: 1.0,
-        "uUseLightTranslation" : false
-    }
-};
+vxl.go.essl.lambert = new vxlLambertProgram();
