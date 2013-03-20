@@ -34,7 +34,7 @@ function runVoxApp(){
     vxl.api.loadLUTS('assets/tables');
     view = vxl.api.setup('view-1');
     gui = new vxlGUI(view);
-    vxl.api.setProgram(view, vxlBakeProgram, vxlBakeEngine);
+    vxl.api.setProgram(view, vxl.go.essl.bake, new vxlBakeEngine(view.renderer));
     vxl.api.load('assets/models/geometry/cube.json');
     view.start();
     

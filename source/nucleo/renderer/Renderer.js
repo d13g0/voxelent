@@ -35,7 +35,7 @@ function vxlRenderer(vw){
     this.transforms 	= new vxlTransforms(vw);
     this.fps            = 0;
     this.currentProgram = undefined;
-    this.engine 		= undefined;
+    this.engine 		= new vxlRenderEngine(this);
     
     
     this._time          = 0;
@@ -46,8 +46,7 @@ function vxlRenderer(vw){
     
     this._knownPrograms = {};
     this._enforce       = false; //to enforce the program or not
-    
-    this.setProgram(vxl.go.essl.lambert, vxlRenderEngine, false);
+    this.setProgram(vxl.go.essl.lambert);
     
 }
 
@@ -103,9 +102,9 @@ vxlRenderer.prototype._initializeGLContext = function(gl){
 /**
  * Tries to add a new program definition to this renderer
  * @param {vxlProgram} program an instance of a vxlProgram object or one of its descendents
- * @param {Class} engineType (optional) a new engine class to be instantiated 
+ * @param {vxlEngine} engine (optional) a new engine
  */
-vxlRenderer.prototype.setProgram = function(program,engineType, forceIt){
+vxlRenderer.prototype.setProgram = function(program,engine,forceIt){
     
     
     if (this._enforce && program.ID != this.currentProgram.ID){
@@ -141,8 +140,8 @@ vxlRenderer.prototype.setProgram = function(program,engineType, forceIt){
 	
 	this.currentProgram = prg;
 	
-	if (engineType != undefined){
-	   this.setupEngine(engineType);
+	if (engine != undefined && engine != this.engine){
+	   this.setEngine(engine);
 	}
 	
 	
@@ -160,15 +159,13 @@ vxlRenderer.prototype.releaseProgram = function(){
 }
 
 /**
- * Sets the current rendering engine. If the engine parameter is null or undefined, this method will check if 
- * the current strategy is null and in that case sets the strategy as an instance of <code>vxlBasicStrategy</code>
+ * Sets the current rendering engine. 
  * 
- * @param {function} engineType The engine to be used. This parameter 
- * corresponds to the constructor of the engine that should be used.  
+ * @param {vxlEngine} engine The engine to be used.  
  */
-vxlRenderer.prototype.setupEngine = function(engineType){
-    if (engineType != null && engineType != undefined){
-        this.engine = new engineType(this);
+vxlRenderer.prototype.setEngine = function(engine){
+    if (engine != null && engine != undefined){
+        this.engine = engine
     }
     else if (this.engine == undefined){
         this.engine = new vxlRenderEngine(this);
@@ -281,11 +278,14 @@ vxlRenderer.prototype.setRenderRate = function(rate){ //rate in ms
 
 /**
  * Sets the color used to clear the rendering context
- * @param {Array} cc the new color passed as a numeric array of three elements
+ * @param {Number, Array, vec3} r it can be the red component, a 3-dimensional Array or a vec3 (glMatrix)
+ * @param {Number} g if r is a number, then this parameter corresponds to the green component
+ * @param {Number} b if r is a number, then this parameter corresponds to the blue component
  * @see vxlView#setBackgroundColor
  */
-vxlRenderer.prototype.clearColor = function(cc){
-    this._clearColor = cc.slice(0);
+vxlRenderer.prototype.clearColor = function(r,g,b){
+    var cc = vxl.util.createArr3(r,g,b);
+    this._clearColor = cc;
 	this.gl.clearColor(cc[0], cc[1], cc[2], 1.0);
 };
 

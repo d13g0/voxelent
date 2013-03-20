@@ -1,0 +1,436 @@
+<html>
+<head>
+<meta name='Diego Cantor' content='Voxelent: The best WebGL platform yet'>
+<meta name='copyright' content='&copy 2013'>
+<meta name='robots' content='all'>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name='keywords' content='webgl, webgl platform, medical imaging, webgl api'>
+
+<link rel='stylesheet' type='text/css' href='css/jquery-ui-bs/theme.css'/>
+
+<script src="lib/jquery.js" type="text/javascript"> </script>
+<script src="lib/jquery-ui.js" type="text/javascript"> </script>
+<script type='text/javascript' src='lib/voxelent_v0.89.4.js'> </script>
+<script type='text/javascript' src='lib/vox-gui_v0.1.js'> </script>
+<title>Voxelent - Demo Boucing Balls</title>
+
+
+<script id="shader-vs" type="x-shader/x-vertex">
+
+attribute vec3 aVertexPosition;
+attribute vec3 aVertexNormal;
+
+
+uniform mat4 uMVMatrix;
+uniform mat4 uPMatrix;
+uniform mat4 uNMatrix;
+uniform vec3 uLightPosition;
+uniform vec4 uMaterialDiffuse;
+
+uniform bool uUpdateLight;
+uniform vec3 uTranslation;
+uniform bool uTranslate;
+
+varying vec3 vNormal;
+varying vec3 vLightRay;
+varying vec3 vEyeVec;
+
+void main(void) {
+	
+	mat4 modelView = uMVMatrix;         
+	if (uTranslate){
+		 modelView = uMVMatrix * mat4(1,0,0,0,0,1,0,0,0,0,1,0, uTranslation.x,uTranslation.y,uTranslation.z,1);
+	}
+	 
+	vec4 vertex = modelView * vec4(aVertexPosition, 1.0); 
+	vec4 light = vec4(uLightPosition,1.0);
+	 
+	 if(uUpdateLight){
+	     light = modelView * vec4(uLightPosition,1.0);
+	 }
+	 
+	 vLightRay = vertex.xyz - light.xyz;
+	 vEyeVec = -vec3(vertex.xyz);
+	 vNormal = vec3(uNMatrix * vec4(aVertexNormal, 1.0));
+	 
+	 gl_Position = uPMatrix * vertex;
+
+}	
+</script>
+<script id="shader-fs" type="x-shader/x-fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+
+uniform bool uWireframe;
+uniform vec4 uLightAmbient;
+uniform vec4 uLightDiffuse;
+uniform vec4 uLightSpecular;
+uniform vec4 uMaterialAmbient;
+uniform vec4 uMaterialDiffuse;
+uniform vec4 uMaterialSpecular;
+uniform float uShininess;       
+
+varying vec3 vNormal;
+varying vec3 vLightRay;
+varying vec3 vEyeVec;
+varying vec4 vFinalColor;
+
+void main(void)
+{
+	if(uWireframe){
+		gl_FragColor = uMaterialDiffuse;
+	}
+	else{
+    	vec3 L = normalize(vLightRay);
+    	vec3 N = normalize(vNormal);
+    	float lambertTerm = dot(N,-L);
+    	vec4 Ia = uLightAmbient * uMaterialAmbient;
+    	vec4 Id = vec4(0.0,0.0,0.0,1.0);
+    	vec4 Is = vec4(0.0,0.0,0.0,1.0);
+
+    	if(lambertTerm > 0.0)
+    	{
+        	Id = uLightDiffuse * uMaterialDiffuse * lambertTerm; 
+        	vec3 E = normalize(vEyeVec);
+        	vec3 R = reflect(L, N);
+        	float specular = pow( max(dot(R, E), 0.0), uShininess);
+        	Is = uLightSpecular * uMaterialSpecular * specular;
+    	}
+
+    	gl_FragColor = vec4(Ia.rgb + Id.rgb + Is.rgb,1.0);
+    }
+
+}
+</script>
+<script id='code-js' type="text/javascript">
+
+	var ball = [];
+	var BALL_GRAVITY = 9.8;
+	var NUM_BALLS = 800;
+	var SCENE_TIME = 0.0;
+	var vbo, ibo, nbo; //buffers
+	var allocated = false;
+	var MODEL = undefined;
+    var shininess = 40;
+    var updateLightPosition = false;
+
+	function generatePosition(){
+	    
+	    var x = Math.floor(Math.random()*80);
+	    var y = Math.floor(Math.random()*10)+50;
+	    var z = Math.floor(Math.random()*80);
+	    
+	    var flagX = Math.floor(Math.random()*10);
+	    var flagZ = Math.floor(Math.random()*10);
+	    
+	    if (flagX >= 5) {x=-x;}
+	    if (flagZ >= 5) {z=-z;}
+	    return [x,y,z];
+	};
+
+	function BouncingBall(x,y,z){
+	    this.H0 = y;
+	    this.V0 = 0;
+	    this.VF = Math.sqrt(2 * BALL_GRAVITY * this.H0);
+	    this.HF = 0;
+	    this.bouncing_time  = 0;
+	    this.position = [x,y,z];
+	    this.BOUNCINESS = (Math.random()+0.5);
+	    this.color = [Math.random(), Math.random(), Math.random(),1.0];
+	};
+
+	BouncingBall.prototype.update = function(time){
+	    var t = time - this.bouncing_time;  //update time
+	    var h  = this.position[1]; //update positioon // y-coordinate
+	    h = this.H0 + (this.V0 * t) - (0.5 * BALL_GRAVITY * t * t);
+	    if (h <= 0){ //bounce
+	       this.bouncing_time = time;
+	       this.V0 = this.VF * this.BOUNCINESS;
+	       this.HF = (this.V0 * this.V0) / (2 * BALL_GRAVITY);
+	       this.VF = Math.sqrt(2*BALL_GRAVITY* this.HF);
+	       this.H0 = 0;
+	       
+	    }
+	    else{
+	        this.position[1] = h;
+	    }
+	}
+	
+	function createWorld(){
+		ball = [];
+		SCENE_TIME = 0;
+		for (var i=0;i<NUM_BALLS;i++){
+	        var pos = generatePosition();
+	        ball.push(new BouncingBall(pos[0],pos[1],pos[2]));
+	    }
+	}
+
+	function updateWorld(){
+		i = ball.length;
+	    while(i--){
+	        ball[i].update(SCENE_TIME);
+	    }
+	    SCENE_TIME += 30/1000;
+	}
+
+	function animateWorld(){
+		setInterval(updateWorld,20);
+	}
+
+
+	function runVoxApp() {
+		
+		vxl.go.notifier.subscribe(vxl.events.MODELS_LOADED, this);
+		
+		var view 	= vxl.api.setup('view-1');  
+		var gui 	= new vxlGUI(vxl.c.view); 
+		var camera 	= vxl.c.camera;
+	    var engine 	= new vxlExternalEngine(view.renderer, allocate, draw, deallocate);
+	    var program = vxlProgram.createFromDOM('balls','shader-vs','shader-fs');
+	    
+	    view.renderer.setProgram(program, engine);
+	    view.renderer.clearColor(0.3,0.3,0.3);
+	    view.renderer.clearDepth(100);
+	    
+	    var pm = view.renderer.pm;
+	    pm.setUniform("uTranslation",[0,0,0]);
+	    pm.setUniform("uTranslate",false);
+	    pm.setUniform("uLightSpecular",[0.5,0.5,0.5,1]);
+	    pm.setUniform("uLightAmbient",[0,0,0,1]);
+		pm.setUniform("uLightDiffuse",[1,1,1,1]);
+		pm.setUniform("uLightPosition",[0,50,500]);
+		pm.setUniform("uUpdateLight", false);
+		pm.setUniform('uMaterialSpecular', [1.0,1.0,1.0,1.0]);
+	    pm.setUniform('uMaterialAmbient', [1.0,1.0,1.0,1.0]);
+	    vxl.api.load('ball.json','assets/models/geometry',vxl.def.model.loadingMode.DETACHED);
+	    
+	    view.start();
+	
+	};
+	
+	
+	function handleEvent(event, src){
+		MODEL = src.models[0]; 
+		
+		var camera = vxl.c.camera;
+		
+		camera.setPosition([0, 11.25, 95.28]);
+	    camera.setFocalPoint(0,0,0);
+	    camera.setType(vxl.def.camera.type.ORBITING);
+	    vxl.api.floorON(80,2);
+	    
+		createWorld();
+	    animateWorld();
+	    vxl.c.view.renderer.setMode(vxl.def.renderer.mode.ANIMFRAME);
+	    vxl.c.scene.bb = [-80,-80,-80,80,80,80];
+	}
+
+	
+	function allocate(renderer, scene){
+		if (!allocated){
+			var gl = renderer.gl;
+			vbo = gl.createBuffer();
+			nbo = gl.createBuffer();
+			ibo = gl.createBuffer();
+			allocated = true;
+		}
+	};
+	
+	function deallocate(renderer,scene){};
+	
+	function draw(renderer,scene){
+		
+		if (MODEL == undefined || ball.length ==0) return; //not ready yet
+		
+		var gl = renderer.gl;
+		var pm = renderer.pm;
+		
+		var trx = renderer.transforms;
+		
+		trx.update();
+
+        
+        pm.setUniform('uPMatrix',   trx.pMatrix);
+        pm.setUniform('uMVMatrix',	trx.mvMatrix);
+        pm.setUniform('uNMatrix',   trx.nMatrix);
+	
+	    try{
+	        	pm.setUniform('uUpdateLight',updateLightPosition);
+	        	
+	        	
+	        	var floor = scene.toys.floor;
+	        	if (floor.visible){
+	        		
+	        		pm.setUniform('uTranslate', false);
+	        		pm.setUniform('uMaterialDiffuse', floor.material.diffuse);
+	        		pm.setUniform('uWireframe',true);
+	        		pm.enableAttribute('aVertexPosition');
+	            	pm.disableAttribute('aVertexNormal');
+	                
+	                gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+	                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(floor.model.vertices), gl.STATIC_DRAW);
+	                pm.setAttributePointer('aVertexPosition', 3, gl.FLOAT, false, 0, 0);
+	                pm.enableAttribute('aVertexPosition');
+	                
+	                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ibo);
+	                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(floor.model.wireframe), gl.STATIC_DRAW);
+                    
+                    gl.drawElements(gl.LINES, floor.model.wireframe.length, gl.UNSIGNED_SHORT,0);
+	                
+	                gl.bindBuffer(gl.ARRAY_BUFFER, null);
+	            	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	        	}
+	        	
+	        	drawBalls(renderer);
+	        	gl.bindBuffer(gl.ARRAY_BUFFER, null);
+	            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	            
+	 
+	    }
+	    catch(err){
+	        alert(err);
+	        console.error(err.description);
+	    }
+		
+	};
+	
+	
+	
+
+	
+
+	function drawBalls(renderer){
+		
+		var pm = renderer.pm;
+		var gl = renderer.gl;
+		
+
+	    pm.setUniform('uShininess',shininess);
+	    pm.setUniform('uWireframe', false);
+	    pm.setUniform('uTranslate', true);
+	   
+	    
+	    //Setting Buffers
+	    gl.bindBuffer(gl.ARRAY_BUFFER,vbo);
+	    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(MODEL.vertices), gl.STATIC_DRAW);
+	    pm.setAttributePointer('aVertexPosition', 3, gl.FLOAT, false, 0, 0);
+	    pm.enableAttribute('aVertexPosition');
+	            
+	    gl.bindBuffer(gl.ARRAY_BUFFER, nbo);
+	    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(MODEL.normals), gl.STATIC_DRAW);
+	    pm.setAttributePointer('aVertexNormal', 3, gl.FLOAT, false, 0, 0);
+	    pm.enableAttribute('aVertexNormal');
+	    
+	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
+	    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(MODEL.indices), gl.STATIC_DRAW);
+	    
+	    var j = NUM_BALLS;
+	    while(j--){
+	       drawBall(renderer, ball[j]);
+	     }
+	     
+	     gl.bindBuffer(gl.ARRAY_BUFFER, null);
+	     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	};
+	
+	function drawBall(renderer, ball){
+		
+		var pm = renderer.pm;
+		var gl = renderer.gl;
+		
+		pm.setUniform('uTranslation', ball.position);
+		pm.setUniform('uMaterialDiffuse', ball.color);
+	    gl.drawElements(gl.TRIANGLES, MODEL.indices.length, gl.UNSIGNED_SHORT,0);
+	};
+
+
+</script>
+
+<script type="text/javascript">
+  //Google Analytics Script 
+  var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-26954785-1']); _gaq.push(['_trackPageview']);  (function() {  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);   })();
+</script>
+
+</head>
+
+<body onLoad='runVoxApp()'>
+<div class='show' style='height:90%'>
+<canvas id = 'view-1' width='1200' height='400'>
+	<p>
+		Your browser does not support WebGL :-(
+	</p>
+</canvas>
+<div>
+<table cellspacing=4px style='vertical-align:top'>
+    <tr>
+        <td align='center'>
+        <div id='opt-type' >
+                <input type='radio' id='opt-tracking' name='typecam' /><label for='opt-tracking'>Tracking</label>
+                <input type='radio' id='opt-orbiting' name='typecam' checked='checked'/><label for='opt-orbiting'>Orbiting</label>
+        </div>
+        </td>
+        <td align='center'>
+        <button id='btnGoHome'>Go Home</button>
+        <button id='btnBirdView'>Bird View</button>
+        <input type="checkbox" id="chkUpdateLight" /><label for="chkUpdateLight">Fixed Light Source</label>
+        </td>
+        <td align='center'>
+        <button id='btnReset'>Reset</button>
+      
+        </td>
+    </tr>
+</table>
+</div>
+<script> 
+
+$('#chkUpdateLight').button();
+$('#opt-type').buttonset();
+$('#btnGoHome').button();
+$('#btnReset').button();
+$('#btnBirdView').button();
+
+
+$('#chkUpdateLight').click(toggleLight);
+
+$('#opt-tracking').click(function(){
+    vxl.c.camera.setType(vxl.def.camera.type.TRACKING);
+ 
+});
+
+$('#opt-orbiting').click(function(){
+   vxl.c.camera.setType(vxl.def.camera.type.ORBITING);
+});
+
+
+function toggleLight(){
+    updateLightPosition = !updateLightPosition;
+}
+
+$('#btnGoHome').click(
+    function(){
+    	var camera = vxl.c.camera;
+        camera.longShot();
+        camera.setPosition([0, 11.25, 95.28]);
+	    camera.setFocalPoint(0,0,0);
+
+});
+
+$('#btnReset').click(
+    function(){
+    	createWorld();
+
+});
+ 
+$('#btnBirdView').click(
+	function(){
+		vxl.c.camera.longShot();
+ 		vxl.c.camera.setDistance(426);
+        vxl.c.camera.setElevation(-40);
+		vxl.c.camera.setAzimuth(134);
+	});
+
+</script>
+
+</body>
+</html>

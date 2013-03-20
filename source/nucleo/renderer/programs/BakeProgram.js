@@ -23,7 +23,8 @@ vxlBakeProgram.prototype = new vxlProgram();
 vxlBakeProgram.prototype.constructor = vxlBakeProgram;
 
 function vxlBakeProgram(){
-    this.createFromJSON({
+    
+    this.copy(vxlProgram.createFromJSON({
     
         ID : 'bake',
     
@@ -80,7 +81,8 @@ function vxlBakeProgram(){
             "uLightDiffuse"     : [1.0,1.0,1.0,1.0],
             "uUseLightTranslation" : false
         }
-    });
+    }));
+ 
 }; 
 
 

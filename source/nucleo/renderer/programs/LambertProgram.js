@@ -22,7 +22,8 @@ vxlLambertProgram.prototype = new vxlProgram();
 vxlLambertProgram.prototype.constructor = vxlLambertProgram;
 
 function vxlLambertProgram(){
-    this.createFromJSON({
+    
+    this.copy(vxlProgram.createFromJSON({
     
         ID : 'lambert',
         VERTEX_SHADER : [
@@ -98,7 +99,7 @@ function vxlLambertProgram(){
             "uPointSize"        : 1.0,
             "uUseLightTranslation" : false
         }
-    });
+    }));
   
 }; 
 

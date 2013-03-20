@@ -151,6 +151,8 @@ vxlProgramManager.prototype.loadDefaults = function(){
     if ('DEFAULTS' in code){
     
         var defaults = code.DEFAULTS;
+        
+        
         for(var u in defaults){
             this.setUniform(u,defaults[u]);
         }

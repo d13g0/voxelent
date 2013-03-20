@@ -1,27 +1,50 @@
 -------------------------------------------------------------------------------------------
-VERSION 0.89.4 - INLINE SHADERS
+VERSION 0.89.4 - EXTERNAL SHADERS
 -------------------------------------------------------------------------------------------
+
+EXTERNAL SHADERS
+---------------------------
 In this version we are making possible to design and use your own shaders by embedding
 ESSL code in a voxelent web page.
+
+please check the demo-bouncing-balls.html code to see how this is possible.
+
+CHANGES TO PROGRAMS
+-----------------------------
+the new class vxlProgram represents a one to one mapping between a JavaScript object and a ESSL program
 
 the old vxlProgram class has been renamed to vxlProgramManager given that its operations deal
 with handling actual ESSL programs.
 
-the new class vxlProgram represents a one to one mapping between a JavaScript object and a ESSL program
 
-In code this means that the old invocation:
+ENFORCING PROGRAMS
+---------------------------------
 
 vxl.api.setProgram(view, vxl.def.glsl.lambert)
 
 is replaced instead by:
 
-vxl.api.setProgram(view, vxlLambertProgram);
+vxl.api.setProgram(view, vxl.go.essl.lambert);
 
-where vxlLambertProgram is a proper JavaScript object instead of an untyped JSON object
-as in previous versions.
 
 Other programs available in this version are:
-vxlBlenderProgram, vxlBakeProgram, vxlPhongProgram
+
+vxlBlenderProgram (vxl.go.essl.blender), 
+vxlBakeProgram (vxl.go.essl.bake), 
+vxlPhongProgram (vxl.go.essl.phong)
+
+When vxl.api.setProgram is used, the program is enforced (actors can't override the program of current use)
+until the program is released using
+vxl.api.releaseProgram()
+
+NEW CLASSES
+----------------------------------------
+vxlEngine: defines the minimum set of actions an engine should have
+vxlExternalEngine: used when the programs are defined on the hosting web page 
+vxlProgram: provides operations to load programs using DOM, JSON, AJAX.
+
+
+
 
 -------------------------------------------------------------------------------------------
 VERSION 0.89.3 - COMPLEX RENDERING: Renderables

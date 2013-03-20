@@ -1,4 +1,32 @@
-import platform, sys,string,traceback, os.path, subprocess, shutil, pdb, fileinput
+import platform, glob, sys
+import subprocess
+import fileinput
+import pdb
+from tempfile import mkstemp
+from shutil import move, copy
+from os import walk,path, close, remove, makedirs
+import re
+
+
+def updateDemoVersion(filename, version):
+    #Create temp file
+    fh, abs_path = mkstemp()
+    new_file = open(abs_path,'w')
+    old_file = open(filename)
+    for line in old_file:
+        subst = re.sub(r'(voxelent_v).+(.js)','voxelent_v%s.js'%version, line);
+        new_file.write(line.replace(line, subst))
+    #close temp file
+    new_file.close()
+    close(fh)
+    old_file.close()
+    #Remove original file
+    remove(filename)
+    #Move new file
+    move(abs_path, filename)
+    print("%s updated to version %s"%(filename,version))
+
+
 
 def updateVersion(VOX_VERSION_NUMBER):
     once = True
@@ -10,8 +38,16 @@ def updateVersion(VOX_VERSION_NUMBER):
         else:
             sys.stdout.write(line)
         
-        
-       
+    for r,d,f in walk("../demos"):
+        for files in f:
+            if files.endswith(".html"):
+                 url = path.join(r,files)
+                 updateDemoVersion(url,VOX_VERSION_NUMBER)
+
+     
+     
+
+
 
 def pack(VOX_VERSION_NUMBER):
 
@@ -54,6 +90,8 @@ def pack(VOX_VERSION_NUMBER):
              'Mesh',  
              'Actor',
              'Picker', 
+             'Engine',
+             'ExternalEngine',
              'RenderEngine',
              'BlenderEngine',
              'BakeEngine',
@@ -77,13 +115,13 @@ def pack(VOX_VERSION_NUMBER):
     ]
     
     
-    vox_files = [os.path.join(root,name)
-                 for root, dirs, files in os.walk(".."+SEP+"source"+SEP+"nucleo")
+    vox_files = [path.join(root,name)
+                 for root, dirs, files in walk(".."+SEP+"source"+SEP+"nucleo")
                  for name in files
                  if name.endswith(".js")]
 
     for f in vox_files:                         #the separator replacements of this section always apply because we are calling java
-        head, tail =  os.path.split(f)
+        head, tail =  path.split(f)
         tail = str.replace(tail,'.js','')
         head = str.replace(head,'\\','//')
         tdir = SLUG + '/' + head
@@ -91,21 +129,21 @@ def pack(VOX_VERSION_NUMBER):
         
         print 'Processing ' + tail
  
-        if not os.path.exists(tdir):
-            os.makedirs(tdir)
+        if not path.exists(tdir):
+            makedirs(tdir)
         
         origin =  head + '/' + tail + '.js'
         target =  tdir + '/' + tail + VERSION_TAG + '.js'
         target_min =  tdir + '/' + tail + VERSION_TAG + '-min.js'
         subprocess.call(['java','-jar','yui.jar','--type', 'js', '--line-break', '500', origin, '-o',target_min])
-        shutil.copy(origin, target) 
+        copy(origin, target) 
     
    
     hashmap = {}
-    for root, dirs, files in os.walk(SLUG+SEP+"source"+SEP+"nucleo"):
+    for root, dirs, files in walk(SLUG+SEP+"source"+SEP+"nucleo"):
         for name in files:
     
-            n = os.path.join(root,name)
+            n = path.join(root,name)
             #print 'opening '+ name
             try:
                 f = open(n,'r')

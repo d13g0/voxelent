@@ -296,8 +296,9 @@ vxlTrackerInteractor.prototype.pan = function(dx,dy){
 	var dimMax = Math.max(canvas.width, canvas.height);
 	var deltaX = 1 / dimMax;
 	var deltaY = 1 / dimMax;
-	var ndx = dx * deltaX * this.MOTION_FACTOR * scene.bb.max();
-	var ndy = -dy * deltaY * this.MOTION_FACTOR * scene.bb.max();
+	var max = scene.bb.max();
+    var ndx = dx * deltaX * this.MOTION_FACTOR * max / 2;
+	var ndy = -dy * deltaY * this.MOTION_FACTOR * max / 2;
 
 	camera.pan(ndx,ndy);
 };

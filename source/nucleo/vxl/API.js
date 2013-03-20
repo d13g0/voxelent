@@ -691,12 +691,20 @@ wireframeON :  function(){
   * Forces the renderer to use a specific program
   * @param{vxlView} view the view to configure
   * @param{Object} program a JSON object that defines the progrma to execute
-  * @param{vxlRenderEngine} engine (optional) the engine that the renderer should use to communicate with the program. T
+  * @param{vxlEngine} engine (optional) the engine that the renderer should use to communicate with the program. T
   *                        
   */
  setProgram :  function(view,program,engine){
     view.renderer.setProgram(program,engine,true);
     
+ },
+ 
+ /**
+  *Releases the program used by the view passed as parameter
+  * @param{vxlView} view
+  */
+ releaseProgram: function(view){
+     view.renderer.releaseProgram();
  },
  /**
   * Returns the name of the current program

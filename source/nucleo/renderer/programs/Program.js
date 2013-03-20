@@ -23,61 +23,17 @@ function vxlProgram(){
     this.UNIFORMS = [];
     this.VERTEX_SHADER = "";
     this.FRAGMENT_SHADER = "";
-    this.DEFAULTS = [];
+    this.DEFAULTS = {};
 };
 
-
-/**
- * Creates a program object from the ESSL scripts embedded in the DOM
- * @param {Object} id
- * @param {Object} vertexShaderId
- * @param {Object} fragmentShaderId
- */
-vxlProgram.prototype.createFromDOM = function(id, vertexShaderId,fragmentShaderId){
-
-    
-    this.ID = id;
-    var vsElement   = document.getElementById(vertexShaderId);
-    var fsElement = document.getElementById(fragmentShaderId);
-    
-    if (vsElement == null || fsElement == null){
-        throw new vxlProgramException("shaders don't exist");
-    }
-    
-    this.VERTEX_SHADER = vsElement.innerHTML;
-    this.FRAGMENT_SHADER = fsElement.innerHTML;
-    
-    this.introspect();
-    
-    
+vxlProgram.prototype.copy = function(prg){
+    this.ID                 = prg.ID;
+    this.ATTRIBUTES         = prg.ATTRIBUTES;
+    this.UNIFORMS           = prg.UNIFORMS;
+    this.VERTEX_SHADER      = prg.VERTEX_SHADER;
+    this.FRAGMENT_SHADER    = prg.FRAGMENT_SHADER;
+    this.DEFAULTS           = prg.DEFAULTS;
 };
-
-
-vxlProgram.prototype.createFromJSON = function(json){
-  
-
-  if (json.ID){
-    this.ID = json.ID;
-  } //otherwise use the one defined in the constructor
-  
-  this.VERTEX_SHADER = json.VERTEX_SHADER;
-  this.FRAGMENT_SHADER = json.FRAGMENT_SHADER;
-  this.DEFAULTS = json.DEFAULTS;
-  
-  this.introspect();
-  
-
-  
-};
-
-
-vxlProgram.prototype.createFromTextURL = function(id, vertexShaderURL, fragmentShaderURL){
-  //TODO: check $ajax with no async  
-  //  $.ajax(vs_url, {async: false, dataType: "text"}).done(function(data){m_VertexShaderSource = data;});
-  //$.ajax(fs_url, {async: false, dataType: "text"}).done(function(data){m_FragmentShaderSource = data;});
-};
-
-
 
 /**
  * Obtain the list of attributes and uniforms from the code
@@ -110,6 +66,60 @@ vxlProgram.prototype.introspect = function(){
     }
     
 };
+/**
+ * Creates a program object from the ESSL scripts embedded in the DOM
+ * @param {Object} id
+ * @param {Object} vertexShaderId
+ * @param {Object} fragmentShaderId
+ */
+vxlProgram.createFromDOM = function(id, vertexShaderId,fragmentShaderId){
+
+    var prg = new vxlProgram();
+    
+    prg.ID = id;
+    var vsElement   = document.getElementById(vertexShaderId);
+    var fsElement = document.getElementById(fragmentShaderId);
+    
+    if (vsElement == null || fsElement == null){
+        throw new vxlProgramException("shaders don't exist");
+    }
+    
+    prg.VERTEX_SHADER = vsElement.innerHTML;
+    prg.FRAGMENT_SHADER = fsElement.innerHTML;
+    
+    prg.introspect();
+    
+    return prg;
+    
+};
+
+
+vxlProgram.createFromJSON = function(json){
+  
+    var prg = new vxlProgram();
+     if (json.ID){
+       prg.ID = json.ID;
+     } //otherwise use the one defined in the constructor
+      
+     prg.VERTEX_SHADER = json.VERTEX_SHADER;
+     prg.FRAGMENT_SHADER = json.FRAGMENT_SHADER;
+     prg.DEFAULTS = json.DEFAULTS;      
+     prg.introspect();
+     
+     return prg;
+  
+};
+
+
+vxlProgram.createFromTextURL = function(id, vertexShaderURL, fragmentShaderURL){
+  //TODO: check $ajax with no async  
+  //  $.ajax(vs_url, {async: false, dataType: "text"}).done(function(data){m_VertexShaderSource = data;});
+  //$.ajax(fs_url, {async: false, dataType: "text"}).done(function(data){m_FragmentShaderSource = data;});
+};
+
+
+
+
 
 
 function vxlProgramException(message){

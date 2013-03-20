@@ -23,7 +23,8 @@ vxlBlenderProgram.prototype = new vxlProgram();
 vxlBlenderProgram.prototype.constructor = vxlBlenderProgram;
 
 function vxlBlenderProgram(){
-    this.createFromJSON({
+    
+    this.copy(vxlProgram.createFromJSON({
     
         ID : 'blender',
     
@@ -121,7 +122,7 @@ function vxlBlenderProgram(){
             "uTranslateLight" : false,
             "uLightPosition"   : [0,50,50]
         }
-    });
+    }));
 };
 
 

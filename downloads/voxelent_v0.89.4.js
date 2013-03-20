@@ -5629,8 +5629,9 @@ vxlTrackerInteractor.prototype.pan = function(dx,dy){
 	var dimMax = Math.max(canvas.width, canvas.height);
 	var deltaX = 1 / dimMax;
 	var deltaY = 1 / dimMax;
-	var ndx = dx * deltaX * this.MOTION_FACTOR * scene.bb.max();
-	var ndy = -dy * deltaY * this.MOTION_FACTOR * scene.bb.max();
+	var max = scene.bb.max();
+    var ndx = dx * deltaX * this.MOTION_FACTOR * max / 2;
+	var ndy = -dy * deltaY * this.MOTION_FACTOR * max / 2;
 
 	camera.pan(ndx,ndy);
 };/*-------------------------------------------------------------------------
@@ -5886,61 +5887,17 @@ function vxlProgram(){
     this.UNIFORMS = [];
     this.VERTEX_SHADER = "";
     this.FRAGMENT_SHADER = "";
-    this.DEFAULTS = [];
+    this.DEFAULTS = {};
 };
 
-
-/**
- * Creates a program object from the ESSL scripts embedded in the DOM
- * @param {Object} id
- * @param {Object} vertexShaderId
- * @param {Object} fragmentShaderId
- */
-vxlProgram.prototype.createFromDOM = function(id, vertexShaderId,fragmentShaderId){
-
-    
-    this.ID = id;
-    var vsElement   = document.getElementById(vertexShaderId);
-    var fsElement = document.getElementById(fragmentShaderId);
-    
-    if (vsElement == null || fsElement == null){
-        throw new vxlProgramException("shaders don't exist");
-    }
-    
-    this.VERTEX_SHADER = vsElement.innerHTML;
-    this.FRAGMENT_SHADER = fsElement.innerHTML;
-    
-    this.introspect();
-    
-    
+vxlProgram.prototype.copy = function(prg){
+    this.ID                 = prg.ID;
+    this.ATTRIBUTES         = prg.ATTRIBUTES;
+    this.UNIFORMS           = prg.UNIFORMS;
+    this.VERTEX_SHADER      = prg.VERTEX_SHADER;
+    this.FRAGMENT_SHADER    = prg.FRAGMENT_SHADER;
+    this.DEFAULTS           = prg.DEFAULTS;
 };
-
-
-vxlProgram.prototype.createFromJSON = function(json){
-  
-
-  if (json.ID){
-    this.ID = json.ID;
-  } //otherwise use the one defined in the constructor
-  
-  this.VERTEX_SHADER = json.VERTEX_SHADER;
-  this.FRAGMENT_SHADER = json.FRAGMENT_SHADER;
-  this.DEFAULTS = json.DEFAULTS;
-  
-  this.introspect();
-  
-
-  
-};
-
-
-vxlProgram.prototype.createFromTextURL = function(id, vertexShaderURL, fragmentShaderURL){
-  //TODO: check $ajax with no async  
-  //  $.ajax(vs_url, {async: false, dataType: "text"}).done(function(data){m_VertexShaderSource = data;});
-  //$.ajax(fs_url, {async: false, dataType: "text"}).done(function(data){m_FragmentShaderSource = data;});
-};
-
-
 
 /**
  * Obtain the list of attributes and uniforms from the code
@@ -5973,6 +5930,60 @@ vxlProgram.prototype.introspect = function(){
     }
     
 };
+/**
+ * Creates a program object from the ESSL scripts embedded in the DOM
+ * @param {Object} id
+ * @param {Object} vertexShaderId
+ * @param {Object} fragmentShaderId
+ */
+vxlProgram.createFromDOM = function(id, vertexShaderId,fragmentShaderId){
+
+    var prg = new vxlProgram();
+    
+    prg.ID = id;
+    var vsElement   = document.getElementById(vertexShaderId);
+    var fsElement = document.getElementById(fragmentShaderId);
+    
+    if (vsElement == null || fsElement == null){
+        throw new vxlProgramException("shaders don't exist");
+    }
+    
+    prg.VERTEX_SHADER = vsElement.innerHTML;
+    prg.FRAGMENT_SHADER = fsElement.innerHTML;
+    
+    prg.introspect();
+    
+    return prg;
+    
+};
+
+
+vxlProgram.createFromJSON = function(json){
+  
+    var prg = new vxlProgram();
+     if (json.ID){
+       prg.ID = json.ID;
+     } //otherwise use the one defined in the constructor
+      
+     prg.VERTEX_SHADER = json.VERTEX_SHADER;
+     prg.FRAGMENT_SHADER = json.FRAGMENT_SHADER;
+     prg.DEFAULTS = json.DEFAULTS;      
+     prg.introspect();
+     
+     return prg;
+  
+};
+
+
+vxlProgram.createFromTextURL = function(id, vertexShaderURL, fragmentShaderURL){
+  //TODO: check $ajax with no async  
+  //  $.ajax(vs_url, {async: false, dataType: "text"}).done(function(data){m_VertexShaderSource = data;});
+  //$.ajax(fs_url, {async: false, dataType: "text"}).done(function(data){m_FragmentShaderSource = data;});
+};
+
+
+
+
 
 
 function vxlProgramException(message){
@@ -6002,7 +6013,8 @@ vxlLambertProgram.prototype = new vxlProgram();
 vxlLambertProgram.prototype.constructor = vxlLambertProgram;
 
 function vxlLambertProgram(){
-    this.createFromJSON({
+    
+    this.copy(vxlProgram.createFromJSON({
     
         ID : 'lambert',
         VERTEX_SHADER : [
@@ -6078,7 +6090,7 @@ function vxlLambertProgram(){
             "uPointSize"        : 1.0,
             "uUseLightTranslation" : false
         }
-    });
+    }));
   
 }; 
 
@@ -6107,114 +6119,114 @@ vxlPhongProgram.prototype = new vxlProgram();
 vxlPhongProgram.prototype.constructor = vxlPhongProgram;
 
 function vxlPhongProgram(){
-    this.createFromJSON({
+    
+    this.copy(vxlProgram.createFromJSON({
 
-    ID : 'phong',
-    
-    
-    VERTEX_SHADER: [
-    "attribute vec3 aVertexPosition;",
-    "attribute vec3 aVertexNormal;",
-    "attribute vec3 aVertexColor;",
-    "attribute vec2 aVertexTextureCoords;",
-    "uniform float uPointSize;",
-    "uniform mat4 mModelView;",
-    "uniform mat4 mPerspective;",
-    "uniform mat4 mModelViewPerspective;",
-    "uniform mat4 mNormal;",
-    "uniform bool uUseVertexColors;",
-    "varying vec3 vNormal;",
-    "varying vec3 vEyeVec;",
-    "varying vec4 vFinalColor;",
-    "varying vec2 vTextureCoords;",
-    "uniform bool uUseTextures;",
-    
-    "void main(void) {",
-    "  gl_Position = mPerspective * mModelView * vec4(aVertexPosition, 1.0);",
-    "  gl_PointSize = uPointSize;",
-    "   if(uUseVertexColors) {",
-    "       vFinalColor = vec4(aVertexColor,1.0);",
-    "       return;",  
-    "   }",
-    "   vec4 vertex = mModelView * vec4(aVertexPosition, 1.0);",
-    "   vNormal = vec3(mNormal * vec4(aVertexNormal, 1.0));",
-    "   vEyeVec = -vec3(vertex.xyz);",
-    "   if (uUseTextures){" ,
-    "       vTextureCoords = aVertexTextureCoords;",
-    "   }",
-    "}"].join('\n'),
+        ID : 'phong',
 
-    FRAGMENT_SHADER : [
-    "#ifdef GL_ES",
-    "precision highp float;",
-    "#endif",
+        VERTEX_SHADER: [
+        "attribute vec3 aVertexPosition;",
+        "attribute vec3 aVertexNormal;",
+        "attribute vec3 aVertexColor;",
+        "attribute vec2 aVertexTextureCoords;",
+        "uniform float uPointSize;",
+        "uniform mat4 mModelView;",
+        "uniform mat4 mPerspective;",
+        "uniform mat4 mModelViewPerspective;",
+        "uniform mat4 mNormal;",
+        "uniform bool uUseVertexColors;",
+        "varying vec3 vNormal;",
+        "varying vec3 vEyeVec;",
+        "varying vec4 vFinalColor;",
+        "varying vec2 vTextureCoords;",
+        "uniform bool uUseTextures;",
+        
+        "void main(void) {",
+        "  gl_Position = mPerspective * mModelView * vec4(aVertexPosition, 1.0);",
+        "  gl_PointSize = uPointSize;",
+        "   if(uUseVertexColors) {",
+        "       vFinalColor = vec4(aVertexColor,1.0);",
+        "       return;",  
+        "   }",
+        "   vec4 vertex = mModelView * vec4(aVertexPosition, 1.0);",
+        "   vNormal = vec3(mNormal * vec4(aVertexNormal, 1.0));",
+        "   vEyeVec = -vec3(vertex.xyz);",
+        "   if (uUseTextures){" ,
+        "       vTextureCoords = aVertexTextureCoords;",
+        "   }",
+        "}"].join('\n'),
     
-    "uniform bool uUseShading;",
-    "uniform bool uUseVertexColors;",
-    "uniform float uShininess;      ",
-    "uniform vec3 uLightDirection;  ",
+        FRAGMENT_SHADER : [
+        "#ifdef GL_ES",
+        "precision highp float;",
+        "#endif",
+        
+        "uniform bool uUseShading;",
+        "uniform bool uUseVertexColors;",
+        "uniform float uShininess;      ",
+        "uniform vec3 uLightDirection;  ",
+        
+        "uniform vec4 uLightAmbient;    ",
+        "uniform vec4 uLightDiffuse;    ",
+        "uniform vec4 uLightSpecular;   ",
+        
+        "uniform vec4 uMaterialAmbient; ",
+        "uniform vec4 uMaterialDiffuse; ",
+        "uniform vec4 uMaterialSpecular;",
+        
+        "varying vec3 vNormal;",
+        "varying vec3 vEyeVec;",
+        "varying vec4 vFinalColor;",
+        
+        "varying vec2      vTextureCoords;",
+        "uniform bool      uUseTextures;",
+        "uniform sampler2D uSampler;",
+        
+        "void main(void)",
+        "{",
+         "  vec4 finalColor = vec4(0.0);",
+         "  vec3 L = normalize(uLightDirection);",
+         "  vec3 N = normalize(vNormal);",
+         "  float lambertTerm = dot(N,-L);",
+         "  vec4 Ia = uLightAmbient * uMaterialAmbient;",
+         "  vec4 Id = vec4(0.0,0.0,0.0,1.0);",
+         "  vec4 Is = vec4(0.0,0.0,0.0,1.0);",
+         "  vec4 varMaterialDiffuse = uMaterialDiffuse;",
+         "  if(uUseVertexColors) {",
+         "        varMaterialDiffuse = vFinalColor;",
+         "   }",
+         "  if(uUseShading){  ",
+         "      if(lambertTerm > 0.0)",
+         "      {",
+         "          Id = uLightDiffuse * varMaterialDiffuse * lambertTerm;",
+         "          vec3 E = normalize(vEyeVec);",
+         "          vec3 R = reflect(L, N);",
+         "          float specular = pow( max(dot(R, E), 0.0), uShininess);",
+         "          Is = uLightSpecular * uMaterialSpecular * specular;",
+         "      }",
+         "      finalColor = Ia + Id + Is;",
+         "      finalColor.a = uMaterialDiffuse.a;",
+         "  } ",
+         "  else {",
+         "      finalColor = varMaterialDiffuse; ", 
+         "  }",
+         "   if (uUseTextures){",
+         "       finalColor =  texture2D(uSampler, vec2(vTextureCoords.s, vTextureCoords.t));",
+         "   }",
+         "   gl_FragColor = finalColor;",
+         "}"].join('\n'),
     
-    "uniform vec4 uLightAmbient;    ",
-    "uniform vec4 uLightDiffuse;    ",
-    "uniform vec4 uLightSpecular;   ",
-    
-    "uniform vec4 uMaterialAmbient; ",
-    "uniform vec4 uMaterialDiffuse; ",
-    "uniform vec4 uMaterialSpecular;",
-    
-    "varying vec3 vNormal;",
-    "varying vec3 vEyeVec;",
-    "varying vec4 vFinalColor;",
-    
-    "varying vec2      vTextureCoords;",
-    "uniform bool      uUseTextures;",
-    "uniform sampler2D uSampler;",
-    
-    "void main(void)",
-    "{",
-     "  vec4 finalColor = vec4(0.0);",
-     "  vec3 L = normalize(uLightDirection);",
-     "  vec3 N = normalize(vNormal);",
-     "  float lambertTerm = dot(N,-L);",
-     "  vec4 Ia = uLightAmbient * uMaterialAmbient;",
-     "  vec4 Id = vec4(0.0,0.0,0.0,1.0);",
-     "  vec4 Is = vec4(0.0,0.0,0.0,1.0);",
-     "  vec4 varMaterialDiffuse = uMaterialDiffuse;",
-     "  if(uUseVertexColors) {",
-     "        varMaterialDiffuse = vFinalColor;",
-     "   }",
-     "  if(uUseShading){  ",
-     "      if(lambertTerm > 0.0)",
-     "      {",
-     "          Id = uLightDiffuse * varMaterialDiffuse * lambertTerm;",
-     "          vec3 E = normalize(vEyeVec);",
-     "          vec3 R = reflect(L, N);",
-     "          float specular = pow( max(dot(R, E), 0.0), uShininess);",
-     "          Is = uLightSpecular * uMaterialSpecular * specular;",
-     "      }",
-     "      finalColor = Ia + Id + Is;",
-     "      finalColor.a = uMaterialDiffuse.a;",
-     "  } ",
-     "  else {",
-     "      finalColor = varMaterialDiffuse; ", 
-     "  }",
-     "   if (uUseTextures){",
-     "       finalColor =  texture2D(uSampler, vec2(vTextureCoords.s, vTextureCoords.t));",
-     "   }",
-     "   gl_FragColor = finalColor;",
-     "}"].join('\n'),
-
-    DEFAULTS : {
-        "uShininess"        : 230.0,
-        "uLightDirection"   : [0.0, -1.0, -1.0],
-        "uLightAmbient"     : [0.03,0.03,0.03,1.0],
-        "uLightDiffuse"     : [1.0,1.0,1.0,1.0], 
-        "uLightSpecular"    : [1.0,1.0,1.0,1.0],
-        "uMaterialAmbient"  : [1.0,1.0,1.0,1.0],
-        "uMaterialDiffuse"  : [0.8,0.8,0.8,1.0],
-        "uMaterialSpecular" : [1.0,1.0,1.0,1.0]
-    }
-});
+        DEFAULTS : {
+            "uShininess"        : 230.0,
+            "uLightDirection"   : [0.0, -1.0, -1.0],
+            "uLightAmbient"     : [0.03,0.03,0.03,1.0],
+            "uLightDiffuse"     : [1.0,1.0,1.0,1.0], 
+            "uLightSpecular"    : [1.0,1.0,1.0,1.0],
+            "uMaterialAmbient"  : [1.0,1.0,1.0,1.0],
+            "uMaterialDiffuse"  : [0.8,0.8,0.8,1.0],
+            "uMaterialSpecular" : [1.0,1.0,1.0,1.0]
+        }
+    }));
    
 }; 
 
@@ -6244,7 +6256,8 @@ vxlBlenderProgram.prototype = new vxlProgram();
 vxlBlenderProgram.prototype.constructor = vxlBlenderProgram;
 
 function vxlBlenderProgram(){
-    this.createFromJSON({
+    
+    this.copy(vxlProgram.createFromJSON({
     
         ID : 'blender',
     
@@ -6342,7 +6355,7 @@ function vxlBlenderProgram(){
             "uTranslateLight" : false,
             "uLightPosition"   : [0,50,50]
         }
-    });
+    }));
 };
 
 
@@ -6372,7 +6385,8 @@ vxlBakeProgram.prototype = new vxlProgram();
 vxlBakeProgram.prototype.constructor = vxlBakeProgram;
 
 function vxlBakeProgram(){
-    this.createFromJSON({
+    
+    this.copy(vxlProgram.createFromJSON({
     
         ID : 'bake',
     
@@ -6429,7 +6443,8 @@ function vxlBakeProgram(){
             "uLightDiffuse"     : [1.0,1.0,1.0,1.0],
             "uUseLightTranslation" : false
         }
-    });
+    }));
+ 
 }; 
 
 
@@ -6590,6 +6605,8 @@ vxlProgramManager.prototype.loadDefaults = function(){
     if ('DEFAULTS' in code){
     
         var defaults = code.DEFAULTS;
+        
+        
         for(var u in defaults){
             this.setUniform(u,defaults[u]);
         }
@@ -6912,7 +6929,7 @@ function vxlRenderer(vw){
     this.transforms 	= new vxlTransforms(vw);
     this.fps            = 0;
     this.currentProgram = undefined;
-    this.engine 		= undefined;
+    this.engine 		= new vxlRenderEngine(this);
     
     
     this._time          = 0;
@@ -6923,8 +6940,7 @@ function vxlRenderer(vw){
     
     this._knownPrograms = {};
     this._enforce       = false; //to enforce the program or not
-    
-    this.setProgram(vxl.go.essl.lambert, vxlRenderEngine, false);
+    this.setProgram(vxl.go.essl.lambert);
     
 }
 
@@ -6980,9 +6996,9 @@ vxlRenderer.prototype._initializeGLContext = function(gl){
 /**
  * Tries to add a new program definition to this renderer
  * @param {vxlProgram} program an instance of a vxlProgram object or one of its descendents
- * @param {Class} engineType (optional) a new engine class to be instantiated 
+ * @param {vxlEngine} engine (optional) a new engine
  */
-vxlRenderer.prototype.setProgram = function(program,engineType, forceIt){
+vxlRenderer.prototype.setProgram = function(program,engine,forceIt){
     
     
     if (this._enforce && program.ID != this.currentProgram.ID){
@@ -7018,8 +7034,8 @@ vxlRenderer.prototype.setProgram = function(program,engineType, forceIt){
 	
 	this.currentProgram = prg;
 	
-	if (engineType != undefined){
-	   this.setupEngine(engineType);
+	if (engine != undefined && engine != this.engine){
+	   this.setEngine(engine);
 	}
 	
 	
@@ -7037,15 +7053,13 @@ vxlRenderer.prototype.releaseProgram = function(){
 }
 
 /**
- * Sets the current rendering engine. If the engine parameter is null or undefined, this method will check if 
- * the current strategy is null and in that case sets the strategy as an instance of <code>vxlBasicStrategy</code>
+ * Sets the current rendering engine. 
  * 
- * @param {function} engineType The engine to be used. This parameter 
- * corresponds to the constructor of the engine that should be used.  
+ * @param {vxlEngine} engine The engine to be used.  
  */
-vxlRenderer.prototype.setupEngine = function(engineType){
-    if (engineType != null && engineType != undefined){
-        this.engine = new engineType(this);
+vxlRenderer.prototype.setEngine = function(engine){
+    if (engine != null && engine != undefined){
+        this.engine = engine
     }
     else if (this.engine == undefined){
         this.engine = new vxlRenderEngine(this);
@@ -7158,11 +7172,14 @@ vxlRenderer.prototype.setRenderRate = function(rate){ //rate in ms
 
 /**
  * Sets the color used to clear the rendering context
- * @param {Array} cc the new color passed as a numeric array of three elements
+ * @param {Number, Array, vec3} r it can be the red component, a 3-dimensional Array or a vec3 (glMatrix)
+ * @param {Number} g if r is a number, then this parameter corresponds to the green component
+ * @param {Number} b if r is a number, then this parameter corresponds to the blue component
  * @see vxlView#setBackgroundColor
  */
-vxlRenderer.prototype.clearColor = function(cc){
-    this._clearColor = cc.slice(0);
+vxlRenderer.prototype.clearColor = function(r,g,b){
+    var cc = vxl.util.createArr3(r,g,b);
+    this._clearColor = cc;
 	this.gl.clearColor(cc[0], cc[1], cc[2], 1.0);
 };
 
@@ -8789,6 +8806,79 @@ vxlPicker.prototype.query = function(color){
  */
 vxl.go.picker = new vxlPicker();
 
+/*-------------------------------------------------------------------------
+    This file is part of Voxelent's Nucleo
+
+    Nucleo is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation version 3.
+
+    Nucleo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------------------------------------------*/ 
+
+/**
+ * Engine interface
+ */
+function vxlEngine(){
+    
+};
+
+vxlEngine.prototype = {
+    
+    allocate   : function(scene){},
+    render     : function(scene){},
+    deallocate : function(scene){}
+};
+/*-------------------------------------------------------------------------
+    This file is part of Voxelent's Nucleo
+
+    Nucleo is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation version 3.
+
+    Nucleo is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------------------------------------------*/ 
+
+vxlExternalEngine.prototype = new vxlEngine();
+vxlExternalEngine.prototype.constructor = vxlExternalEngine;
+/**
+ * 
+ * @param {Object} allocate
+ * @param {Object} render
+ * @param {Object} deallocate
+ */
+function vxlExternalEngine(renderer, allocate, render, deallocate){
+    this.renderer = renderer;
+    this.allocateCallback = allocate;
+    this.renderCallback = render;
+    this.deallocateCallback = deallocate;
+}
+
+
+vxlExternalEngine.prototype.allocate = function(scene){
+    this.allocateCallback(this.renderer, scene);
+};
+
+
+vxlExternalEngine.prototype.render = function(scene){
+    this.renderCallback(this.renderer, scene);  
+};
+
+vxlExternalEngine.prototype.deallocate = function(scene){
+    this.deallocateCallback(this.renderer, scene);  
+};
 /*-------------------------------------------------------------------------
     This file is part of Voxelent's Nucleo
 
@@ -12563,12 +12653,20 @@ wireframeON :  function(){
   * Forces the renderer to use a specific program
   * @param{vxlView} view the view to configure
   * @param{Object} program a JSON object that defines the progrma to execute
-  * @param{vxlRenderEngine} engine (optional) the engine that the renderer should use to communicate with the program. T
+  * @param{vxlEngine} engine (optional) the engine that the renderer should use to communicate with the program. T
   *                        
   */
  setProgram :  function(view,program,engine){
     view.renderer.setProgram(program,engine,true);
     
+ },
+ 
+ /**
+  *Releases the program used by the view passed as parameter
+  * @param{vxlView} view
+  */
+ releaseProgram: function(view){
+     view.renderer.releaseProgram();
  },
  /**
   * Returns the name of the current program

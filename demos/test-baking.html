@@ -19,7 +19,7 @@
 	    vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
 	    
 	    view = vxl.api.setup('view-1');
-	    vxl.api.setProgram(view, vxlBakeProgram, vxlBakeEngine);
+	    vxl.api.setProgram(view, vxl.go.essl.bake, new vxlBakeEngine(view.renderer));
 	    vxl.api.load(['cone.json','cube.json'],'assets/models/simple/');
 	    view.start();
 	    view.cameraman.active.setPosition(0,0,8);
