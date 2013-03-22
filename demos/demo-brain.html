@@ -54,9 +54,29 @@
             	$("#pan").html("Shift + Click: panning");
             	$("#roll").html("Command + Shift + Click: roll");
             }
+            
+             setupLUTSelector();    
         	
     	}
 	}
+	
+	/**
+     * Creates the dropdown selector from which lookup tables can be selected
+     */
+    function setupLUTSelector(){
+    
+    var tables = vxl.api.getLookupTables();
+    var options = "";
+    
+    for (var i=0;i<tables.length;i+=1){
+        options += '<option value=\"'+tables[i]+'\">'+tables[i]+'</option>';
+    }
+    
+    $('#lutPicker').html(options);
+    $('#lutPicker').change(function(){
+        vxl.api.setLookupTable($('#lutPicker').val());
+    });
+}; 
 </script>
         
 <script type="text/javascript">
@@ -89,6 +109,16 @@
     padding-right:10px;
 }
 
+.overlay select{
+   background: #333;
+   color: #BCBCBC;
+   width: 100px;
+   padding: 5px;
+   font-size: 13px;
+   height: 30px;
+   border: 0px;
+}
+
 </style> 
 
 </head>
@@ -111,6 +141,7 @@
       <p>
           Opacity: <div id='op-slider-id'> </div>
       </p>
+      <select id='lutPicker'></select>
     </div>  
 </div>
 
