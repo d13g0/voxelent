@@ -1,0 +1,2 @@
+original OBJ file: monkey.obj
+part1.json > alias: Monkey_Monkey_Material.001

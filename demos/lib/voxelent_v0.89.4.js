@@ -529,6 +529,63 @@ util : {
     int2rgb: function(i){
         return [((i >> 16) & 0xFF)/256,((i >> 8) & 0xFF)/256,(i & 0xFF)/256]; 
     },
+    
+    /**
+     * This function is attributed to Tim Down
+     * @link{http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb} 
+     */
+    hex2rgb: function(hex){
+        var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+            return r + r + g + g + b + b;
+        });
+
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? [
+             parseInt(result[1], 16),
+             parseInt(result[2], 16),
+             parseInt(result[3], 16)
+        ] : null;
+    },
+    /**
+     * Rescales the color from [0,255] to [0,1]
+     * WebGL uses [0,1] range 
+     */
+    rgb2decimal : function(rgb){
+        if (rgb == null || rgb == undefined) return null;  
+        return [rgb[0]/255, rgb[1]/255,rgb[2]/255];   
+    },
+    
+    createColor : function(r,g,b){
+        var color = [];
+        if (r == undefined) {
+            return null;
+        }
+        
+        if (r instanceof Array){
+            var c = r.slice(0);
+            r = c[0];
+            g = c[1];
+            b = c[2];
+        }
+        
+        if (typeof(r) == 'string'){
+            color = this.rgb2decimal(this.hex2rgb(r)); 
+        }
+        else if (typeof(r) == 'number'){
+            if (r <0 || g == undefined || b == undefined || g <0 || b <0){
+                return null; //invalid color
+            }
+            else if (r>1 || g>1 || b>1){
+                color = this.rgb2decimal([r,g,b]);
+            }
+            else{
+                color = [r,g,b]
+            }
+        }
+        
+        return color;
+    },
     /**
      * Formats Arrays, vec3 and vec4 for display
      * 
@@ -6496,6 +6553,7 @@ function vxlProgramManager (gl) {
     this._currentProgramID        = "";
     this._currentUniformLocation  = {};
     this._defaults         = [];
+    this._oneTimeWarning  = false;
 };
 
 
@@ -6589,6 +6647,7 @@ vxlProgramManager.prototype.useProgram = function(ID){
         this._essl = esslProgram;
         this._currentProgramID = ID;
         this._parseUniforms();
+        this._oneTimeWarning  = false;
     }
     else{
         alert("Program: the program " + ID + " has NOT been loaded");
@@ -6868,6 +6927,22 @@ vxlProgramManager.prototype._setPolymorphicUniform = function(uniformID, locatio
     
     
     else if (value instanceof Array){
+        
+        /*If we receive a uniform of length 3 but the type is length 4
+         * complete with 1.0
+         * This will happen for blender scenes where the material colors are 
+         * of length 3 (no alpha)
+         * 
+         */ 
+         
+        if (value.length == 3 && glslType == 'vec4'){
+             value[3] = 1.0;
+             if (!this._oneTimeWarning){
+                 alert('The uniform '+uniformID+' has only 3 components but voxelent needs 4. This is a one time warning');
+                 this._oneTimeWarning = true;
+             }
+        }
+        
         if (hint  == 'int'){
             switch(value.length){
                 case 1: { gl.uniform1iv(locationID,value); break; };
@@ -9328,7 +9403,12 @@ vxlRenderEngine.prototype._renderSolid = function(actor){
     var pm     = this.renderer.pm;
     var essl    = vxl.def.essl;
     
-    if (actor.renderable){
+    if (actor.model.type != vxl.def.model.type.SIMPLE){
+        
+        if (actor.renderable  == undefined){
+            alert('the actor does not have a renderable object');
+            throw 'the actor does not have a renderable object';
+        }
         
         parts = actor.renderable.parts;
         var i = parts.length;
@@ -9410,8 +9490,12 @@ vxlRenderEngine.prototype._renderLines = function(actor){
     var essl    = vxl.def.essl;
     
     pm.setUniform("uUseShading", false);
+     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.model.vertices), gl.STATIC_DRAW);
+    pm.setAttributePointer(essl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
     this._enableColors(actor);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(actor.model.indices), gl.STATIC_DRAW);
     gl.drawElements(gl.LINES, actor.model.indices.length, gl.UNSIGNED_SHORT,0); 
 };
 
@@ -9500,7 +9584,7 @@ vxlRenderEngine.prototype._renderFlat = function(actor){
     var essl    = vxl.def.essl;
     
     if (actor.mesh == undefined){
-        actor.mesh = new vxlMesh(actor.model);
+        actor.mesh = new vxlMesh(actor);
         actor.renderable = new vxlRenderable(actor);
         
     }
@@ -9553,7 +9637,7 @@ vxlRenderEngine.prototype._renderFlat = function(actor){
         
        if (part.colors && part.colors.length > 0){ 
            
-                if (buffers.colorss == undefined){
+                if (buffers.colors == undefined){
                     //when switching to parts this might not be defined
                     buffers.colors = gl.createBuffer();
                 }
@@ -9773,7 +9857,7 @@ vxlRenderEngine.prototype._renderActor = function(actor){
      * If the renderer is not forcing his program, then give the actors
      * a chance to decide which program they want to use to be rendered
      */
-    if (!this.renderer._enforce){
+    if (!this.renderer._enforce && actor.mode != vxl.def.actor.mode.FLAT){
         if(actor.material.shininess > 0){
             this.renderer.setProgram(vxl.go.essl.phong);
             pm.setUniform("uShininess", actor.material.shininess);
@@ -9782,6 +9866,10 @@ vxlRenderEngine.prototype._renderActor = function(actor){
         else{
             this.renderer.setProgram(vxl.go.essl.lambert);
         }
+    }
+    
+    if (actor.mode == vxl.def.actor.mode.FLAT){
+        this.renderer.setProgram(vxl.go.essl.lambert);
     }
     
     
@@ -9811,7 +9899,7 @@ vxlRenderEngine.prototype._renderActor = function(actor){
     if (actor.mode != vxl.def.actor.mode.FLAT && actor.model.type != vxl.def.model.type.BIG_DATA){
         try{
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices), gl.STATIC_DRAW);
             pm.setAttributePointer(essl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
         }
         catch(err){
@@ -11682,7 +11770,7 @@ vxlView.prototype.reset = function(){
  * @see vxlRenderer#clearColor
  */
 vxlView.prototype.setBackgroundColor = function(r,g,b){
-	this.backgroundColor = vxl.util.createArr3(r,g,b); 
+	this.backgroundColor = vxl.util.createColor(r,g,b); 
 	this.renderer.clearColor(this.backgroundColor);
 };
 

@@ -529,6 +529,63 @@ util : {
     int2rgb: function(i){
         return [((i >> 16) & 0xFF)/256,((i >> 8) & 0xFF)/256,(i & 0xFF)/256]; 
     },
+    
+    /**
+     * This function is attributed to Tim Down
+     * @link{http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb} 
+     */
+    hex2rgb: function(hex){
+        var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+            return r + r + g + g + b + b;
+        });
+
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? [
+             parseInt(result[1], 16),
+             parseInt(result[2], 16),
+             parseInt(result[3], 16)
+        ] : null;
+    },
+    /**
+     * Rescales the color from [0,255] to [0,1]
+     * WebGL uses [0,1] range 
+     */
+    rgb2decimal : function(rgb){
+        if (rgb == null || rgb == undefined) return null;  
+        return [rgb[0]/255, rgb[1]/255,rgb[2]/255];   
+    },
+    
+    createColor : function(r,g,b){
+        var color = [];
+        if (r == undefined) {
+            return null;
+        }
+        
+        if (r instanceof Array){
+            var c = r.slice(0);
+            r = c[0];
+            g = c[1];
+            b = c[2];
+        }
+        
+        if (typeof(r) == 'string'){
+            color = this.rgb2decimal(this.hex2rgb(r)); 
+        }
+        else if (typeof(r) == 'number'){
+            if (r <0 || g == undefined || b == undefined || g <0 || b <0){
+                return null; //invalid color
+            }
+            else if (r>1 || g>1 || b>1){
+                color = this.rgb2decimal([r,g,b]);
+            }
+            else{
+                color = [r,g,b]
+            }
+        }
+        
+        return color;
+    },
     /**
      * Formats Arrays, vec3 and vec4 for display
      * 

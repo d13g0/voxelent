@@ -42,6 +42,7 @@ function vxlProgramManager (gl) {
     this._currentProgramID        = "";
     this._currentUniformLocation  = {};
     this._defaults         = [];
+    this._oneTimeWarning  = false;
 };
 
 
@@ -135,6 +136,7 @@ vxlProgramManager.prototype.useProgram = function(ID){
         this._essl = esslProgram;
         this._currentProgramID = ID;
         this._parseUniforms();
+        this._oneTimeWarning  = false;
     }
     else{
         alert("Program: the program " + ID + " has NOT been loaded");
@@ -414,6 +416,22 @@ vxlProgramManager.prototype._setPolymorphicUniform = function(uniformID, locatio
     
     
     else if (value instanceof Array){
+        
+        /*If we receive a uniform of length 3 but the type is length 4
+         * complete with 1.0
+         * This will happen for blender scenes where the material colors are 
+         * of length 3 (no alpha)
+         * 
+         */ 
+         
+        if (value.length == 3 && glslType == 'vec4'){
+             value[3] = 1.0;
+             if (!this._oneTimeWarning){
+                 alert('The uniform '+uniformID+' has only 3 components but voxelent needs 4. This is a one time warning');
+                 this._oneTimeWarning = true;
+             }
+        }
+        
         if (hint  == 'int'){
             switch(value.length){
                 case 1: { gl.uniform1iv(locationID,value); break; };

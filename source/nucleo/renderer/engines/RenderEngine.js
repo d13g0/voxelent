@@ -447,7 +447,12 @@ vxlRenderEngine.prototype._renderSolid = function(actor){
     var pm     = this.renderer.pm;
     var essl    = vxl.def.essl;
     
-    if (actor.renderable){
+    if (actor.model.type != vxl.def.model.type.SIMPLE){
+        
+        if (actor.renderable  == undefined){
+            alert('the actor does not have a renderable object');
+            throw 'the actor does not have a renderable object';
+        }
         
         parts = actor.renderable.parts;
         var i = parts.length;
@@ -529,8 +534,12 @@ vxlRenderEngine.prototype._renderLines = function(actor){
     var essl    = vxl.def.essl;
     
     pm.setUniform("uUseShading", false);
+     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(actor.model.vertices), gl.STATIC_DRAW);
+    pm.setAttributePointer(essl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
     this._enableColors(actor);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(actor.model.indices), gl.STATIC_DRAW);
     gl.drawElements(gl.LINES, actor.model.indices.length, gl.UNSIGNED_SHORT,0); 
 };
 
@@ -619,7 +628,7 @@ vxlRenderEngine.prototype._renderFlat = function(actor){
     var essl    = vxl.def.essl;
     
     if (actor.mesh == undefined){
-        actor.mesh = new vxlMesh(actor.model);
+        actor.mesh = new vxlMesh(actor);
         actor.renderable = new vxlRenderable(actor);
         
     }
@@ -672,7 +681,7 @@ vxlRenderEngine.prototype._renderFlat = function(actor){
         
        if (part.colors && part.colors.length > 0){ 
            
-                if (buffers.colorss == undefined){
+                if (buffers.colors == undefined){
                     //when switching to parts this might not be defined
                     buffers.colors = gl.createBuffer();
                 }
@@ -892,7 +901,7 @@ vxlRenderEngine.prototype._renderActor = function(actor){
      * If the renderer is not forcing his program, then give the actors
      * a chance to decide which program they want to use to be rendered
      */
-    if (!this.renderer._enforce){
+    if (!this.renderer._enforce && actor.mode != vxl.def.actor.mode.FLAT){
         if(actor.material.shininess > 0){
             this.renderer.setProgram(vxl.go.essl.phong);
             pm.setUniform("uShininess", actor.material.shininess);
@@ -901,6 +910,10 @@ vxlRenderEngine.prototype._renderActor = function(actor){
         else{
             this.renderer.setProgram(vxl.go.essl.lambert);
         }
+    }
+    
+    if (actor.mode == vxl.def.actor.mode.FLAT){
+        this.renderer.setProgram(vxl.go.essl.lambert);
     }
     
     
@@ -930,7 +943,7 @@ vxlRenderEngine.prototype._renderActor = function(actor){
     if (actor.mode != vxl.def.actor.mode.FLAT && actor.model.type != vxl.def.model.type.BIG_DATA){
         try{
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices.slice(0)), gl.STATIC_DRAW);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertices), gl.STATIC_DRAW);
             pm.setAttributePointer(essl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
         }
         catch(err){
