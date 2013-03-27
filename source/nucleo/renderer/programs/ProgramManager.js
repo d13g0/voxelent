@@ -96,10 +96,9 @@ vxlProgramManager.prototype.loadProgram = function(ID){
     gl.linkProgram(esslProgram);
      
     if (!gl.getProgramParameter(esslProgram, gl.LINK_STATUS)) {
-        alert("Program: Could not link the shading program");
-    }
-    else{
-        //vxl.go.console("Program: the program "+ID+" has been loaded");
+        
+        alert(ID+":\n\n "+gl.getProgramInfoLog(esslProgram));
+        throw("Error linking program "+ID+":\n\n "+gl.getProgramInfoLog(esslProgram));
     }
     
     this._program[ID] = esslProgram;
@@ -313,7 +312,8 @@ vxlProgramManager.prototype._createShader = function(type,code){
     gl.compileShader(shader);
 
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        alert(gl.getShaderInfoLog(shader));
+        alert(type+":\n\n "+gl.getShaderInfoLog(shader));
+        throw("Error compiling shader "+type+":\n\n "+gl.getShaderInfoLog(shader));
     }
     
     return shader;

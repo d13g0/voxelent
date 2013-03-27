@@ -6607,10 +6607,9 @@ vxlProgramManager.prototype.loadProgram = function(ID){
     gl.linkProgram(esslProgram);
      
     if (!gl.getProgramParameter(esslProgram, gl.LINK_STATUS)) {
-        alert("Program: Could not link the shading program");
-    }
-    else{
-        //vxl.go.console("Program: the program "+ID+" has been loaded");
+        
+        alert(ID+":\n\n "+gl.getProgramInfoLog(esslProgram));
+        throw("Error linking program "+ID+":\n\n "+gl.getProgramInfoLog(esslProgram));
     }
     
     this._program[ID] = esslProgram;
@@ -6824,7 +6823,8 @@ vxlProgramManager.prototype._createShader = function(type,code){
     gl.compileShader(shader);
 
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        alert(gl.getShaderInfoLog(shader));
+        alert(type+":\n\n "+gl.getShaderInfoLog(shader));
+        throw("Error compiling shader "+type+":\n\n "+gl.getShaderInfoLog(shader));
     }
     
     return shader;
@@ -8449,7 +8449,7 @@ vxlActor.prototype.setShininess = function(s){
  */
 vxlActor.prototype.setTexture = function(uri){
     this.material.texture = new vxlTexture(uri);  
-    
+    this.dirty = true; //reallocation required
     return this;  
 }
 
@@ -9069,7 +9069,7 @@ vxlRenderEngine.prototype._allocateActor = function(actor){
     buffers.bb = gl.createBuffer();
 	
 	//Texture Coords Buffer
-	if (model.texture){
+	if (model.texcoords){
 	    buffers.texcoords = gl.createBuffer();
 	}
 	   
@@ -9128,7 +9128,7 @@ vxlRenderEngine.prototype._reallocateActor = function(actor){
     
     
     //Texture Coords Buffer
-    if (model.texture && actor.material.texture.loaded){
+    if (model.texcoords && actor.material.texture && actor.material.texture.loaded){
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texcoords);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.texcoords), gl.STATIC_DRAW);
         
@@ -9136,7 +9136,6 @@ vxlRenderEngine.prototype._reallocateActor = function(actor){
         gl.bindTexture(gl.TEXTURE_2D, this._gl_textures[actor.UID]);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, actor.material.texture.image);
         gl.generateMipmap(gl.TEXTURE_2D);
-        
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
     

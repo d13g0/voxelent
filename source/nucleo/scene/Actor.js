@@ -390,7 +390,7 @@ vxlActor.prototype.setShininess = function(s){
  */
 vxlActor.prototype.setTexture = function(uri){
     this.material.texture = new vxlTexture(uri);  
-    
+    this.dirty = true; //reallocation required
     return this;  
 }
 
