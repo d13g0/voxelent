@@ -22,6 +22,8 @@ function vxlViewInteractor(){
     this.view   = undefined;
 	this.camera = undefined;
 	this.UID    = vxl.util.generateUID();
+	this.keymap = {};
+	this.keysEnabled = true; //keys enabled by default
 };
 
 /**
@@ -98,53 +100,40 @@ vxlViewInteractor.prototype.connectCamera = function(c){
 	}
 };
 
-/**
- * Abstract method to be implemented by the descendants 
- * @param {Object} ev
- */
-vxlViewInteractor.prototype.onMouseUp   = function(ev){ alert('implement onMouseUp');};
-/**
- * Abstract method to be implemented by the descendants 
- * @param {Object} ev
- */
-vxlViewInteractor.prototype.onMouseDown = function(ev){ alert('implement onMouseDown');};
-/**
- * Abstract method to be implemented by the descendants 
- * @param {Object} ev
- */
-vxlViewInteractor.prototype.onMouseMove = function(ev){ alert('implement onMouseMove');};
-/**
- * Abstract method to be implemented by the descendants 
- * @param {Object} ev
- */
-vxlViewInteractor.prototype.onKeyDown   = function(ev){ alert('implement onKeyDown');};
-/**
- * Abstract method to be implemented by the descendants 
- * @param {Object} ev
- */
-vxlViewInteractor.prototype.onKeyUp     = function(ev){ alert('implement onKeyUp');};
-/**
- * Abstract method to be implemented by the descendants 
- * @param {Object} ev
- */
-vxlViewInteractor.prototype.onDragOver     = function(ev){ alert('implement onDragOver');};
-/**
- * Abstract method to be implemented by the descendants 
- * @param {Object} ev
- */
-vxlViewInteractor.prototype.onDragLeave     = function(ev){ alert('implement onDragLeave');};
 
 /**
- * Abstract method to be implemented by the descendants 
- * @param {Object} ev
+ * Maps a key code to a function
+ * @param {String} key
+ * @param {Object} fn
  */
-vxlViewInteractor.prototype.onDrop     = function(ev){ alert('implement onDrop');};
+vxlViewInteractor.prototype.addKeyAction = function(key, fn){
+    var keycode = key.charCodeAt(0);
+    this.keymap[keycode] = fn;
+};
+
 /**
- * Abstract method to be implemented by the descendants 
- * @param {Object} ev
+ * Removes a key binding
+ * @param {String} key
  */
-vxlViewInteractor.prototype.onDoubleClick     = function(ev){ alert('implement onDrop');};
+vxlViewInteractor.prototype.removeKeyAction = function(key){
+    var keycode = key.charCodeAt(0);
+    delete this.keymap[keycode];
+};
 
+/**
+ * Invokes the function associated with a key code
+ * @param {Object} keycode
+ */
+vxlViewInteractor.prototype.fireKeyAction = function(keycode){
+    
+    if (!this.keysEnabled) return;
+    if (this.keymap[keycode]){
+        this.keymap[keycode](this.view, this.camera);
+    }
+};
 
+vxlViewInteractor.prototype.enableKeyActions = function(flag){
+    this.keysEnabled = flag;
+}
 
 

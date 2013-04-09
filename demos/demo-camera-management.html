@@ -10,7 +10,7 @@
 
 <script type="text/javascript" src="lib/jquery.js" ></script>
 <script type="text/javascript" src="lib/jquery-ui.js" ></script>
-<script type='text/javascript' src='lib/voxelent_v0.89.4.js'> </script>
+<script type='text/javascript' src='lib/voxelent_v0.89.5.js'> </script>
 <script type='text/javascript' src='lib/vox-gui_v0.1.js'> </script>
 
 <link rel='stylesheet' type='text/css' href='css/jquery-ui/theme-1.css'/>
@@ -110,6 +110,10 @@ function handleEvent(event){
     cam2.setElevation(-39);
     
     createScene();
+    
+    view.interactor.addKeyAction('W', function(view,cam){cam.setFieldOfView(cam._fov+5); });
+    view.interactor.addKeyAction('N', function(view,cam){cam.setFieldOfView(cam._fov-5); });
+    
     $('#overlay-div').fadeIn(3000);
 }; 
 

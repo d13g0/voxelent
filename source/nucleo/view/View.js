@@ -91,6 +91,7 @@ function vxlView(canvasID, scene, handleLayout){
 	}
 	
 	this.setAutoResize(handleLayout);
+	this._fullscreenFlag = true;
 	
 	this.UID = vxl.util.generateUID();
 
@@ -216,6 +217,7 @@ vxlView.prototype._runPrefixMethod = function(obj,method){
  * @param {Boolean} flag set flag to true if fullscreen is wanted. Set it to false to exit fullscreen.
  */
 vxlView.prototype.fullscreen = function(flag){
+    if (!this._fullscreenFlag) return; //ignore request if fullscreen is not active
     if (flag == true){
         this._runPrefixMethod(this.canvas, "RequestFullScreen");
     }
@@ -228,6 +230,19 @@ vxlView.prototype.fullscreen = function(flag){
 
 };
 
+/**
+ * Forbids this view from going to Full Screen mode
+ */
+vxlView.prototype.disableFullScreen = function(){
+    this._fullscreenFlag = false;
+}
+
+/**
+ * Enables this view to go to Full Screen mode. Fullscreen mode is available by default.
+ */
+vxlView.prototype.enableFullScreen = function(){
+    this._fullscreenFlag = true;
+}
 
 /**
  * Starts the view
@@ -310,3 +325,4 @@ vxlView.prototype.getFPS = function(){
     return this.renderer.fps;
     
 };
+

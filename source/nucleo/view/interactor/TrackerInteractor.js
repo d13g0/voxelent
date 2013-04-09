@@ -41,6 +41,9 @@ function vxlTrackerInteractor(){
 	this.dragndrop = false;
 	this.isMac = vxl.util.isMac();
 	
+	this.addKeyAction('F', function(view,cam){view.fullscreen(true);});
+	this.addKeyAction('X', function(view,cam){view.fullscreen(false);});
+	
 };
 
 /**
@@ -54,6 +57,7 @@ vxlTrackerInteractor.prototype.getType = function(){
  * Reacts to the window onKeyDown event 
  */
 vxlTrackerInteractor.prototype.onKeyDown = function(ev){
+
     this.keyPressed = ev.keyCode;
     this.altPressed = ev.altKey;
     this.shiftPressed = ev.shiftKey;
@@ -67,9 +71,7 @@ vxlTrackerInteractor.prototype.onKeyDown = function(ev){
               case 40:camera.changeElevation(-10); break;
               case 37:camera.changeAzimuth(-10);   break;
               case 39:camera.changeAzimuth(10);    break;
-              case 70: this.view.fullscreen(true); break;
-              case 88: this.view.fullscreen(false); break;
-              default: break;
+              default: this.fireKeyAction(this.keyPressed);
         }
     }
     //PANNING
@@ -81,7 +83,7 @@ vxlTrackerInteractor.prototype.onKeyDown = function(ev){
             case 40:py = -10;break;
             case 37:px = -10;break;
             case 39:px = 10; break;
-            default: break;
+            default: this.fireKeyAction(this.keyPressed);
         }
         if(px != 0 || py !=0){
             this.pan(px,py);

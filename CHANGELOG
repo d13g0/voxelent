@@ -1,4 +1,36 @@
 -------------------------------------------------------------------------------------------
+VERSION 0.89.5 - Work in progress
+-------------------------------------------------------------------------------------------
+
+KEY ACTIONS
+------------
+
+Now keys can be programmed to perform customized operations. See demo-camera-management.html: 
+
+
+view.interactor.addKeyAction('W', function()....)
+view.interactor.addKeyAction('N', function()....)
+
+key actions are enabled by default. Key actions can be disabled with:
+
+view.interactor.enableKeyActions(false);
+
+
+DISABLING FULLSCREEN MODE
+--------------------------
+
+Fullscreen mode can be enabled/disabled with:
+
+view.enableFullScreen()
+view.disableFullScreen()
+
+these instructions don't take the view to fullscreen mode but instead control how the view
+answers fullscreen requests.
+
+
+
+
+-------------------------------------------------------------------------------------------
 VERSION 0.89.4 - EXTERNAL SHADERS
 -------------------------------------------------------------------------------------------
 
