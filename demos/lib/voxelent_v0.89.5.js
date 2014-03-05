@@ -4269,7 +4269,7 @@ function vxlLandmark(name, camera) {
     this._matrix          = mat4.set(c._matrix, mat4.create());
     this._right           = vec3.set(c._right, vec3.create());
     this._up              = vec3.set(c._up, vec3.create());
-    this._normal          = vec3.set(c._normal, vec3.create());   
+    this._forward         = vec3.set(c._forward, vec3.create());   
     this._position        = vec3.set(c._position, vec3.create());
     this._focalPoint      = vec3.set(c._focalPoint, vec3.create());
     this._distanceVector  = vec3.set(c._distanceVector, vec3.create());
@@ -4302,7 +4302,7 @@ vxlLandmark.prototype.retrieve = function() {
     c._matrix          = mat4.set(this._matrix, mat4.create());
     c._right           = vec3.set(this._right, vec3.create());
     c._up              = vec3.set(this._up, vec3.create());
-    c._normal          = vec3.set(this._normal, vec3.create());   
+    c._forward         = vec3.set(this._forward, vec3.create());   
     c._position        = vec3.set(this._position, vec3.create());
     c._focalPoint      = vec3.set(this._focalPoint, vec3.create());
     c._distanceVector  = vec3.set(this._distanceVector, vec3.create());

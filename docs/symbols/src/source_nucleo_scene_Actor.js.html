@@ -397,7 +397,7 @@
 <span class='line'>390</span>  */</span><span class="WHIT">
 <span class='line'>391</span> </span><span class="NAME">vxlActor.prototype.setTexture</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">uri</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'>392</span> </span><span class="WHIT">    </span><span class="NAME">this.material.texture</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">vxlTexture</span><span class="PUNC">(</span><span class="NAME">uri</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">  </span><span class="WHIT">
-<span class='line'>393</span> </span><span class="WHIT">    </span><span class="WHIT">
+<span class='line'>393</span> </span><span class="WHIT">    </span><span class="NAME">this.dirty</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">//reallocation required</span><span class="WHIT">
 <span class='line'>394</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">  </span><span class="WHIT">
 <span class='line'>395</span> </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>396</span> 

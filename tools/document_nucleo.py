@@ -1,6 +1,9 @@
 import platform, sys,string,traceback, os.path, subprocess, shutil
 
 def document(VOX_VERSION_NUMBER):
+    '''
+    Runs the JSDoc documentation generator on the voxelent source
+    '''
     if len(str(VOX_VERSION_NUMBER)) == 0:
         print "No version indicated"
         return

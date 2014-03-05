@@ -1,4 +1,17 @@
 -------------------------------------------------------------------------------------------
+VERSION 0.89.6 - Minor maintenance
+-------------------------------------------------------------------------------------------
+1. The python scripts were updated. Running pack_and_document.py makes sure that the demos
+are updated to the latest packed version.
+
+2. Copyright is also updated
+
+3. vxlLandmark.js source is updated to match latest version of vxlCamera.js (replacing normal
+vector by forward vector).
+
+4. Checking that everything works before retaking development
+
+-------------------------------------------------------------------------------------------
 VERSION 0.89.5 - Work in progress
 -------------------------------------------------------------------------------------------
 

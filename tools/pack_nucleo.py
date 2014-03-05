@@ -7,8 +7,11 @@ from shutil import move, copy
 from os import walk,path, close, remove, makedirs
 import re
 
-
 def updateDemoVersion(filename, version):
+    '''
+    Updates the voxelent version in all demos in the demo folder
+    useful to test that the newer version does not break anything previously working
+    '''
     #Create temp file
     fh, abs_path = mkstemp()
     new_file = open(abs_path,'w')
@@ -29,6 +32,11 @@ def updateDemoVersion(filename, version):
 
 
 def updateVersion(VOX_VERSION_NUMBER):
+    '''
+    Updates the version number in VXL.js and in the demos folder
+    '''
+    print '-- UPDATING VERSION IN FILES --'
+    print('Updating VXL.js')
     once = True
     for line in fileinput.input('../source/nucleo/vxl/VXL.js',inplace=1):
         text = line.strip()
@@ -37,19 +45,24 @@ def updateVersion(VOX_VERSION_NUMBER):
             once = False
         else:
             sys.stdout.write(line)
-        
+    
+    print('Updating Demos')    
     for r,d,f in walk("../demos"):
         for files in f:
             if files.endswith(".html"):
                  url = path.join(r,files)
                  updateDemoVersion(url,VOX_VERSION_NUMBER)
-
+    print '-- END UPDATING VERSION IN FILES --'
      
      
 
 
 
 def pack(VOX_VERSION_NUMBER):
+    '''
+    Creates ONE javascript file to be added to any web project. Actually
+    the minified version is also created
+    ''' 
 
     print 'Packaging Voxelent Nucleo. Version:' + str(VOX_VERSION_NUMBER)
     
@@ -182,6 +195,6 @@ def pack(VOX_VERSION_NUMBER):
     print ' -- END PACKAGER --'
     
 if __name__ == '__main__':
-    updateVersion(sys.argv[1])
     pack(sys.argv[1])
+    updateVersion(sys.argv[1])
 
