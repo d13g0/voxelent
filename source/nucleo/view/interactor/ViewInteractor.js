@@ -33,6 +33,19 @@ vxlViewInteractor.prototype.getType = function(){
     return "vxlViewInteractor";
 };
 
+vxlViewInteractor.prototype.disconnectFromView = function(){
+	canvas = this.view.canvas;
+	canvas.onmousedown 	= null;
+	canvas.onmouseup 	= null;
+    canvas.onmousemove 	= null;
+    canvas.ondragover 	= null;
+    canvas.ondragleave 	= null;
+    canvas.ondrop 		= null;
+    window.onkeydown 	= null;
+    window.onkeyup 		= null;
+    canvas.ondblclick 	= null;
+};
+
 /**
  * @param {vxlView} view the view 
  */
@@ -82,7 +95,7 @@ vxlViewInteractor.prototype.connectView = function(view){
     
     canvas.ondblclick = function(ev){
         interactor.onDoubleClick(ev);
-    }
+    };
 };
 
 
@@ -134,6 +147,6 @@ vxlViewInteractor.prototype.fireKeyAction = function(keycode){
 
 vxlViewInteractor.prototype.enableKeyActions = function(flag){
     this.keysEnabled = flag;
-}
+};
 
 

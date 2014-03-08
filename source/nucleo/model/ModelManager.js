@@ -47,7 +47,7 @@ vxlModelManager.prototype.handleEvent = function(event,source){
     for (var i = 0; i < parts.length; i+=1){
         this.add(parts[i],parts[i].name,reader.scene);
     }
-}
+};
 
 
 /**

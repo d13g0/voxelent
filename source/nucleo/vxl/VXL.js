@@ -54,7 +54,7 @@ var vxl = {
 */
 version : 
 {
-    number: '0.89.6',
+    number: '0.89.7',
    	codename : 'c4n314',
    	plugins  : []
 },
@@ -294,8 +294,8 @@ def : {
                          * <p>The camera type can be:
                          * <ul>
                          * <li><code>ORBITING</code>: Orbiting Camera - Around the World</li>
-                         * <li><code>DYNAMIC</code>: Camera axes are updated on every rotation</li> 
-                         * <li><code>TRACKING</code>: Tracking Camera - First Person Camera</li> 
+                         * <li><code>TRACKING</code>: Tracking Camera - First Person Camera</li>
+                         * <li><code>EXPLORING</code>: Camera axes are updated on every rotation</li> 
                          * </ul>
                          * </p>
                          * 
@@ -685,7 +685,7 @@ util : {
      * Returns an angle between 0 and 360 deg
      * @param{Number} angle the angle 
      */
-    getAngle: function(angle){
+    getAngle : function(angle){
         if (angle > 360 || angle <-360) {
             return angle % 360;
         }
@@ -695,9 +695,30 @@ util : {
      *Converts degrees to radians
      * @param{Number} deg angle in degrees 
      */
-    deg2rad: function(deg){
+    deg2rad : function(deg){
         return deg * Math.PI / 180;
-    }
+    },
+    
+	doTimer : function(length, resolution, oninstance, oncomplete){
+		var steps = (length / 100) * (resolution / 10),
+        speed = length / steps,
+        count = 0,
+        start = new Date().getTime();
+
+		function instance(){
+			if(count++ == steps)
+			{	
+				oncomplete(steps, count);
+			}
+			else
+			{	
+				oninstance(steps, count);
+				var diff = (new Date().getTime() - start) - (count * speed);
+				window.setTimeout(instance, (speed - diff));
+			}
+		};
+		window.setTimeout(instance, speed);
+	}
     
 }
 

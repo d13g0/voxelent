@@ -1,0 +1,175 @@
+<html>
+<head>
+<meta name='Diego Cantor' content='Voxelent: The best WebGL platform yet'>
+<meta name='copyright' content='&copy; 2013'>
+<meta name='robots' content='all'>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name='keywords' content='webgl, webgl platform, medical imaging, webgl api'>
+
+<title>Voxelent - Camera Landmarks Demo</title>
+
+<script type="text/javascript" src="lib/jquery.js" ></script>
+<script type="text/javascript" src="lib/jquery-ui.js" ></script>
+<script type='text/javascript' src='lib/voxelent_v0.89.7.js'> </script>
+<script type='text/javascript' src='lib/vox-gui_v0.1.js'> </script>
+
+<link rel='stylesheet' type='text/css' href='css/jquery-ui/theme-1.css'/>
+
+<script type='text/javascript'>
+
+var view, scene, cone, sphere, cylinder, cam;
+
+/**
+ * Main function
+ */
+function runVoxApp(){
+    
+    
+    vxl.api.subscribe(vxl.events.MODELS_LOADED, this); //handleEvent is invoked 
+                                                       //when all motes have been loaded  
+    view = vxl.api.setup('view-1');
+    var gui = new vxlGUI(view);
+    
+    vxl.api.load(['cone.json','sphere.json','cylinder.json'],
+                  'assets/models/geometry/',
+                  vxl.def.model.loadingMode.DETACHED);
+    view.start();
+};
+
+
+
+function handleEvent(event){
+    
+    /**
+    * Just for illustrative purposes the models have been loaded in DETACHED mode. 
+    * This means that no actors were created. So we retrieve them 
+    * from the model manager and create them
+    * 
+    */
+   
+    cam = vxl.c.camera;
+    cam.setType(vxl.def.camera.type.TRACKING);
+    cam.setPosition(0,53,213);
+    
+    var mman = vxl.go.modelManager;
+
+    cone     = new vxlActor(mman.getModelByName('cone'));
+    sphere   = new vxlActor(mman.getModelByName('sphere'));
+    cylinder = new vxlActor(mman.getModelByName('cylinder'));
+    
+    
+    scene = view.scene;
+    
+    cone.setPosition([-50,0,0]);
+    cone.setColor([1,0,0]);
+    sphere.setPosition([0,0,0]);
+    sphere.setColor([0,1,0]);
+    cylinder.setPosition([50,0,0]);
+    cylinder.setColor([0,0,1]);
+    
+    scene.addActor(cone);
+    scene.addActor(sphere);
+    scene.addActor(cylinder);
+
+
+    vxl.api.floorON(60,5);
+ 
+ 
+    //Setup camera
+  
+    
+    cam.setLandmark('to-home');
+    cam.createLandmark('to-cone',[-50,40,100],[-50,0,0]);
+    cam.createLandmark('to-sphere',[-0.15, 12.21, 42.29],[-2.3, -17.8, -175.13]);
+    cam.createLandmark('to-cylinder',[127.19, 22.97, 28.16],[18.43, 1.51, -15.22]);
+    
+    $('#overlay-div').fadeIn(3000);
+}; 
+
+</script>
+
+<script type="text/javascript">
+  //Google Analytics Script 
+  var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-26954785-1']); _gaq.push(['_trackPageview']);  (function() {  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);   })();
+</script>
+
+<style type="text/css">
+.show {
+
+     position: relative;
+}
+
+.overlay {
+    background: rgba(50,50,50,0.5);
+    padding: 5px;
+    width: 100px;
+    height: 20%;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size:12px;
+	font-family: Arial,Helvetica;
+	color: white;
+}
+
+
+</style> 
+</head>
+<body onload='runVoxApp()'>
+	<div class='show'>
+	<canvas id = 'view-1' width=800 height=650 >
+		<p>
+			Your browser does not support WebGL :-(
+		</p>
+	</canvas>
+    
+    
+    <div id = 'overlay-div' class='overlay'>
+      <p><a href='#' id='btnhome'>Go Home </a></p>
+      <p><a href='#' id='btn0'>Visit Cone </a></p>
+      <p><a href='#' id='btn1'>Visit Sphere</a></p>
+      <p><a href='#' id='btn2'>Visit Cylinder</a></p>
+    </div>  
+    
+    </div>
+    
+<script>
+
+$('#btnhome').button().click(
+    function(){
+        cam.gotoLandmark('to-home',true,3000,30);
+    }
+);
+
+$('#btn0').button().click(
+    function(){
+        //cam.gotoLandmark('to-home',true,3000,30);
+        //window.setTimeout(function(){
+            cam.gotoLandmark('to-cone',true,3000,30);
+        //},1000);
+        
+    }
+);
+
+$('#btn1').button().click(
+    function(){
+        //cam.gotoLandmark('to-home',true,3000,30);
+        //window.setTimeout(function(){
+            cam.gotoLandmark('to-sphere',true,3000,30);
+        //},1000);
+        
+    }
+);
+
+$('#btn2').button().click(
+    function(){
+        //cam.gotoLandmark('to-home',true,3000,30);
+        //window.setTimeout(function(){
+            cam.gotoLandmark('to-cylinder',true,3000,30);
+        //},1000);
+        
+    }
+);
+</script>    
+</body>			
+</html>

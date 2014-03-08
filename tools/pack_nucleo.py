@@ -12,21 +12,19 @@ def updateDemoVersion(filename, version):
     Updates the voxelent version in all demos in the demo folder
     useful to test that the newer version does not break anything previously working
     '''
-    #Create temp file
-    fh, abs_path = mkstemp()
-    new_file = open(abs_path,'w')
-    old_file = open(filename)
-    for line in old_file:
+    
+    lines = open(filename,'r').readlines()
+    newlines = []
+    
+    
+    for line in lines:
         subst = re.sub(r'(voxelent_v).+(.js)','voxelent_v%s.js'%version, line);
-        new_file.write(line.replace(line, subst))
-    #close temp file
-    new_file.close()
-    close(fh)
-    old_file.close()
-    #Remove original file
-    remove(filename)
-    #Move new file
-    move(abs_path, filename)
+        newlines.append(line.replace(line, subst))
+        
+    
+    out = open(filename,'w')
+    out.writelines(newlines);
+    out.close();
     print("%s updated to version %s"%(filename,version))
 
 

@@ -64,6 +64,7 @@ function vxlCamera(vw,t) {
     this._trackingMode  = vxl.def.camera.tracking.DEFAULT;
     
     this.landmarks         = [];
+    this._lmarkAnimationID = undefined; //useful to interrupt landmark animations
 
 	if (t != undefined && t !=null){
         this.type = t;
@@ -90,7 +91,7 @@ vxlCamera.prototype.setType = function(type, trackingMode){
         this.type = vxl.def.camera.type.EXPLORING;
     }
     else {
-        this.type = type
+        this.type = type;
     }
     
     if (this.type  == vxl.def.camera.type.TRACKING && trackingMode != undefined){
@@ -535,9 +536,26 @@ vxlCamera.prototype.setFieldOfView = function(fov){
 };
 
 /**
+ * Creates a new landmark without moving the camera. It basically defines
+ * 'future' landmarks.
+ * @param {String} name the landmark given name
+ * @param {Array, vec3} position the position of this landmark
+ * @param {Array, vec3} focalPoint the desired focalPoint for the camera at the landmark
+ * @see vxlLandmark
+ */
+vxlCamera.prototype.createLandmark = function(name, position, focalPoint){
+	
+	var c = new vxlCamera(this.view, this.type);
+	c.setPosition(position);
+	c.setFocalPoint(focalPoint);
+	var l = new vxlLandmark(name, c);
+	this.landmarks.push(l);
+};
+
+/**
  * Saves the current camera state in a landmark
  * @param {String} name the landmark name
- * @see vxlCameraState
+ * @see vxlLandmark
  */
 vxlCamera.prototype.setLandmark = function(name) {
     var l = new vxlLandmark (name, this);
@@ -547,16 +565,86 @@ vxlCamera.prototype.setLandmark = function(name) {
 /**
  * Retrieves the landmark by name from the known landmarks
  * @param {String} name the landmark name
- * @see vxlCameraState
+ * @param {Boolean} iflag (optional) interpolation flag. If true it applies a lerp between the
+ * @param {Number} length (optional) the duration of the animation 
+ * @param {Number} fps (optional) the number of frames per second (estmate)  
+ * two landmarks.
+ * @see vxlLandmark
  */
-vxlCamera.prototype.goTo = function(name) {
-    for(var i=0, N =this.landmarks.length; i<N;i+=1){
+vxlCamera.prototype.gotoLandmark = function(name,iflag,length,fps) {
+	
+	var lmark = undefined;
+	
+	for(var i=0, N =this.landmarks.length; i<N;i+=1){
         if (this.landmarks[i].name == name){
-            this.landmarks[i].retrieve();
-            return;
+        	lmark = this.landmarks[i];
+        	break;
         }
-    }
-    console.warn('vxlCamera.goTo: landmark with name: '+name+', was not found');
+	}
+	
+	if (lmark == undefined){
+		console.warn('vxlCamera.goTo: landmark with name: '+name+', was not found');
+		return;
+	}
+    
+	if (iflag == undefined || !iflag){
+		lmark.retrieve(this);
+        return;
+	}
+	
+	if (this._lmarkAnimationID != undefined){
+		window.clearTimeout(this._lmarkAnimationID);
+	}
+	
+	var self = this;
+	var dest_pos = lmark._position;
+	var dest_fp = lmark._focalPoint;
+	
+	if (length == undefined){ length = 1000; }
+	if (fps == undefined) {fps ==  20; } 
+	
+	var interactor = this.view.interactor;
+	interactor.disconnectFromView(); //do not process events during animation
+	
+	function animate(length, resolution){
+		var steps = (length / 100) * (resolution / 10),
+        speed = length / steps,
+        count = 0,
+        start = new Date().getTime();
+
+		function iteration(){
+			
+			if(count++ != steps){
+				percent = count/steps;
+				var inter_fp = vec3.lerp(self._focalPoint, dest_fp,percent);
+				var inter_pos = vec3.lerp(self._position, dest_pos,percent);
+				
+				
+				self.setFocalPoint(inter_fp);
+				self.setPosition(inter_pos);
+				self.refresh();
+				
+				var dist = vec3.dist(inter_fp,dest_fp) + vec3.dist(inter_pos,dest_pos);
+				if (dist >0.01){
+					var diff = (new Date().getTime() - start) - (count * speed);
+					self._lmarkAnimationID = window.setTimeout(iteration, (speed - diff));
+				}
+				else{
+					self.setFocalPoint(dest_fp);
+					self.setPosition(dest_pos);
+					self.refresh();
+					interactor.connectView(this.view); //reconnect interactor
+				}
+				return;
+			}
+		};
+		
+		//first time invocation
+		self._lmarkAnimationID = window.setTimeout(iteration, speed);
+	}
+	
+	animate(length,fps); 
+	
 };
 
 /**
@@ -571,7 +659,10 @@ vxlCamera.prototype.getLandmarks = function(){
 };
 
 
-vxlCamera.prototype.getLandmarks
+
+
+
+
 /**
  * This method sets the camera to a distance such that the area covered by the bounding box (parameter)
  * is viewed.

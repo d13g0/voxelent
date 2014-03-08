@@ -32,9 +32,8 @@ function vxlLandmark(name, camera) {
 	}
 	
 	this.name             = name;
-	this.camera           = camera;
 	
-	var c = this.camera;
+	var c = camera;
     
     this._fov             = c._fov;
     this.Z_NEAR           = c.Z_NEAR;    
@@ -65,9 +64,9 @@ function vxlLandmark(name, camera) {
 /**
  * Updates the camera with the state stored in vxlLandmark.
  */
-vxlLandmark.prototype.retrieve = function() {
+vxlLandmark.prototype.retrieve = function(camera) {
     
-	var c = this.camera;
+	var c = camera;
 	
 	c._fov             = this._fov;
     c.Z_NEAR           = this.Z_NEAR;    

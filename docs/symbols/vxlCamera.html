@@ -37,7 +37,7 @@
 			<!-- begin publish.classesIndex -->
 			<div align="center"><h2><a href="../index.html">Class List</a></h2></div>
 <hr />
-<h3>Current Version:  0.89.6</h3>
+<h3>Current Version:  0.89.7</h3>
 <p>Download it <a href='http://voxelent.com/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -303,6 +303,28 @@ matrix manipulations that are required to view a 3D scene.</div>
 								
 								
 								
+								<b><a href="../symbols/vxlCamera.html#createLandmark">createLandmark</a></b>
+								(name, position, focalPoint)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
 								<b><a href="../symbols/vxlCamera.html#dolly">dolly</a></b>
 								(value)
 								</div>
@@ -393,8 +415,8 @@ matrix manipulations that are required to view a 3D scene.</div>
 								
 								
 								
-								<b><a href="../symbols/vxlCamera.html#goTo">goTo</a></b>
-								(name)
+								<b><a href="../symbols/vxlCamera.html#gotoLandmark">gotoLandmark</a></b>
+								(name, iflag, length, fps)
 								</div>
 							</td>
 							
@@ -1132,6 +1154,84 @@ of
 				</div>	
 				
 				<div class='methodDetail'>
+					<a name="createLandmark"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>createLandmark</b>(name, position, focalPoint)
+					</div>
+					</div>
+					<div class="description">
+						Creates a new landmark without moving the camera. It basically defines
+'future' landmarks.
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{String}</span> 
+								</td>
+								<td>
+									<code>name</code>
+								</td>	
+								<td><p>the landmark given name
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									<span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>|vec3}</span> 
+								</td>
+								<td>
+									<code>position</code>
+								</td>	
+								<td><p>the position of this landmark
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									<span class="light fixedFont">{<a href="../symbols/Array.html">Array</a>|vec3}</span> 
+								</td>
+								<td>
+									<code>focalPoint</code>
+								</td>	
+								<td><p>the desired focalPoint for the camera at the landmark
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+							<p class="heading">See:</p>
+							
+								<span><a href="../symbols/vxlLandmark.html">vxlLandmark</a></span>
+							
+						
+				</div>	
+				
+				<div class='methodDetail'>
 					<a name="dolly"> </a>
 					<div class="title">
 					<div class="fixedFont">
@@ -1321,7 +1421,7 @@ the camera mode will change to be a TRACKING camera.
 				</div>	
 				
 				<div class='methodDetail'>
-					<a name="goTo"> </a>
+					<a name="gotoLandmark"> </a>
 					<div class="title">
 					<div class="fixedFont">
 
@@ -1331,7 +1431,7 @@ the camera mode will change to be a TRACKING camera.
 					
 					
 					
-					  <b>goTo</b>(name)
+					  <b>gotoLandmark</b>(name, iflag, length, fps)
 					</div>
 					</div>
 					<div class="description">
@@ -1358,6 +1458,43 @@ the camera mode will change to be a TRACKING camera.
 								</td>
 							</tr>	
 							
+							<tr><td>
+									<span class="light fixedFont">{Boolean}</span> 
+								</td>
+								<td>
+									<code>iflag</code>
+								</td>	
+								<td><p>(optional) interpolation flag. If true it applies a lerp between the
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									<span class="light fixedFont">{Number}</span> 
+								</td>
+								<td>
+									<code>length</code>
+								</td>	
+								<td><p>(optional) the duration of the animation
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									<span class="light fixedFont">{Number}</span> 
+								</td>
+								<td>
+									<code>fps</code>
+								</td>	
+								<td><p>(optional) the number of frames per second (estmate)  
+two landmarks.
+								
+								</p>
+								</td>
+							</tr>	
+							
 							</table>
 						
 						
@@ -1368,7 +1505,7 @@ the camera mode will change to be a TRACKING camera.
 						
 							<p class="heading">See:</p>
 							
-								<span>vxlCameraState</span>
+								<span><a href="../symbols/vxlLandmark.html">vxlLandmark</a></span>
 							
 						
 				</div>	
@@ -1944,7 +2081,7 @@ Note: If the camera is doing cinematic tracking, the up vector will be affected.
 						
 							<p class="heading">See:</p>
 							
-								<span>vxlCameraState</span>
+								<span><a href="../symbols/vxlLandmark.html">vxlLandmark</a></span>
 							
 						
 				</div>	
@@ -2461,7 +2598,7 @@ this camera is following the actor passed as parameter here
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Mar 05 2014 15:04:18 GMT-0500 (EST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sat Mar 08 2014 17:05:36 GMT-0500 (EST)
 		</div>
         </div>
         </div>
