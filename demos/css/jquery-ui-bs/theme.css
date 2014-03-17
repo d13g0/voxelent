@@ -546,6 +546,7 @@
   -o-transition: 0.1s linear background-image;
   transition: 0.1s linear background-image;
    overflow: visible;
+   text-decoration:none;
 
 } /* the overflow property removes extra width in IE */
 
@@ -764,6 +765,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   border-color: #0064cd #0064cd #003f81;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  text-decoration:none;
 }
 /*
  * jQuery UI Slider 1.8.16
