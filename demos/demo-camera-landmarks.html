@@ -137,27 +137,19 @@ function handleEvent(event){
 
 $('#btnhome').button().click(
     function(){
-        cam.gotoLandmark('to-home',true,3000,30);
+        cam.gotoLandmark('to-home',3000,30);
     }
 );
 
 $('#btn0').button().click(
     function(){
-        //cam.gotoLandmark('to-home',true,3000,30);
-        //window.setTimeout(function(){
-            cam.gotoLandmark('to-cone',true,3000,30);
-        //},1000);
-        
+        cam.gotoLandmark('to-cone',3000,30);
     }
 );
 
 $('#btn1').button().click(
     function(){
-        //cam.gotoLandmark('to-home',true,3000,30);
-        //window.setTimeout(function(){
-            cam.gotoLandmark('to-sphere',true,3000,30);
-        //},1000);
-        
+        cam.gotoLandmark('to-sphere',3000,30);
     }
 );
 
@@ -165,9 +157,8 @@ $('#btn2').button().click(
     function(){
         //cam.gotoLandmark('to-home',true,3000,30);
         //window.setTimeout(function(){
-            cam.gotoLandmark('to-cylinder',true,3000,30);
+            cam.gotoLandmark('to-cylinder',3000,30);
         //},1000);
-        
     }
 );
 </script>    

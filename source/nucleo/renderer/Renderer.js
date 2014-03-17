@@ -240,7 +240,7 @@ vxlRenderer.prototype._timeUp = function(){
             self._timeUp();
         }
     })(this), this.renderRate - diff);
-}
+};
 /**
  * Stops the renderer
  */

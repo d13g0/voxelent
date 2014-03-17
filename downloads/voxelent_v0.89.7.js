@@ -4908,13 +4908,12 @@ vxlCamera.prototype.setLandmark = function(name) {
 /**
  * Retrieves the landmark by name from the known landmarks
  * @param {String} name the landmark name
- * @param {Boolean} iflag (optional) interpolation flag. If true it applies a lerp between the
  * @param {Number} length (optional) the duration of the animation 
  * @param {Number} fps (optional) the number of frames per second (estmate)  
  * two landmarks.
  * @see vxlLandmark
  */
-vxlCamera.prototype.gotoLandmark = function(name,iflag,length,fps) {
+vxlCamera.prototype.gotoLandmark = function(name,length,fps) {
 	
 	var lmark = undefined;
 	
@@ -4930,7 +4929,7 @@ vxlCamera.prototype.gotoLandmark = function(name,iflag,length,fps) {
 		return;
 	}
     
-	if (iflag == undefined || !iflag){
+	if (length == undefined || length == 0){
 		lmark.retrieve(this);
         return;
 	}
@@ -7324,7 +7323,7 @@ vxlRenderer.prototype._timeUp = function(){
             self._timeUp();
         }
     })(this), this.renderRate - diff);
-}
+};
 /**
  * Stops the renderer
  */
