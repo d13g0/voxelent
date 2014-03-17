@@ -4988,6 +4988,35 @@ vxlCamera.prototype.gotoLandmark = function(name,length,fps) {
 	animate(length,fps); 
 	
 };
+/**
+ * The animation map has one entry per gotoLandmark step
+ * steps = [ ['landmark_1',duration_1, fps_1],
+ *           ['landmark_2',duration_2, fps_2],
+ *           ...
+ *           ['landmark_N,duration_N,fps_N]];
+ * }
+ */
+vxlCamera.prototype.doLandmarkAnimation = function(steps){
+	
+	var _steps = steps.slice(0); //copy so we can destroy it
+	var camera = this;
+	
+	function processStep(){
+		if (_steps.length ==0){
+			return;
+		}
+		
+		step = _steps.splice(0,1)[0];
+
+		lmark = step[0];
+		duration = step[1];
+		fps = step[2];
+		camera.gotoLandmark(lmark,duration,fps);
+		window.setTimeout(processStep,duration);
+	}
+	
+	processStep();
+};
 
 /**
  * Returns a list of known landmarks

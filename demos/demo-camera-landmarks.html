@@ -103,7 +103,7 @@ function handleEvent(event){
     background: rgba(50,50,50,0.5);
     padding: 5px;
     width: 100px;
-    height: 20%;
+    height: 25%;
     position: absolute;
     top: 5px;
     right: 5px;
@@ -129,6 +129,7 @@ function handleEvent(event){
       <p><a href='#' id='btn0'>Visit Cone </a></p>
       <p><a href='#' id='btn1'>Visit Sphere</a></p>
       <p><a href='#' id='btn2'>Visit Cylinder</a></p>
+      <p><a href='#' id='btn3'>Visit All</a></p>
     </div>  
     
     </div>
@@ -155,10 +156,19 @@ $('#btn1').button().click(
 
 $('#btn2').button().click(
     function(){
-        //cam.gotoLandmark('to-home',true,3000,30);
-        //window.setTimeout(function(){
-            cam.gotoLandmark('to-cylinder',3000,30);
-        //},1000);
+        cam.gotoLandmark('to-cylinder',3000,30);
+    }
+);
+
+$('#btn3').button().click(
+    function(){
+        steps = [
+            ['to-cone',2000,30],
+            ['to-sphere',2000,30],
+            ['to-cylinder',2000,30],
+            ['to-home',2000,30]
+        ];
+        cam.doLandmarkAnimation(steps);
     }
 );
 </script>    
