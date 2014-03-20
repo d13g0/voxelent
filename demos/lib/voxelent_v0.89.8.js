@@ -4630,7 +4630,7 @@ vxlCamera.prototype.changeElevation = function(el){
  * @param {Number} rl the roll increment in degrees
  */
 vxlCamera.prototype.changeRoll = function(rl){
-    this.roll(this._roll + rl);
+    this.setRoll(this._roll + rl);
 };
 /**
  * Sets the initial azimuth of the camera
@@ -4697,10 +4697,12 @@ vxlCamera.prototype.rotate = function(azimuth,elevation,roll){
         azimuth   = this._getAngle(azimuth);
         elevation = this._getAngle(elevation);
         roll      = this._getAngle(roll);
+        
         var rotX  = quat4.fromAngleAxis(elevation * vxl.def.deg2rad, [1,0,0]);
         var rotY  = quat4.fromAngleAxis(azimuth   * vxl.def.deg2rad, [0,1,0]);
         var rotZ  = quat4.fromAngleAxis(roll      * vxl.def.deg2rad, [0,0,1]); 
         var rotQ = quat4.multiply(rotY, rotX, quat4.create());
+        
         rotQ = quat4.multiply(rotQ, rotZ, quat4.create());
         var rotMatrix = quat4.toMat4(rotQ);
         mat4.translate(this._matrix, [0,0,-this._distance]);
@@ -4712,18 +4714,11 @@ vxlCamera.prototype.rotate = function(azimuth,elevation,roll){
         this._relElevation = this._getAngle(elevation);
         this._relAzimuth = this._getAngle(azimuth);
         this._relRoll = this._getAngle(roll);
-        
-        if (this.type == vxl.def.camera.type.TRACKING){
-            //this._relElevation = -this._relElevation;
-            //this._relAzimuth   = -this._relAzimuth;
-            //this._relRoll      = -this._relRoll;
-        }
-        
         this._elevation += this._relElevation;
         this._azimuth += this._relAzimuth;
         this._roll += this._relRoll;
         
-         this._computeMatrix();
+        this._computeMatrix();
     }
     
        
@@ -5114,7 +5109,7 @@ vxlCamera.prototype._computeMatrix = function(){
     var rotZ  = quat4.fromAngleAxis(this._roll      * vxl.def.deg2rad, [0,0,1]); 
     
     if(this.type == vxl.def.camera.type.ORBITING || this.type == vxl.def.camera.type.EXPLORING){
-        rotX  = quat4.fromAngleAxis(this._elevation * vxl.def.deg2rad, [-1,0,0]);
+        rotX  = quat4.fromAngleAxis(-this._elevation * vxl.def.deg2rad, [1,0,0]);
     } 
    
     
@@ -5227,7 +5222,13 @@ vxlCamera.prototype._getAngles = function(){
     //Recalculates angles  
     var x = this._distanceVector[0], y = this._distanceVector[1],  z = this._distanceVector[2];
     var r = vec3.length(this._distanceVector);
-    this._elevation = Math.asin(y/r)    * vxl.def.rad2deg;
+    
+    if (this.type == vxl.def.camera.type.ORBITING || this.type == vxl.def.camera.type.EXPLORING){
+        this._elevation = -1 * Math.asin(y/r)    * vxl.def.rad2deg;
+    }
+    else{
+        this._elevation = Math.asin(y/r)    * vxl.def.rad2deg;
+    }
     this._azimuth   = Math.atan2(-x,-z) * vxl.def.rad2deg;
 };
 

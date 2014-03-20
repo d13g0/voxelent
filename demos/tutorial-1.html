@@ -15,13 +15,14 @@
 <title>Voxelent - Hello 3D World!</title>
 
 <script type='text/javascript'>
-	var view;
+	var view,c;
 	
 	function runVoxApp(){
 	    view = vxl.api.setup('view-1');
 	    vxl.api.load('assets/models/simple/cone.json');
 	    view.start();
 	    view.cameraman.active.setPosition(0,0,8);
+	    
 	}
 </script>
 
