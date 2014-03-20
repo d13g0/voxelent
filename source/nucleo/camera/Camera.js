@@ -769,6 +769,12 @@ vxlCamera.prototype._computeMatrix = function(){
     var rotX  = quat4.fromAngleAxis(this._elevation * vxl.def.deg2rad, [1,0,0]);
     var rotY  = quat4.fromAngleAxis(this._azimuth   * vxl.def.deg2rad, [0,1,0]);
     var rotZ  = quat4.fromAngleAxis(this._roll      * vxl.def.deg2rad, [0,0,1]); 
+    
+    if(this.type == vxl.def.camera.type.ORBITING || this.type == vxl.def.camera.type.EXPLORING){
+        rotX  = quat4.fromAngleAxis(this._elevation * vxl.def.deg2rad, [-1,0,0]);
+    } 
+   
+    
     var rotQ = quat4.multiply(rotY, rotX, quat4.create());
     rotQ = quat4.multiply(rotQ, rotZ, quat4.create());
     var rotMatrix = quat4.toMat4(rotQ);
