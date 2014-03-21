@@ -1,117 +1,113 @@
 <html>
-	<head>
-		<meta charset="utf-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-		<meta name="description" content="Voxelent - Learn & Play: Heart demo" />
-		<meta name="author" content="Diego Cantor" />
-		<meta name="viewport" content="width=device-width; initial-scale=1.0" />
-		<meta name='Diego Cantor' content='Voxelent: The best WebGL platform yet'>
-		<meta name='copyright' content='&copy; 2013'>
-		<meta name='robots' content='all'>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<meta name='keywords' content='webgl, webgl platform, medical imaging, webgl api'>
-		<link rel='stylesheet' type='text/css' href='css/jquery-ui-bs/theme.css'/>
+<head>
+<meta name='Diego Cantor'       content='Voxelent: The best WebGL platform yet'>
+<meta name='copyright'          content='&copy 2014'>
+<meta name='robots'             content='all'>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name='keywords'           content='webgl, webgl platform, medical imaging, webgl api'>
+<meta http-equiv="expires"      content="0">
+<link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
+<script src="lib/jquery.js"     type="text/javascript"></script>
+<script src="lib/jquery-ui.js"  type="text/javascript"> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.89.8.js'> </script>
+<script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
 
-        <script src="lib/jquery.js" type="text/javascript"> </script>
-        <script src="lib/jquery-ui.js" type="text/javascript"> </script>
-        <script type='text/javascript' src='lib/voxelent_v0.89.7.js'> </script>
-        <script type='text/javascript' src='lib/vox-gui_v0.1.js'> </script>
+<title>Voxelent - Heart Demo</title>
 
-		<title>Voxelent - Heart Demo</title>
-		<script type='text/javascript' id='code-js'>
-			var view, scene, animation, gui;
+<script type='text/javascript' id='code-js'>
+	var view, scene, animation, gui;
 
-			function runVoxApp() {
+	function runVoxApp() {
 
-				var e = vxl.events;
-				var ntf = vxl.go.notifier;
-				ntf.subscribe([e.MODELS_LOADED, e.SCENE_UPDATED], this);
+		var e = vxl.events;
+		var ntf = vxl.go.notifier;
+		ntf.subscribe([e.MODELS_LOADED, e.SCENE_UPDATED], this);
 
-				//1. Setup the view
-				view = vxl.api.setup('view-1');
-				scene = view.scene;
-				gui   = new vxlGUI(view);
-				
-				
+		//1. Setup the view
+		view = vxl.api.setup('view-1');
+		scene = view.scene;
+		gui   = new vxlGUI(view);
+		
+		
 
-				//2. Load assets
-				var list = ["MYO_01.json", "RAV_01.json", "LAA_01.json", 
-				            "MYO_02.json", "RAV_02.json", "LAA_02.json", 
-				            "MYO_03.json", "RAV_03.json", "LAA_03.json", 
-				            "MYO_04.json", "RAV_04.json", "LAA_04.json", 
-				            "MYO_05.json", "RAV_05.json", "LAA_05.json", 
-				            "MYO_06.json", "RAV_06.json", "LAA_06.json", 
-				            "MYO_07.json", "RAV_07.json", "LAA_07.json", 
-				            "MYO_08.json", "RAV_08.json", "LAA_08.json", 
-				            "MYO_09.json", "RAV_09.json", "LAA_09.json", 
-				            "MYO_10.json", "RAV_10.json", "LAA_10.json", 
-				            "MYO_11.json", "RAV_11.json", "LAA_11.json", 
-				            "MYO_12.json", "RAV_12.json", "LAA_12.json", 
-				            "MYO_13.json", "RAV_13.json", "LAA_13.json", 
-				            "MYO_14.json", "RAV_14.json", "LAA_14.json", 
-				            "MYO_15.json", "RAV_15.json", "LAA_15.json", 
-				            "MYO_16.json", "RAV_16.json", "LAA_16.json", 
-				            "MYO_17.json", "RAV_17.json", "LAA_17.json", 
-				            "MYO_18.json", "RAV_18.json", "LAA_18.json", 
-				            "MYO_19.json", "RAV_19.json", "LAA_19.json", 
-				            "MYO_20.json", "RAV_20.json", "LAA_20.json"];
-				
-				vxl.api.load(list,'assets/models/heart');
+		//2. Load assets
+		var list = ["MYO_01.json", "RAV_01.json", "LAA_01.json", 
+		            "MYO_02.json", "RAV_02.json", "LAA_02.json", 
+		            "MYO_03.json", "RAV_03.json", "LAA_03.json", 
+		            "MYO_04.json", "RAV_04.json", "LAA_04.json", 
+		            "MYO_05.json", "RAV_05.json", "LAA_05.json", 
+		            "MYO_06.json", "RAV_06.json", "LAA_06.json", 
+		            "MYO_07.json", "RAV_07.json", "LAA_07.json", 
+		            "MYO_08.json", "RAV_08.json", "LAA_08.json", 
+		            "MYO_09.json", "RAV_09.json", "LAA_09.json", 
+		            "MYO_10.json", "RAV_10.json", "LAA_10.json", 
+		            "MYO_11.json", "RAV_11.json", "LAA_11.json", 
+		            "MYO_12.json", "RAV_12.json", "LAA_12.json", 
+		            "MYO_13.json", "RAV_13.json", "LAA_13.json", 
+		            "MYO_14.json", "RAV_14.json", "LAA_14.json", 
+		            "MYO_15.json", "RAV_15.json", "LAA_15.json", 
+		            "MYO_16.json", "RAV_16.json", "LAA_16.json", 
+		            "MYO_17.json", "RAV_17.json", "LAA_17.json", 
+		            "MYO_18.json", "RAV_18.json", "LAA_18.json", 
+		            "MYO_19.json", "RAV_19.json", "LAA_19.json", 
+		            "MYO_20.json", "RAV_20.json", "LAA_20.json"];
+		
+		vxl.api.load(list,'assets/models/heart');
 
-				//3. Define animation map
-				var map = {
-					frame1 : ["MYO_01.json", "RAV_01.json", "LAA_01.json"],
-					frame2 : ["MYO_02.json", "RAV_02.json", "LAA_02.json"],
-					frame3 : ["MYO_03.json", "RAV_03.json", "LAA_03.json"],
-					frame4 : ["MYO_04.json", "RAV_04.json", "LAA_04.json"],
-					frame5 : ["MYO_05.json", "RAV_05.json", "LAA_05.json"],
-					frame6 : ["MYO_06.json", "RAV_06.json", "LAA_06.json"],
-					frame7 : ["MYO_07.json", "RAV_07.json", "LAA_07.json"],
-					frame8 : ["MYO_08.json", "RAV_08.json", "LAA_08.json"],
-					frame9 : ["MYO_09.json", "RAV_09.json", "LAA_09.json"],
-					frame10 : ["MYO_10.json", "RAV_10.json", "LAA_10.json"],
-					frame11 : ["MYO_11.json", "RAV_11.json", "LAA_11.json"],
-					frame12 : ["MYO_12.json", "RAV_12.json", "LAA_12.json"],
-					frame13 : ["MYO_13.json", "RAV_13.json", "LAA_13.json"],
-					frame14 : ["MYO_14.json", "RAV_14.json", "LAA_14.json"],
-					frame15 : ["MYO_15.json", "RAV_15.json", "LAA_15.json"],
-					frame16 : ["MYO_16.json", "RAV_16.json", "LAA_16.json"],
-					frame17 : ["MYO_17.json", "RAV_17.json", "LAA_17.json"],
-					frame18 : ["MYO_18.json", "RAV_18.json", "LAA_18.json"],
-					frame19 : ["MYO_19.json", "RAV_19.json", "LAA_19.json"],
-					frame20 : ["MYO_20.json", "RAV_20.json", "LAA_20.json"]
-				};
-				
-				//Create the animation object
-				animation = new vxlFrameAnimation(map);
-				
-				//Tell the scene to run the animation 
-				scene.setAnimation(animation);
-				
-				//Start the view
-				view.start();
-				
-			};
+		//3. Define animation map
+		var map = {
+			frame1 : ["MYO_01.json", "RAV_01.json", "LAA_01.json"],
+			frame2 : ["MYO_02.json", "RAV_02.json", "LAA_02.json"],
+			frame3 : ["MYO_03.json", "RAV_03.json", "LAA_03.json"],
+			frame4 : ["MYO_04.json", "RAV_04.json", "LAA_04.json"],
+			frame5 : ["MYO_05.json", "RAV_05.json", "LAA_05.json"],
+			frame6 : ["MYO_06.json", "RAV_06.json", "LAA_06.json"],
+			frame7 : ["MYO_07.json", "RAV_07.json", "LAA_07.json"],
+			frame8 : ["MYO_08.json", "RAV_08.json", "LAA_08.json"],
+			frame9 : ["MYO_09.json", "RAV_09.json", "LAA_09.json"],
+			frame10 : ["MYO_10.json", "RAV_10.json", "LAA_10.json"],
+			frame11 : ["MYO_11.json", "RAV_11.json", "LAA_11.json"],
+			frame12 : ["MYO_12.json", "RAV_12.json", "LAA_12.json"],
+			frame13 : ["MYO_13.json", "RAV_13.json", "LAA_13.json"],
+			frame14 : ["MYO_14.json", "RAV_14.json", "LAA_14.json"],
+			frame15 : ["MYO_15.json", "RAV_15.json", "LAA_15.json"],
+			frame16 : ["MYO_16.json", "RAV_16.json", "LAA_16.json"],
+			frame17 : ["MYO_17.json", "RAV_17.json", "LAA_17.json"],
+			frame18 : ["MYO_18.json", "RAV_18.json", "LAA_18.json"],
+			frame19 : ["MYO_19.json", "RAV_19.json", "LAA_19.json"],
+			frame20 : ["MYO_20.json", "RAV_20.json", "LAA_20.json"]
+		};
+		
+		//Create the animation object
+		animation = new vxlFrameAnimation(map);
+		
+		//Tell the scene to run the animation 
+		scene.setAnimation(animation);
+		
+		//Start the view
+		view.start();
+		
+	};
 
-			function handleEvent(event, src) {
-				
-				
-				if (event == vxl.events.SCENE_UPDATED) {
-                    var loaded = src._actors.length;
-                    $('#status').html('Objects loaded: ' + loaded + ' out of 60');
-                }
-				else if (event == vxl.events.MODELS_LOADED) {
-				    //Set up the camera
-				    var cam = view.cameraman.active;
-                  
-					cam.setElevation(90);
-					cam.setPosition(0,-467,0);
-					animation.start(100);
+	function handleEvent(event, src) {
+		
+		
+		if (event == vxl.events.SCENE_UPDATED) {
+            var loaded = src._actors.length;
+            $('#status').html('Objects loaded: ' + loaded + ' out of 60');
+        }
+		else if (event == vxl.events.MODELS_LOADED) {
+		    //Set up the camera
+		    var cam = view.cameraman.active;
+          
+			cam.setElevation(90);
+			cam.setPosition(0,-467,0);
+			animation.start(100);
 
-					
-				} 
-			};
-		</script>
+			
+		} 
+	};
+</script>
 
 <style type="text/css">
 
