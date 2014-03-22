@@ -55,9 +55,7 @@ function vxlLandmark(name, camera) {
     this._relRoll       = c._relRoll;
     this._dollyingStep  = c._dollyngStep; //dollying step
     this._distance      = c._distance;
-    
-    this._following     = c._following;
-    this._trackingMode  = c._trackingMode;
+
 };
 
 
@@ -88,9 +86,6 @@ vxlLandmark.prototype.retrieve = function(camera) {
     c._relRoll       = this._relRoll;
     c._dollyingStep  = this._dollyngStep; //dollying step
     c._distance      = this._distance;
-    
-    c._following     = this._following;
-    c._trackingMode  = this._trackingMode;
     
     c.refresh();
 };

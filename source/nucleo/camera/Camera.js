@@ -65,14 +65,27 @@ function vxlCamera(vw,t) {
     
     this.landmarks         = [];
     this._lmarkAnimationID = undefined; //useful to interrupt landmark animations
-
-	if (t != undefined && t !=null){
-        this.type = t;
-    }
-    else {
-        this.type = vxl.def.camera.type.EXPLORING;
-    }
     
+    this._rotate_world   = false; //invert the horizontal coordinate system HCS
+	this.type = undefined; //then....
+	this.setType(t);
+    
+};
+
+/**
+ * If flag is true, it reverses the azimuth and elevation angles.
+ * Subsequent calls to rotate, setAzimuth, setElevation,
+ * changeAzimuth or changeElevation will cause the inverted effect.
+ * setRoll or changeRoll is not affected by this method.
+ * 
+ * This inversion is useful when one wants to simulate that the world
+ * is moving, instead of the camera. 
+ * 
+ * By default the camera angles are not reversed.
+ * @param{Boolean} flag the boolean flag to reverse the angles.
+ */
+vxlCamera.prototype.setWorldRotation = function(flag){
+	this._rotate_world = flag;
 };
 
 /**
@@ -89,9 +102,16 @@ vxlCamera.prototype.setType = function(type, trackingMode){
         type != vxl.def.camera.type.EXPLORING) {
         console.error('vxlCamera.setType ERROR type'+ type +' unknown. Setting camera to EXPLORING type.');
         this.type = vxl.def.camera.type.EXPLORING;
+        this.setWorldRotation(true);
     }
     else {
         this.type = type;
+        if (type == vxl.def.camera.type.EXPLORING){
+        	this.setWorldRotation(true);
+        }
+        else{
+        	this.setWorldRotation(false);
+        }
     }
     
     if (this.type  == vxl.def.camera.type.TRACKING && trackingMode != undefined){
@@ -355,8 +375,14 @@ vxlCamera.prototype.rotate = function(azimuth,elevation,roll){
         elevation = this._getAngle(elevation);
         roll      = this._getAngle(roll);
         
-        var rotX  = quat4.fromAngleAxis(elevation * vxl.def.deg2rad, [1,0,0]);
-        var rotY  = quat4.fromAngleAxis(azimuth   * vxl.def.deg2rad, [0,1,0]);
+        var rotX  = quat4.fromAngleAxis(-elevation * vxl.def.deg2rad, [1,0,0]);
+        var rotY  = quat4.fromAngleAxis(-azimuth   * vxl.def.deg2rad, [0,1,0]);
+        
+        if (this._rotate_world){
+        	rotX = quat4.fromAngleAxis(elevation * vxl.def.deg2rad, [1,0,0]);
+        	rotY = quat4.fromAngleAxis(azimuth   * vxl.def.deg2rad, [0,1,0]);
+        }
+        
         var rotZ  = quat4.fromAngleAxis(roll      * vxl.def.deg2rad, [0,0,1]); 
         var rotQ = quat4.multiply(rotY, rotX, quat4.create());
         
@@ -760,14 +786,25 @@ vxlCamera.prototype.setMatrix = function(matrix){
 vxlCamera.prototype._computeMatrix = function(){
     
     mat4.identity(this._matrix);
+    var rotZ  = quat4.fromAngleAxis(this._roll      * vxl.def.deg2rad, [0,0,1]);
+    var rotX = undefined;
+    var rotY = undefined;
     
-    var rotX  = quat4.fromAngleAxis(this._elevation * vxl.def.deg2rad, [1,0,0]);
-    var rotY  = quat4.fromAngleAxis(this._azimuth   * vxl.def.deg2rad, [0,1,0]);
-    var rotZ  = quat4.fromAngleAxis(this._roll      * vxl.def.deg2rad, [0,0,1]); 
-    
-    if(this.type == vxl.def.camera.type.ORBITING || this.type == vxl.def.camera.type.EXPLORING){
-        rotX  = quat4.fromAngleAxis(-this._elevation * vxl.def.deg2rad, [1,0,0]);
-    } 
+    if (this.type == vxl.def.camera.type.TRACKING){
+    	rotX  = quat4.fromAngleAxis(this._elevation * vxl.def.deg2rad, [1,0,0]);
+    	rotY  = quat4.fromAngleAxis(this._azimuth   * vxl.def.deg2rad, [0,1,0]);
+    }
+    else {
+    	//only consider HCS for EXPLORING and ORBITING cameras
+    	if(this._rotate_world){
+    		rotX  = quat4.fromAngleAxis(this._elevation * vxl.def.deg2rad, [1,0,0]);
+    		rotY  = quat4.fromAngleAxis(this._azimuth   * vxl.def.deg2rad, [0,1,0]);
+    	} 
+    	else{
+    		rotX  = quat4.fromAngleAxis(-this._elevation * vxl.def.deg2rad, [1,0,0]);
+    		rotY  = quat4.fromAngleAxis(-this._azimuth   * vxl.def.deg2rad, [0,1,0]);
+    	}
+    }
    
     
     var rotQ = quat4.multiply(rotY, rotX, quat4.create());
@@ -880,13 +917,22 @@ vxlCamera.prototype._getAngles = function(){
     var x = this._distanceVector[0], y = this._distanceVector[1],  z = this._distanceVector[2];
     var r = vec3.length(this._distanceVector);
     
-    if (this.type == vxl.def.camera.type.ORBITING || this.type == vxl.def.camera.type.EXPLORING){
-        this._elevation = -1 * Math.asin(y/r)    * vxl.def.rad2deg;
+    if (this.type == vxl.def.camera.type.TRACKING){
+    	this._elevation = Math.asin(y/r)    * vxl.def.rad2deg;
+        this._azimuth   = Math.atan2(-x,-z) * vxl.def.rad2deg;
     }
-    else{
-        this._elevation = Math.asin(y/r)    * vxl.def.rad2deg;
+    else {
+    	 if (this._rotate_world){
+    		 this._elevation = Math.asin(y/r)    * vxl.def.rad2deg;
+             this._azimuth   = Math.atan2(-x,-z) * vxl.def.rad2deg;
+    	 }
+    	 else{
+    		 this._elevation = -1 * Math.asin(y/r)    * vxl.def.rad2deg;
+             this._azimuth   = -1 * Math.atan2(-x,-z) * vxl.def.rad2deg;
+    		 
+    	 }
     }
-    this._azimuth   = Math.atan2(-x,-z) * vxl.def.rad2deg;
+     
 };
 
 
