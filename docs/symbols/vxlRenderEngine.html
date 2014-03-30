@@ -37,7 +37,7 @@
 			<!-- begin publish.classesIndex -->
 			<div align="center"><h2><a href="../index.html">Class List</a></h2></div>
 <hr />
-<h3>Current Version:  0.89.9</h3>
+<h3>Current Version:  0.90.0</h3>
 <p>Download it <a href='http://voxelent.com/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -62,6 +62,8 @@
 	<li><a href="../symbols/vxl.def.interactor.html">vxl.def.interactor</a></li>
 	
 	<li><a href="../symbols/vxl.def.lut.html">vxl.def.lut</a></li>
+	
+	<li><a href="../symbols/vxl.def.material.html">vxl.def.material</a></li>
 	
 	<li><a href="../symbols/vxl.def.model.html">vxl.def.model</a></li>
 	
@@ -88,8 +90,6 @@
 	<li><a href="../symbols/vxlAxis.html">vxlAxis</a></li>
 	
 	<li><a href="../symbols/vxlBakeEngine.html">vxlBakeEngine</a></li>
-	
-	<li><a href="../symbols/vxlBlenderEngine.html">vxlBlenderEngine</a></li>
 	
 	<li><a href="../symbols/vxlBoundingBox.html">vxlBoundingBox</a></li>
 	
@@ -166,14 +166,7 @@
 				
 				
 
-				Implements the default rendering strategy 
-
-
-A vxlRenderEngine object is selected by default as the strategy that an actor
-will use for rendering.
-
-A rendering strategy allows decoupling rendering specific code (i.e. code that access and 
-	communicates with the program) from the actor.
+				Implements the default rendering engine
 
 				
 					<br /><i>Defined in: </i> <a href="../symbols/src/source_nucleo_renderer_engines_RenderEngine.js.html">RenderEngine.js</a>.
@@ -188,9 +181,9 @@ A rendering strategy allows decoupling rendering specific code (i.e. code that a
 				<td class="attributes">&nbsp;</td>
 				<td class="nameDescription" >
 					<div class="fixedFont">
-						<b><a href="../symbols/vxlRenderEngine.html#constructor">vxlRenderEngine</a></b>(renderer)
+						<b><a href="../symbols/vxlRenderEngine.html#constructor">vxlRenderEngine</a></b>()
 					</div>
-					<div class="description"></div>
+					<div class="description">This is the default rendering engine.</div>
 				</td>
 				</tr>
 				</table>
@@ -223,6 +216,28 @@ A rendering strategy allows decoupling rendering specific code (i.e. code that a
 								
 								<b><a href="../symbols/vxlRenderEngine.html#allocate">allocate</a></b>
 								(scene)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlRenderEngine.html#configure">configure</a></b>
+								()
 								</div>
 							</td>
 							
@@ -333,6 +348,28 @@ A rendering strategy allows decoupling rendering specific code (i.e. code that a
 								
 								
 								
+								<b><a href="../symbols/vxlRenderEngine.html#readOffscreenPixel">readOffscreenPixel</a></b>
+								(x, y)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
 								<b><a href="../symbols/vxlRenderEngine.html#render">render</a></b>
 								(scene)
 								</div>
@@ -358,37 +395,19 @@ A rendering strategy allows decoupling rendering specific code (i.e. code that a
 				<div class='methodDetail'>
 				<div class="title">
 				<div class="fixedFont">
-						<b>vxlRenderEngine</b>(renderer)
+						<b>vxlRenderEngine</b>()
 				</div>
 				</div>
 
 				<div class="description">
-					
+					This is the default rendering engine. It contains all the low level GL code that makes
+possible efficient rendering in Voxelent
 					<br /><i>Author: </i>Diego Cantor.
 				</div>
 
 				
 
 
-					
-						<p class="heading">Parameters:</p>
-						<table class='paramTable'>
-						
-							<tr>
-							<td>
-								
-							</td>
-							<td>	
-								 <code>renderer</code>
-							</td>
-							<td>
-								<p>
-								
-								</p>
-							</td>
-								
-						
-						</table>
 					
 					
 					
@@ -448,6 +467,37 @@ A rendering strategy allows decoupling rendering specific code (i.e. code that a
 							</tr>	
 							
 							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="configure"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>configure</b>()
+					</div>
+					</div>
+					<div class="description">
+						Configures the engine
+						
+						
+					</div>
+
+					
+
 						
 						
 						
@@ -643,6 +693,66 @@ A rendering strategy allows decoupling rendering specific code (i.e. code that a
 				</div>	
 				
 				<div class='methodDetail'>
+					<a name="readOffscreenPixel"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>readOffscreenPixel</b>(x, y)
+					</div>
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{Object}</span> 
+								</td>
+								<td>
+									<code>x</code>
+								</td>	
+								<td><p>position to read in the offscreen buffer
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									<span class="light fixedFont">{Object}</span> 
+								</td>
+								<td>
+									<code>y</code>
+								</td>	
+								<td><p>position to read in the offscreen buffer
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
 					<a name="render"> </a>
 					<div class="title">
 					<div class="fixedFont">
@@ -702,7 +812,7 @@ A rendering strategy allows decoupling rendering specific code (i.e. code that a
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Mar 21 2014 21:08:17 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Mar 30 2014 03:31:57 GMT-0400 (EDT)
 		</div>
         </div>
         </div>

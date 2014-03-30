@@ -63,7 +63,7 @@ vxlActorGroup.prototype.addList = function(list){
         throw new vxlActorGroupException(messages);
     }
     
-}
+};
 
 /**
 * Adds one actor to the actor group
@@ -107,7 +107,7 @@ vxlActorGroup.prototype.hasActor = function(actor){
     }
     
     else return false;
-}
+};
 
 vxlActorGroup.prototype.remove = function(actor){
     var index = -1;

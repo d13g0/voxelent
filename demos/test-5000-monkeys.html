@@ -1,0 +1,132 @@
+<html>
+<head>
+<meta name='Diego Cantor'       content='Voxelent: The best WebGL platform yet'>
+<meta name='copyright'          content='&copy 2014'>
+<meta name='robots'             content='all'>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name='keywords'           content='webgl, webgl platform, medical imaging, webgl api'>
+<meta http-equiv="expires"      content="0">
+<link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
+<script src="lib/jquery.js"     type="text/javascript"></script>
+<script src="lib/jquery-ui.js"  type="text/javascript"> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.0.js'> </script>
+<script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
+
+
+<title>Voxelent - Performance Test: Rendering Monkeys</title>
+
+<script type='text/javascript'>
+
+var view, scene;
+
+function runVoxApp(){
+    vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
+    
+    view = vxl.api.setup('view-1');
+    scene = view.scene;
+    
+    vxl.api.load('suzzane.json','assets/models/monkey',vxl.def.model.loadingMode.DETACHED);
+    view.renderer.setMode('DEBUG');
+    view.start();
+}
+
+function handleEvent(event, source){
+    if (event == vxl.events.MODELS_LOADED){
+        var monkey_model = source.getModelByName('suzzane');
+        var monkey_actor = new vxlActor(monkey_model);
+        scene.addActor(monkey_actor);
+        var SCALE = 1000;
+        var i = SCALE;
+        while(i--){
+            
+            var actor = monkey_actor.clone();
+            actor.setPosition(Math.random() * SCALE/10,
+                             Math.random() * SCALE/10,
+                             Math.random() * SCALE/10);
+                                 
+            actor.rotateX(Math.random() * 2 * 180 / Math.PI);
+            actor.rotateY(Math.random() * 2 * 180 / Math.PI);
+            actor.rotateZ(Math.random() * 2 * 180 / Math.PI);
+            //actor.setScale(Math.random()*10);
+            //actor.setScale(10);
+            actor.setShininess(200);
+            
+            actor.setColor(Math.random(),Math.random(),Math.random());
+                            
+            scene.addActor(actor);
+        }
+        vxl.c.camera.longShot();
+    }
+};
+
+
+function visitThemAll(){
+    var actors = scene._actors;
+    var cam = vxl.c.camera;
+    var off = 10;
+    for (var i=0; i < actors.length; i+=1){
+        var actor = actors[i];
+        var fp = actor._position;
+        var pos = vec3.transformMat4(vec3.create(), [0,0,20],actor._matrix);
+
+        
+        cam.createLandmark(actor.name, pos,fp);
+    }
+    
+    var names = scene.getActorNames();
+    var steps = [];
+    var i = names.length;
+    while(i--){
+        steps.push([names[i],3000,40]);
+    };
+    
+    cam.doLandmarkAnimation(steps);
+    
+}
+</script>
+
+
+<style type="text/css">
+
+.show {
+
+     position: relative;
+}
+
+.overlay {
+    background: rgba(100,100,100,0.5);
+    padding: 10px;
+    width: 150px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size:12px;
+    font-family: Arial,Helvetica;
+    color: white;
+    display: block;
+
+}
+</style>
+
+</head>
+<body onload='runVoxApp()'>
+	<div class='show'>
+    <canvas id ='view-1' width=800 height=600>
+    </canvas>
+    <div id='overlay-div' class='overlay'>
+    Visit all the monkeys using a landmark-based animation
+    <p>
+    <button class='iu-button' id='btn-visit-monkeys'>Go!</button>
+    </p>
+    </div>
+    <script>
+    $('#btn-visit-monkeys').button().click(
+    	function(){
+    		visitThemAll();
+    	}
+    	
+    );
+    </script>
+    </div>
+</body>
+</html>

@@ -89,15 +89,15 @@ vxlModelManager.prototype.load = function(uri, scene) {
 	    case 'json':
     		return function(json, textStatus){
     		    json.uri = filename;
-    		    json.path = vxl.util.getPath(uri)
+    		    json.path = vxl.util.getPath(uri);
     			manager.add(json,modelname,scene);
-    		}
+    		};
     		break;
     	case 'vtk':
 		    return function(data){
-		        reader = new vxlVTKReader(scene)
-		        reader.parseText(modelname, data)
-		    }
+		        reader = new vxlVTKReader(scene);
+		        reader.parseText(modelname, data);
+		    };
 		 }
 	};
 	
@@ -111,7 +111,7 @@ vxlModelManager.prototype.load = function(uri, scene) {
 			else{
 				alert ('There was a problem loading the file '+uri+'. HTTP error code:'+request.status);
 			}		
-		}
+		};
 	};
 	
 	var request  = $.ajax({

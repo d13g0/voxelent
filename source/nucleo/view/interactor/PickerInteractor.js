@@ -29,7 +29,7 @@ function vxlPickerInteractor(){
 	this._drag = false;
 	this.timerID = -1;
 	this.list = [];
-	this.rate = 600;
+	this.rate = 50;
 
 };
 
@@ -95,12 +95,12 @@ vxlPickerInteractor.prototype.onMouseMove = function(ev){
 };
 
 vxlPickerInteractor.prototype._doWork = function(){
-  var i = this.list.length;
-  var rt = this.view.renderer._renderTarget;
-    
+  var i        = this.list.length;
+  var renderer = this.view.renderer;
+  var scene    = this.view.scene;  
   while(i--){
         var coords = this.list.pop();
-        var color  = rt.readPixel(coords[0], coords[1]);
+        var color  = renderer.readOffscreenPixel(coords[0], coords[1]);
 
         if (color[0] == 0 && color[1] == 0 && color[2] == 0 && color[3] ==0){
             continue;
@@ -110,10 +110,10 @@ vxlPickerInteractor.prototype._doWork = function(){
         
         if (results == null) continue;
         
-        var actor  = this.view.scene.getActorByCellUID(results.uid);
+        var actor  = scene.getActorByCellUID(results.uid);
         
         if (actor == null) { //try object UID
-            actor = this.view.scene.getActorByUID(results.uid);
+            actor = scene.getActorByUID(results.uid);
         }
         
         if (actor != null && actor.isPickable() && actor._pickingCallback != undefined){
@@ -123,10 +123,10 @@ vxlPickerInteractor.prototype._doWork = function(){
 };
 
 
-vxlPickerInteractor.prototype.onKeyDown   = function(ev){};
-vxlPickerInteractor.prototype.onKeyUp     = function(ev){};
-vxlPickerInteractor.prototype.onDragOver     = function(ev){ };
+vxlPickerInteractor.prototype.onKeyDown       = function(ev){};
+vxlPickerInteractor.prototype.onKeyUp         = function(ev){};
+vxlPickerInteractor.prototype.onDragOver      = function(ev){ };
 vxlPickerInteractor.prototype.onDragLeave     = function(ev){};
-vxlPickerInteractor.prototype.onDrop     = function(ev){};
+vxlPickerInteractor.prototype.onDrop          = function(ev){};
 vxlViewInteractor.prototype.onDoubleClick     = function(ev){};
 

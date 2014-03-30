@@ -24,6 +24,7 @@
  * @author Diego Cantor
  */
 function vxlModel(name, JSON_OBJECT){
+    this.UID        = vxl.util.generateUID();
 	this.name       = name;
 	this.indices 	= [];
 	this.vertices 	= [];

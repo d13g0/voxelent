@@ -30,121 +30,52 @@ function vxlRenderer(vw){
 	this.view       	= vw;
 	this.renderRate 	= vxl.def.renderer.rate.NORMAL;
 	this.mode       	= vxl.def.renderer.mode.TIMER;
-    this.gl         	= this.getWebGLContext();
-    this.pm        	    = new vxlProgramManager(this.gl);
-    this.transforms 	= new vxlTransforms(vw);
     this.fps            = 0;
-    this.currentProgram = undefined;
-    this.engine 		= new vxlRenderEngine(this);
-    
-    
+    this.engine 		= undefined;
     this._time          = 0;
     this._startDate     = 0;
     this._running       = false;
-    this._clearColor    = undefined;
-    this._renderTarget  = undefined;
-    
-    this._knownPrograms = {};
-    this._enforce       = false; //to enforce the program or not
+    this.setEngine(vxlRenderEngine);
     this.setProgram(vxl.go.essl.lambert);
+};
+
+/**
+ * Sets the current rendering engine. 
+ * 
+ * <p>The parameter can be a class definition or an instance of the engine</p>
+ * 
+ * @param {vxlEngine} p_engine The engine to be used (function reference or instance)  
+ */
+vxlRenderer.prototype.setEngine = function(p_engine){
     
+    var instance = undefined;
+    //Create a new instance
+    if (typeof p_engine == 'function'){
+        instance  = new p_engine();
+    }
+    //Use this instance
+    else if (typeof p_engine == 'object'){
+        instance = p_engine;
+    }
+    else{
+        console.warn('vxlRenderer.setEngine WARN: '+p_engine+' is not an engine');
+        console.warn('vxlRenderer.setEngine WARN: using vxlRenderEngine by default');
+        instance = new vxlRenderEngine();
+        
+    }
+    instance.init(this);
+    this.engine = instance;
 }
 
 /**
- * Tries to obtain a WebGL context from the canvas associated with the view to which this
- * renderer belongs to.
- * @TODO: Review depth test and blending functions maybe these should be configurable.
+ * Sets the current rendering program 
+ * 
+ * <p>The parameter can be a class definition or an instance of the program</p>
+ * 
+ * @param {vxlProgram} p_program the program to be used (function reference or instance)
  */
-vxlRenderer.prototype.getWebGLContext = function(){
-	
-	var WEB_GL_CONTEXT = null;
-	var canvas     = this.view.canvas;
-	this.width     = canvas.width;
-	this.height    = canvas.height;
-	
-	var names      = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
-	
-	for (var i = 0; i < names.length; ++i) {
-		try {
-			WEB_GL_CONTEXT = canvas.getContext(names[i]);
-		} 
-		catch(e) {}
-		if (WEB_GL_CONTEXT) {
-			break;
-		}
-	}
-	if (WEB_GL_CONTEXT == null) {
-		//@TODO: print a nicer jquery  alert
-		alert("Sorry: WebGL is not available on this browser. Have you tried the newest version of Firefox, Chrome or Safari?"); 
-		return;
-	}
-	else {
-		this._initializeGLContext(WEB_GL_CONTEXT);
-		
-	}
-    return WEB_GL_CONTEXT;
-};
-
-/**
- * Initializes the WebGL context
- *
- * @private 
- */
-vxlRenderer.prototype._initializeGLContext = function(gl){
-    gl.enable(gl.DEPTH_TEST);
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.depthFunc(gl.LESS);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-};
-
-
-/**
- * Tries to add a new program definition to this renderer
- * @param {vxlProgram} program an instance of a vxlProgram object or one of its descendents
- * @param {vxlEngine} engine (optional) a new engine
- */
-vxlRenderer.prototype.setProgram = function(program,engine,forceIt){
-    
-    
-    if (this._enforce && program.ID != this.currentProgram.ID){
-        throw new vxlRendererException("The current program is being enforced. Please use vxlRenderer.releaseProgram first");
-    }
-    
-    if (forceIt != undefined && forceIt == true){
-        this._enforce = true;
-    }
-    else{
-        this._enforce = false;
-    }
-    
-    
-    //Check if the program has be instantiated before
-    if (this._knownPrograms[program.ID] == undefined || this._enforce){
-        this._knownPrograms[program.ID]= program;
-    }
-    
-    var prg = this._knownPrograms[program.ID];
-    var pm = this.pm;
-
-	if (!pm.isRegistered(prg.ID)){
-		pm.register(prg);
-	}
-	
-	if (!pm.isLoaded(prg.ID)){
-		pm.loadProgram(prg.ID);
-	}
-	
-	pm.useProgram(prg.ID);
-	pm.loadDefaults();
-	
-	this.currentProgram = prg;
-	
-	if (engine != undefined && engine != this.engine){
-	   this.setEngine(engine);
-	}
-	
-	
+vxlRenderer.prototype.setProgram = function(p_program,p_force_it){
+    this.engine.setProgram(p_program, p_force_it);
 };
 
 /**
@@ -155,38 +86,79 @@ vxlRenderer.prototype.setProgram = function(program,engine,forceIt){
  * This method releases the current program from being enforced 
  */
 vxlRenderer.prototype.releaseProgram = function(){
-    this._enforce = false;
-}
+    this.engine.releaseProgram();
+};
 
-/**
- * Sets the current rendering engine. 
- * 
- * @param {vxlEngine} engine The engine to be used.  
- */
-vxlRenderer.prototype.setEngine = function(engine){
-    if (engine != null && engine != undefined){
-        this.engine = engine
-    }
-    else if (this.engine == undefined){
-        this.engine = new vxlRenderEngine(this);
-    }
-}
+
 
 
 /**
- * Clears the rendering context
+ * Clears the WebGL scene
  */
 vxlRenderer.prototype.clear = function(){
-    this.gl.clearColor(this._clearColor[0], this._clearColor[1], this._clearColor[2], 1.0);
-	this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-	this.gl.viewport(0, 0, this.view.canvas.width, this.view.canvas.height); //@TODO: Think about dividing view ports for multi-view apps - March 19/2012
-	this.transforms.calculatePerspective();
+    this.engine.clear();
 };
+
+/**
+ * Sets the color used to clear the rendering context
+ * @param {Number, Array, vec3} r it can be the red component, a 3-dimensional Array or a vec3 (glMatrix)
+ * @param {Number} g if r is a number, then this parameter corresponds to the green component
+ * @param {Number} b if r is a number, then this parameter corresponds to the blue component
+ * @see vxlView#setBackgroundColor
+ */
+vxlRenderer.prototype.clearColor = function(r,g,b){
+    this.engine.clearColor(r,g,b);
+};
+
+/**
+ * Sets the clear depth for the rendering context
+ * @param {Number} d the new clear depth
+ */
+vxlRenderer.prototype.clearDepth = function(d){
+    this.engine.clearDepth(d);
+};
+
+/**
+ * Reallocates the actors marked as dirty, without requiring rerendering. This mechanism allows
+ * to update the GL buffers for dirty actors. 
+ */
+vxlRenderer.prototype.reallocate = function(){
+  this.engine.allocate(this.view.scene);  
+};
+
+/**
+ * Disables offscreen rendering
+ *  
+ */
+vxlRenderer.prototype.disableOffscreen = function(){
+    this.engine.disableOffscreen();
+};
+
+
+/**
+ *Sets the render target for this renderer 
+ */
+vxlRenderer.prototype.enableOffscreen = function(){
+    this.engine.enableOffscreen();    
+};
+
+/**
+ * Returns true if the offscreen rendering is enabled. False otherwise. 
+ */
+vxlRenderer.prototype.isOffscreenEnabled = function(){
+    return this.engine.isOffscreenEnabled();  
+};
+
+
+vxlRenderer.prototype.readOffscreenPixel = function(x,y){
+    return this.engine.readOffscreenPixel(x,y);
+}
 
 /**
  * Sets the rendering mode. Options are in vxl.def.renderer.mode
  * This method updates the rendering mode and tries to restart the rendering process
  * @param {String} mode the mode to set
+ * @see vxl.def.render.mode
  */
 vxlRenderer.prototype.setMode = function(mode){
     this.stop();
@@ -212,6 +184,10 @@ vxlRenderer.prototype.start = function(){
 	    vxl.go.console('Renderer: starting rendering at the fastest speed',true);
 		vxl.go.renderman.render();
 	}
+	else if (this.mode == 'DEBUG'){
+	    //do not start the rendering
+	    this.clear();
+	}
 };
 
 /**
@@ -220,7 +196,7 @@ vxlRenderer.prototype.start = function(){
  * @private   
  */
 vxlRenderer.prototype._timeUp = function(){
-    if (!this._running) return;
+    if (!this._running || this.mode == vxl.def.renderer.mode.ANIMFRAME) return;
     
     this.render();
     
@@ -276,31 +252,13 @@ vxlRenderer.prototype.setRenderRate = function(rate){ //rate in ms
 
 };
 
-/**
- * Sets the color used to clear the rendering context
- * @param {Number, Array, vec3} r it can be the red component, a 3-dimensional Array or a vec3 (glMatrix)
- * @param {Number} g if r is a number, then this parameter corresponds to the green component
- * @param {Number} b if r is a number, then this parameter corresponds to the blue component
- * @see vxlView#setBackgroundColor
- */
-vxlRenderer.prototype.clearColor = function(r,g,b){
-    var cc = vxl.util.createArr3(r,g,b);
-    this._clearColor = cc;
-	this.gl.clearColor(cc[0], cc[1], cc[2], 1.0);
-};
 
-/**
- * Sets the clear depth for the rendering context
- * @param {Number} d the new clear depth
- */
-vxlRenderer.prototype.clearDepth = function(d){
-	this.gl.clearDepth(d);
-};
 
 /**
  * Renders the scene using the current engine
  */
 vxlRenderer.prototype.render = function(){
+    
     var engine = this.engine, scene = this.view.scene, start = undefined, elapsed = undefined;
     
     this.clear();                   //clear the canvas
@@ -318,39 +276,6 @@ vxlRenderer.prototype.render = function(){
     }
     
 };
-
-/**
- * Reallocates the actors marked as dirty, without requiring rerendering. This mechanism allows
- * to update the GL buffers for dirty actors. 
- */
-vxlRenderer.prototype.reallocate = function(){
-  this.engine.allocate(this.view.scene);  
-};
-
-/**
- * Disables offscreen rendering
- *  
- */
-vxlRenderer.prototype.disableOffscreen = function(){
-    this.engine.disableOffscreen();
-};
-
-
-/**
- *Sets the render target for this renderer 
- */
-vxlRenderer.prototype.enableOffscreen = function(){
-    this._renderTarget = new vxlRenderTarget(this);
-    this.engine.enableOffscreen(this._renderTarget);    
-};
-
-/**
- * Returns true if the offscreen rendering is enabled. False otherwise. 
- */
-vxlRenderer.prototype.isOffscreenEnabled = function(){
-    return this.engine.isOffscreenEnabled();  
-};
-
 
 /**
  * @class  Encapsulates a renderer exception

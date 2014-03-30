@@ -23,27 +23,40 @@
  * @author Diego Cantor
  */
 function vxlPicker(){
-    this._map = {};
-    
-    this._hmap = [];
-    
-    for (var i=0;i<=256; i+=1){
-        this._hmap[i] = [];
-        for(var j=0;j<=256; j+=1){
-            this._hmap[i][j] = [];
-            for(var k=0;k<=256; k+=1){
-                this._hmap[i][j][k] = null;
-                }
-        }
-    }
-    
- 
+    this._objects = {};
+    this._colors = {};
 };
 
 /**
  * @static 
  */
 vxlPicker.RESOLUTION = 1/255; // 1 / (2^8-1) for unsigned byte according to WebGL reference
+
+/**
+ * @private
+ */
+vxlPicker.prototype._hex2rgb = function(p_hex_string){
+    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = p_hex_string.replace(shorthandRegex, function(m, r, g, b) {
+            return r + r + g + g + b + b;
+        });
+
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? [
+         parseInt(result[1], 16),
+         parseInt(result[2], 16),
+         parseInt(result[3], 16)
+    ] : null;
+};
+
+/**
+ * @private
+ */
+vxlPicker.prototype._rgb2hex = function(r,g,b){
+    
+    var c = vxl.util.createArr3(r,g,b);
+    return "#" + ((1 << 24) + (c[0] << 16) + (c[1]<< 8) + c[2]).toString(16).slice(1);
+};
 
 /**
  * Generates a color that has not been assigned to any object or cell in the scene
@@ -83,16 +96,19 @@ vxlPicker.prototype.getColorFor = function(obj){
         return;
     }
     
-    if(!this._map[uid]){
-        
-        var color; 
+    var color,key; 
+    
+    if(!this._objects[uid]){
+         
         do{
             color = this._getColor();
-        } while(this._hmap[color[0]][color[1]][color[2]] != null);
+            key   = this._rgb2hex(color);
+        } while(key in this._colors);
 
-        this._map[uid] =  color;
-        this._hmap[color[0]][color[1]][color[2]] = uid;
+        this._objects[uid] =  color;
+        this._colors[key] = uid;
     }
+    color = this._objects[uid];
     return this.color2decimal(color);
 };
 
@@ -100,17 +116,20 @@ vxlPicker.prototype.getColorFor = function(obj){
  * Checks if the color passed as a parameter correspond to any UID (object,cell) assigned in the picker
  * If so, it returns an object with the results
  * If not, it returns null indicating the query was unsuccessful.
- * @param {Array} color
+ * @param {Array} p_color
  * 
  */
-vxlPicker.prototype.query = function(color){
+vxlPicker.prototype.query = function(p_color){
     
     var distance = 100;
     var closest_uid = undefined;
     var results = {}
+    var color = p_color.slice(0,3); //only rgb -> 3 components
     
-    if (this._hmap[color[0]][color[1]][color[2]] != null){
-        results.uid = this._hmap[color[0]][color[1]][color[2]];
+    var key = this._rgb2hex(color);
+    
+    if (this._colors[key]){
+        results.uid = this._colors[key];
         results.color = color;
         return results;
     }

@@ -22,13 +22,13 @@
 <span class='line'> 15</span> ---------------------------------------------------------------------------*/</span><span class="WHIT">   
 <span class='line'> 16</span> 
 <span class='line'> 17</span> 
-<span class='line'> 18</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">vxlRenderTarget</span><span class="PUNC">(</span><span class="NAME">renderer</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 18</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">vxlRenderTarget</span><span class="PUNC">(</span><span class="NAME">engine</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 19</span> </span><span class="WHIT">   
-<span class='line'> 20</span>     </span><span class="NAME">this.canvas</span><span class="WHIT">         </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">renderer.view.canvas</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 20</span>     </span><span class="NAME">this.canvas</span><span class="WHIT">         </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">engine._view.canvas</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 21</span> </span><span class="WHIT">    </span><span class="NAME">this.texture</span><span class="WHIT">        </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 22</span> </span><span class="WHIT">    </span><span class="NAME">this.framebuffer</span><span class="WHIT">    </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 23</span> </span><span class="WHIT">    </span><span class="NAME">this.renderbuffer</span><span class="WHIT">   </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 24</span> </span><span class="WHIT">    </span><span class="NAME">this.gl</span><span class="WHIT">             </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">renderer.gl</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 24</span> </span><span class="WHIT">    </span><span class="NAME">this.gl</span><span class="WHIT">             </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">engine.gl</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 25</span> </span><span class="WHIT">    </span><span class="NAME">this.configure</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> 
 <span class='line'> 26</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 27</span> 

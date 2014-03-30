@@ -77,8 +77,26 @@ vxlMaterial.prototype.getFrom = function(model){
     
 };
 
-
-
+/**
+ *  Clones this material
+ *  @see vxlActor#clone
+ */
+vxlMaterial.prototype.clone = function(){
+    var copy = new vxlMaterial();
+    var self = this;
+     
+    for (var prop in self){
+        if (self.hasOwnProperty(prop)) {
+            if (self[prop] instanceof Array){
+                copy[prop] = self[prop].slice(0);
+            }
+            else {
+               copy[prop] = self[prop];               
+            }
+        }
+    }
+    return copy;
+};
 
 
 

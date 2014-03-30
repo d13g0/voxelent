@@ -22,18 +22,18 @@
 function vxlTransforms(vw){
 	this._stack = [];
 	this.view = vw;
-	this.mvMatrix    = mat4.identity();    // The Model-View matrix
-	this.pMatrix     = mat4.identity();    // The projection matrix
-	this.nMatrix     = mat4.identity();    // The normal matrix
-	this.cMatrix     = mat4.identity();    // The camera matrix
-	this.mvpMatrix   = mat4.identity();	
+	this.mvMatrix    = mat4.create();    // The Model-View matrix
+	this.pMatrix     = mat4.create();    // The projection matrix
+	this.nMatrix     = mat4.create();    // The normal matrix
+	this.cMatrix     = mat4.create();    // The camera matrix
+	this.mvpMatrix   = mat4.create();	
 };
 
 /**
  * Calculates the Model-View matrix for the current camera.
  */
 vxlTransforms.prototype.calculateModelView = function(){
-	mat4.set(this.view.cameraman.active.getViewTransform(), this.mvMatrix);
+	mat4.copy(this.mvMatrix, this.view.cameraman.active.getViewTransform());
     
 };
 
@@ -41,10 +41,9 @@ vxlTransforms.prototype.calculateModelView = function(){
  * Calculates the normal matrix corresponding to the current Model-View matrix
  */
 vxlTransforms.prototype.calculateNormal = function(){
-	mat4.identity(this.nMatrix);
-    mat4.set(this.mvMatrix, this.nMatrix);
-    mat4.inverse(this.nMatrix);
-    mat4.transpose(this.nMatrix);
+	this.nMatrix = mat4.clone(this.mvMatrix);
+    this.nMatrix = mat4.invert(mat4.create(), this.nMatrix);
+    this.nMatrix = mat4.transpose(this.nMatrix, this.nMatrix);
 };
 
 /**
@@ -53,13 +52,13 @@ vxlTransforms.prototype.calculateNormal = function(){
 vxlTransforms.prototype.calculatePerspective = function(){
     var c = this.view.cameraman.active;
     var vw = this.view;
-	mat4.identity(this.pMatrix);
-	mat4.perspective(c._fov, vw.width/vw.height, c.Z_NEAR, c.Z_FAR, this.pMatrix);
+    var rads = vxl.util.deg2rad(c._fov);
+	mat4.perspective(this.pMatrix, rads, vw.width/vw.height, c.Z_NEAR, c.Z_FAR);
 };
 
 
 vxlTransforms.prototype.calculateModelViewPerspective = function(){
-    mat4.multiply(this.pMatrix, this.mvMatrix, this.mvpMatrix);
+    mat4.multiply(this.mvpMatrix, this.pMatrix, this.mvMatrix);
 }
 /**
  * Calculate the transforms for the current view.renderer
@@ -80,7 +79,7 @@ vxlTransforms.prototype.update = function(){
 
 vxlTransforms.prototype.push = function(){
 	var memento =  mat4.create();
-	mat4.set(this.mvMatrix, memento);
+	mat4.copy(memento, this.mvMatrix);
 	this._stack.push(memento);
 };
 

@@ -19,37 +19,30 @@
  * A vxlCamera object simplifies WebGL programming by providing a simple object interface to the lower level
  * matrix manipulations that are required to view a 3D scene.
  * 
- * When moving and rotating the camera, such matrices are updated and Voxelent's Nucleo will use this information
- * in order to draw the scene accordingly to the camera position an orientation.
+ * <p>A vxlCamera is always associated to one <code>vxlView</code> object. However, one vxlView object can host multiple
+ * cameras (through its <code>vxlCameraManager</code>)</p>
  * 
- * A vxlCamera object requires a vxlView to be created. Having said that, a vxlView can be associated with 
- * multiple cameras.
- * 
- * The azimuth, elevation and roll operations occur with respect to the standard coordinate system:
- * right =[1,0,0], up = [0,1,0] and normal 
- * of 
- * 
- * @class Like a real camera it moves around the 3D scene displaying the current point of view in the browser
+ * @class Determines which region of the scene will be visible to the user. 
  * @constructor Creates a vxlCamera. 
- * @param {vxlView} vw
- * @param {Object} t the type of camera 
+ * @param {vxlView} p_view
+ * @param {Object} p_type the type of camera 
  * @author Diego Cantor
  */
-function vxlCamera(vw,t) {
+function vxlCamera(p_view,p_type) {
     this.UID            = vxl.util.generateUID(); //unique identification key
-    this.view           = vw;
+    this.view           = p_view;
 
     this._fov           = vxl.def.camera.fov;
     this.Z_NEAR         = vxl.def.camera.near;    
     this.Z_FAR          = vxl.def.camera.far;
     
-    this._matrix 	      = mat4.identity();
-    this._right 		  = vec3.createFrom(1, 0, 0);
-	this._up              = vec3.createFrom(0, 1, 0);
-	this._forward          = vec3.createFrom(0, 0, 1);	
-	this._position        = vec3.createFrom(0, 0, 1);
-	this._focalPoint      = vec3.createFrom(0, 0, 0);
-	this._distanceVector  = vec3.createFrom(0, 0, 0);
+    this._matrix 	      = mat4.create();
+    this._right 		  = vec3.fromValues(1, 0, 0);
+	this._up              = vec3.fromValues(0, 1, 0);
+	this._forward         = vec3.fromValues(0, 0, 1);	
+	this._position        = vec3.fromValues(0, 0, 1);
+	this._focalPoint      = vec3.fromValues(0, 0, 0);
+	this._distanceVector  = vec3.fromValues(0, 0, 0);
     
     this._azimuth 	    = 0;
     this._elevation     = 0;
@@ -67,9 +60,13 @@ function vxlCamera(vw,t) {
     this._lmarkAnimationID = undefined; //useful to interrupt landmark animations
     
     this._rotate_world   = false; //invert the horizontal coordinate system HCS
-	this.type = undefined; //then....
-	this.setType(t);
-    
+	
+	if (p_type == undefined){
+	    this.setType(vxl.def.camera.type.EXPLORING);
+	}
+	else{
+	   this.setType(p_type);
+    }
 };
 
 /**
@@ -86,42 +83,51 @@ function vxlCamera(vw,t) {
  */
 vxlCamera.prototype.setWorldRotation = function(flag){
 	this._rotate_world = flag;
+	this._getAngles();
+	return this;
 };
 
 /**
  * Establishes the type of camera
- * @param {vxl.def.camera.type} type the type of camera
- * @param {vxl.def.camera.tracking} trackingMode if the camera is of tracking type, the tracking mode can be set as 
+ * @param {vxl.def.camera.type} p_type the type of camera
+ * @param {vxl.def.camera.tracking} p_tracking_mode if the camera is of tracking type, the tracking mode can be set as 
  * an optional parameter here.
- * @see {vxl.def.camera}
+ * @see vxl.def.camera.type,
+ * @see vxl.def.camera.tracking
  */
-vxlCamera.prototype.setType = function(type, trackingMode){
+vxlCamera.prototype.setType = function(p_type, p_tracking_mode){
     
-    if (type != vxl.def.camera.type.ORBITING && 
-        type != vxl.def.camera.type.TRACKING &&
-        type != vxl.def.camera.type.EXPLORING) {
-        console.error('vxlCamera.setType ERROR type'+ type +' unknown. Setting camera to EXPLORING type.');
-        this.type = vxl.def.camera.type.EXPLORING;
+    var t = vxl.def.camera.type;
+    
+    if (p_type != t.ORBITING && p_type != t.TRACKING && p_type != t.EXPLORING) {
+        console.warn('vxlCamera.setType WARNING type ['+ p_type +'] unknown. Setting camera to EXPLORING type.');
+        this.type = t.EXPLORING;
         this.setWorldRotation(true);
     }
     else {
-        this.type = type;
-        if (type == vxl.def.camera.type.EXPLORING){
+       
+        this.type = p_type;
+        if (this.type == t.EXPLORING){
         	this.setWorldRotation(true);
         }
         else{
         	this.setWorldRotation(false);
         }
+        this._getAngles();
     }
     
-    if (this.type  == vxl.def.camera.type.TRACKING && trackingMode != undefined){
-        this.setTrackingMode(trackingMode);
+    if (this.type  == vxl.def.camera.type.TRACKING && p_tracking_mode != undefined){
+        this.setTrackingMode(p_tracking_mode);
     }
+    
+    return this;
+    
+    
 };
 
 /**
  * Sets the tracking type of this camera when it follows an actor
- * <p> to set the tracking type of the camera <code>myCamera</code> you should make sure that your camera is of tracking type with:
+ * <p>To set the tracking type of the camera <code>myCamera</code> you should make sure that your camera is of tracking type with:
  *  <code>myCamera.setType(vxl.def.camera.type.TRACKING)</code>.
  *  For instance:
  * </p>
@@ -139,7 +145,10 @@ vxlCamera.prototype.setType = function(type, trackingMode){
  *  camera.setType(vxl.def.camera.type.TRACKING);
  *  camera.follow(actor, vxl.def.camera.tracking.ROTATIONAL);
  * </pre>
- * @see vxlCamera#follow, vxlCamera#setTrackingMode
+ * @see vxlCamera#follow,
+ * @see vxl.def.camera.tracking
+ *
+ * 
  */
 vxlCamera.prototype.setTrackingMode = function(mode){
     if (this.type != vxl.def.camera.type.TRACKING){
@@ -154,18 +163,30 @@ vxlCamera.prototype.setTrackingMode = function(mode){
  * Follows a given actor. If this operation is called on an ORBITING camera,
  * the camera mode will change to be a TRACKING camera.
  * 
- * @param {vxlActor} actor actor to track
+ * @param {vxlActor, String} actor actor to track (It can be the actor name or the actor instance)
  * @param {String} trackingType one of the possible values of <code>vxl.def.camera.tracking</code>
  * @see {vxlCamera#setType, vxl.def.camera.tracking}
  */
 vxlCamera.prototype.follow = function(actor, trackingType){
+    
     this.setType(vxl.def.camera.type.TRACKING, trackingType);
-    if (actor == undefined || actor == null){
-        alert("vxlCamera.follow: Unable to follow undefined/null actor");
-        console.error("vxlCamera.follow: Unable to follow undefined/null actor");
+    
+    if (actor instanceof vxlActor){
+        instance = actor;
     }
-    this._following = actor;
-    actor.addTrackingCamera(this);
+    else if (typeof(actor) == 'string'){
+        instance = this.view.scene.getActorByName(actor);
+    }
+
+    if (instance == undefined){
+            console.error('vxlCamera.follow ERROR: The actor '+actor+' does not exist');
+    }
+    else{
+        this._following = instance;
+        instance.addTrackingCamera(this);
+    }
+        
+    return this;
 };
 
 /**
@@ -174,6 +195,7 @@ vxlCamera.prototype.follow = function(actor, trackingType){
 vxlCamera.prototype.unfollow = function(){
     this._following.removeTrackingCamera(this);
     this._following = undefined;
+    return this;
 };
 
 /**
@@ -217,6 +239,7 @@ vxlCamera.prototype.updateWithActor = function(actor){
 vxlCamera.prototype.setPosition = function(x,y,z) {
     this._setPosition(x,y,z);
     this.setFocalPoint(this._focalPoint);
+    return this;
 };
 
 /**
@@ -229,26 +252,27 @@ vxlCamera.prototype.setPosition = function(x,y,z) {
  */
 vxlCamera.prototype.setFocalPoint = function(x,y,z) {
     
-    var up = vec3.create([0,1,0]);
+    var up = vec3.fromValues(0,1,0);
     //var up = vec3.create(this._up);
     this._focalPoint = vxl.util.createVec3(x,y,z);
     
     if (this._trackingMode == vxl.def.camera.tracking.CINEMATIC){
-        var d  = vec3.subtract(this._focalPoint, this._position, vec3.create());
+        var d  = vec3.subtract(vec3.create(), this._focalPoint, this._position);
         var x  = d[0], y = d[1],  z = d[2],  r  = vec3.length(d);
         var el =      Math.asin(y/r)  * vxl.def.rad2deg;
         var az = 90 + Math.atan2(z,x) * vxl.def.rad2deg;
-        var m = mat4.identity();
-        mat4.rotateY(m, az * vxl.def.deg2rad);
-        mat4.rotateX(m, el * vxl.def.deg2rad);
-        up = mat4.multiplyVec3(m, [0,1,0], vec3.create());
+        var m = mat4.create();
+        mat4.rotateY(m, m, az * vxl.def.deg2rad);
+        mat4.rotateX(m, m, el * vxl.def.deg2rad);
+        up = vec3.transformMat4(vec3.create(), [0,1,0], m);
     }
     
-    mat4.inverse(mat4.lookAt(this._position, this._focalPoint, up), this._matrix);
+    mat4.invert(this._matrix, mat4.lookAt(mat4.create(), this._position, this._focalPoint, up));
     
     this._getAxes();
     this._getDistance();
     this._getAngles();
+    return this;
 };
 
 /**
@@ -283,6 +307,7 @@ vxlCamera.prototype.setDistance = function(d) {
     pos[2] = d*n[2] + f[2];
     
     this._setPosition(pos);
+    return this;
 };
 
 /**
@@ -291,6 +316,7 @@ vxlCamera.prototype.setDistance = function(d) {
  */
 vxlCamera.prototype.changeAzimuth = function(az){
     this.setAzimuth(this._azimuth + az);
+    return this;
 };
 
 /**
@@ -299,6 +325,7 @@ vxlCamera.prototype.changeAzimuth = function(az){
  */
 vxlCamera.prototype.changeElevation = function(el){
     this.setElevation(this._elevation + el);
+    return this;
 };
 
 
@@ -308,6 +335,7 @@ vxlCamera.prototype.changeElevation = function(el){
  */
 vxlCamera.prototype.changeRoll = function(rl){
     this.setRoll(this._roll + rl);
+    return this;
 };
 /**
  * Sets the initial azimuth of the camera
@@ -324,6 +352,7 @@ vxlCamera.prototype.setAzimuth = function(az){
     else if (this.type == vxl.def.camera.type.TRACKING){
         this._getFocalPoint();
     }
+    return this;
 };
 
 /**
@@ -341,6 +370,7 @@ vxlCamera.prototype.setElevation = function(el){
     else if (this.type == vxl.def.camera.type.TRACKING){
         this._getFocalPoint();
     }
+    return this;
 };
 
 /**
@@ -359,6 +389,7 @@ vxlCamera.prototype.setRoll = function(angle){
     else if (this.type == vxl.def.camera.type.TRACKING){
         this._getFocalPoint();
     }
+    return this;
 };
 
 /**
@@ -375,22 +406,22 @@ vxlCamera.prototype.rotate = function(azimuth,elevation,roll){
         elevation = this._getAngle(elevation);
         roll      = this._getAngle(roll);
         
-        var rotX  = quat4.fromAngleAxis(-elevation * vxl.def.deg2rad, [1,0,0]);
-        var rotY  = quat4.fromAngleAxis(-azimuth   * vxl.def.deg2rad, [0,1,0]);
+        var rotX  = quat.setAxisAngle(quat.create(), [1,0,0],-elevation * vxl.def.deg2rad);
+        var rotY  = quat.setAxisAngle(quat.create(), [0,1,0],-azimuth   * vxl.def.deg2rad);
         
         if (this._rotate_world){
-        	rotX = quat4.fromAngleAxis(elevation * vxl.def.deg2rad, [1,0,0]);
-        	rotY = quat4.fromAngleAxis(azimuth   * vxl.def.deg2rad, [0,1,0]);
+        	rotX = quat.setAxisAngle(quat.create(), [1,0,0], elevation * vxl.def.deg2rad);
+        	rotY = quat.setAxisAngle(quat.create(), [0,1,0], azimuth   * vxl.def.deg2rad);
         }
         
-        var rotZ  = quat4.fromAngleAxis(roll      * vxl.def.deg2rad, [0,0,1]); 
-        var rotQ = quat4.multiply(rotY, rotX, quat4.create());
+        var rotZ = quat.setAxisAngle(quat.create(), [0,0,1], roll      * vxl.def.deg2rad); 
+        var rotQ = quat.multiply(quat.create(), rotY, rotX);
         
-        rotQ = quat4.multiply(rotQ, rotZ, quat4.create());
-        var rotMatrix = quat4.toMat4(rotQ);
-        mat4.translate(this._matrix, [0,0,-this._distance]);
-        mat4.multiply(this._matrix, rotMatrix);
-        mat4.translate(this._matrix, [0,0,this._distance]);
+        rotQ = quat.multiply(quat.create(), rotQ, rotZ);
+        var rotMatrix = mat4.fromQuat(mat4.create(),rotQ);
+        mat4.translate(this._matrix, this._matrix, [0,0,-this._distance]);
+        mat4.multiply (this._matrix, this._matrix, rotMatrix);
+        mat4.translate(this._matrix, this._matrix, [0,0,this._distance]);
     }
     else {
         if (Math.abs(this._elevation + elevation) > 90) return; //don't allow
@@ -414,6 +445,7 @@ vxlCamera.prototype.rotate = function(azimuth,elevation,roll){
     }
     
    this._update();
+   return this;
 };
 
 
@@ -429,20 +461,21 @@ vxlCamera.prototype.rotate = function(azimuth,elevation,roll){
 vxlCamera.prototype.dolly = function(value) {
     
 	var    n =  this._forward; 
-    var pos = vec3.create(this._position);
+    var pos = vec3.clone(this._position);
     var step = value*this._dollyingStep;
     pos[0] += step*n[0];
     pos[1] += step*n[1];
     pos[2] += step*n[2];
     
     this._setPosition(pos);
-    if (this.type == vxl.def.camera.type.ORBITING || this.type == vxl.def.camera.type.DYNAMIC){
+    if (this.type == vxl.def.camera.type.ORBITING || this.type == vxl.def.camera.type.EXPLORING){
         this._getDistance();
     }
     else if (this.type == vxl.def.camera.type.TRACKING){
         //move the focal point and keep the distance
-        vec3.add(pos, this._distanceVector, this._focalPoint);
+        vec3.add(this._focalPoint, pos, this._distanceVector);
     }
+    return this;
 };
 
 /**
@@ -451,7 +484,16 @@ vxlCamera.prototype.dolly = function(value) {
  * @param {Number} dy the vertical displacement
  */
 vxlCamera.prototype.pan = function(tx, ty) {
-    this.translate(tx,ty,0); 
+    
+    var coords = vxl.util.createVec3(tx,ty,0);
+    var pos = vec3.clone(this._position);
+    
+    vec3.add(pos, pos, vec3.scale(vec3.create(), this._right  ,coords[0]));
+    vec3.add(pos, pos, vec3.scale(vec3.create(), this._up     ,coords[1]));    
+    
+    this._setPosition(pos);
+    
+    return this;
 };
 
 /**
@@ -464,21 +506,11 @@ vxlCamera.prototype.pan = function(tx, ty) {
 vxlCamera.prototype.translate = function(x,y,z){
     
     var coords = vxl.util.createVec3(x,y,z);
-    var pos = vec3.create(this._position);
+    var pos = vec3.clone(this._position);
     
-    vec3.add(pos, vec3.scale(this._right  ,coords[0], vec3.create()));
-    vec3.add(pos, vec3.scale(this._up     ,coords[1],vec3.create()));    
-    vec3.add(pos, vec3.scale(this._forward ,coords[2], vec3.create()));
-    
+    vec3.add(pos,pos, coords);
     this._setPosition(pos);
-    
-   /* var fp  = vec3.create(this._focalPoint);
-    vec3.add(fp, vec3.scale(this._right  ,x, vec3.create()));
-    vec3.add(fp, vec3.scale(this._up     ,y, vec3.create()));    
-    vec3.add(fp, vec3.scale(this._forward ,z, vec3.create()));*/
-    
- 
-    //this.setFocalPoint(fp);
+    return this;
 };
 
 
@@ -491,6 +523,7 @@ vxlCamera.prototype.translate = function(x,y,z){
  */
 vxlCamera.prototype.refresh = function() {
 	this.view.refresh();
+	return this;
 };
 
 
@@ -511,6 +544,7 @@ vxlCamera.prototype.lookAt = function(actor){
             this.setFocalPoint(actor._position);
         }
     }  
+    return this;
 };
 
 
@@ -532,6 +566,7 @@ vxlCamera.prototype.closeUp = function(actor){
 	       this._shot(actor._bb);
 	    }
 	}	
+	return this;
 };
 
 /**
@@ -544,6 +579,7 @@ vxlCamera.prototype.closeUp = function(actor){
 vxlCamera.prototype.longShot = function() {
     this.view.scene.computeBoundingBox(); //perfect example of BY DEMAND UPDATING OF BB
     this._shot(this.view.scene.bb);
+    return this;
 };
 
 /**
@@ -554,6 +590,7 @@ vxlCamera.prototype.longShot = function() {
  */
 vxlCamera.prototype.setFieldOfView = function(fov){
     this._fov = fov;
+    return this;
 };
 
 /**
@@ -571,6 +608,7 @@ vxlCamera.prototype.createLandmark = function(name, position, focalPoint){
 	c.setFocalPoint(focalPoint);
 	var l = new vxlLandmark(name, c);
 	this.landmarks.push(l);
+	return this;
 };
 
 /**
@@ -581,6 +619,7 @@ vxlCamera.prototype.createLandmark = function(name, position, focalPoint){
 vxlCamera.prototype.setLandmark = function(name) {
     var l = new vxlLandmark (name, this);
     this.landmarks.push(l);
+    return this;
 };
 
 /**
@@ -594,8 +633,8 @@ vxlCamera.prototype.setLandmark = function(name) {
 vxlCamera.prototype.gotoLandmark = function(name,length,fps) {
 	
 	var lmark = undefined;
-	
-	for(var i=0, N =this.landmarks.length; i<N;i+=1){
+	var i = this.landmarks.length;
+	while(i--){
         if (this.landmarks[i].name == name){
         	lmark = this.landmarks[i];
         	break;
@@ -634,10 +673,12 @@ vxlCamera.prototype.gotoLandmark = function(name,length,fps) {
 
 		function iteration(){
 			
+			var inter_fp = vec3.create();
+			var inter_pos = vec3.create();
 			if(count++ != steps){
 				percent = count/steps;
-				var inter_fp = vec3.lerp(self._focalPoint, dest_fp,percent);
-				var inter_pos = vec3.lerp(self._position, dest_pos,percent);
+				var inter_fp = vec3.lerp(inter_fp, self._focalPoint, dest_fp,percent);
+				var inter_pos = vec3.lerp(inter_pos, self._position, dest_pos,percent);
 				
 				
 				self.setFocalPoint(inter_fp);
@@ -663,7 +704,8 @@ vxlCamera.prototype.gotoLandmark = function(name,length,fps) {
 		self._lmarkAnimationID = window.setTimeout(iteration, speed);
 	}
 	
-	animate(length,fps); 
+	animate(length,fps);
+	return this; 
 	
 };
 /**
@@ -694,6 +736,7 @@ vxlCamera.prototype.doLandmarkAnimation = function(steps){
 	}
 	
 	processStep();
+	return this;
 };
 
 /**
@@ -701,7 +744,8 @@ vxlCamera.prototype.doLandmarkAnimation = function(steps){
  */
 vxlCamera.prototype.getLandmarks = function(){
   var lmarks = [];
-  for(var i=0, N =this.landmarks.length; i<N;i+=1){
+  var i = this.landmarks.length;
+  while(i--){
       lmarks.push(this.landmarks[i].name);
   }
   return lmarks;  
@@ -721,6 +765,7 @@ vxlCamera.prototype._shot = function(bb){
     
     this.setElevation(0);
     this.setAzimuth(0);
+    this.setRoll(0);
     
 	var maxDim = Math.max(bb[3] - bb[0], bb[4] - bb[1]);
 	
@@ -740,6 +785,7 @@ vxlCamera.prototype._shot = function(bb){
 	}
 	
 	this.setFocalPoint(cc);
+	this.refresh();
 };
 
 
@@ -767,7 +813,7 @@ vxlCamera.prototype.status = function() {
  * @returns {mat4} m the Model-View Transform
  */
 vxlCamera.prototype.getViewTransform = function(){
-    return mat4.inverse(this._matrix, mat4.create());
+    return mat4.invert(mat4.create(),this._matrix);
 };
 
 /**
@@ -786,68 +832,41 @@ vxlCamera.prototype.setMatrix = function(matrix){
 vxlCamera.prototype._computeMatrix = function(){
     
     mat4.identity(this._matrix);
-    var rotZ  = quat4.fromAngleAxis(this._roll      * vxl.def.deg2rad, [0,0,1]);
+    var rotZ  = quat.setAxisAngle(quat.create(), [0,0,1], this._roll * vxl.def.deg2rad);
     var rotX = undefined;
     var rotY = undefined;
     
     if (this.type == vxl.def.camera.type.TRACKING){
-    	rotX  = quat4.fromAngleAxis(this._elevation * vxl.def.deg2rad, [1,0,0]);
-    	rotY  = quat4.fromAngleAxis(this._azimuth   * vxl.def.deg2rad, [0,1,0]);
+    	rotX  = quat.setAxisAngle(quat.create(),[1,0,0],this._elevation * vxl.def.deg2rad);
+    	rotY  = quat.setAxisAngle(quat.create(),[0,1,0],this._azimuth   * vxl.def.deg2rad);
     }
     else {
     	//only consider HCS for EXPLORING and ORBITING cameras
     	if(this._rotate_world){
-    		rotX  = quat4.fromAngleAxis(this._elevation * vxl.def.deg2rad, [1,0,0]);
-    		rotY  = quat4.fromAngleAxis(this._azimuth   * vxl.def.deg2rad, [0,1,0]);
+    		rotX  = quat.setAxisAngle(quat.create(),[1,0,0],this._elevation * vxl.def.deg2rad);
+    		rotY  = quat.setAxisAngle(quat.create(),[0,1,0],this._azimuth   * vxl.def.deg2rad);
     	} 
     	else{
-    		rotX  = quat4.fromAngleAxis(-this._elevation * vxl.def.deg2rad, [1,0,0]);
-    		rotY  = quat4.fromAngleAxis(-this._azimuth   * vxl.def.deg2rad, [0,1,0]);
+    		rotX  = quat.setAxisAngle(quat.create(),[1,0,0],-this._elevation * vxl.def.deg2rad);
+    		rotY  = quat.setAxisAngle(quat.create(),[0,1,0],-this._azimuth   * vxl.def.deg2rad);
     	}
     }
    
     
-    var rotQ = quat4.multiply(rotY, rotX, quat4.create());
-    rotQ = quat4.multiply(rotQ, rotZ, quat4.create());
-    var rotMatrix = quat4.toMat4(rotQ);
+    var rotQ = quat.multiply(quat.create(), rotY, rotX);
+    rotQ = quat.multiply(quat.create(), rotQ, rotZ);
+    var rotMatrix = mat4.fromQuat(mat4.create(),rotQ);
     
     if (this.type ==  vxl.def.camera.type.ORBITING || this.type == vxl.def.camera.type.EXPLORING){
-        mat4.translate(this._matrix, this._focalPoint);
-        mat4.multiply(this._matrix, rotMatrix);
-        mat4.translate(this._matrix, [0,0,this._distance]);
+        mat4.translate(this._matrix, this._matrix, this._focalPoint);
+        mat4.multiply(this._matrix, this._matrix, rotMatrix);
+        mat4.translate(this._matrix, this._matrix, [0,0,this._distance]);
     } 
     else if(this.type ==  vxl.def.camera.type.TRACKING){
-        mat4.translate(this._matrix, this._position);
-        mat4.multiply(this._matrix, rotMatrix);
+        mat4.translate(this._matrix, this._matrix, this._position);
+        mat4.multiply(this._matrix,this._matrix, rotMatrix);
     }
 };
-
-/*
- * Updates the camera matrix. Used on rotate to avoid gimbal lock
- * @private
- */
-/*vxlCamera.prototype._updateMatrix = function(){
-   
-    var rotX  = quat4.fromAngleAxis(this._relElevation * vxl.def.deg2rad, [1,0,0]);
-    var rotY  = quat4.fromAngleAxis(this._relAzimuth   * vxl.def.deg2rad, [0,1,0]);
-    var rotZ  = quat4.fromAngleAxis(this._relRoll      * vxl.def.deg2rad, [0,0,1]); 
-    var rotQ = quat4.multiply(rotY, rotX, quat4.create());
-    rotQ = quat4.multiply(rotQ, rotZ, quat4.create());
-    var rotMatrix = quat4.toMat4(rotQ);
-    
-    if (this.type ==  vxl.def.camera.type.ORBITING){
-        mat4.translate(this._matrix, [0,0,-this._distance]);
-        mat4.multiply(this._matrix, rotMatrix);
-        mat4.translate(this._matrix, [0,0,this._distance]);
-    } 
-    else if(this.type ==  vxl.def.camera.type.TRACKING){
-        mat4.multiply(this._matrix, rotMatrix);
-    }
-    
-    this._relElevation  = 0;
-    this._relAzimuth    = 0;
-    this._relRoll       = 0;
-};*/
 
 
 /**
@@ -869,12 +888,12 @@ vxlCamera.prototype._setPosition = function(x,y,z){
  */
 vxlCamera.prototype._getAxes = function(){
     var m       = this._matrix;
-    vec3.set(mat4.multiplyVec4(m, [1, 0, 0, 0]), this._right);
-    vec3.set(mat4.multiplyVec4(m, [0, 1, 0, 0]), this._up);
-    vec3.set(mat4.multiplyVec4(m, [0, 0, 1, 0]), this._forward);
-    vec3.normalize(this._right);
-    vec3.normalize(this._up);
-    vec3.normalize(this._forward);
+    vec3.copy(this._right,   vec4.transformMat4(vec4.create(), [1, 0, 0, 0], m));
+    vec3.copy(this._up,      vec4.transformMat4(vec4.create(), [0, 1, 0, 0], m));
+    vec3.copy(this._forward, vec4.transformMat4(vec4.create(), [0, 0, 1, 0], m));
+    vec3.normalize(this._right, this._right);
+    vec3.normalize(this._up, this._up);
+    vec3.normalize(this._forward, this._forward);
 };
 
 /**
@@ -884,7 +903,7 @@ vxlCamera.prototype._getAxes = function(){
  */
 vxlCamera.prototype._getPosition = function(){
     var m       = this._matrix;
-    vec3.set(mat4.multiplyVec4(m, [0, 0, 0, 1]), this._position);
+    vec3.copy(this._position, vec4.transformMat4(vec4.create(), [0, 0, 0, 1], m));
     this._getDistance();
 };
 
@@ -893,8 +912,9 @@ vxlCamera.prototype._getPosition = function(){
  * @private
  */
 vxlCamera.prototype._getFocalPoint = function(){
-    mat4.multiplyVec3(mat4.toRotationMat(this._matrix), [0,0,-this._distance], this._distanceVector); 
-    vec3.add(this._position, this._distanceVector, this._focalPoint);
+    
+    vec3.transformMat3(this._distanceVector, [0,0,-this._distance], mat3.fromMat4(mat3.create(),this._matrix)); 
+    vec3.add(this._focalPoint, this._position, this._distanceVector);
     this._getDistance();               
 };
 
@@ -903,7 +923,7 @@ vxlCamera.prototype._getFocalPoint = function(){
  * @private
  */
 vxlCamera.prototype._getDistance = function(){
-    this._distanceVector = vec3.subtract(this._focalPoint, this._position, vec3.create());
+    this._distanceVector = vec3.subtract(vec3.create(), this._focalPoint, this._position);
     this._distance = vec3.length(this._distanceVector);
     this._dollyingStep = this._distance / 100;
 };
@@ -913,9 +933,18 @@ vxlCamera.prototype._getDistance = function(){
  * @private
  */
 vxlCamera.prototype._getAngles = function(){
+   
+    
     //Recalculates angles  
     var x = this._distanceVector[0], y = this._distanceVector[1],  z = this._distanceVector[2];
     var r = vec3.length(this._distanceVector);
+    
+     //FAST FAIL: If there is no distance we cannot compute angles
+     if (r == 0){
+         this._elevation = 0;
+         this._azimuth   = 0;
+         return;
+     }
     
     if (this.type == vxl.def.camera.type.TRACKING){
     	this._elevation = Math.asin(y/r)    * vxl.def.rad2deg;

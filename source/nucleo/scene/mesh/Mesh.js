@@ -63,6 +63,7 @@ vxlMesh.prototype.updateColor = function(){
     
     model.colors = [];
     model.pickingColors = [];
+    //@TODO review if this can be replaced with a reverse while
     for(var i=0, count = this.cells.length; i<count; i +=1){
            
             for (var j = 0; j<3;j+=1){
@@ -82,7 +83,8 @@ vxlMesh.prototype.updateColor = function(){
  * @param {String} cellUID the unique identifier of a cell
  */
 vxlMesh.prototype.hasCell = function(cellUID){
-  for(var i=0, count= this.cells.length; i < count; i+=1){
+  var i = this.cells.length;
+  while(i--){
       if (this.cells[i].UID == cellUID){
           return true;
       }
@@ -95,7 +97,8 @@ vxlMesh.prototype.hasCell = function(cellUID){
  * @param {String} cellUID the unique identifier of a cell
  */
 vxlMesh.prototype.getCell = function(cellUID){
-  for(var i=0, count= this.cells.length; i < count; i+=1){
+    var i = this.cells.length;
+    while(i--){
       if (this.cells[i].UID == cellUID){
           return this.cells[i];
       }
@@ -108,7 +111,8 @@ vxlMesh.prototype.getCell = function(cellUID){
 
 vxlMesh.prototype.removeCell = function(cellUID){
   var idx = -1;
-  for(var i=0, count= this.cells.length; i < count; i+=1){
+  var i = this.cells.length;
+  while(i--){
       if (this.cells[i].UID == cellUID){
           idx = i;
           break;

@@ -26,6 +26,9 @@ function vxlProgram(){
     this.DEFAULTS = {};
 };
 
+/**
+ * @param{prg} the instance to copy
+ */
 vxlProgram.prototype.copy = function(prg){
     this.ID                 = prg.ID;
     this.ATTRIBUTES         = prg.ATTRIBUTES;
@@ -93,7 +96,10 @@ vxlProgram.createFromDOM = function(id, vertexShaderId,fragmentShaderId){
     
 };
 
-
+/**
+ * Creates a new program from the JSON definition passed as parameter
+ * @param {Object} json
+ */
 vxlProgram.createFromJSON = function(json){
   
     var prg = new vxlProgram();
@@ -110,7 +116,12 @@ vxlProgram.createFromJSON = function(json){
   
 };
 
-
+/**
+ * Creates a new program using the URLs... work in progress...
+ * @param {Object} id
+ * @param {Object} vertexShaderURL
+ * @param {Object} fragmentShaderURL
+ */
 vxlProgram.createFromTextURL = function(id, vertexShaderURL, fragmentShaderURL){
   //TODO: check $ajax with no async  
   //  $.ajax(vs_url, {async: false, dataType: "text"}).done(function(data){m_VertexShaderSource = data;});
@@ -121,7 +132,10 @@ vxlProgram.createFromTextURL = function(id, vertexShaderURL, fragmentShaderURL){
 
 
 
-
+/**
+ * 
+ * @param {Object} message
+ */
 function vxlProgramException(message){
     this.message = "vxlProgramException:" + message;
 };

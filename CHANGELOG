@@ -1,4 +1,102 @@
 -------------------------------------------------------------------------------------------
+VERSION 0.90.0 - 
+-------------------------------------------------------------------------------------------
+
+Fixed Bugs
+---------------
+- camera type undefined when creating a camera.
+
+- longShot after setRoll works now (vxlCamera)
+
+- the azimuth and elevation are now recalculated (inverted) when changing from ORBITING or 
+  EXPLORING to TRACKING and viceversa. After this fix, the camera does not 'get lost' after changing the type when 
+  it moves again.
+
+- when setting setWorldRotation(true) and back to setWorldRotation(false)
+  the camera does not get lost. The angles are recalculated.
+  
+- the vxlCamera.translate works as expected. The camera is translated by a vector
+- the vxlCamera.pan method has been revisited.  
+
+New Features
+---------------
+
+- Models now have unique object idenfiers UID. This is fundamental for
+  geometry catching in the render engine.
+
+- Materials can be cloned now with vxlMaterial.clone()
+
+- Now camera operations can be chained (similar to actor operations):
+  camera.longShot().status();
+  camera.setAzimuth(30).setElevation(40);
+  
+- vxlActor.follow now receives the actor name or the actor instance as parameter
+
+- demo-camera-landmarks.html : check it out
+- test-5000-monkeys.html : check it out
+- demo-lookup-table : check it out
+- test-follow.html has been graduated to demo-follow.html: check it out
+
+Performance Improvement
+------------------------
+- jQuery support: Upgraded from 1.5.1 to 2.1
+
+- Voxelent now uses the latest gl-matrix version: 2.2.1
+  This was a MAJOR pain in the BHIND but it needed to be done. Previous version was 1.3.4 and 
+  the syntax of the library is completely different now! Changing vxlCamera was quite comendable.
+
+- vxlActor.clone method has been revisited and cleaned up 
+
+- vxlRenderEngine has been completely revamped. Thanks to geometry catching (instead of actor catching)
+  it renders in a 3rd of the time compared to previous versions. 
+
+- The amount of memory used by the vxlPicker class has been reduced considerably by eliminating the huge 
+  tridimensional associative array _hmap. In previous versions this created a cube [r,g,b] storing on each 
+  position the cell or the object that had that color.
+  Instead of this the color is stored as hex value in an unidimensional associative array (hashmap).
+
+- The try/catch blocks have been removed from vxlRenderEngine,
+  after reading http://ryanmorr.com/reinventing-the-try-catch-block/  
+  
+- the WebGL buffers for each actor are only recreated
+  when the actor requires reallocation (after morphing or texturing for example) 
+  To cause reallocation use vxlActor.reallocate()
+
+Refactoring / Clean Up
+--------------------------
+- vxlActor clean up from previous versions: gl_buffers, renderers attributes these are now obsolete
+  as the actors do not know anything about their rendering thanks to vxlEngine and its subclasses.
+
+- there is no WebGL code in vxlRenderer. All the WebGL code has been moved
+  to the vxlEngine class.
+
+- the vxlProgramManager is an attribute of vxlEngine. There is no dependency
+  between the vxlRenderer and the vxlProgramManager anymore. This makes the code of vxlRenderer more compact and maintanable.
+
+- Now any Engine can use the inherited vxlProgramManager [through the attribute this.pm] to
+  facilitate working with ESSL programs.
+  
+- The code of vxlRenderEngine has been modified accordingly to work with this refactoring
+  all the references to this.renderer.gl and this.renderer.pm have been replaced by this.gl and this.pm (
+  check this change in action in demo-bouncing-balls.html)
+
+- the code of vxlProgramManager has been updated and simplified
+
+- the vxlPickerInteractor calls the renderer.readOffscreenPixel which in
+  turn delegates this call to the engine. There's no gl code floating around the vxlRenderer anymore.
+  This provide better encapsulation and separation of concerns.
+
+- vxlBlenderProgram and vxlBlenderEngine have been deleted! There is no reason for this
+the blender obj imported models will work with the existing engines.
+
+
+Note on vxlRenderable
+--------------------------
+MESH has a special meaning in voxelent. These are actor representations where individual cells
+can be altered. If an actor has a mesh, the mesh has a model of type MESH.
+
+
+-------------------------------------------------------------------------------------------
 VERSION 0.89.7, 0.89.8, 0.89.9 - Spring'14
 -------------------------------------------------------------------------------------------
 1. Work on camera landmarks finished. New demo available.

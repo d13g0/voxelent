@@ -9,7 +9,7 @@
 <link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
 <script src="lib/jquery.js"     type="text/javascript"></script>
 <script src="lib/jquery-ui.js"  type="text/javascript"> </script>
-<script type='text/javascript'  src='lib/voxelent_v0.89.9.js'> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.0.js'> </script>
 <script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
 
 
@@ -66,8 +66,8 @@ var vbo, ibo, tbo, texture, plane,  allocated = false;
 	    var engine 	 = new vxlExternalEngine(renderer, allocate, draw, deallocate);
 	    var program  = vxlProgram.createFromDOM('sampling-texture','shader-vs','shader-fs');	    
 	    
-	    
-	    renderer.setProgram(program, engine);
+	    renderer.setEngine(engine);
+	    renderer.setProgram(program);
 	    renderer.clearColor(0.3,0.3,0.3);
 	    
 	    var gui 	= new vxlGUI(vxl.c.view);
@@ -89,7 +89,7 @@ var vbo, ibo, tbo, texture, plane,  allocated = false;
 		if (plane == undefined || !plane.material.texture.loaded) return; //not ready yet
 		
 		if (!allocated){
-			var gl = renderer.gl;
+			var gl = renderer.engine.gl;
 			
 
 			
@@ -123,9 +123,9 @@ var vbo, ibo, tbo, texture, plane,  allocated = false;
 		
 		if (!allocated) return;
 		
-		var gl = renderer.gl;
-		var pm = renderer.pm;
-		var trx = renderer.transforms;
+		var gl = renderer.engine.gl;
+		var pm = renderer.engine.pm;
+		var trx = renderer.engine._transforms;
 		var model = plane.model;
 		trx.update();
 

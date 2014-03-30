@@ -9,7 +9,7 @@
 <link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
 <script src="lib/jquery.js"     type="text/javascript"></script>
 <script src="lib/jquery-ui.js"  type="text/javascript"> </script>
-<script type='text/javascript'  src='lib/voxelent_v0.89.9.js'> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.0.js'> </script>
 <script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
 
 <title>Voxelent - Cube Lookup Table Demo - Baked!</title>
@@ -20,7 +20,7 @@
 var view;
 var S = 2;
 var T = (Math.pow(S*2+1,3) - Math.pow(S*2-1,3)); //external cube minus internal cube. Easy!
-var cubes = [];
+var actors = [];
 
 /**
  * Main function
@@ -28,10 +28,8 @@ var cubes = [];
 function runVoxApp(){
     vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
     vxl.api.loadLUTS('assets/tables');
-    
     view = vxl.api.setup('view-1');
-    
-    vxl.api.load('cube.json','assets/models/geometry/');
+    vxl.api.load('assets/models/geometry/sphere.json','',vxl.def.model.loadingMode.DETACHED);
     view.start();
     
 };
@@ -39,20 +37,23 @@ function runVoxApp(){
 /**
  * Creates the cube array
  */
-function createCubes(cube){
+function createScene(actor){
     var count = 0, clon = undefined;
     for (var i=-S;i<=S;i+=1){
         for (var j=-S;j<=S;j+=1){
             for (var k=-S;k<=S;k+=1){
-                if (Math.abs(i) <S && Math.abs(j) <S  && Math.abs(k) < S) {
-                    continue;  //don't bother with internal cubes that are not rendered
-                }
+            	
+            	var d = i*i + j*j + k*k;
+            	//if (d >2*S) continue;
+                //if (Math.abs(i) <S && Math.abs(j) <S  && Math.abs(k) < S) {
+                //    continue;  //don't bother with internal cubes that are not rendered
+                //}
                 count++;
                 //Create a cube
-                clon = cube.clone();
-                clon.setPosition(i*1.5,j*1.5,k*1.5);
+                clon = actor.clone();
+                clon.setPosition(i*30,j*30,k*30);
                 clon.setShading(false);
-                cubes.push(clon);
+                actors.push(clon);
                 //add it to the current scene
                 view.scene.addActor(clon);
             }
@@ -61,13 +62,14 @@ function createCubes(cube){
 };
 
 /**
- * Colors the cube array according to the lookup table passed as a parameter
+ * Colors the actors according to the lookup table passed as a parameter
  * @param {String} ID the lookup table ID
  */
-function colorCubes(ID){
+function colorActors(ID){
     var lut = vxl.go.lookupTableManager.get(ID);
-    for(var i=0; i<cubes.length; i+=1){
-        cubes[i].setColor(lut.getColor(i,0,T));
+    var i = actors.length;
+    while(i--){
+        actors[i].setColor(lut.getColor(i,0,T));
     }
 };
 
@@ -86,7 +88,7 @@ function setupLUTSelector(){
     
     $('#lutPicker').html(options);
     $('#lutPicker').change(function(){
-        colorCubes($('#lutPicker').val());
+        colorActors($('#lutPicker').val());
     });
 }; 
 
@@ -98,21 +100,22 @@ var timer = -1;
 function handleEvent(event){
 
     
-    var cube = vxl.api.getActorByName('cube.json');
-    view.scene.removeActor(cube);
+    var mman = vxl.go.modelManager;
+    actor     = new vxlActor(mman.getModelByName('sphere'));
     
     //Create all the copies based on the cube actor that was removed from the scene
-    createCubes(cube);
-    colorCubes('default');
+    createScene(actor);
+    colorActors('default');
     setupLUTSelector();    
  
     //Setup our camera
     var cam = vxl.c.camera;
-    cam.setPosition(0,0,20);
+    cam.setType(vxl.def.camera.type.EXPLORING);
+    cam.setPosition(0,0,520);
   
     cam.setAzimuth(-43);   
     cam.setElevation(-17);
-    cam.setType(vxl.def.camera.type.EXPLORING);
+
     
     //Start the animation
     vxl.api.setRenderMode(vxl.def.renderer.mode.ANIMFRAME);
@@ -170,7 +173,6 @@ function animate(){
 </style> 
 </head>
 <body onload='runVoxApp()'>
-	<div><img src="css/img/voxelent.png" /></div>
 	<div class='show'>
 	<canvas id = 'view-1' width=800 height=650 >
 		<p>

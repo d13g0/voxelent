@@ -694,8 +694,8 @@ wireframeON :  function(){
   * @param{vxlEngine} engine (optional) the engine that the renderer should use to communicate with the program. T
   *                        
   */
- setProgram :  function(view,program,engine){
-    view.renderer.setProgram(program,engine,true);
+ setProgram :  function(view,program){
+    view.renderer.engine.pm.setProgram(program);
     
  },
  
@@ -704,7 +704,7 @@ wireframeON :  function(){
   * @param{vxlView} view
   */
  releaseProgram: function(view){
-     view.renderer.releaseProgram();
+     view.renderer.engine.pm.releaseProgram();
  },
  /**
   * Returns the name of the current program
@@ -718,24 +718,24 @@ wireframeON :  function(){
      if (view == undefined){
          throw ('vxl.api.getProgram: please indicate a view');
      }
-     return view.renderer.pm._currentProgramID;
+     return view.renderer.engine.pm._current_program_ID;
  },
  /**
   * Sets the default value for an uniform
   */
   setUniformDefault: function(programID, uniformID, value){
-      vxl.c.view.renderer.pm.setDefault(programID, uniformID, value)
+      vxl.c.view.renderer.engine.pm.setDefault(programID, uniformID, value)
   },
   
   setUniform: function(uniformID, value){
-      vxl.c.view.renderer.pm.setUniform(uniformID, value)
+      vxl.c.view.renderer.engine.pm.setUniform(uniformID, value)
   },
   
   /**
    * Gets the default value for an uniform 
    */
   getUniformDefault: function(programID, uniformID){
-      vxl.c.view.renderer.pm.getDefault(programID, uniformID);
+      vxl.c.view.renderer.engine.pm.getDefault(programID, uniformID);
   },
   
   /**

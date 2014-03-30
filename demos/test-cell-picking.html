@@ -9,7 +9,7 @@
 <link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
 <script src="lib/jquery.js"     type="text/javascript"></script>
 <script src="lib/jquery-ui.js"  type="text/javascript"> </script>
-<script type='text/javascript'  src='lib/voxelent_v0.89.9.js'> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.0.js'> </script>
 <script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
 
 <title>Voxelent - Cell Picking Test</title>
@@ -37,6 +37,7 @@ function handleEvent(event){
     
     var cam = vxl.c.camera;
     cam.setType(vxl.def.camera.type.ORBITING);
+    cam.setWorldRotation(true);
     cam.longShot();
     vxl.api.floorON(60,5);
     $('#overlay-div').fadeIn(3000);
@@ -70,6 +71,10 @@ document.onkeypress = function(e){
             console.info('picker interactor active');
         }    
     }
+    
+    if (charCode == 98){
+	    	vxl.c.view.renderer.engine._debug_picking_flag = !vxl.c.view.renderer.engine._debug_picking_flag;
+	    }
 };
 
 

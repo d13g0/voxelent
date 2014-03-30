@@ -79,7 +79,7 @@ def pack(VOX_VERSION_NUMBER):
     nucleo = [
              'VXL',
              'Notifier', 
-             'glMatrix',
+             'gl-matrix',
              'Landmark',   
              'Camera',
              'CameraManager',
@@ -91,8 +91,8 @@ def pack(VOX_VERSION_NUMBER):
              'Program',
              'LambertProgram',
              'PhongProgram',
-             'BlenderProgram',
              'BakeProgram',
+             'DashProgram',
              'ProgramManager',
              'Renderer',
              'RenderTarget',
@@ -104,7 +104,6 @@ def pack(VOX_VERSION_NUMBER):
              'Engine',
              'ExternalEngine',
              'RenderEngine',
-             'BlenderEngine',
              'BakeEngine',
              'Scene', 
              'Toys',
@@ -121,7 +120,9 @@ def pack(VOX_VERSION_NUMBER):
              'Texture',
              'Material',
              'Renderable',
-             'ActorGroup'
+             'ActorGroup',
+             'Silo',
+             'DashEngine'
               
     ]
     
@@ -193,6 +194,7 @@ def pack(VOX_VERSION_NUMBER):
     print ' -- END PACKAGER --'
     
 if __name__ == '__main__':
-    pack(sys.argv[1])
     updateVersion(sys.argv[1])
+    pack(sys.argv[1])
+    
 

@@ -9,7 +9,7 @@
 <link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
 <script src="lib/jquery.js"     type="text/javascript"></script>
 <script src="lib/jquery-ui.js"  type="text/javascript"> </script>
-<script type='text/javascript'  src='lib/voxelent_v0.89.9.js'> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.0.js'> </script>
 <script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
 
 <title>Voxelent - Demo Brain</title>
@@ -55,6 +55,7 @@
         	
   
         	brain = vxl.api.createActorGroup('brain', list);
+        	brain.setProperty('cull', vxl.def.actor.cull.BACK);
         	var actors = brain.list;
         	var index = 0;
         	
@@ -69,7 +70,7 @@
         		setTimeout(arguments.callee,100);
         	}
 
-        	setTimeout(function(){setPicker()},100);
+        	setPicker();
 
     	}
 	}

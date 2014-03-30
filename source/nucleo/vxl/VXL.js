@@ -54,7 +54,7 @@ var vxl = {
 */
 version : 
 {
-    number: '0.89.9',
+    number: '0.90.0',
    	codename : 'c4n314',
    	plugins  : []
 },
@@ -154,7 +154,10 @@ def : {
                           */
                          type :{SIMPLE:'SIMPLE', MESH:'MESH', BIG_DATA:'BIG DATA'}
 					},
-
+    /**
+     * @namespace Default values for <code>vxlMaterial</code> 
+     * @see vxlMaterial
+     */
     material        : {
                        /**
                         * Diffuse color used by default when a model does 
@@ -192,7 +195,7 @@ def : {
     * @property {Array} background  A 4-valued array that contains the default background colour for view. The format is [r,g,b,a]
     */
     view			: {
-    					background: [135/256,135/256,135/256]
+    					background: [0.3,0.3,0.3]
     					
     				},	
     /**
@@ -530,6 +533,27 @@ util : {
         return [((i >> 16) & 0xFF)/256,((i >> 8) & 0xFF)/256,(i & 0xFF)/256]; 
     },
     
+    frac2rgb: function(r,g,b){
+        var c = vxl.util.createArr3(r,g,b);
+        c[0] = Math.round(255 * c[0]);
+        c[1] = Math.round(255 * c[1]);
+        c[2] = Math.round(255 * c[2]);
+        return c;
+    },
+    
+    rgb2frac: function(r,g,b){ //@TODO: is this round  good?
+        var c = vxl.util.createArr3(r,g,b);
+        c[0] = Math.round(c[0] / 255);
+        c[1] = Math.round(c[1] / 255);
+        c[2] = Math.round(c[2] / 255);
+        return c;
+    },
+    
+    rgb2hex: function(r,g,b){
+        var c = vxl.util.createArr3(r,g,b);
+       return "#" + ((1 << 24) + (c[0] << 16) + (c[1]<< 8) + c[2]).toString(16).slice(1);
+    },
+    
     /**
      * This function is attributed to Tim Down
      * @link{http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb} 
@@ -580,7 +604,7 @@ util : {
                 color = this.rgb2decimal([r,g,b]);
             }
             else{
-                color = [r,g,b]
+                color = [r,g,b];
             }
         }
         
@@ -616,14 +640,11 @@ util : {
 	 */
 	createVec3: function(x,y,z){
 	    var vvv = vec3.create();
-	    if (x instanceof Array){
-            vec3.set(vec3.create(x), vvv)
-        }
-        else if (x instanceof determineMatrixArrayType()){
-            vec3.set(x, vvv)
+	    if (x instanceof Array || x instanceof Float32Array){
+            vvv = vec3.clone(x)
         }
         else{
-            vec3.set(vec3.createFrom(x,y,z), vvv);
+            vvv = vec3.fromValues(x,y,z);
         }
         return vvv;
 	},
@@ -635,7 +656,7 @@ util : {
      */
 	createArr3: function(x,y,z){
 	    var vvv = []
-        if (x instanceof Array || x instanceof determineMatrixArrayType()){
+        if (x instanceof Array || x instanceof Float32Array){
             vvv[0] = x[0];
             vvv[1] = x[1];
             vvv[2] = x[2];

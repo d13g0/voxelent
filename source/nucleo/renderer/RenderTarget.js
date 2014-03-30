@@ -15,13 +15,13 @@
 ---------------------------------------------------------------------------*/   
 
 
-function vxlRenderTarget(renderer){
+function vxlRenderTarget(engine){
    
-    this.canvas         = renderer.view.canvas;
+    this.canvas         = engine._view.canvas;
     this.texture        = null;
     this.framebuffer    = null;
     this.renderbuffer   = null;
-    this.gl             = renderer.gl;
+    this.gl             = engine.gl;
     this.configure(); 
 };
 

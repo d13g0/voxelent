@@ -6,43 +6,62 @@
  * @constructor
  */
 function vxlLookupTableManager(){
-	this.lutTimerID = 0;
 	this._hashmap = {};
-	this.location = "";
+	this._location = "";
 	vxl.go.notifier.publish(vxl.events.DEFAULT_LUT_LOADED,this);
 };
 
+/**
+ * Relative path to the webpage where lookup tables can be located.
+ * @param {String} loc
+ */
 vxlLookupTableManager.prototype.setLocation = function(loc){
-	this.location = loc;
-}
+	this._location = loc;
+};
 
 /**
  * Load a lookup table file
  * @param {String} name the filename of the lookup table to load
  */
 vxlLookupTableManager.prototype.load = function(name){
-		var self = this;
-		if (this.isLoaded(name)) return;
+    if (this.isLoaded(name)) return;
 
-	    var request = new XMLHttpRequest();
-	    request.open("GET", this.location+'/'+name+'.lut');
-	    request.onreadystatechange = function() {
-	      if (request.readyState == 4) {
-		    if(request.status == 404) {
-				alert (name + ' does not exist');
-				vxl.go.console('LookupTableManager: '+name + ' does not exist');
-			 }
-			else {
-				self.handle(name,JSON.parse(request.responseText));
-			}
-		  }
-	    };
-		request.send();
+	var manager    = this;
+	var uri        =  this._location+'/'+name+'.lut';
+	var nocacheuri = uri +'?nocache=' + (new Date()).getTime();
+
+		
+    var successHandler = function(manager,name){
+        return function(payload, textStatus){
+            manager._handle(name,payload);
+        };
+   };
+   
+   var errorHandler = function(uri){
+       return function(request, status, error){
+           if(error.code = 1012){
+               alert('The file '+uri+' could not be accessed. \n\n'+
+               'Please make sure that the path is correct and that you have the right pemissions');
+           }
+           else{
+               alert ('There was a problem loading the file '+uri+'. HTTP error code:'+request.status);
+           }       
+        };
+    };
+	
+    var request  = $.ajax({
+        url         : nocacheuri,
+        type        :"GET",
+        dataType    : "json",
+        success     : successHandler(manager,name),
+        error       : errorHandler(uri)
+    }); 
 };
+
 /**
  * Once the lookup table file is retrieved, this method adds it to the lookup table manager
  */
-vxlLookupTableManager.prototype.handle = function (ID, payload) {
+vxlLookupTableManager.prototype._handle = function (ID, payload) {
 	var lut = new vxlLookupTable();
 	lut.load(ID,payload);
 	this._hashmap[ID] = lut;

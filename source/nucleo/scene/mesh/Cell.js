@@ -26,8 +26,8 @@ function vxlCell(mesh, index, vertices, color){
     this.mesh  = mesh;
     this.index = index;
     this.vertices = vertices;
-    this.color = color==undefined?[0.8,0.8,0.8]:color;
-    this.normal = undefined; //cell normal
+    this.color = color==undefined?[0.8,0.8,0.8]:color; //@TODO: this is a hack
+    this.normal = [0,0,0]; 
     this.position = [0,0,0];
     this._calculatePosition();
     this._calculateNormal();
@@ -46,9 +46,9 @@ vxlCell.prototype._calculatePosition = function(){
  * @private
  */
 vxlCell.prototype._calculateNormal = function(){
-    var p1 = vec3.subtract(this.vertices[1], this.vertices[0], vec3.create());
-    var p2 = vec3.subtract(this.vertices[2], this.vertices[0], vec3.create());
-    this.normal =  vec3.normalize(vec3.cross(p1,p2,vec3.create()));
+    var p1 = vec3.subtract(vec3.create(),this.vertices[1], this.vertices[0]);
+    var p2 = vec3.subtract(vec3.create(),this.vertices[2], this.vertices[0]);
+    this.normal =  vec3.normalize(this.normal, vec3.cross(this.normal,p1,p2));
 };
 
 /**

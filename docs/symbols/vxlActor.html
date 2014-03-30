@@ -37,7 +37,7 @@
 			<!-- begin publish.classesIndex -->
 			<div align="center"><h2><a href="../index.html">Class List</a></h2></div>
 <hr />
-<h3>Current Version:  0.89.9</h3>
+<h3>Current Version:  0.90.0</h3>
 <p>Download it <a href='http://voxelent.com/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -62,6 +62,8 @@
 	<li><a href="../symbols/vxl.def.interactor.html">vxl.def.interactor</a></li>
 	
 	<li><a href="../symbols/vxl.def.lut.html">vxl.def.lut</a></li>
+	
+	<li><a href="../symbols/vxl.def.material.html">vxl.def.material</a></li>
 	
 	<li><a href="../symbols/vxl.def.model.html">vxl.def.model</a></li>
 	
@@ -88,8 +90,6 @@
 	<li><a href="../symbols/vxlAxis.html">vxlAxis</a></li>
 	
 	<li><a href="../symbols/vxlBakeEngine.html">vxlBakeEngine</a></li>
-	
-	<li><a href="../symbols/vxlBlenderEngine.html">vxlBlenderEngine</a></li>
 	
 	<li><a href="../symbols/vxlBoundingBox.html">vxlBoundingBox</a></li>
 	
@@ -239,28 +239,6 @@
 								
 								
 								<b><a href="../symbols/vxlActor.html#clone">clone</a></b>
-								()
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-							      <span>void</span>   
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
-								<b><a href="../symbols/vxlActor.html#computePosition">computePosition</a></b>
 								()
 								</div>
 							</td>
@@ -491,6 +469,28 @@
 								
 								
 								<b><a href="../symbols/vxlActor.html#isVisible">isVisible</a></b>
+								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlActor.html#reallocate">reallocate</a></b>
 								()
 								</div>
 							</td>
@@ -1049,7 +1049,7 @@
 					</div>
 					</div>
 					<div class="description">
-						Duplicates this actor.Properties copied by REFERENCE:model,buffers,renderersEverything else is copied by VALUE.This method is fundamental to replicate objects in the scene, without having to duplicatethe shared model. A cloned actor however can have different position, colors, properties, etc.If a cloned actor modifies his internal model, any other actor that shares the model will beaffected. The returned actor is not added to the scene automatically. It is up theprogrammer to determine the scene the cloned actor needs to be added to if any.
+						Duplicates this actor.<p>The model property of the actor (vxlModel) is shared with the new instance</p><p>The actor level properties are copied by VALUE.</p>If a cloned actor modifies his internal model, any other actor that shares the model will beaffected. A cloned actor however can have different position, colors, etc. (actor level properties)The returned actor is not added to the scene automatically. It is up theprogrammer to determine the scene the cloned actor needs to be added to if at all.The clone does not keep any information about the current position or rotation of the originalactor.
 						
 						
 					</div>
@@ -1075,37 +1075,6 @@
 							
 								<span><a href="../symbols/vxlModel.html">vxlModel</a></span>
 							
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="computePosition"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>computePosition</b>()
-					</div>
-					</div>
-					<div class="description">
-						Estimates the current position asthe center of the current bounding box. This method does not update the internal position of the actorit only returns an estimate based on the location of its bounding box.
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
 						
 				</div>	
 				
@@ -1498,6 +1467,37 @@
 								<td><span class="light fixedFont">{boolean}</span> true if the object is visible</td></tr>
 							
 							</table>							
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="reallocate"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>reallocate</b>()
+					</div>
+					</div>
+					<div class="description">
+						This method needs to be invoked whenever the actor undergoes changes thataffect its rendering. These changes are:1. morphing = the geometry has changed2. texturing = the actor has a new texture3.
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
 						
 						
 						
@@ -2583,7 +2583,7 @@
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Mar 21 2014 21:08:16 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Mar 30 2014 03:31:57 GMT-0400 (EDT)
 		</div>
         </div>
         </div>

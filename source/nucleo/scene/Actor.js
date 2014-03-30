@@ -49,16 +49,17 @@
  */
 function vxlActor(model){
   
-  this._bb = [0, 0, 0, 0, 0, 0];
-  this._position 	= vec3.create([0, 0, 0]);
-  this._translation = vec3.create([0, 0, 0]);
-  this._centre      = vec3.create([0, 0, 0]);
-  this._scale 		= vec3.create([1, 1, 1]);
-  this._rotation 	= vec3.create([0, 0, 0]);
-  this._matrix      = mat4.identity();
-  this._renderers   = [];
-  this._gl_buffers  = [];
-  this._picking     = vxl.def.actor.picking.DISABLED;
+  this._bb            = [0, 0, 0, 0, 0, 0];
+  this._position 	  = vec3.fromValues(0, 0, 0);
+  this._translation   = vec3.fromValues(0, 0, 0);
+  this._centre        = vec3.fromValues(0, 0, 0);
+  this._scale 		  = vec3.fromValues(1, 1, 1);
+  this._rotation 	  = vec3.fromValues(0, 0, 0);
+  this._matrix        = mat4.create();
+  this._matrix_world  = mat4.create();
+  this._matrix_normal = mat4.create();
+  this._dirty         = false;
+  this._picking       = vxl.def.actor.picking.DISABLED;
   this._pickingCallback = undefined;
   this._pickingColor    = undefined; //used when the picking is vxl.def.actor.picking.OBJECT
   this._trackingCameras = [];
@@ -76,12 +77,15 @@ function vxlActor(model){
   this.material     = new vxlMaterial();
   this.renderable   = undefined;
   
+  this._bb_disabled = false; //to accelerate animations if we dont care about bb.
+                             //@TODO: find another way to optimize this.
+  
   if (model){
   	this.model 	    = model;
   	this.name 	    = model.name;
   	this.mode       = model.mode;
   	this._bb        = model.bb.slice(0);
-  	this._centre    = vec3.set(model.centre, vec3.create());
+  	this._centre    = vec3.clone(model.centre);
   	this.material.getFrom(model);
   	
   	if (model.type == vxl.def.model.type.BIG_DATA){
@@ -123,7 +127,7 @@ vxlActor.prototype.setScene = function(scene){
  */
 vxlActor.prototype.setPosition = function (x,y,z){
     var np = vxl.util.createVec3(x,y,z);
-    vec3.subtract(np, this._position, this._translation);
+    vec3.subtract(this._translation, np, this._position);
     this._position = np;  
     
     var m = this._matrix;
@@ -131,7 +135,10 @@ vxlActor.prototype.setPosition = function (x,y,z){
     m[13] = this._position[1];
     m[14] = this._position[2];
     m[15] = 1;
-    this._computeBoundingBox();
+    if (!this._bb_disabled) {
+        this._computeBoundingBox();
+    }
+    
     this._notifyTrackingCameras();
     vxl.go.notifier.fire(vxl.events.ACTOR_MOVED, this);
     
@@ -150,9 +157,12 @@ vxlActor.prototype.translate = function (x,y,z){
     this._translation = vxl.util.createVec3(x,y,z); 
     
     var m = this._matrix;
-    mat4.translate(m,this._translation);
-    this._position = vec3.createFrom(m[12], m[13], m[14]);
-    this._computeBoundingBox();
+    mat4.translate(m, m,this._translation);
+    this._position = vec3.fromValues(m[12], m[13], m[14]);
+    
+    if (!this._bb_disabled) { 
+        this._computeBoundingBox(); 
+    }
     this._notifyTrackingCameras();
     vxl.go.notifier.fire(vxl.events.ACTOR_MOVED, this);
     
@@ -168,8 +178,10 @@ vxlActor.prototype.translate = function (x,y,z){
 vxlActor.prototype.rotateX = function (angle){
     var m = this._matrix;
     var a = vxl.util.deg2rad(vxl.util.getAngle(angle));
-    mat4.rotateX(m,a);
-    this._computeBoundingBox();
+    mat4.rotateX(m,m,a);
+    if (!this._bb_disabled){
+       this._computeBoundingBox();
+    }
     vxl.go.notifier.fire(vxl.events.ACTOR_ROTATED, this);
     
     return this;
@@ -183,8 +195,10 @@ vxlActor.prototype.rotateX = function (angle){
 vxlActor.prototype.rotateY = function (angle){
     var m = this._matrix;
     var a = vxl.util.deg2rad(vxl.util.getAngle(angle));
-    mat4.rotateY(m,a);
-    this._computeBoundingBox();
+    mat4.rotateY(m,m,a);
+    if (!this._bb_disabled){
+      this._computeBoundingBox();
+    }
     vxl.go.notifier.fire(vxl.events.ACTOR_ROTATED, this);
     
     return this;
@@ -199,8 +213,10 @@ vxlActor.prototype.rotateY = function (angle){
 vxlActor.prototype.rotateZ = function (angle){
     var m = this._matrix;
     var a = vxl.util.deg2rad(vxl.util.getAngle(angle));
-    mat4.rotateZ(m,a);
-    this._computeBoundingBox();
+    mat4.rotateZ(m,m,a);
+    if (!this._bb_disabled){
+       this._computeBoundingBox();
+    }
     vxl.go.notifier.fire(vxl.events.ACTOR_ROTATED, this);
     
     return this;
@@ -223,8 +239,10 @@ vxlActor.prototype.setScale = function(s,a,b){
     }
     
     var m = this._matrix;
-    mat4.scale(m,this._scale);
-    this._computeBoundingBox();
+    mat4.scale(m, m, this._scale);
+    if (!this._bb_disabled){
+        this._computeBoundingBox();
+    }
     vxl.go.notifier.fire(vxl.events.ACTOR_SCALED, this);
     
     return this;
@@ -281,7 +299,7 @@ vxlActor.prototype._computeBoundingBox = function(){
     
     for(var i=0;i<vs.length;i=i+3){
         var x = vxl.util.createVec3(vs[i],vs[i+1],vs[i+2]);
-        mat4.multiplyVec3(T, x);
+        vec3.transformMat4(x, x, T);
         vsT.push(x[0], x[1], x[2]);    
     }
     
@@ -476,10 +494,13 @@ vxlActor.prototype.getProperty = function(property){
  * the center of the current bounding box. 
  * This method does not update the internal position of the actor
  * it only returns an estimate based on the location of its bounding box.
+ * Is there really any use for this? I forgot..!
+ * 
+ * @private
  */
 vxlActor.prototype.computePosition = function(){
 	bb = this._bb;
-	var cc = this._position;
+	var cc = vec3.create();
 	
 	cc[0] = (bb[3] + bb[0]) /2;
 	cc[1] = (bb[4] + bb[1]) /2;
@@ -489,18 +510,18 @@ vxlActor.prototype.computePosition = function(){
 	cc[1] = Math.round(cc[1]*1000)/1000;
 	cc[2] = Math.round(cc[2]*1000)/1000;
 	
-	return vec3.create(cc); 
+	return vec3.clone(cc); 
 };
 
 
 /**
 * Sets the visualization mode for this actor.
 * @param {vxl.def.actor.mode} mode mode needs to be one of the elements defined in vxl.def.actor.mode
-* @TODO: VALIDATE
+* 
 */
 vxlActor.prototype.setVisualizationMode = function(mode){
 	this.mode = mode;
-	
+	this._dirty = true;
 	return this;
 };
 
@@ -579,21 +600,18 @@ vxlActor.prototype.isVisible = function(){
 /**
  * Duplicates this actor.
  * 
- * Properties copied by REFERENCE:
- * model,
- * buffers,
- * renderers
+ * <p>The model property of the actor (vxlModel) is shared with the new instance</p>
  * 
- * Everything else is copied by VALUE.
- * 
- * This method is fundamental to replicate objects in the scene, without having to duplicate
- * the shared model. A cloned actor however can have different position, colors, properties, etc.
+ * <p>The actor level properties are copied by VALUE.</p>
  * 
  * If a cloned actor modifies his internal model, any other actor that shares the model will be
- * affected. 
+ * affected. A cloned actor however can have different position, colors, etc. (actor level properties)
  * 
  * The returned actor is not added to the scene automatically. It is up the
- * programmer to determine the scene the cloned actor needs to be added to if any.
+ * programmer to determine the scene the cloned actor needs to be added to if at all.
+ * 
+ * The clone does not keep any information about the current position or rotation of the original
+ * actor.
  * 
  * @see vxlModel
  * @returns {vxlActor} an actor 
@@ -601,17 +619,14 @@ vxlActor.prototype.isVisible = function(){
 vxlActor.prototype.clone = function(){
     this.clones++;
 	
-	var duplicate = new vxlActor(this.model);
-	duplicate.setScene(this.scene);
+	//create clone
+	var clone = new vxlActor(this.model);
+	clone.name     += '-'+this.clones; 
 	
-	//TODO: duplicate.setMatrix(this._matrix); this method should update all the other variables (position, scale, rot, etc).
-     	
-	//Now to save us some memory, let's SHARE the WebGL buffers that the current actor has already allocated'
-	//duplicate.renderers = this._renderers;
-	//duplicate.buffers   = this._gl_buffers;
-
-	duplicate.name     += '-'+this.clones; 
-	return duplicate;
+	//copy the material
+	clone.material = this.material.clone();
+	
+	return clone;
 };
 
 /**
@@ -650,8 +665,10 @@ vxlActor.prototype.setPicker = function(type, callback){
             break;
     }
     
-    if (this.isPickable()){
-        for(var i=0, N = this.scene.views.length; i<N; i+=1){
+    if (this._picking  != vxl.def.actor.picking.DISABLED){
+        var i = this.scene.views.length;
+        while(i--){
+            //@TODO: do we want this for all the views?
             var r = this.scene.views[i].renderer;
             if(!r.isOffscreenEnabled()){
                 r.enableOffscreen();
@@ -697,4 +714,18 @@ vxlActor.prototype.getRenderableModel = function(){
  */
 vxlActor.prototype.updateRenderable = function(task){
     this.renderable.update(task);
-}
+};
+
+/**
+ * This method needs to be invoked whenever the actor undergoes changes that
+ * affect its rendering. These changes are:
+ * 
+ * 1. morphing = the geometry has changed
+ * 2. texturing = the actor has a new texture
+ * 3.  
+ */
+vxlActor.prototype.reallocate = function(){
+    
+    // The engine will read and affect this property.
+    this._dirty = true;  
+};

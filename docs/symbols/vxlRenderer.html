@@ -37,7 +37,7 @@
 			<!-- begin publish.classesIndex -->
 			<div align="center"><h2><a href="../index.html">Class List</a></h2></div>
 <hr />
-<h3>Current Version:  0.89.9</h3>
+<h3>Current Version:  0.90.0</h3>
 <p>Download it <a href='http://voxelent.com/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -62,6 +62,8 @@
 	<li><a href="../symbols/vxl.def.interactor.html">vxl.def.interactor</a></li>
 	
 	<li><a href="../symbols/vxl.def.lut.html">vxl.def.lut</a></li>
+	
+	<li><a href="../symbols/vxl.def.material.html">vxl.def.material</a></li>
 	
 	<li><a href="../symbols/vxl.def.model.html">vxl.def.model</a></li>
 	
@@ -88,8 +90,6 @@
 	<li><a href="../symbols/vxlAxis.html">vxlAxis</a></li>
 	
 	<li><a href="../symbols/vxlBakeEngine.html">vxlBakeEngine</a></li>
-	
-	<li><a href="../symbols/vxlBlenderEngine.html">vxlBlenderEngine</a></li>
 	
 	<li><a href="../symbols/vxlBoundingBox.html">vxlBoundingBox</a></li>
 	
@@ -324,7 +324,7 @@
 								
 								
 								
-								<b><a href="../symbols/vxlRenderer.html#getWebGLContext">getWebGLContext</a></b>
+								<b><a href="../symbols/vxlRenderer.html#isOffscreenEnabled">isOffscreenEnabled</a></b>
 								()
 								</div>
 							</td>
@@ -346,8 +346,8 @@
 								
 								
 								
-								<b><a href="../symbols/vxlRenderer.html#isOffscreenEnabled">isOffscreenEnabled</a></b>
-								()
+								<b><a href="../symbols/vxlRenderer.html#readOffscreenPixel">readOffscreenPixel</a></b>
+								(x, y)
 								</div>
 							</td>
 							
@@ -435,7 +435,7 @@
 								
 								
 								<b><a href="../symbols/vxlRenderer.html#setEngine">setEngine</a></b>
-								(engine)
+								(p_engine)
 								</div>
 							</td>
 							
@@ -479,7 +479,7 @@
 								
 								
 								<b><a href="../symbols/vxlRenderer.html#setProgram">setProgram</a></b>
-								(program, engine, forceIt)
+								(p_program, p_force_it)
 								</div>
 							</td>
 							
@@ -635,7 +635,7 @@
 					</div>
 					</div>
 					<div class="description">
-						Clears the rendering context
+						Clears the WebGL scene
 						
 						
 					</div>
@@ -839,37 +839,6 @@
 				</div>	
 				
 				<div class='methodDetail'>
-					<a name="getWebGLContext"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>getWebGLContext</b>()
-					</div>
-					</div>
-					<div class="description">
-						Tries to obtain a WebGL context from the canvas associated with the view to which thisrenderer belongs to.
-						
-						
-					</div>
-
-					
-
-						
-						
-						
-						
-						
-						
-						
-				</div>	
-				
-				<div class='methodDetail'>
 					<a name="isOffscreenEnabled"> </a>
 					<div class="title">
 					<div class="fixedFont">
@@ -891,6 +860,66 @@
 
 					
 
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="readOffscreenPixel"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>readOffscreenPixel</b>(x, y)
+					</div>
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>x</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>y</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
 						
 						
 						
@@ -1004,11 +1033,11 @@
 					
 					
 					
-					  <b>setEngine</b>(engine)
+					  <b>setEngine</b>(p_engine)
 					</div>
 					</div>
 					<div class="description">
-						Sets the current rendering engine.
+						Sets the current rendering engine. <p>The parameter can be a class definition or an instance of the engine</p>
 						
 						
 					</div>
@@ -1023,9 +1052,9 @@
 									<span class="light fixedFont">{<a href="../symbols/_global_.html#vxlEngine">vxlEngine</a>}</span> 
 								</td>
 								<td>
-									<code>engine</code>
+									<code>p_engine</code>
 								</td>	
-								<td><p>The engine to be used.
+								<td><p>The engine to be used (function reference or instance)
 								
 								</p>
 								</td>
@@ -1087,6 +1116,11 @@
 						
 						
 						
+							<p class="heading">See:</p>
+							
+								<span>vxl.def.render.mode</span>
+							
+						
 				</div>	
 				
 				<div class='methodDetail'>
@@ -1100,11 +1134,11 @@
 					
 					
 					
-					  <b>setProgram</b>(program, engine, forceIt)
+					  <b>setProgram</b>(p_program, p_force_it)
 					</div>
 					</div>
 					<div class="description">
-						Tries to add a new program definition to this renderer
+						Sets the current rendering program <p>The parameter can be a class definition or an instance of the program</p>
 						
 						
 					</div>
@@ -1119,21 +1153,9 @@
 									<span class="light fixedFont">{<a href="../symbols/vxlProgram.html">vxlProgram</a>}</span> 
 								</td>
 								<td>
-									<code>program</code>
+									<code>p_program</code>
 								</td>	
-								<td><p>an instance of a vxlProgram object or one of its descendents
-								
-								</p>
-								</td>
-							</tr>	
-							
-							<tr><td>
-									<span class="light fixedFont">{<a href="../symbols/_global_.html#vxlEngine">vxlEngine</a>}</span> 
-								</td>
-								<td>
-									<code>engine</code>
-								</td>	
-								<td><p>(optional) a new engine
+								<td><p>the program to be used (function reference or instance)
 								
 								</p>
 								</td>
@@ -1143,7 +1165,7 @@
 									
 								</td>
 								<td>
-									<code>forceIt</code>
+									<code>p_force_it</code>
 								</td>	
 								<td><p>
 								
@@ -1283,7 +1305,7 @@
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Mar 21 2014 21:08:17 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Mar 30 2014 03:31:57 GMT-0400 (EDT)
 		</div>
         </div>
         </div>

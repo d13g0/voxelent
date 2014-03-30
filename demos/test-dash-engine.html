@@ -1,0 +1,67 @@
+<html>
+<head>
+<meta name='Diego Cantor'       content='Voxelent: The best WebGL platform yet'>
+<meta name='copyright'          content='&copy 2014'>
+<meta name='robots'             content='all'>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name='keywords'           content='webgl, webgl platform, medical imaging, webgl api'>
+<meta http-equiv="expires"      content="0">
+<link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
+<script src="lib/jquery.js"     type="text/javascript"></script>
+<script src="lib/jquery-ui.js"  type="text/javascript"> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.0.js'> </script>
+<script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
+
+<title>Voxelent - Test Dash Engine</title>
+
+<script type='text/javascript'>
+	var view;
+	
+	function runVoxApp(){
+	    
+	    vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
+	    
+	    view = vxl.api.setup('view-1');
+	    vxl.api.setProgram(view, vxl.go.essl.dash, new vxlDashEngine(view.renderer));
+	    //vxl.api.load(['cone.json'],'assets/models/simple/');
+	    vxl.api.load(['ball.json'],'assets/models/geometry');
+	    view.start();
+	    view.cameraman.active.setPosition(0,0,8);
+
+	}
+	
+	function handleEvent(event){
+	    var ball = vxl.api.getActorByName('ball.json');
+	    //ball.setPosition(0,0,-30);
+	    
+	    for (var i=0; i < 20; i+=1){
+	    	var c = ball.clone();
+	    	c.setColor(Math.random(),Math.random(), Math.random());
+	    	c.setPosition(Math.random()*100,Math.random()*100, Math.random()*100);
+	    	vxl.c.scene.addActor(c);
+	    }
+	    
+	    //cube.setPosition(1,0,-3);
+	    vxl.c.camera.longShot();
+	    vxl.api.floorON(60,5);
+	}
+</script>
+
+<script type="text/javascript">
+  //Google Analytics Script 
+  var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-26954785-1']); _gaq.push(['_trackPageview']);  (function() {  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);   })();
+</script>
+
+</head>
+<body onload='runVoxApp()'>
+	<div><img src="css/img/voxelent.png" /></div>
+	<div>
+	<canvas id = 'view-1' width='1200' height='600'>
+		<p>
+			Your browser does not support WebGL :-(
+		</p>
+	</canvas>
+	
+    </div>
+</body>			
+</html>

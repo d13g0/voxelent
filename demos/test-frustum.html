@@ -1,0 +1,74 @@
+<html>
+<head>
+<meta name='Diego Cantor'       content='Voxelent: The best WebGL platform yet'>
+<meta name='copyright'          content='&copy 2014'>
+<meta name='robots'             content='all'>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name='keywords'           content='webgl, webgl platform, medical imaging, webgl api'>
+<meta http-equiv="expires"      content="0">
+<link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
+<script src="lib/jquery.js"     type="text/javascript"></script>
+<script src="lib/jquery-ui.js"  type="text/javascript"> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.0.js'> </script>
+<script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
+
+<title>Voxelent - Test Frustum</title>
+
+<script type='text/javascript'>
+	var view,cam, triangle,v1,v2,v3;
+	
+	function runVoxApp(){
+		vxl.api.subscribe(vxl.events.MODELS_LOADED, this);
+	    view = vxl.api.setup('view-1');
+	    vxl.api.load('assets/models/simple/triangle.json');
+	    view.start();
+	   
+	    cam = vxl.c.camera;
+	}
+	
+	function handleEvent(event){
+		triangle = vxl.api.getActor('triangle');
+		view.cameraman.active.setPosition(0,0,10);
+		v1 = triangle.model.vertices.slice(0,3);
+		v2 = triangle.model.vertices.slice(3,6);
+		v3 = triangle.model.vertices.slice(6,9);
+		cam.Z_NEAR = 2;
+		cam.Z_FAR = 50;
+		test();
+	}
+	
+	function test(){
+		var near = cam.Z_NEAR;
+		var far = cam.Z_FAR;
+		var angle = cam._fov * Math.PI / 180;
+		
+		//camera coordinates
+		var pmatrix = vxl.c.view.renderer.engine._transforms.pMatrix;
+		var mvmatrix = vxl.c.camera._matrix;
+		
+		var v1c = vec3.transformMat4(vec3.create(), v1, mvmatrix);
+		var v2c = vec3.transformMat4(vec3.create(), v1, mvmatrix);
+		var v3c = vec3.transformMat4(vec3.create(), v1, mvmatrix);
+		var pos = vec3.clone(cam._position);
+		
+		var v1p = vec3.subtract(vec3.create(),v1c, pos);
+		var z1 = vec3.dot(v1p, cam._forward); //vec3.negate(vec3.create(),cam._forward));
+		//console.info(z1);
+		console.info(v1c, cam._distance)
+	    setTimeout(test,1000);
+	}
+	
+</script>
+
+</head>
+<body onload='runVoxApp()'>
+	<div><img src="css/img/voxelent.png" /></div>
+	<div>
+	<canvas id = 'view-1' width='1200' height='600'>
+		<p>
+			Your browser does not support WebGL :-(
+		</p>
+	</canvas>
+    </div>
+</body>			
+</html>

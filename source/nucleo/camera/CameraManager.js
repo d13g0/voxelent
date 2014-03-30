@@ -23,7 +23,7 @@
 function vxlCameraManager(vw){
 	this.view = vw;
 	this.cameras = [];
-	this.active = this.create();
+	this.active = this.create(vxl.def.camera.type.EXPLORING); //exploring is the default type
 	if (vxl.c.camera == undefined){
 	    vxl.c.camera = this.active;
 	}

@@ -37,7 +37,7 @@
 			<!-- begin publish.classesIndex -->
 			<div align="center"><h2><a href="../index.html">Class List</a></h2></div>
 <hr />
-<h3>Current Version:  0.89.9</h3>
+<h3>Current Version:  0.90.0</h3>
 <p>Download it <a href='http://voxelent.com/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -62,6 +62,8 @@
 	<li><a href="../symbols/vxl.def.interactor.html">vxl.def.interactor</a></li>
 	
 	<li><a href="../symbols/vxl.def.lut.html">vxl.def.lut</a></li>
+	
+	<li><a href="../symbols/vxl.def.material.html">vxl.def.material</a></li>
 	
 	<li><a href="../symbols/vxl.def.model.html">vxl.def.model</a></li>
 	
@@ -88,8 +90,6 @@
 	<li><a href="../symbols/vxlAxis.html">vxlAxis</a></li>
 	
 	<li><a href="../symbols/vxlBakeEngine.html">vxlBakeEngine</a></li>
-	
-	<li><a href="../symbols/vxlBlenderEngine.html">vxlBlenderEngine</a></li>
 	
 	<li><a href="../symbols/vxlBoundingBox.html">vxlBoundingBox</a></li>
 	
@@ -294,54 +294,6 @@
 							
 							<td class="returns">
 							
-								
-									<span></span>
-							    
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
-								<b><a href="../symbols/vxlProgramManager.html#isLoaded">isLoaded</a></b>
-								(ID)
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-								
-									<span></span>
-							    
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
-								<b><a href="../symbols/vxlProgramManager.html#isRegistered">isRegistered</a></b>
-								(ID)
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
 							      <span>void</span>   
 							    
 							</td>
@@ -352,50 +304,6 @@
 								
 								<b><a href="../symbols/vxlProgramManager.html#loadDefaults">loadDefaults</a></b>
 								()
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-							      <span>void</span>   
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
-								<b><a href="../symbols/vxlProgramManager.html#loadProgram">loadProgram</a></b>
-								(ID)
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-							      <span>void</span>   
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
-								<b><a href="../symbols/vxlProgramManager.html#register">register</a></b>
-								(the)
 								</div>
 							</td>
 							
@@ -461,7 +369,7 @@
 								
 								
 								<b><a href="../symbols/vxlProgramManager.html#setUniform">setUniform</a></b>
-								(uniform, the, hint)
+								(p_uniform_id, p_value, hint)
 								</div>
 							</td>
 							
@@ -483,29 +391,7 @@
 								
 								
 								<b><a href="../symbols/vxlProgramManager.html#setUniforms">setUniforms</a></b>
-								(an)
-								</div>
-							</td>
-							
-						</tr>
-					
-						<tr>
-							<td class="attributes">
-							    <div class="fixedFont">&nbsp;
-							</div></td>
-							
-							<td class="returns">
-							
-							      <span>void</span>   
-							    
-							</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								
-								
-								
-								<b><a href="../symbols/vxlProgramManager.html#useProgram">useProgram</a></b>
-								(ID)
+								(p_dictionary)
 								</div>
 							</td>
 							
@@ -534,7 +420,7 @@
 				</div>
 
 				<div class="description">
-					<p>Presents a simple interface to communicate with a ESSL (GLSL) programThis class is responsible for creating, compiling and linking any ESSL program.It also has methods to query and set uniforms and attributes belonging to the programthat is being currently executed in the GPU</P><p>a vxlProgramManager maintains a database of the programs that have been linked to the GPU. This way, program switching is easier as it is not necessary to go through the compilation and linking process every time</p>
+					<p>Presents a simple interface to communicate with a ESSL (GLSL) programThis class is responsible for creating, compiling and linking any ESSL program.It also has methods to query and set uniforms and attributes belonging to the programthat is being currently executed in the GPU</P><p>a vxlProgramManager maintains a database of the programs that have been linked to the GPU. This way, program switching is easier as it is not necessary to go through the compilation and linking process every timeThe program manager is available through the <code>pm</code> attribute  of vxlEngine</p>
 					
 				</div>
 
@@ -785,118 +671,6 @@
 				</div>	
 				
 				<div class='methodDetail'>
-					<a name="isLoaded"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>isLoaded</b>(ID)
-					</div>
-					</div>
-					<div class="description">
-						Verifies if a program is loaded
-						
-						
-					</div>
-
-					
-
-						
-							<p class="heading">Parameters:</p>
-							<table class="paramTable">
-							
-							<tr><td>
-									<span class="light fixedFont">{String}</span> 
-								</td>
-								<td>
-									<code>ID</code>
-								</td>	
-								<td><p>the program id
-								
-								</p>
-								</td>
-							</tr>	
-							
-							</table>
-						
-						
-						
-						
-						
-							<p class="heading">Returns:</p>
-							<table class="paramTable">
-							
-								<tr>
-								<td>true if the program is loaded, false otherwise</td></tr>
-							
-							</table>							
-						
-						
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="isRegistered"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>isRegistered</b>(ID)
-					</div>
-					</div>
-					<div class="description">
-						Verifies whether a program is loaded in the database or not
-						
-						
-					</div>
-
-					
-
-						
-							<p class="heading">Parameters:</p>
-							<table class="paramTable">
-							
-							<tr><td>
-									<span class="light fixedFont">{String}</span> 
-								</td>
-								<td>
-									<code>ID</code>
-								</td>	
-								<td><p>program id
-								
-								</p>
-								</td>
-							</tr>	
-							
-							</table>
-						
-						
-						
-						
-						
-							<p class="heading">Returns:</p>
-							<table class="paramTable">
-							
-								<tr>
-								<td>true if the program is registered, false otherwise</td></tr>
-							
-							</table>							
-						
-						
-						
-				</div>	
-				
-				<div class='methodDetail'>
 					<a name="loadDefaults"> </a>
 					<div class="title">
 					<div class="fixedFont">
@@ -918,102 +692,6 @@
 
 					
 
-						
-						
-						
-						
-						
-						
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="loadProgram"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>loadProgram</b>(ID)
-					</div>
-					</div>
-					<div class="description">
-						Loads a program
-						
-						
-					</div>
-
-					
-
-						
-							<p class="heading">Parameters:</p>
-							<table class="paramTable">
-							
-							<tr><td>
-									<span class="light fixedFont">{String}</span> 
-								</td>
-								<td>
-									<code>ID</code>
-								</td>	
-								<td><p>the id of the program to load
-								
-								</p>
-								</td>
-							</tr>	
-							
-							</table>
-						
-						
-						
-						
-						
-						
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="register"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>register</b>(the)
-					</div>
-					</div>
-					<div class="description">
-						Register a program in the database
-						
-						
-					</div>
-
-					
-
-						
-							<p class="heading">Parameters:</p>
-							<table class="paramTable">
-							
-							<tr><td>
-									<span class="light fixedFont">{JSON}</span> 
-								</td>
-								<td>
-									<code>the</code>
-								</td>	
-								<td><p>program to register
-								
-								</p>
-								</td>
-							</tr>	
-							
-							</table>
 						
 						
 						
@@ -1214,7 +892,7 @@
 					
 					
 					
-					  <b>setUniform</b>(uniform, the, hint)
+					  <b>setUniform</b>(p_uniform_id, p_value, hint)
 					</div>
 					</div>
 					<div class="description">
@@ -1233,7 +911,7 @@
 									<span class="light fixedFont">{String}</span> 
 								</td>
 								<td>
-									<code>uniform</code>
+									<code>p_uniform_id</code>
 								</td>	
 								<td><p>name
 								
@@ -1245,9 +923,9 @@
 									<span class="light fixedFont">{Object}</span> 
 								</td>
 								<td>
-									<code>the</code>
+									<code>p_value</code>
 								</td>	
-								<td><p>value
+								<td><p>the uniform value
 								
 								</p>
 								</td>
@@ -1286,7 +964,7 @@
 					
 					
 					
-					  <b>setUniforms</b>(an)
+					  <b>setUniforms</b>(p_dictionary)
 					</div>
 					</div>
 					<div class="description">
@@ -1305,9 +983,9 @@
 									<span class="light fixedFont">{Object}</span> 
 								</td>
 								<td>
-									<code>an</code>
+									<code>p_dictionary</code>
 								</td>	
-								<td><p>object containing uniform names and values. Every property of this objectwill be considered a uniform
+								<td><p>an object containing uniform names and values. Every property of this objectwill be considered a uniform
 								
 								</p>
 								</td>
@@ -1320,59 +998,6 @@
 						
 						
 						
-						
-				</div>	
-				
-				<div class='methodDetail'>
-					<a name="useProgram"> </a>
-					<div class="title">
-					<div class="fixedFont">
-
-					
-					
-					 	<span>void</span> 
-					
-					
-					
-					  <b>useProgram</b>(ID)
-					</div>
-					</div>
-					<div class="description">
-						Uses a program from the database.If you are not sure if the program you want to use is in the database then call vxlRenderer.setProgram instead
-						
-						
-					</div>
-
-					
-
-						
-							<p class="heading">Parameters:</p>
-							<table class="paramTable">
-							
-							<tr><td>
-									<span class="light fixedFont">{String}</span> 
-								</td>
-								<td>
-									<code>ID</code>
-								</td>	
-								<td><p>the program id
-								
-								</p>
-								</td>
-							</tr>	
-							
-							</table>
-						
-						
-						
-						
-						
-						
-						
-							<p class="heading">See:</p>
-							
-								<span><a href="../symbols/vxlRenderer.html#setProgram">vxlRenderer#setProgram</a></span>
-							
 						
 				</div>	
 				
@@ -1388,7 +1013,7 @@
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Mar 21 2014 21:08:17 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Mar 30 2014 03:31:57 GMT-0400 (EDT)
 		</div>
         </div>
         </div>

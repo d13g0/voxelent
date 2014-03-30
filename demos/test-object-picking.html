@@ -9,7 +9,7 @@
 <link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
 <script src="lib/jquery.js"     type="text/javascript"></script>
 <script src="lib/jquery-ui.js"  type="text/javascript"> </script>
-<script type='text/javascript'  src='lib/voxelent_v0.89.9.js'> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.0.js'> </script>
 
 <title>Voxelent - Object Picking Test</title>
 
@@ -60,7 +60,7 @@ function handleEvent(event){
     cam.setType(vxl.def.camera.type.ORBITING);
     cam.longShot();
     cam.setAzimuth(15);
-    cam.setElevation(-15);
+    cam.setElevation(15);
    
 
     vxl.api.floorON(60,5);
@@ -92,6 +92,10 @@ document.onkeypress = function(e){
             console.info('picker interactor active');
         }    
     }
+    
+    if (charCode == 98){
+	    	vxl.c.view.renderer.engine._debug_picking_flag = !vxl.c.view.renderer.engine._debug_picking_flag;
+	    }
 };
 
 

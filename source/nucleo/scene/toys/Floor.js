@@ -16,7 +16,7 @@
 
 
 vxl.def.model.floor = new vxlModel();
-vxl.def.model.floor.load('floor',{"vertices":[],"indices":[],"color":[1.0,1.0,1.0,1.0],"shading": false});
+vxl.def.model.floor.load('floor',{"vertices":[],"indices":[],"color":[0.6,0.6,0.6,1.0],"shading": false});
 
 vxlFloor.prototype = new vxlActor();
 vxlFloor.prototype.constructor = vxlFloor;
@@ -69,6 +69,7 @@ vxlFloor.prototype.setGrid =function(dimension, spacing){
     this.model.vertices = v.slice(0);
     this.model.wireframe = i.slice(0);
     this.visible = true;
+    this.reallocate();
 };
 
 

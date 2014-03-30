@@ -22,41 +22,33 @@
  * 
  * <p>a vxlProgramManager maintains a database of the programs that have been linked to the GPU. 
  * This way, program switching is easier as it is not necessary to go through the 
- * compilation and linking process every time</p>
+ * compilation and linking process every time
+ * 
+ * The program manager is available through the <code>pm</code> attribute  of vxlEngine
+ * </p>
  * @class
  * @constructor
  */
 function vxlProgramManager (gl) {
-    this._gl                = gl;
-    this._codebase          = {};
-
-    this._program           = {};
-    this._attributeList     = {};
-    this._enabledAttributes = [];
-    this._uniformList       = {};
-    this._uniformType       = {};
-
-    this._uniform_cache     = {};
     
-    this._essl     =  null;
-    this._currentProgramID        = "";
-    this._currentUniformLocation  = {};
-    this._defaults         = [];
-    this._oneTimeWarning  = false;
-};
-
-
-/**
- * Register a program in the database
- * @param {JSON} the program to register
- */
-vxlProgramManager.prototype.register = function(program){
-	/*@TODO: this method receives a JSON Object we could instead
-	 * receive a text file and parse it into JSON. This would make
-	 * the writing of shaders much easier.
-	 */
-	vxl.go.console('Registering program '+ program.ID);
-    this._codebase[program.ID] = program;
+    this._gl                     = gl;
+    this._registered_programs    = {};
+    this._programs        = {};
+    
+    this._attribute_map          = {};
+    this._enabled_attribute_list = [];
+    
+    this._uniform_map            = {};
+    this._uniform_types          = {};
+    this._uniform_cache          = {};
+    
+    this._current_program_object   =  null;
+    this._current_program_ID       = undefined;
+    this._curr_uniform_loc_map     = {};
+    
+    this._defaults                 = [];
+    this._one_time_warning         = false;
+    this._program_enforced         = false; 
 };
 
 /**
@@ -64,45 +56,21 @@ vxlProgramManager.prototype.register = function(program){
  * @param {String} ID program id
  * @returns true if the program is registered, false otherwise
  */
-vxlProgramManager.prototype.isRegistered = function(ID){
-	return (this._codebase[ID] != undefined);
+vxlProgramManager.prototype._isProgramRegistered = function(ID){
+    return (this._registered_programs[ID] != undefined);
 };
 
 /**
- * Loads a program
- * @param {String} ID the id of the program to load
+ * Register a program in the database
+ * @param {JSON} the program to register
  */
-vxlProgramManager.prototype.loadProgram = function(ID){
-    
-    var code = this._codebase[ID];
-    
-    var gl   = this._gl;
-    var esslProgram  = gl.createProgram();
-    
-    
-    if (code.VERTEX_SHADER){
-        var vs = this._createShader(vxl.def.essl.VERTEX_SHADER,code.VERTEX_SHADER);
-        gl.attachShader(esslProgram, vs);
-    }
-    
-    if (code.FRAGMENT_SHADER){
-        var fs = this._createShader(vxl.def.essl.FRAGMENT_SHADER,code.FRAGMENT_SHADER);
-        gl.attachShader(esslProgram, fs);
-    }
-    
-    //fix for version 0.89.2 Making sure that the vertex array is ALWAYS the attribute with location 0
-    gl.bindAttribLocation(esslProgram, 0 , vxl.def.essl.VERTEX_ATTRIBUTE);
-    
-    gl.linkProgram(esslProgram);
-     
-    if (!gl.getProgramParameter(esslProgram, gl.LINK_STATUS)) {
-        
-        alert(ID+":\n\n "+gl.getProgramInfoLog(esslProgram));
-        throw("Error linking program "+ID+":\n\n "+gl.getProgramInfoLog(esslProgram));
-    }
-    
-    this._program[ID] = esslProgram;
-  
+vxlProgramManager.prototype._registerProgram = function(program){
+	/*@TODO: this method receives a JSON Object we could instead
+	 * receive a text file and parse it into JSON. This would make
+	 * the writing of shaders much easier.
+	 */
+	vxl.go.console('Registering program '+ program.ID);
+    this._registered_programs[program.ID] = program;
 };
 
 /**
@@ -110,9 +78,58 @@ vxlProgramManager.prototype.loadProgram = function(ID){
  * @param {String} ID the program id
  * @returns true if the program is loaded, false otherwise
  */
-vxlProgramManager.prototype.isLoaded = function(ID){
-    return (this._program[ID] != undefined);
+vxlProgramManager.prototype._isProgramCreated = function(ID){
+    return (this._programs[ID] != undefined);
 };
+
+/**
+ * Loads a program
+ * @param {String} ID the id of the program to load
+ */
+vxlProgramManager.prototype._createProgramObject = function(ID){
+    
+    if (this._isProgramCreated(ID)){
+        return;
+    }
+    
+    var code = this._registered_programs[ID];
+    
+    if (code == undefined){
+        var message = 'vxlProgramManager.loadProgram WARN: '/
+        ' The program '+ID+' must be registered first!'
+        console.warn(message);
+        return;
+    }
+    
+    var gl   = this._gl;
+    var prg  = gl.createProgram();
+    var essl = vxl.def.essl;
+    
+    if (code.VERTEX_SHADER){
+        var vs = this._createShader(essl.VERTEX_SHADER,code.VERTEX_SHADER);
+        gl.attachShader(prg, vs);
+    }
+    
+    if (code.FRAGMENT_SHADER){
+        var fs = this._createShader(essl.FRAGMENT_SHADER,code.FRAGMENT_SHADER);
+        gl.attachShader(prg, fs);
+    }
+    
+    //fix for version 0.89.2 Making sure that the vertex array is ALWAYS the attribute with location 0
+    gl.bindAttribLocation(prg, 0 , essl.VERTEX_ATTRIBUTE);
+    
+    gl.linkProgram(prg);
+     
+    if (!gl.getProgramParameter(prg, gl.LINK_STATUS)) {
+        
+        alert(ID+":\n\n "+gl.getProgramInfoLog(prg));
+        throw("Error linking program "+ID+":\n\n "+gl.getProgramInfoLog(prg));
+    }
+    
+    this._programs[ID] = prg;
+  
+};
+
 
 /**
  * Uses a program from the database.
@@ -123,31 +140,80 @@ vxlProgramManager.prototype.isLoaded = function(ID){
 vxlProgramManager.prototype.useProgram = function(ID){
 
     var gl = this._gl;
-    var esslProgram = this._program[ID];
+    var prg = this._programs[ID];
     
-    if (esslProgram != undefined && esslProgram != null){
+    if (prg != undefined && prg != null){
         
-        if (esslProgram == this._essl) return;
+        if (prg == this._current_program_object) return; //don't change if current
         
         //gl.linkProgram(esslProgram);
-        gl.useProgram (esslProgram);
+        gl.useProgram (prg);
         
-        this._essl = esslProgram;
-        this._currentProgramID = ID;
+        this._current_program_object = prg;
+        this._current_program_ID = ID;
         this._parseUniforms();
-        this._oneTimeWarning  = false;
+        this._one_time_warning  = false;
     }
     else{
         alert("Program: the program " + ID + " has NOT been loaded");
     }
 };
 
+vxlProgramManager.prototype.releaseProgram = function(){
+     this._enforce = false;
+};
+
+/**
+ * Tries to add a new program definition to this renderer
+ * @param {vxlProgram} p_program an instance of a vxlProgram object or one of its descendants
+ */
+vxlProgramManager.prototype.setProgram = function(p_program, p_force_it){
+    
+    var instance = undefined;
+    //Create a new instance
+    if (typeof p_program == 'function'){
+        instance  = new p_program();
+    }
+    //Use this instance
+    else if (typeof p_program == 'object'){
+        instance = p_program;
+    }
+    else{
+        console.error('vxlProgramManager.setProgram ERROR: '+p_program+' is not an engine');
+        return;
+    }
+    
+    
+    if (this._enforce && instance.ID != this._current_program_id){
+        var message = 'vxlProgramManager.setProgram WARN: '/
+        'Unable to set the program '+instance.ID+'.\n'/
+        'The current program ['+instance.ID+ '] is being enforced\n'/
+        'Please use releaseProgram first.'
+        console.warn(message);
+        return;
+    }
+    
+    this._program_enforced = (p_force_it != undefined && p_force_it == true);
+    //register
+    if (!this._isProgramRegistered(instance.ID)){ this._registerProgram(instance);        }
+    
+    //create
+    if (!this._isProgramCreated(instance.ID)) { this._createProgramObject(instance.ID); }
+    
+    //use
+    this.useProgram(instance.ID);
+    this.loadDefaults();
+};
+
+
+
+
     
 /**
  * Loads the uniform defaults for the current program
  */
 vxlProgramManager.prototype.loadDefaults = function(){
-    var code = this._codebase[this._currentProgramID];
+    var code = this._registered_programs[this._current_program_ID];
    
     if ('DEFAULTS' in code){
     
@@ -159,7 +225,7 @@ vxlProgramManager.prototype.loadDefaults = function(){
         }
     }
     //overriding defaults
-    var defaults = this._defaults[this._currentProgramID];
+    var defaults = this._defaults[this._current_program_ID];
     if (defaults != undefined){
   
         for (var u in defaults){
@@ -181,7 +247,7 @@ vxlProgramManager.prototype.setDefault = function(programID, uniformName, value)
     this._defaults[programID][uniformName] = value;
     
     //Overriding behaviour
-    if (programID == this._currentProgramID){
+    if (programID == this._current_program_ID){
         this.setUniform(uniformName, value);
     }
 };
@@ -201,39 +267,39 @@ vxlProgramManager.prototype.getDefault = function(programID, uniformName){
 
 /**
  * Sets all the uniforms defined by the object obj
- * @param {Object} an object containing uniform names and values. Every property of this object
+ * @param {Object} p_dictionary an object containing uniform names and values. Every property of this object
  * will be considered a uniform
  */
-vxlProgramManager.prototype.setUniforms = function(obj){
-	for(uni in obj){
-		this.setUniform(uni,obj[uni]);
+vxlProgramManager.prototype.setUniforms = function(p_dictionary){
+	for(key in p_dictionary){
+		this.setUniform(key,p_dictionary[key]);
 	}
 };
 
 /**
  * Sets a uniform.
  * Uses polymorphism to make the programmers life happier
- * @param {String} uniform name
- * @param {Object} the value
+ * @param {String} p_uniform_id name
+ * @param {Object} p_value the uniform value 
  */
-vxlProgramManager.prototype.setUniform = function(uniformID, value, hint){
-    
-    var webGLProgram 		= this._essl;
-    var uniformList 		= this._uniformList[this._currentProgramID];
-    var uniformLoc  		= this._currentUniformLocation;
+vxlProgramManager.prototype.setUniform = function(p_uniform_id, p_value, hint){
+    var gl                  = this._gl;
+    var prg          		= this._current_program_object;
+    var uniform_map   		= this._uniform_map[this._current_program_ID];
+    var uniform_loc  		= this._curr_uniform_loc_map;
     var uniform_cache 		= this._uniform_cache;
     
-    if (uniformList.hasObject(uniformID)){
-        uniformLoc[uniformID] = this._gl.getUniformLocation(webGLProgram,uniformID);
+    if (uniform_map.hasObject(p_uniform_id)){
+        uniform_loc[p_uniform_id] = gl.getUniformLocation(prg,p_uniform_id);
         
     }
     else{
-    	throw('Program: the uniform '+uniformID+' is not defined for the program '+this._currentProgramID);
+    	console.warn('vxlProgramManager.setUniform: the uniform '+p_uniform_id+' is not defined for the program '+this._current_program_ID);
         return;
     }
     
-    uniform_cache[uniformID] = value;
-    this._setPolymorphicUniform(uniformID, uniformLoc[uniformID], value, hint);
+    uniform_cache[p_uniform_id] = p_value;
+    this._setPolymorphicUniform(p_uniform_id, uniform_loc[p_uniform_id], p_value, hint);
 };
 
 /**
@@ -242,7 +308,7 @@ vxlProgramManager.prototype.setUniform = function(uniformID, value, hint){
  */
 vxlProgramManager.prototype.getUniform = function(uniformID){
     //TODO: Think about this
-    //if(!(name in this._uniformList)){
+    //if(!(name in this._uniform_map)){
       //  alert('Program: the uniform ' + name + ' has not been set');
         //return null;
    //}
@@ -266,11 +332,11 @@ vxlProgramManager.prototype.setAttributePointer = function(name, numElements, ty
  */
 vxlProgramManager.prototype.enableAttribute = function(name){
     
-   if (this._enabledAttributes.indexOf(name) != -1) return; //Speeds up
+   if (this._enabled_attribute_list.indexOf(name) != -1) return; //Speeds up
      
    var a = this._getAttributeLocation(name);
    this._gl.enableVertexAttribArray(a);
-   this._enabledAttributes.push(name);
+   this._enabled_attribute_list.push(name);
 };
 
 /**
@@ -280,11 +346,11 @@ vxlProgramManager.prototype.enableAttribute = function(name){
  */
 vxlProgramManager.prototype.disableAttribute = function(name){
     
-    var idx = this._enabledAttributes.indexOf(name); 
+    var idx = this._enabled_attribute_list.indexOf(name); 
     if (idx != -1) { //so it is enabled
         var a = this._getAttributeLocation(name);
         this._gl.disableVertexAttribArray(a);
-        this._enabledAttributes.splice(idx,1);
+        this._enabled_attribute_list.splice(idx,1);
     }
 };
 
@@ -328,11 +394,11 @@ vxlProgramManager.prototype._createShader = function(type,code){
  */
 vxlProgramManager.prototype._parseUniforms = function(id){
     
-    vs = this._codebase[this._currentProgramID].VERTEX_SHADER;
-    fs = this._codebase[this._currentProgramID].FRAGMENT_SHADER;
+    vs = this._registered_programs[this._current_program_ID].VERTEX_SHADER;
+    fs = this._registered_programs[this._current_program_ID].FRAGMENT_SHADER;
     /*@TODO: look for a way to retrieve uNames directly from the parsing of the shaders
     this should simplify the structure of the JSON file representing the program*/
-    uNames = this._codebase[this._currentProgramID].UNIFORMS;
+    uNames = this._registered_programs[this._current_program_ID].UNIFORMS;
     
     uTypes = {};
     
@@ -350,13 +416,13 @@ vxlProgramManager.prototype._parseUniforms = function(id){
         }
         
         else{
-            alert('Program: In the program '+this._currentProgramID+' the uniform '+uniformID+' is listed but not used');
+            alert('Program: In the program '+this._current_program_ID+' the uniform '+uniformID+' is listed but not used');
         }
     }
     
     
-    this._uniformList[this._currentProgramID] = uNames;
-    this._uniformType[this._currentProgramID] = uTypes; 
+    this._uniform_map[this._current_program_ID] = uNames;
+    this._uniform_types[this._current_program_ID] = uTypes; 
 };
 
 /**
@@ -366,12 +432,23 @@ vxlProgramManager.prototype._parseUniforms = function(id){
  * @private
  */
 vxlProgramManager.prototype._getAttributeLocation = function(name){
-
-    if(!(name in this._attributeList)){
-        this._attributeList[name] = this._gl.getAttribLocation(this._essl,name);
+    var aLoc = undefined;
+    
+    if (name in this._attribute_map){
+        return this._attribute_map[name];
     }
-
-    return this._attributeList[name];
+    
+    else{
+        aloc = this._gl.getAttribLocation(this._current_program_object,name);
+        if (aloc == -1){
+            console.error('vxlProgramManager._getAttributeLocation ERROR: the attribute '+name+''+
+            'could not be located');
+            return;
+        }
+        this._attribute_map[name] = aloc;
+        return aloc;
+     }
+    
 };
 
 /**
@@ -389,7 +466,7 @@ vxlProgramManager.prototype._setPolymorphicUniform = function(uniformID, locatio
 	//hint allows better casting of int and float values. If not specified default is float
     
     var gl = this._gl;
-    var glslType = this._uniformType[this._currentProgramID][uniformID];
+    var glslType = this._uniform_types[this._current_program_ID][uniformID];
     
     if (glslType == 'bool'){
     	//if (typeof value != 'boolean') { 
@@ -426,9 +503,9 @@ vxlProgramManager.prototype._setPolymorphicUniform = function(uniformID, locatio
          
         if (value.length == 3 && glslType == 'vec4'){
              value[3] = 1.0;
-             if (!this._oneTimeWarning){
+             if (!this._one_time_warning){
                  alert('The uniform '+uniformID+' has only 3 components but voxelent needs 4. This is a one time warning');
-                 this._oneTimeWarning = true;
+                 this._one_time_warning = true;
              }
         }
         

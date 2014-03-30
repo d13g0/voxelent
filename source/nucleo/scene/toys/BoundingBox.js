@@ -60,6 +60,7 @@ vxlBoundingBox.prototype.setBoundingBox = function(b){
 		];
         
     this.model.vertices = this.bb;
+    this.reallocate();
 };
 
 

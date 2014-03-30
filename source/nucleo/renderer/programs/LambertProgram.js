@@ -34,7 +34,6 @@ function vxlLambertProgram(){
         "uniform float uPointSize;",
         "uniform mat4 mModelView;",
         "uniform mat4 mPerspective;",
-        "uniform mat4 mModelViewPerspective;",
         "uniform mat4 mNormal;",
         "uniform vec3 uLightDirection;",
         "uniform vec4 uLightAmbient;",  
@@ -48,9 +47,8 @@ function vxlLambertProgram(){
         "varying vec2 vTextureCoords;",
         
         "void main(void) {",
-        "   gl_Position = mModelViewPerspective * vec4(aVertexPosition, 1.0);",
+        "   gl_Position = mPerspective * mModelView * vec4(aVertexPosition, 1.0);",
         "   gl_PointSize = uPointSize;",
-        
         "   if (uUseVertexColors) {",
         "       vFinalColor = vec4(aVertexColor,uMaterialDiffuse.a);",
         "   }",
@@ -58,7 +56,7 @@ function vxlLambertProgram(){
         "       vFinalColor = uMaterialDiffuse;",
         "   }",
         "   if (uUseShading){",
-        "       vec3 N = vec3(mNormal * vec4(aVertexNormal, 1.0));",
+        "       vec3 N = normalize(vec3(mNormal * vec4(aVertexNormal, 1.0)));",
         "       vec3 L = normalize(uLightDirection);",
         "       if (uUseLightTranslation){ L = vec3(mNormal * vec4(L,1.0));}",
         "       float lambertTerm = max(dot(N,-L),0.4);",

@@ -157,7 +157,8 @@ vxlRenderable.prototype._processMesh = function(model,task){
  */
 vxlRenderable.prototype._reindex = function(indices){
     var min = indices.min();
-    for(var i=0, N = indices.length; i<N;i+=1){
+    var i = indices.length;
+    while(i--){
         indices[i] = indices[i] - min;
     }
     return indices;

@@ -701,8 +701,8 @@
 <span class='line'>694</span>   * @param{vxlEngine} engine (optional) the engine that the renderer should use to communicate with the program. T
 <span class='line'>695</span>   *                        
 <span class='line'>696</span>   */</span><span class="WHIT">
-<span class='line'>697</span> </span><span class="WHIT"> </span><span class="NAME">setProgram</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">view</span><span class="PUNC">,</span><span class="NAME">program</span><span class="PUNC">,</span><span class="NAME">engine</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>698</span> </span><span class="WHIT">    </span><span class="NAME">view.renderer.setProgram</span><span class="PUNC">(</span><span class="NAME">program</span><span class="PUNC">,</span><span class="NAME">engine</span><span class="PUNC">,</span><span class="KEYW">true</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>697</span> </span><span class="WHIT"> </span><span class="NAME">setProgram</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT">  </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">view</span><span class="PUNC">,</span><span class="NAME">program</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>698</span> </span><span class="WHIT">    </span><span class="NAME">view.renderer.engine.pm.setProgram</span><span class="PUNC">(</span><span class="NAME">program</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>699</span> </span><span class="WHIT">    </span><span class="WHIT">
 <span class='line'>700</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>701</span> </span><span class="WHIT"> </span><span class="WHIT">
@@ -711,7 +711,7 @@
 <span class='line'>704</span>   * @param{vxlView} view
 <span class='line'>705</span>   */</span><span class="WHIT">
 <span class='line'>706</span> </span><span class="WHIT"> </span><span class="NAME">releaseProgram</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">view</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>707</span> </span><span class="WHIT">     </span><span class="NAME">view.renderer.releaseProgram</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>707</span> </span><span class="WHIT">     </span><span class="NAME">view.renderer.engine.pm.releaseProgram</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>708</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>709</span> </span><span class="WHIT"> </span><span class="COMM">/**
 <span class='line'>710</span>   * Returns the name of the current program
@@ -725,24 +725,24 @@
 <span class='line'>718</span> </span><span class="WHIT">     </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">view</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'>719</span> </span><span class="WHIT">         </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">'vxl.api.getProgram: please indicate a view'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>720</span> </span><span class="WHIT">     </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>721</span> </span><span class="WHIT">     </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">view.renderer.pm._currentProgramID</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>721</span> </span><span class="WHIT">     </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">view.renderer.engine.pm._current_program_ID</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>722</span> </span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>723</span> </span><span class="WHIT"> </span><span class="COMM">/**
 <span class='line'>724</span>   * Sets the default value for an uniform
 <span class='line'>725</span>   */</span><span class="WHIT">
 <span class='line'>726</span> </span><span class="WHIT">  </span><span class="NAME">setUniformDefault</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">programID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">uniformID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>727</span> </span><span class="WHIT">      </span><span class="NAME">vxl.c.view.renderer.pm.setDefault</span><span class="PUNC">(</span><span class="NAME">programID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">uniformID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>727</span> </span><span class="WHIT">      </span><span class="NAME">vxl.c.view.renderer.engine.pm.setDefault</span><span class="PUNC">(</span><span class="NAME">programID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">uniformID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">)</span><span class="WHIT">
 <span class='line'>728</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>729</span> </span><span class="WHIT">  </span><span class="WHIT">
 <span class='line'>730</span> </span><span class="WHIT">  </span><span class="NAME">setUniform</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">uniformID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>731</span> </span><span class="WHIT">      </span><span class="NAME">vxl.c.view.renderer.pm.setUniform</span><span class="PUNC">(</span><span class="NAME">uniformID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>731</span> </span><span class="WHIT">      </span><span class="NAME">vxl.c.view.renderer.engine.pm.setUniform</span><span class="PUNC">(</span><span class="NAME">uniformID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">)</span><span class="WHIT">
 <span class='line'>732</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>733</span> </span><span class="WHIT">  </span><span class="WHIT">
 <span class='line'>734</span> </span><span class="WHIT">  </span><span class="COMM">/**
 <span class='line'>735</span>    * Gets the default value for an uniform 
 <span class='line'>736</span>    */</span><span class="WHIT">
 <span class='line'>737</span> </span><span class="WHIT">  </span><span class="NAME">getUniformDefault</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">programID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">uniformID</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>738</span> </span><span class="WHIT">      </span><span class="NAME">vxl.c.view.renderer.pm.getDefault</span><span class="PUNC">(</span><span class="NAME">programID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">uniformID</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>738</span> </span><span class="WHIT">      </span><span class="NAME">vxl.c.view.renderer.engine.pm.getDefault</span><span class="PUNC">(</span><span class="NAME">programID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">uniformID</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>739</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>740</span> </span><span class="WHIT">  </span><span class="WHIT">
 <span class='line'>741</span> </span><span class="WHIT">  </span><span class="COMM">/**
