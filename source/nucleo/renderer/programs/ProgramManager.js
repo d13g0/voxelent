@@ -35,18 +35,19 @@ function vxlProgramManager (gl) {
     this._registered_programs    = {};
     this._programs        = {};
     
-    this._attribute_map          = {};
-    this._enabled_attribute_list = [];
     
     this._uniform_map            = {};
     this._uniform_types          = {};
-    this._uniform_cache          = {};
+    
     
     this._current_program_object   =  null;
     this._current_program_ID       = undefined;
     this._curr_uniform_loc_map     = {};
-    
+    this._curr_uniform_cache       = {};
+    this._curr_attribute_loc_map       = {};
+    this._enabled_attribute_list   = [];
     this._defaults                 = [];
+ 
     this._one_time_warning         = false;
     this._program_enforced         = false; 
 };
@@ -185,10 +186,10 @@ vxlProgramManager.prototype.setProgram = function(p_program, p_force_it){
     
     
     if (this._enforce && instance.ID != this._current_program_id){
-        var message = 'vxlProgramManager.setProgram WARN: '/
-        'Unable to set the program '+instance.ID+'.\n'/
-        'The current program ['+instance.ID+ '] is being enforced\n'/
-        'Please use releaseProgram first.'
+        var message = 'vxlProgramManager.setProgram WARN: '+
+        'Unable to set the program '+instance.ID+'.\n'+
+        'The current program ['+instance.ID+ '] is being enforced\n'+
+        'Please use releaseProgram first.';
         console.warn(message);
         return;
     }
@@ -202,10 +203,16 @@ vxlProgramManager.prototype.setProgram = function(p_program, p_force_it){
     
     //use
     this.useProgram(instance.ID);
+    this.clearCache();  //@TODO: what happens when we switch programs back and forth?
     this.loadDefaults();
+    
 };
 
-
+vxlProgramManager.prototype.clearCache = function(){
+    this._curr_uniform_cache = {};
+    this._curr_uniform_loc_map ={};
+    this._curr_attribute_loc_map = {};
+};
 
 
     
@@ -229,7 +236,7 @@ vxlProgramManager.prototype.loadDefaults = function(){
     if (defaults != undefined){
   
         for (var u in defaults){
-            this.setUniform(u,defaults[u])
+            this.setUniform(u,defaults[u]);
         }
     }
    
@@ -241,7 +248,7 @@ vxlProgramManager.prototype.loadDefaults = function(){
 vxlProgramManager.prototype.setDefault = function(programID, uniformName, value){
     
     if (this._defaults[programID] == undefined){
-        this._defaults[programID] = {}
+        this._defaults[programID] = {};
     }
   
     this._defaults[programID][uniformName] = value;
@@ -277,7 +284,8 @@ vxlProgramManager.prototype.setUniforms = function(p_dictionary){
 };
 
 /**
- * Sets a uniform.
+ * Sets a uniform. Caches the uniform location.
+ * 
  * Uses polymorphism to make the programmers life happier
  * @param {String} p_uniform_id name
  * @param {Object} p_value the uniform value 
@@ -285,21 +293,31 @@ vxlProgramManager.prototype.setUniforms = function(p_dictionary){
 vxlProgramManager.prototype.setUniform = function(p_uniform_id, p_value, hint){
     var gl                  = this._gl;
     var prg          		= this._current_program_object;
-    var uniform_map   		= this._uniform_map[this._current_program_ID];
-    var uniform_loc  		= this._curr_uniform_loc_map;
-    var uniform_cache 		= this._uniform_cache;
+    var uniform_list  		= this._uniform_map[this._current_program_ID];
+    var uniform_loc_map	    = this._curr_uniform_loc_map;
+    var uniform_cache 		= this._curr_uniform_cache;
+    var loc                 = undefined;
     
-    if (uniform_map.hasObject(p_uniform_id)){
-        uniform_loc[p_uniform_id] = gl.getUniformLocation(prg,p_uniform_id);
+    if (uniform_list.indexOf(p_uniform_id)){
+        loc = uniform_loc_map[p_uniform_id];
+        if (loc == undefined){
+            loc = gl.getUniformLocation(prg,p_uniform_id);  
+            uniform_loc_map[p_uniform_id] = loc;     
+        }
         
+        cached_value = uniform_cache[p_uniform_id];
+        
+        if (cached_value == p_value ) return; //@TODO: this does not catch all cases (i.e. mat4, vec3)
+        
+        uniform_cache[p_uniform_id] = p_value;
+        this._setPolymorphicUniform(p_uniform_id, loc, p_value, hint);
     }
     else{
     	console.warn('vxlProgramManager.setUniform: the uniform '+p_uniform_id+' is not defined for the program '+this._current_program_ID);
-        return;
+        
     }
     
-    uniform_cache[p_uniform_id] = p_value;
-    this._setPolymorphicUniform(p_uniform_id, uniform_loc[p_uniform_id], p_value, hint);
+    
 };
 
 /**
@@ -312,7 +330,7 @@ vxlProgramManager.prototype.getUniform = function(uniformID){
       //  alert('Program: the uniform ' + name + ' has not been set');
         //return null;
    //}
-    return this._uniform_cache[uniformID];
+    return this._curr_uniform_cache[uniformID];
 };
 
 /**
@@ -345,11 +363,11 @@ vxlProgramManager.prototype.enableAttribute = function(name){
  * 
  */
 vxlProgramManager.prototype.disableAttribute = function(name){
-    
-    var idx = this._enabled_attribute_list.indexOf(name); 
-    if (idx != -1) { //so it is enabled
-        var a = this._getAttributeLocation(name);
-        this._gl.disableVertexAttribArray(a);
+    if (name == undefined) return; //@TODO: WARNING?
+    var idx = this._enabled_attribute_list.indexOf(name);
+    if ( idx>=0){
+        var loc = this._getAttributeLocation(name);
+        this._gl.disableVertexAttribArray(loc);
         this._enabled_attribute_list.splice(idx,1);
     }
 };
@@ -432,23 +450,20 @@ vxlProgramManager.prototype._parseUniforms = function(id){
  * @private
  */
 vxlProgramManager.prototype._getAttributeLocation = function(name){
-    var aLoc = undefined;
     
-    if (name in this._attribute_map){
-        return this._attribute_map[name];
+    var loc = this._curr_attribute_loc_map[name];
+    if (loc != undefined) return loc;
+     
+    loc = this._gl.getAttribLocation(this._current_program_object,name);
+    if (loc == -1){
+        console.error('vxlProgramManager._getAttributeLocation ERROR: the attribute '+name+''+
+        'could not be located');
+        loc = undefined;
     }
-    
     else{
-        aloc = this._gl.getAttribLocation(this._current_program_object,name);
-        if (aloc == -1){
-            console.error('vxlProgramManager._getAttributeLocation ERROR: the attribute '+name+''+
-            'could not be located');
-            return;
-        }
-        this._attribute_map[name] = aloc;
-        return aloc;
+        this._curr_attribute_loc_map[name] = loc;
      }
-    
+    return loc;
 };
 
 /**

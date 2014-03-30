@@ -35,11 +35,12 @@ function handleEvent(event, source){
         var monkey_model = source.getModelByName('suzzane');
         var monkey_actor = new vxlActor(monkey_model);
         scene.addActor(monkey_actor);
-        var SCALE = 1000;
+        var SCALE = 2000;
         var i = SCALE;
         while(i--){
             
             var actor = monkey_actor.clone();
+            actor._bb_disabled = true;
             actor.setPosition(Math.random() * SCALE/10,
                              Math.random() * SCALE/10,
                              Math.random() * SCALE/10);
@@ -47,7 +48,7 @@ function handleEvent(event, source){
             actor.rotateX(Math.random() * 2 * 180 / Math.PI);
             actor.rotateY(Math.random() * 2 * 180 / Math.PI);
             actor.rotateZ(Math.random() * 2 * 180 / Math.PI);
-            //actor.setScale(Math.random()*10);
+            //actor.setScale(Math.random());
             //actor.setScale(10);
             actor.setShininess(200);
             
@@ -55,9 +56,24 @@ function handleEvent(event, source){
                             
             scene.addActor(actor);
         }
-        vxl.c.camera.longShot();
+        vxl.c.camera.setPosition(Math.random()*SCALE/10, Math.random()*SCALE/10, Math.random()*SCALE/10);
+        vxl.c.camera.refresh();
+        //rotate();
     }
 };
+
+function rotate(){
+	var actors = scene._actors;
+	var i = actors.length;
+	while (i--){
+        var actor = actors[i];
+        actor.rotateX(3);
+    }
+    vxl.c.camera.refresh();
+    requestAnimationFrame(rotate);
+};
+
+
 
 
 function visitThemAll(){

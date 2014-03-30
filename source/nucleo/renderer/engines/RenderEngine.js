@@ -546,7 +546,7 @@ vxlRenderEngine.prototype._renderSolid = function(actor){
         var i = parts.length;
         while(i--){
             var part = parts[i];
-            this._setenderableVertices(actor,part)
+            this._setRenderableVertices(actor,part);
             this._setRenderableNormals(actor,part);
             this._setRenderableColors(actor,part);
             
