@@ -307,13 +307,13 @@ vxlProgramManager.prototype.setUniform = function(p_uniform_id, p_value, hint){
         
         cached_value = uniform_cache[p_uniform_id];
         
-        if (cached_value == p_value ) return; //@TODO: this does not catch all cases (i.e. mat4, vec3)
+        //if (cached_value == p_value ) return; //@TODO: this does not catch all cases (i.e. mat4, vec3)
         
         uniform_cache[p_uniform_id] = p_value;
         this._setPolymorphicUniform(p_uniform_id, loc, p_value, hint);
     }
     else{
-    	console.warn('vxlProgramManager.setUniform: the uniform '+p_uniform_id+' is not defined for the program '+this._current_program_ID);
+    	//console.warn('vxlProgramManager.setUniform: the uniform '+p_uniform_id+' is not defined for the program '+this._current_program_ID);
         
     }
     
