@@ -298,7 +298,7 @@ vxlProgramManager.prototype.setUniform = function(p_uniform_id, p_value, hint){
     var uniform_cache 		= this._curr_uniform_cache;
     var loc                 = undefined;
     
-    if (uniform_list.indexOf(p_uniform_id)){
+    if (uniform_list.indexOf(p_uniform_id) >=0){
         loc = uniform_loc_map[p_uniform_id];
         if (loc == undefined){
             loc = gl.getUniformLocation(prg,p_uniform_id);  
@@ -313,7 +313,7 @@ vxlProgramManager.prototype.setUniform = function(p_uniform_id, p_value, hint){
         this._setPolymorphicUniform(p_uniform_id, loc, p_value, hint);
     }
     else{
-    	//console.warn('vxlProgramManager.setUniform: the uniform '+p_uniform_id+' is not defined for the program '+this._current_program_ID);
+    	console.warn('vxlProgramManager.setUniform: the uniform '+p_uniform_id+' is not defined for the program '+this._current_program_ID);
         
     }
     

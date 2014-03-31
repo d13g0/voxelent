@@ -21,10 +21,8 @@ function vxlEngine(){
     
     this.gl           = undefined;
     this.pm           = undefined;
-    
     this._view        = undefined;
     this._clear_color = undefined;
-    
     this._transforms  = undefined;   //@TODO review
 
 };
@@ -51,10 +49,10 @@ vxlEngine.prototype.readOffscreenPixel = function(x,y){};
 vxlEngine.prototype.init = function(p_renderer){
     
     this._getGL(p_renderer);
-    this._view       = p_renderer.view;
-    this.pm          = new vxlProgramManager(this.gl);  
-    this._transforms = new vxlTransforms(p_renderer.view);
-     
+    this.pm           = new vxlProgramManager(this.gl);  
+    this._view        = p_renderer.view;
+    this._clear_color = this._view.backgroundColor;
+    this._transforms  = new vxlTransforms(p_renderer.view);
     this.configure();
 };
 

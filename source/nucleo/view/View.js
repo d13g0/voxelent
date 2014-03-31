@@ -149,7 +149,7 @@ vxlView.prototype._wrapDiv = function(){
     });
     
     this.canvas.focus();
-}
+};
 
 /**
  * Resizes the canvas so it fits its parent node in the DOM tree
@@ -169,7 +169,7 @@ vxlView.prototype.resize = function(){
     
     $(this.canvas).attr('width', this.width);
     $(this.canvas).attr('height', this.height);
-}
+};
 
 /**
  * Enables automatic resizing of the view when the browser window is resized
@@ -235,14 +235,14 @@ vxlView.prototype.fullscreen = function(flag){
  */
 vxlView.prototype.disableFullScreen = function(){
     this._fullscreenFlag = false;
-}
+};
 
 /**
  * Enables this view to go to Full Screen mode. Fullscreen mode is available by default.
  */
 vxlView.prototype.enableFullScreen = function(){
     this._fullscreenFlag = true;
-}
+};
 
 /**
  * Starts the view

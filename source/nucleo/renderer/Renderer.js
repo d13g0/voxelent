@@ -65,7 +65,7 @@ vxlRenderer.prototype.setEngine = function(p_engine){
     }
     instance.init(this);
     this.engine = instance;
-}
+};
 
 /**
  * Sets the current rendering program 
@@ -152,7 +152,7 @@ vxlRenderer.prototype.isOffscreenEnabled = function(){
 
 vxlRenderer.prototype.readOffscreenPixel = function(x,y){
     return this.engine.readOffscreenPixel(x,y);
-}
+};
 
 /**
  * Sets the rendering mode. Options are in vxl.def.renderer.mode
@@ -214,7 +214,7 @@ vxlRenderer.prototype._timeUp = function(){
     setTimeout((function(self){
         return function(){
             self._timeUp();
-        }
+        };
     })(this), this.renderRate - diff);
 };
 /**

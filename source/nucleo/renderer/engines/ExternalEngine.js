@@ -23,6 +23,7 @@ vxlExternalEngine.prototype.constructor = vxlExternalEngine;
  * @param {Object} deallocate
  */
 function vxlExternalEngine(renderer, allocate, render, deallocate){
+    vxlEngine.call(this);
     this.renderer = renderer;
     this.allocateCallback = allocate;
     this.renderCallback = render;

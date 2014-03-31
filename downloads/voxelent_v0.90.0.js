@@ -8037,7 +8037,7 @@ vxlProgramManager.prototype.setUniform = function(p_uniform_id, p_value, hint){
     var uniform_cache 		= this._curr_uniform_cache;
     var loc                 = undefined;
     
-    if (uniform_list.indexOf(p_uniform_id)){
+    if (uniform_list.indexOf(p_uniform_id) >=0){
         loc = uniform_loc_map[p_uniform_id];
         if (loc == undefined){
             loc = gl.getUniformLocation(prg,p_uniform_id);  
@@ -8052,7 +8052,7 @@ vxlProgramManager.prototype.setUniform = function(p_uniform_id, p_value, hint){
         this._setPolymorphicUniform(p_uniform_id, loc, p_value, hint);
     }
     else{
-    	//console.warn('vxlProgramManager.setUniform: the uniform '+p_uniform_id+' is not defined for the program '+this._current_program_ID);
+    	console.warn('vxlProgramManager.setUniform: the uniform '+p_uniform_id+' is not defined for the program '+this._current_program_ID);
         
     }
     
@@ -8354,7 +8354,7 @@ vxlRenderer.prototype.setEngine = function(p_engine){
     }
     instance.init(this);
     this.engine = instance;
-}
+};
 
 /**
  * Sets the current rendering program 
@@ -8441,7 +8441,7 @@ vxlRenderer.prototype.isOffscreenEnabled = function(){
 
 vxlRenderer.prototype.readOffscreenPixel = function(x,y){
     return this.engine.readOffscreenPixel(x,y);
-}
+};
 
 /**
  * Sets the rendering mode. Options are in vxl.def.renderer.mode
@@ -8503,7 +8503,7 @@ vxlRenderer.prototype._timeUp = function(){
     setTimeout((function(self){
         return function(){
             self._timeUp();
-        }
+        };
     })(this), this.renderRate - diff);
 };
 /**
@@ -10204,10 +10204,8 @@ function vxlEngine(){
     
     this.gl           = undefined;
     this.pm           = undefined;
-    
     this._view        = undefined;
     this._clear_color = undefined;
-    
     this._transforms  = undefined;   //@TODO review
 
 };
@@ -10234,10 +10232,10 @@ vxlEngine.prototype.readOffscreenPixel = function(x,y){};
 vxlEngine.prototype.init = function(p_renderer){
     
     this._getGL(p_renderer);
-    this._view       = p_renderer.view;
-    this.pm          = new vxlProgramManager(this.gl);  
-    this._transforms = new vxlTransforms(p_renderer.view);
-     
+    this.pm           = new vxlProgramManager(this.gl);  
+    this._view        = p_renderer.view;
+    this._clear_color = this._view.backgroundColor;
+    this._transforms  = new vxlTransforms(p_renderer.view);
     this.configure();
 };
 
@@ -10362,6 +10360,7 @@ vxlExternalEngine.prototype.constructor = vxlExternalEngine;
  * @param {Object} deallocate
  */
 function vxlExternalEngine(renderer, allocate, render, deallocate){
+    vxlEngine.call(this);
     this.renderer = renderer;
     this.allocateCallback = allocate;
     this.renderCallback = render;
@@ -12883,7 +12882,7 @@ vxlView.prototype._wrapDiv = function(){
     });
     
     this.canvas.focus();
-}
+};
 
 /**
  * Resizes the canvas so it fits its parent node in the DOM tree
@@ -12903,7 +12902,7 @@ vxlView.prototype.resize = function(){
     
     $(this.canvas).attr('width', this.width);
     $(this.canvas).attr('height', this.height);
-}
+};
 
 /**
  * Enables automatic resizing of the view when the browser window is resized
@@ -12969,14 +12968,14 @@ vxlView.prototype.fullscreen = function(flag){
  */
 vxlView.prototype.disableFullScreen = function(){
     this._fullscreenFlag = false;
-}
+};
 
 /**
  * Enables this view to go to Full Screen mode. Fullscreen mode is available by default.
  */
 vxlView.prototype.enableFullScreen = function(){
     this._fullscreenFlag = true;
-}
+};
 
 /**
  * Starts the view

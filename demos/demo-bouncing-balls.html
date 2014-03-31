@@ -190,8 +190,8 @@ void main(void)
 	    
 	    view.renderer.setEngine(engine);
 	    view.renderer.setProgram(program);
-	    view.renderer.clearColor(0.3,0.3,0.3);
-	    view.renderer.clearDepth(100);
+	    //view.renderer.clearColor(0.3,0.3,0.3);
+	    //view.renderer.clearDepth(100);
 	    
 	    var pm = view.renderer.engine.pm;
 	    pm.setUniform("uTranslation",[0,0,0]);
@@ -242,10 +242,17 @@ void main(void)
 	function draw(renderer,scene){
 		
 		if (MODEL == undefined || ball.length ==0) return; //not ready yet
-		
-		var gl = renderer.engine.gl;
+		//--------------------------------------------------------------------
+		//These objects are available to vxlExternalEngine by inheritance:
+		//
+		//  gl --> WebGL context
+		//  pm --> An instance of vxlProgramManager that handles ESSL programs
+		//  trx --> An instance of vxlTransforms, the current scene transforms
+		//
+		//  So you can focus on your code ;-) , we provide all the required scaffolding
+		//----------
+		var gl = renderer.engine.gl;     
 		var pm = renderer.engine.pm;
-		
 		var trx = renderer.engine._transforms;
 		
 		trx.update();
@@ -254,46 +261,35 @@ void main(void)
         pm.setUniform('uPMatrix',   trx.pMatrix);
         pm.setUniform('uMVMatrix',	trx.mvMatrix);
         pm.setUniform('uNMatrix',   trx.nMatrix);
-	
-	    try{
-	        	pm.setUniform('uUpdateLight',updateLightPosition);
-	        	
-	        	
-	        	var floor = scene.toys.floor;
-	        	if (floor.visible){
-	        		
-	        		pm.setUniform('uTranslate', false);
-	        		pm.setUniform('uMaterialDiffuse', floor.material.diffuse);
-	        		pm.setUniform('uWireframe',true);
-	        		pm.enableAttribute('aVertexPosition');
-	            	pm.disableAttribute('aVertexNormal');
-	                
-	                gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-	                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(floor.model.vertices), gl.STATIC_DRAW);
-	                pm.setAttributePointer('aVertexPosition', 3, gl.FLOAT, false, 0, 0);
-	                pm.enableAttribute('aVertexPosition');
-	                
-	                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ibo);
-	                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(floor.model.wireframe), gl.STATIC_DRAW);
-                    
-                    gl.drawElements(gl.LINES, floor.model.wireframe.length, gl.UNSIGNED_SHORT,0);
-	                
-	                gl.bindBuffer(gl.ARRAY_BUFFER, null);
-	            	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-	        	}
-	        	
-	        	drawBalls(renderer);
-	        	gl.bindBuffer(gl.ARRAY_BUFFER, null);
-	            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-	            
-	 
-	    }
-	    catch(err){
-	        alert(err);
-	        console.error(err.description);
-	    }
-		
-	};
+	   	pm.setUniform('uUpdateLight',updateLightPosition);
+    	
+    	var floor = scene.toys.floor;
+    	if (floor.visible){
+    		
+    		pm.setUniform('uTranslate', false);
+    		pm.setUniform('uMaterialDiffuse', floor.material.diffuse);
+    		pm.setUniform('uWireframe',true);
+    		pm.enableAttribute('aVertexPosition');
+        	pm.disableAttribute('aVertexNormal');
+            
+            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(floor.model.vertices), gl.STATIC_DRAW);
+            pm.setAttributePointer('aVertexPosition', 3, gl.FLOAT, false, 0, 0);
+            pm.enableAttribute('aVertexPosition');
+            
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ibo);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(floor.model.wireframe), gl.STATIC_DRAW);
+            
+            gl.drawElements(gl.LINES, floor.model.wireframe.length, gl.UNSIGNED_SHORT,0);
+            
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    	}
+    	
+    	drawBalls(renderer);
+    	gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+   };
 	
 	
 	
