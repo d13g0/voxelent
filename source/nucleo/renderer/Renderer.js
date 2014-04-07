@@ -65,6 +65,7 @@ vxlRenderer.prototype.setEngine = function(p_engine){
     }
     instance.init(this);
     this.engine = instance;
+    vxl.c.engine = this.engine; //Faster access from console
 };
 
 /**
@@ -161,9 +162,15 @@ vxlRenderer.prototype.readOffscreenPixel = function(x,y){
  * @see vxl.def.render.mode
  */
 vxlRenderer.prototype.setMode = function(mode){
-    this.stop();
-    this.mode = mode;
-    this.start();   
+    if (this._running){ 
+        this.stop();
+        this.mode = mode;
+        this.start(); 
+    }
+    else{
+        this.mode = mode; //if the renderer has not started yet.
+    }
+      
 };
 
 /**
@@ -175,19 +182,40 @@ vxlRenderer.prototype.start = function(){
     this._startDate = new Date().getTime();
     this._time  = 0;
     
-	if(this.mode == vxl.def.renderer.mode.TIMER){
-		vxl.go.console('Renderer: starting rendering for view ['+this.view.name+'] at '+this.renderRate+ 'ms');
-		this._timeUp();
-		//this.timerID = setInterval((function(self) {return function() {self.render();}})(this),this.renderRate); 
+    switch (this.mode){
+    	case vxl.def.renderer.mode.TIMER:
+    		
+    		vxl.go.console('Renderer [TIMER]: starting rendering for view ['+this.view.name+'] at '+this.renderRate+ 'ms');
+    		this._timeUp();
+    		break;
+    		
+    		//this.timerID = setInterval((function(self) {return function() {self.render();}})(this),this.renderRate); 
+    	
+    	case vxl.def.renderer.mode.ANIMFRAME:
+    	    
+    	    vxl.go.console('Renderer [ANIMFRAME]: starting request animation frame procedure',true);
+    	    var self = this;
+    	    function one_infinite_loop(){
+    	        this.render();
+    	        window.requestAnimFrame(one_infinite_loop.bind(self));
+    	    }
+    	    one_infinite_loop.bind(this)();
+    	    
+    	    break;
+    
+    	case vxl.def.renderer.mode.ON_DEMAND:
+    	    vxl.go.console('Renderer [ON_DEMAND]: waiting for rendering requests',true);
+    	    this.clear(); // let's just wait until someone calls the renderer...
+    	   	break;
 	}
-	else if(this.mode == vxl.def.renderer.mode.ANIMFRAME){
-	    vxl.go.console('Renderer: starting rendering at the fastest speed',true);
-		vxl.go.renderman.render();
-	}
-	else if (this.mode == 'DEBUG'){
-	    //do not start the rendering
-	    this.clear();
-	}
+};
+
+vxlRenderer.prototype.doBeforeRendering = function(func){
+    this._do_before_rendering = func;
+};
+
+vxlRenderer.prototype.doAfterRendering = function(func){
+    this._do_after_rendering = func;
 };
 
 /**
@@ -261,6 +289,8 @@ vxlRenderer.prototype.render = function(){
     
     var engine = this.engine, scene = this.view.scene, start = undefined, elapsed = undefined;
     
+    if (this._do_before_rendering) this._do_before_rendering();
+    
     this.clear();                   //clear the canvas
     engine.allocate(scene);	    //allocate memory for actors added since last rendering
     
@@ -274,6 +304,8 @@ vxlRenderer.prototype.render = function(){
     if(elapsed >0){
         this.fps = Math.round((this.fps * 0.80 + (1000.0/elapsed) * 0.2)* 100)/100;
     }
+    
+    if (this._do_after_rendering) this._do_after_rendering();
     
 };
 

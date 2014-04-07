@@ -29,12 +29,9 @@
  * @author Diego Cantor
  */
 function vxlCamera(p_view,p_type) {
+    
     this.UID            = vxl.util.generateUID(); //unique identification key
     this.view           = p_view;
-
-    this._fov           = vxl.def.camera.fov;
-    this.Z_NEAR         = vxl.def.camera.near;    
-    this.Z_FAR          = vxl.def.camera.far;
     
     this._matrix 	      = mat4.create();
     this._right 		  = vec3.fromValues(1, 0, 0);
@@ -50,8 +47,16 @@ function vxlCamera(p_view,p_type) {
 	this._relAzimuth    = 0;
     this._relElevation  = 0;
     this._relRoll       = 0;
-	this._dollyingStep  = 0; //dollying step
+	this._dollyingStep  = 0; 
     this._distance      = 1;
+    this._rotate_world  = false; //invert the horizontal coordinate system HCS
+    
+    this._fov           = vxl.def.camera.fov;
+    this._near          = vxl.def.camera.near;    
+    this._far           = vxl.def.camera.far;
+    this._aspect        = undefined;
+    this._perspective   = mat4.create();
+    this.updatePerspective();  //set the default perspective matrix
     
     this._following     = undefined;
     this._trackingMode  = vxl.def.camera.tracking.DEFAULT;
@@ -59,7 +64,8 @@ function vxlCamera(p_view,p_type) {
     this.landmarks         = [];
     this._lmarkAnimationID = undefined; //useful to interrupt landmark animations
     
-    this._rotate_world   = false; //invert the horizontal coordinate system HCS
+    
+    
 	
 	if (p_type == undefined){
 	    this.setType(vxl.def.camera.type.EXPLORING);
@@ -67,6 +73,8 @@ function vxlCamera(p_view,p_type) {
 	else{
 	   this.setType(p_type);
     }
+    
+    
 };
 
 /**
@@ -601,11 +609,14 @@ vxlCamera.prototype.setFieldOfView = function(fov){
  * @param {Array, vec3} focalPoint the desired focalPoint for the camera at the landmark
  * @see vxlLandmark
  */
-vxlCamera.prototype.createLandmark = function(name, position, focalPoint){
+vxlCamera.prototype.createLandmark = function(name, position, focalPoint, roll){
 	
 	var c = new vxlCamera(this.view, this.type);
 	c.setPosition(position);
 	c.setFocalPoint(focalPoint);
+	if (roll != undefined){
+	    c.setRoll(roll);
+	}
 	var l = new vxlLandmark(name, c);
 	this.landmarks.push(l);
 	return this;
@@ -621,6 +632,7 @@ vxlCamera.prototype.setLandmark = function(name) {
     this.landmarks.push(l);
     return this;
 };
+
 
 /**
  * Retrieves the landmark by name from the known landmarks
@@ -658,6 +670,7 @@ vxlCamera.prototype.gotoLandmark = function(name,length,fps) {
 	var self = this;
 	var dest_pos = lmark._position;
 	var dest_fp = lmark._focalPoint;
+	var dest_roll = lmark._roll;
 	
 	if (length == undefined){ length = 1000; }
 	if (fps == undefined) {fps ==  20; } 
@@ -675,14 +688,17 @@ vxlCamera.prototype.gotoLandmark = function(name,length,fps) {
 			
 			var inter_fp = vec3.create();
 			var inter_pos = vec3.create();
+			var inter_roll = 0;
 			if(count++ != steps){
 				percent = count/steps;
-				var inter_fp = vec3.lerp(inter_fp, self._focalPoint, dest_fp,percent);
-				var inter_pos = vec3.lerp(inter_pos, self._position, dest_pos,percent);
-				
+				percent2 = (1-Math.cos(percent*Math.PI))/2; //cosine interpolation is smoother
+				inter_fp = vec3.lerp(inter_fp, self._focalPoint, dest_fp,percent2);
+				inter_pos = vec3.lerp(inter_pos, self._position, dest_pos,percent2);
+				inter_roll = self._roll * (1 - percent2) + dest_roll * (percent2);
 				
 				self.setFocalPoint(inter_fp);
 				self.setPosition(inter_pos);
+				self.setRoll(inter_roll);
 				self.refresh();
 				
 				var dist = vec3.dist(inter_fp,dest_fp) + vec3.dist(inter_pos,dest_pos);
@@ -693,6 +709,7 @@ vxlCamera.prototype.gotoLandmark = function(name,length,fps) {
 				else{
 					self.setFocalPoint(dest_fp);
 					self.setPosition(dest_pos);
+					self.setRoll(dest_roll);
 					self.refresh();
 					interactor.connectView(this.view); //reconnect interactor
 				}
@@ -726,6 +743,12 @@ vxlCamera.prototype.doLandmarkAnimation = function(steps){
 			return;
 		}
 		
+		if (camera._stop_lmark_animation){
+		    camera._stop_lmark_animation = false;
+		    vxl.go.console('Landmark Animation Stopped',true);
+		    return;
+		}
+		
 		step = _steps.splice(0,1)[0];
 
 		lmark = step[0];
@@ -739,6 +762,14 @@ vxlCamera.prototype.doLandmarkAnimation = function(steps){
 	return this;
 };
 
+
+/**
+ * If there is a landmark based animation in progress it will stop it.
+ */
+vxlCamera.prototype.stopLandmarkAnimation = function(){
+    this._stop_lmark_animation = true;
+};
+
 /**
  * Returns a list of known landmarks
  */
@@ -750,11 +781,6 @@ vxlCamera.prototype.getLandmarks = function(){
   }
   return lmarks;  
 };
-
-
-
-
-
 
 /**
  * This method sets the camera to a distance such that the area covered by the bounding box (parameter)
@@ -789,6 +815,60 @@ vxlCamera.prototype._shot = function(bb){
 };
 
 
+/**
+ * <p>Forces the aspect ratio of the camera to a certain value.</p>
+ * <p>To go back to the default aspect ratio that relies on the dimensions 
+ * of the view associated to this camera use:
+ * 
+ * <code>setAspectRatio(undefined)</code>
+ * 
+ * </p>
+ * @param {Number} p_aspect the new aspect ratio
+ */
+vxlCamera.prototype.setAspectRatio = function(p_aspect){
+    this._aspect = p_aspect;
+}
+
+/**
+ * Sets the perspective of the camera. Defines the viewing frustum and its shape
+ * @param {Number} p_near the distance from the camera to the near plane 
+ * @param {Number} p_far the distance from the camera to the far plane 
+ * @param {Number} p_angle the vertical field of view in degrees
+ * @param {Number} p_aspect the desired aspect ratio (optional). If not defined the camera 
+ * automatically selects the current width/height radio of the respective view.
+ */
+vxlCamera.prototype.setPerspective = function(p_near, p_far, p_angle, p_aspect){
+    var view = this.view;
+    
+    this._fov = p_angle;
+    this._near = p_near;
+    this._far = p_far;
+    this._aspect = p_aspect;
+    var rads = vxl.util.deg2rad(p_angle);
+    
+    if(this._aspect == undefined){ 
+        mat4.perspective(this._perspective, rads, view.width/view.height, this._near, this._far);   
+    }
+    else{
+        mat4.perspective(this._perspective, rads, this._aspect, this._near, this._far);
+    }
+};
+
+/**
+ * Updates the current perspective matrix when one of the internal perspective variables
+ * [near,far,fov] has changed, or when the view has changed its dimensions [width, height]
+ * 
+ */
+vxlCamera.prototype.updatePerspective = function(){
+    var view = this.view;
+    var rads = vxl.util.deg2rad(this._fov);
+    if(this._aspect == undefined){ 
+        mat4.perspective(this._perspective, rads, view.width/view.height, this._near, this._far);   
+    }
+    else{
+        mat4.perspective(this._perspective, rads, this._aspect, this._near, this._far);
+    }
+};
 
 /**
  * Prints a summary of the camera variables on the browser's console
@@ -801,10 +881,12 @@ vxlCamera.prototype.status = function() {
     console.info('    forward: ' + vxl.util.format(this._forward,2));           
     console.info('   position: ' + vxl.util.format(this._position,2));
     console.info('focal point: ' + vxl.util.format(this._focalPoint,2));
-    console.info('   d vector: ' + vxl.util.format(this._distanceVector,2));
-    console.info('    azimuth: ' + vxl.util.format(this._azimuth,3));
-    console.info('  elevation: ' + vxl.util.format(this._elevation,3));
+    
+    console.info('    azimuth: ' + vxl.util.format(this._azimuth,2));
+    console.info('  elevation: ' + vxl.util.format(this._elevation,2));
+    console.info('       roll: ' + vxl.util.format(this._roll,2));
     console.info('   distance: ' + vxl.util.format(this._distance,2));
+    console.info('   d vector: ' + vxl.util.format(this._distanceVector,2));
 };
 
 

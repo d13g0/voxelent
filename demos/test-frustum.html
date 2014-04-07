@@ -9,7 +9,7 @@
 <link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
 <script src="lib/jquery.js"     type="text/javascript"></script>
 <script src="lib/jquery-ui.js"  type="text/javascript"> </script>
-<script type='text/javascript'  src='lib/voxelent_v0.90.0.js'> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.1.js'> </script>
 <script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
 
 <title>Voxelent - Test Frustum</title>
@@ -32,30 +32,73 @@
 		v1 = triangle.model.vertices.slice(0,3);
 		v2 = triangle.model.vertices.slice(3,6);
 		v3 = triangle.model.vertices.slice(6,9);
-		cam.Z_NEAR = 2;
+		cam.Z_NEAR = 1;
 		cam.Z_FAR = 50;
 		test();
+		cam.setType(vxl.def.camera.type.TRACKING);
 	}
 	
-	function test(){
+	/**
+	 * returns true if the vertex is clipped
+	 */
+	
+	function testVertex(actor, vertex){
 		var near = cam.Z_NEAR;
 		var far = cam.Z_FAR;
 		var angle = cam._fov * Math.PI / 180;
-		
-		//camera coordinates
 		var pmatrix = vxl.c.view.renderer.engine._transforms.pMatrix;
-		var mvmatrix = vxl.c.camera._matrix;
+		var mvmatrix = mat4.multiply(mat4.create(), mat4.invert(mat4.create(), vxl.c.camera._matrix), actor._matrix);
 		
-		var v1c = vec3.transformMat4(vec3.create(), v1, mvmatrix);
-		var v2c = vec3.transformMat4(vec3.create(), v1, mvmatrix);
-		var v3c = vec3.transformMat4(vec3.create(), v1, mvmatrix);
-		var pos = vec3.clone(cam._position);
+		var vc = vec3.transformMat4(vec3.create(), vertex, mvmatrix);
 		
-		var v1p = vec3.subtract(vec3.create(),v1c, pos);
-		var z1 = vec3.dot(v1p, cam._forward); //vec3.negate(vec3.create(),cam._forward));
-		//console.info(z1);
-		console.info(v1c, cam._distance)
-	    setTimeout(test,1000);
+		
+		var pz = vec3.dot(vc, vec3.fromValues(0,0,-1));
+		var py = vec3.dot(vc, vec3.fromValues(0,1,0));
+		var px = vec3.dot(vc, vec3.fromValues(1,0,0));
+		
+		var aspect = (1/Math.tan(angle/2)) / pmatrix[0];
+		var height = pz * 2 * Math.tan(angle/2);
+		var width = height * aspect;
+		
+		
+		if (py < -height/2 || py > height/2){
+			return true;
+		}
+		else if (px < -width/2 || px > width/2){
+			return true;
+		} 
+		else if (pz < near || pz > far){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	
+	/**
+	 * returns true if the actor is clipped
+	 */
+	function clippingTest(actor){
+		var vertices = actor.model.vertices;
+		
+		var i = vertices.length;
+		while(i--){
+			var vertex  = vec3.fromValues(vertices[i-3], vertices[i-2],vertices[i-1]);
+			if (testVertex(actor,vertex)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	function test(){
+		if (clippingTest(triangle)){
+			triangle.setColor(1,0,0);
+		}
+		else{
+			triangle.setColor(0,1,0);
+		}
+	    setTimeout(test,500);
 	}
 	
 </script>

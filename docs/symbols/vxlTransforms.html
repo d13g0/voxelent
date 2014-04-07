@@ -37,7 +37,7 @@
 			<!-- begin publish.classesIndex -->
 			<div align="center"><h2><a href="../index.html">Class List</a></h2></div>
 <hr />
-<h3>Current Version:  0.90.0</h3>
+<h3>Current Version:  0.90.1</h3>
 <p>Download it <a href='http://voxelent.com/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -181,9 +181,9 @@
 				<td class="attributes">&nbsp;</td>
 				<td class="nameDescription" >
 					<div class="fixedFont">
-						<b><a href="../symbols/vxlTransforms.html#constructor">vxlTransforms</a></b>(vw)
+						<b><a href="../symbols/vxlTransforms.html#constructor">vxlTransforms</a></b>(p_view)
 					</div>
-					<div class="description"></div>
+					<div class="description">This is a class that interfaces between the current camera and the rendering engine.</div>
 				</td>
 				</tr>
 				</table>
@@ -214,7 +214,7 @@
 								
 								
 								
-								<b><a href="../symbols/vxlTransforms.html#calculateModelView">calculateModelView</a></b>
+								<b><a href="../symbols/vxlTransforms.html#calculateCamera">calculateCamera</a></b>
 								()
 								</div>
 							</td>
@@ -236,7 +236,7 @@
 								
 								
 								
-								<b><a href="../symbols/vxlTransforms.html#calculateModelViewPerspective">calculateModelViewPerspective</a></b>
+								<b><a href="../symbols/vxlTransforms.html#calculateModelView">calculateModelView</a></b>
 								()
 								</div>
 							</td>
@@ -280,7 +280,29 @@
 								
 								
 								
-								<b><a href="../symbols/vxlTransforms.html#calculatePerspective">calculatePerspective</a></b>
+								<b><a href="../symbols/vxlTransforms.html#calculateProjection">calculateProjection</a></b>
+								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlTransforms.html#calculateProjectionModelView">calculateProjectionModelView</a></b>
 								()
 								</div>
 							</td>
@@ -371,12 +393,12 @@
 				<div class='methodDetail'>
 				<div class="title">
 				<div class="fixedFont">
-						<b>vxlTransforms</b>(vw)
+						<b>vxlTransforms</b>(p_view)
 				</div>
 				</div>
 
 				<div class="description">
-					
+					This is a class that interfaces between the current camera and the rendering engine.It contains the matrices used by the current camera and that will be used for performing rendering calculations.This class also keeps track of the push-pop operations on the model-view matrix stack.This is required to combine local and global transformations.
 					<br /><i>Author: </i>Diego Cantor.
 				</div>
 
@@ -389,13 +411,13 @@
 						
 							<tr>
 							<td>
-								
+								<span class="light fixedFont">{<a href="../symbols/vxlView.html">vxlView</a>}</span> 
 							</td>
 							<td>	
-								 <code>vw</code>
+								 <code>p_view</code>
 							</td>
 							<td>
-								<p>
+								<p>the view that this object will refer to.
 								
 								</p>
 							</td>
@@ -423,7 +445,7 @@
 				</h2>
 				
 				<div class='methodDetail'>
-					<a name="calculateModelView"> </a>
+					<a name="calculateCamera"> </a>
 					<div class="title">
 					<div class="fixedFont">
 
@@ -433,11 +455,11 @@
 					
 					
 					
-					  <b>calculateModelView</b>()
+					  <b>calculateCamera</b>()
 					</div>
 					</div>
 					<div class="description">
-						Calculates the Model-View matrix for the current camera.
+						Calculates the current camera matrix from the current model-view matrix
 						
 						
 					</div>
@@ -454,7 +476,7 @@
 				</div>	
 				
 				<div class='methodDetail'>
-					<a name="calculateModelViewPerspective"> </a>
+					<a name="calculateModelView"> </a>
 					<div class="title">
 					<div class="fixedFont">
 
@@ -464,11 +486,11 @@
 					
 					
 					
-					  <b>calculateModelViewPerspective</b>()
+					  <b>calculateModelView</b>()
 					</div>
 					</div>
 					<div class="description">
-						
+						Calculates the current model-view transform.This reference is updated whenever the active camera changes.
 						
 						
 					</div>
@@ -516,7 +538,7 @@
 				</div>	
 				
 				<div class='methodDetail'>
-					<a name="calculatePerspective"> </a>
+					<a name="calculateProjection"> </a>
 					<div class="title">
 					<div class="fixedFont">
 
@@ -526,11 +548,42 @@
 					
 					
 					
-					  <b>calculatePerspective</b>()
+					  <b>calculateProjection</b>()
 					</div>
 					</div>
 					<div class="description">
-						Calculates the perspective matrix given the current camera
+						Calculates the projection matrix given the current camera.The projection may be orthographic or perspective
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="calculateProjectionModelView"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>calculateProjectionModelView</b>()
+					</div>
+					</div>
+					<div class="description">
+						Calculates the projection-model-view matrix
 						
 						
 					</div>
@@ -656,7 +709,7 @@
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Mar 30 2014 03:31:57 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Apr 07 2014 17:40:50 GMT-0400 (EDT)
 		</div>
         </div>
         </div>

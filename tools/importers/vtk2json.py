@@ -1,11 +1,16 @@
-# -----------------------------------------------------------------------------------------------
-# vxl_vtk_importer.py 
-# only has one argument: the name of the vtk file to process (include the extension please)
-# Author: dcantor
-# -----------------------------------------------------------------------------------------------
+''' 
+-----------------------------------------------------------------------------------------------
+ vtk2json.py 
+ Usage:
+         python vtk2json.py [vtk file] [output file (no extension)]
 
-import sys
-import pdb
+ Author: dcantor
+ 
+ Revised on April 7th 2014
+-----------------------------------------------------------------------------------------------
+'''
+
+import sys, pdb, json, os
 from threading import Thread
 
 
@@ -32,19 +37,56 @@ LOOKUP_TABLE = 9
 COLOR_SCALARS = 10
 
 outputfile = ''
-numBlocks = 0
+num_parts = 0
 
-# -----------------------------------------------------------------------
-# Parses the VTK file
-# -----------------------------------------------------------------------
+'''
+-----------------------------------------------------------------------
+Clears the console
+-----------------------------------------------------------------------
+'''
+try:
+    os.system('cls')
+    os.system('clear')
+except:
+    pass
+
+'''
+-----------------------------------------------------------------------
+Creates the line segments for multilines
+-----------------------------------------------------------------------
+'''
+def createIndicesForLine(line):
+    global indices
+    elements = line.split()
+    if len(elements) == 0:
+        return
+    N = int(elements[0])
+    values = elements[1:len(elements)]
+    
+    
+    for i,j in enumerate(values):
+        if i+1<N:
+            indices.append(values[i])
+            indices.append(values[i+1])
+    
+ 
+''' 
+-----------------------------------------------------------------------
+ Parses the VTK file
+-----------------------------------------------------------------------
+'''
 def parseVTK(filename):
 
-    global mode
+    global mode, vertices, indices, normals, colors, scalars, hasLines
+    
     location = NOWHERE
     
     linenumber = 0
+    
+    print 'Hold on. Reading file...'
         
     for line in open(filename, 'r').readlines():
+        
         linenumber = linenumber + 1
         try:
             if line.startswith('POINTS'):
@@ -88,13 +130,10 @@ def parseVTK(filename):
                 print(line)
                 continue
             elif location == POINTS:
-                for v in line.split():
-                    vertices.append(float(v))
+                for pp in line.split():
+                    vertices.append(pp)
             elif location == LINES:
-                tt = line.split()
-                if len(tt)>0 and tt[0] == '2':
-                    indices.append(int(tt[1]))
-                    indices.append(int(tt[2]))
+                createIndicesForLine(line)
             elif location == POLYGONS: #they have to be triangles
                 tt = line.split()
                 if len(tt)>0 and tt[0] != '3':
@@ -118,155 +157,252 @@ def parseVTK(filename):
             print(line)
             raise
     
+    print 'Veryfing numeric types...',
+    
+    vertices = [float(x) for x in vertices]
+    indices =[int(x) for x in indices]
+    
+    print 'Done'
+    
+    printInfo()
 
-# -----------------------------------------------------------------------    
-# Divides the calculated indices into blocks
-# -----------------------------------------------------------------------
-def processIndexBlocks():
-    global numBlocks
+'''
+-----------------------------------------------------------------------
+Prints information about the geometry stored in the VTK file
+-----------------------------------------------------------------------
+'''    
+def printInfo():
     v_count = len(vertices)/3
     n_count = len(normals)/3
-    ii_count =len(indices)
-    i_count = ii_count/3
     c_count = len(colors)/3
-    
     pd_count = len(scalars)
-    print('vertices:\t' + str(v_count) +'\nnormals:\t' + str(n_count) + '\nindices:\t' + str(ii_count)+'\ntriangles:\t' + str(i_count) + '\nscalars:\t' + str(pd_count) + '\ncolors:\t'+str(c_count)+'\n')    
-    #if (v_err or n_err):
-    #    print ('vertex error = ' + str(v_err) +', normal error = ' + str(n_err))
-        
-    numBlocks = ii_count // ARRAY_SIZE
-    if(ii_count % ARRAY_SIZE != 0):
-        numBlocks = numBlocks + 1
-    print( 'Number of Blocks: ' + str(numBlocks))
+    i_count = len(indices)
     
-    for i in range(numBlocks):
-        #Thread(target=processBlock, args=(vertices, indices, scalars, i)).start()
-        processBlock(i,vertices, indices, scalars,colors)
-        
-# -----------------------------------------------------------------------    
-# Selects a block to process
-# -----------------------------------------------------------------------    
-def processBlock(blockID, pver, pidx, psc, pcol):
-     global outputfile
-     global numBlocks
-     fid = str(blockID + 1)
-     if numBlocks == 1:
-         filename = outputfile + '.json'
-     else:
-         filename = outputfile+'_'+fid+'.json'
-    
-     vtx, idx, pdx, clx = weaveBlock(blockID, pver, pidx, psc, pcol)
-     writeJSON(filename,vtx, idx, pdx, clx)
-     print ('Block [' + fid +'] processed,  output: '+filename)
-    
+    print
+    print('Info from file:')
+    print('----------------------------')
+    print('geometry:\t%s'%mode)
+    print('vertices:\t'  + str(v_count))
+    print('normals:\t'   + str(n_count))
+    print('indices:\t'   + str(i_count))
+    print('scalars:\t'   + str(pd_count))
+    print('colors:\t'    +str(c_count))   
+    print('max index id:\t[%d]'% max(indices)) 
+    if mode == 'SOLID':
+        print('triangles:\t' + str(i_count/3)) 
+    else:
+        print('lines:\t'+ str(i_count/2))
  
-# -----------------------------------------------------------------------
-# Calculates new index array for the block in question
-# ver - vertices
-# ind - indices
-# seg - segment
-# -----------------------------------------------------------------------
-def weaveBlock(blockID, ver,ind, pod,clr):
-    lowerBound  = ARRAY_SIZE*blockID
-    upperBound = ARRAY_SIZE*(blockID+1)
-    if upperBound > len(ind):
-        upperBound = len(ind)
-    newindex = dict()
-    vtxBlock = []   # new vertex array
-    idxBlock = []   # new index array
-    pdxBlock = []   # new scalar array
-    clrBlock = []   # new color array
-    
-    hasPointData = len(pod)>0
-    hasColorData = len(clr)>0
-    
-    # Set of indices to be processed
-    aux = ind[lowerBound:upperBound]
-    taux = len(aux)
-    nidx = -1
-    
-    
-    print('Weaving block #' + str(blockID+1) + '  ['+str(lowerBound)+','+str(upperBound)+']')
-    
-    #for each index to be processed
-    for i,oidx in enumerate(aux):
-        sys.stdout.write('Processing index %d out of %d \r' % (i,taux))
-        # if index hasn't been mapped
-        if oidx not in newindex.keys():
-            nidx = nidx + 1
-            # create new index for the old index (incrementally)
-            idxBlock.append(nidx)
-            # save in the map for posterior searches
-            newindex[oidx] = nidx
-            # multiply by three to find the right starting point in the vertex array
-            index = oidx * 3
-            # add the correspondent vertex into the new position in the new vertex array
-            vtxBlock.append(ver[index])
-            vtxBlock.append(ver[index+1])
-            vtxBlock.append(ver[index+2])
-            # add the correspondent point data if any
-            if hasPointData:
-                pdxBlock.append(pod[oidx])
-            
-            if hasColorData:
-                clrBlock.append(clr[index])
-                clrBlock.append(clr[index+1])
-                clrBlock.append(clr[index+2])
-        else:
-            # if the index was mapped then use it in the new index array
-            idxBlock.append(newindex[oidx])
-    print('')
-    del aux
-    return vtxBlock, idxBlock, pdxBlock, clrBlock
-
-# -----------------------------------------------------------------------    
-# Writes a JSON file segment
-# -----------------------------------------------------------------------
-def writeJSON(fname,ver,ind, pod, clr):
-    f = open(fname,'w')
-    f.write('{\n')
-    # writing vertices    
-    f.write('  "vertices" : [')
-    for v in ver[0:len(ver)-1]:
-        f.write(str(v)+',')
-    f.write(str(ver[len(ver)-1])+'],\n')
-    
-    # writing indices
-    f.write('  "indices" : [')
-    for i in ind[0:len(ind)-1]:
-        f.write(str(i)+',')
-    f.write(str(ind[len(ind)-1])+'],\n')
-    
-    # writing scalars    
-    if len(pod) > 0:
-        f.write('  "scalars" : [')
-        for pd in  pod[0:len(pod)-1]:
-            f.write(str(pd)+',')
-        f.write(str(pod[len(pod)-1])+'],\n')
         
-    # writing colors
-    if len(clr) > 0:
-        f.write('  "colors" : [')
-        for cl in  clr[0:len(clr)-1]:
-            f.write(str(cl)+',')
-        f.write(str(clr[len(clr)-1])+'],\n')
+'''
+-----------------------------------------------------------------------
+ Obtains information for one vertex
+-----------------------------------------------------------------------
+'''
+def getVertexData(index):
     
-    f.write('  "mode" : "'+mode+'"\n')    
-    f.write('}')
-    f.close()
+    vertex = {};
     
+    vertex['coords']   = vertices[index*3: index*3+3]
+    
+    if (len(normals)>0):
+        vertex['normal'] = normals[index*3: index*3+3]
+        
+    if (len(colors)>0):
+        vertex['color'] = colors[index*3: index*3+3]
+    
+    if (len(scalars)>0):
+        vertex['scalar'] = scalars[index]
+    
+    return vertex
+   
+
+def processBigData2():
+    
+    global num_parts
+    
+    print 
+    print 'Processing Big Data 2'
+    print
+    
+    global_index = indices
+    size =  65535
+    
+    if mode=='LINES':
+        size = size -1
+    L = len(global_index)    
+    has_normals = len(normals) > 0
+    has_colors  = len(colors)  > 0
+    has_scalars = len(scalars) > 0
+    
+    
+    part = {'vertices':[], 'indices':[],'mode':mode}
+    if (has_colors):  
+        part['colors'] = []
+    if (has_normals): 
+        part['normals'] = []
+    if (has_scalars):
+        part['scalars'] = []
+    
+    index_map = {}
+    part_number = 1
+    new_index = 0
+    
+    for p, index in enumerate(global_index):
+        
+        progress = (p/float(L)) *100
+        
+        if index not in index_map:
+             
+            index_map[index] = new_index
+            vertex = getVertexData(index)
+            
+            part['vertices'] += vertex['coords']
+            
+            if has_normals:
+                part['normals'] += vertex['normal']
+            if has_colors:
+                part['colors'] += vertex['color']
+            if has_scalars:
+                part['scalars'].append(vertex['scalar'])
+            
+            new_index +=1;
+        
+        part['indices'].append(index_map[index])
+        
+        if new_index == size + 1 or p == L-1:
+            
+            sys.stdout.write('Status: [Part %d]  [%s%.1f]\r' % (part_number,'%',progress))
+            
+            createPart(part_number, part)
+            
+            new_index    = 0
+            part_number += 1
+            part         = {'vertices':[], 'indices':[],'mode':mode}
+            index_map    = {}
+            
+            if (has_colors):  
+                part['colors'] = []
+            if (has_normals): 
+                part['normals'] = []
+            if (has_scalars):
+                part['scalars'] = []
+     
+       
+    print ('DONE.')
 
 
+def processBigData():
+    
+    global num_parts
+    
+    print 
+    print 'Processing Big Data'
+    print
+    
+    global_index = indices
+    size =  65535
+    
+    if mode=='LINES':
+        size = size -1
+    L = len(global_index)    
+    N = len(global_index) // size
+    R = len(global_index) % size
+    
+    has_normals = len(normals) > 0
+    has_colors  = len(colors)  > 0
+    has_scalars = len(scalars) > 0
+    
+    #parts = []
+    num_parts = N if R==0 else N+1
+    
+    print( 'Number of Parts: %d'%(num_parts))
+    print
+    
+    for i in range(N+1):
+        
+        part              = {}
+        index_map         = {}
+        global_index_part = []
+        new_index         = 0
+        
+        if i<N:
+            global_index_part = global_index[i*size:(i+1)*size];
+        elif R>0:
+            global_index_part = global_index[i*size:i*size+R];
+        else:
+            break;
+        
+        part['vertices'] = []
+        part['indices']  = []
+         
+        if (has_colors):  
+            part['colors'] = []
+        if (has_normals): 
+            part['normals'] = []
+        if (has_scalars):
+            part['scalars'] = []
+            
+        for k in range(len(global_index_part)):
+            
+            
+            index = global_index_part[k]
+            sys.stdout.write('Status: [Part %d of %d] [index %d out of %d] \r' % (i+1,num_parts, index,L))
+            
+            if index not in index_map:
+                index_map[index] = new_index
+                
+                vertex = getVertexData(index)
+                
+                part['vertices'] += vertex['coords']
+                
+                if has_normals:
+                    part['normals'] += vertex['normal']
+                
+ 
+                if has_colors:
+                    part['colors'] += vertex['color']
+                
+ 
+                if has_scalars:
+                    part['scalars'].append(vertex['scalar'])
+                
+                new_index +=1;
+                
+            part['indices'].append(index_map[index])
+        part['mode'] = mode
+        createPart(i+1, part)
+        
+    print ('DONE.')
 
-
+        
 # -----------------------------------------------------------------------    
-# Main function
+# Selects a part to process
 # -----------------------------------------------------------------------    
+def createPart(part_id, part):
+    
+    file_id = str(part_id)
+     
+    if num_parts == 1:
+        filename = outputfile + '.json'
+    else:
+        filename = outputfile+'_'+file_id+'.json'
+    
+    with open(filename,'w') as part_file:
+        json.dump(part,part_file,indent=2)
+    
+   
+
+''' 
+-----------------------------------------------------------------------    
+ Main function
+-----------------------------------------------------------------------    
+'''
 def main():
     global outputfile
     if len(sys.argv) != 3:
-        print ('Usage: python vxl_vtk_importer.py vtkFile.vtk outputFile')
+        print
+        print ('Usage:\n\n python vtk2json.py [vtk file (ASCII)] [output file (no extension)]')
         exit()
     
     outputfile = sys.argv[2]
@@ -275,7 +411,7 @@ def main():
     print(' Processing: ' + sys.argv[1])
     print('----------------------------------------------------------')
     parseVTK(sys.argv[1])
-    processIndexBlocks()
+    processBigData2()
     print('----------------------------------------------------------')
     print("                       DONE                               ")
     print('----------------------------------------------------------')

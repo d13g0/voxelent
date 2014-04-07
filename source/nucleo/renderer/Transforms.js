@@ -15,60 +15,82 @@
 ---------------------------------------------------------------------------*/   
 
 /**
+ * This is a class that interfaces between the current camera and the rendering engine.
+ * It contains the matrices used by the current camera and that will be used for 
+ * performing rendering calculations.
+ * 
+ * This class also keeps track of the push-pop operations on the model-view matrix stack.
+ * This is required to combine local and global transformations.
+ * 
  * @class Encapsulates the matrices required to perform 3D rendering
  * @constructor
  * @author Diego Cantor
+ * @param {vxlView} p_view the view that this object will refer to.
  */
-function vxlTransforms(vw){
+function vxlTransforms(p_view){
+	
 	this._stack = [];
-	this.view = vw;
-	this.mvMatrix    = mat4.create();    // The Model-View matrix
-	this.pMatrix     = mat4.create();    // The projection matrix
-	this.nMatrix     = mat4.create();    // The normal matrix
-	this.cMatrix     = mat4.create();    // The camera matrix
-	this.mvpMatrix   = mat4.create();	
+	this.view = p_view;
+	
+	this.model_view               = mat4.create();   // The Model-View matrix
+	this.projection               = mat4.create();   // The projection matrix
+	this.camera                   = mat4.create();   // The camera matrix
+	this.normal                   = mat4.create();   // The normal matrix
+	this.projection_model_view   = mat4.create();	
 };
 
 /**
- * Calculates the Model-View matrix for the current camera.
+ * Calculates the current model-view transform.
+ * This reference is updated whenever the active camera changes.
  */
 vxlTransforms.prototype.calculateModelView = function(){
-	mat4.copy(this.mvMatrix, this.view.cameraman.active.getViewTransform());
+    //Copy is required so we can do push pop operations
+	this.model_view = mat4.copy(this.model_view,this.view.cameraman.active.getViewTransform());
     
+};
+
+/**
+ *Calculates the current camera matrix from the current model-view matrix 
+ */
+vxlTransforms.prototype.calculateCamera = function(){
+    this.camera = mat4.inverse(this.camera, this.model_view);
 };
 
 /**
  * Calculates the normal matrix corresponding to the current Model-View matrix
  */
 vxlTransforms.prototype.calculateNormal = function(){
-	this.nMatrix = mat4.clone(this.mvMatrix);
-    this.nMatrix = mat4.invert(mat4.create(), this.nMatrix);
-    this.nMatrix = mat4.transpose(this.nMatrix, this.nMatrix);
+	this.normal = mat4.clone(this.model_view);
+    this.normal = mat4.invert(mat4.create(), this.normal);
+    this.normal = mat4.transpose(this.normal, this.normal);
 };
 
 /**
- * Calculates the perspective matrix given the current camera
+ * Calculates the projection matrix given the current camera.
+ * The projection may be orthographic or perspective
  */
-vxlTransforms.prototype.calculatePerspective = function(){
+vxlTransforms.prototype.calculateProjection = function(){
     var c = this.view.cameraman.active;
-    var vw = this.view;
-    var rads = vxl.util.deg2rad(c._fov);
-	mat4.perspective(this.pMatrix, rads, vw.width/vw.height, c.Z_NEAR, c.Z_FAR);
+    c.updatePerspective();
+    this.projection = c._perspective;  //for now
 };
 
+/**
+ * Calculates the projection-model-view matrix 
+ */
+vxlTransforms.prototype.calculateProjectionModelView = function(){
+    mat4.multiply(this.projection_model_view, this.projection, this.model_view);
+};
 
-vxlTransforms.prototype.calculateModelViewPerspective = function(){
-    mat4.multiply(this.mvpMatrix, this.pMatrix, this.mvMatrix);
-}
 /**
  * Calculate the transforms for the current view.renderer
  * 
  */
 vxlTransforms.prototype.update = function(){
     this.calculateModelView();
-    this.calculatePerspective();
+    this.calculateProjection();
     this.calculateNormal();
-    this.calculateModelViewPerspective();
+    this.calculateProjectionModelView();
 };
 
 /**
@@ -79,7 +101,7 @@ vxlTransforms.prototype.update = function(){
 
 vxlTransforms.prototype.push = function(){
 	var memento =  mat4.create();
-	mat4.copy(memento, this.mvMatrix);
+	mat4.copy(memento, this.model_view);
 	this._stack.push(memento);
 };
 
@@ -89,8 +111,10 @@ vxlTransforms.prototype.push = function(){
  */
 vxlTransforms.prototype.pop = function(){
 	if(this._stack.length == 0) return;
-	this.mvMatrix  =  this._stack.pop();
+	
+	this.model_view  =  this._stack.pop();
+	
 	this.calculatePerspective();
 	this.calculateNormal();
-	this.calculateModelViewPerspective();
+	this.calculateProjectionModelView();
 };

@@ -1,0 +1,109 @@
+<html>
+<head>
+<meta name='Diego Cantor'       content='Voxelent: The best WebGL platform yet'>
+<meta name='copyright'          content='&copy 2014'>
+<meta name='robots'             content='all'>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name='keywords'           content='webgl, webgl platform, medical imaging, webgl api'>
+<meta http-equiv="expires"      content="0">
+<link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
+<script src="lib/jquery.js"     type="text/javascript"></script>
+<script src="lib/jquery-ui.js"  type="text/javascript"> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.1.js'> </script>
+<script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
+
+<title>Voxelent - DTI tracts</title>
+
+<script type='text/javascript'>
+	var view,c;
+	
+	function runVoxApp(){
+		
+		vxl.go.notifier.subscribe(vxl.events.MODELS_LOADED, this);
+	    view = vxl.api.setup('view-1');
+	    
+	    var gui = new vxlGUI(view); 
+	  
+	    view.start();
+	    createWalk();
+	    
+	    c = vxl.c.camera.setPosition(0,0,10);
+	    c.longShot();
+	    vxl.api.boundingBoxON();
+	}
+	
+	function createWalk(){
+		var radius =50;
+		var elevation, azimuth,x,y,z;
+		
+		elevation =  Math.random() * Math.PI / 180;
+		azimuth =  Math.random() * Math.PI /180;
+		
+		var vertices = [];
+		var indices = [];
+		var colors  =[];
+		
+		x = radius * Math.sin(elevation) * Math.cos(azimuth);
+		y = radius * Math.sin(elevation) * Math.sin(azimuth);
+		z = radius * Math.cos(elevation);
+		
+		vertices = [x,y,z];
+		colors    = [0,0,1];
+	  
+	    
+	    var sign = undefined;
+		var total = 65535*3; //Unrenderable by WebGL alone
+		
+		for(var i=0;i<total;i+=1){
+			
+			if (i%1000 == 0){
+				console.debug('progress: '+i);
+			}
+			sign = (Math.random()>0.5?-1:1);
+			elevation = elevation + sign * Math.random() * Math.PI / 180;
+			sign = (Math.random()>0.5?-1:1);
+			azimuth = azimuth + sign * Math.random() * Math.PI / 180;
+			
+			x = radius * Math.sin(elevation) * Math.cos(azimuth);
+		    y = radius * Math.sin(elevation) * Math.sin(azimuth);
+		    z = radius * Math.cos(elevation);
+		    
+		    vertices.push(x); vertices.push(y);vertices.push(z);
+		    indices.push(i); indices.push(i+1);
+		    
+		    if (i<65535){
+		     	colors.push(0);colors.push(0);colors.push(1);
+		   }
+		   else if (i>65535 && i<65535*2) {
+		   		colors.push(0);colors.push(1);colors.push(0);
+		   }
+		   else{
+		   		colors.push(1);colors.push(0);colors.push(0);
+		   }
+		    
+		}
+		
+		var model = new vxlModel('walk',{vertices:vertices, indices:indices, colors:colors,mode:'LINES'});
+		walk = new vxlActor(model);
+		vxl.c.scene.addActor(walk);
+	}
+
+</script>
+
+<script type="text/javascript">
+  //Google Analytics Script 
+  var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-26954785-1']); _gaq.push(['_trackPageview']);  (function() {  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);   })();
+</script>
+
+</head>
+<body onload='runVoxApp()'>
+	<div><img src="css/img/voxelent.png" /></div>
+	<div>
+	<canvas id = 'view-1' width='1200' height='600'>
+		<p>
+			Your browser does not support WebGL :-(
+		</p>
+	</canvas>
+    </div>
+</body>			
+</html>

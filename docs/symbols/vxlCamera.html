@@ -37,7 +37,7 @@
 			<!-- begin publish.classesIndex -->
 			<div align="center"><h2><a href="../index.html">Class List</a></h2></div>
 <hr />
-<h3>Current Version:  0.90.0</h3>
+<h3>Current Version:  0.90.1</h3>
 <p>Download it <a href='http://voxelent.com/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -304,7 +304,7 @@ matrix manipulations that are required to view a 3D scene.</div>
 								
 								
 								<b><a href="../symbols/vxlCamera.html#createLandmark">createLandmark</a></b>
-								(name, position, focalPoint)
+								(name, position, focalPoint, roll)
 								</div>
 							</td>
 							
@@ -569,6 +569,28 @@ matrix manipulations that are required to view a 3D scene.</div>
 								
 								
 								
+								<b><a href="../symbols/vxlCamera.html#setAspectRatio">setAspectRatio</a></b>
+								(p_aspect)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
 								<b><a href="../symbols/vxlCamera.html#setAzimuth">setAzimuth</a></b>
 								(el)
 								</div>
@@ -723,6 +745,28 @@ matrix manipulations that are required to view a 3D scene.</div>
 								
 								
 								
+								<b><a href="../symbols/vxlCamera.html#setPerspective">setPerspective</a></b>
+								(p_near, p_far, p_angle, p_aspect)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
 								<b><a href="../symbols/vxlCamera.html#setPosition">setPosition</a></b>
 								(y, z, z)
 								</div>
@@ -855,6 +899,28 @@ matrix manipulations that are required to view a 3D scene.</div>
 								
 								
 								
+								<b><a href="../symbols/vxlCamera.html#stopLandmarkAnimation">stopLandmarkAnimation</a></b>
+								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
 								<b><a href="../symbols/vxlCamera.html#translate">translate</a></b>
 								(x, y, z)
 								</div>
@@ -878,6 +944,28 @@ matrix manipulations that are required to view a 3D scene.</div>
 								
 								
 								<b><a href="../symbols/vxlCamera.html#unfollow">unfollow</a></b>
+								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlCamera.html#updatePerspective">updatePerspective</a></b>
 								()
 								</div>
 							</td>
@@ -1201,7 +1289,7 @@ cameras (through its <code>vxlCameraManager</code>)</p>
 					
 					
 					
-					  <b>createLandmark</b>(name, position, focalPoint)
+					  <b>createLandmark</b>(name, position, focalPoint, roll)
 					</div>
 					</div>
 					<div class="description">
@@ -1248,6 +1336,18 @@ cameras (through its <code>vxlCameraManager</code>)</p>
 									<code>focalPoint</code>
 								</td>	
 								<td><p>the desired focalPoint for the camera at the landmark
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>roll</code>
+								</td>	
+								<td><p>
 								
 								</p>
 								</td>
@@ -1841,6 +1941,60 @@ vxlCamera.refresh -> vxlView.refresh -> vxlRenderer.render
 				</div>	
 				
 				<div class='methodDetail'>
+					<a name="setAspectRatio"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setAspectRatio</b>(p_aspect)
+					</div>
+					</div>
+					<div class="description">
+						<p>Forces the aspect ratio of the camera to a certain value.</p>
+<p>To go back to the default aspect ratio that relies on the dimensions 
+of the view associated to this camera use:
+
+<code>setAspectRatio(undefined)</code>
+
+</p>
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{Number}</span> 
+								</td>
+								<td>
+									<code>p_aspect</code>
+								</td>	
+								<td><p>the new aspect ratio
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
 					<a name="setAzimuth"> </a>
 					<div class="title">
 					<div class="fixedFont">
@@ -2197,6 +2351,91 @@ Note: If the camera is doing cinematic tracking, the up vector will be affected.
 									<code>matrix</code>
 								</td>	
 								<td><p>the new camera matrix
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
+					<a name="setPerspective"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setPerspective</b>(p_near, p_far, p_angle, p_aspect)
+					</div>
+					</div>
+					<div class="description">
+						Sets the perspective of the camera. Defines the viewing frustum and its shape
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{Number}</span> 
+								</td>
+								<td>
+									<code>p_near</code>
+								</td>	
+								<td><p>the distance from the camera to the near plane
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									<span class="light fixedFont">{Number}</span> 
+								</td>
+								<td>
+									<code>p_far</code>
+								</td>	
+								<td><p>the distance from the camera to the far plane
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									<span class="light fixedFont">{Number}</span> 
+								</td>
+								<td>
+									<code>p_angle</code>
+								</td>	
+								<td><p>the vertical field of view in degrees
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									<span class="light fixedFont">{Number}</span> 
+								</td>
+								<td>
+									<code>p_aspect</code>
+								</td>	
+								<td><p>the desired aspect ratio (optional). If not defined the camera 
+automatically selects the current width/height radio of the respective view.
 								
 								</p>
 								</td>
@@ -2572,6 +2811,37 @@ By default the camera angles are not reversed.
 				</div>	
 				
 				<div class='methodDetail'>
+					<a name="stopLandmarkAnimation"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>stopLandmarkAnimation</b>()
+					</div>
+					</div>
+					<div class="description">
+						If there is a landmark based animation in progress it will stop it.
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
 					<a name="translate"> </a>
 					<div class="title">
 					<div class="fixedFont">
@@ -2675,6 +2945,38 @@ By default the camera angles are not reversed.
 				</div>	
 				
 				<div class='methodDetail'>
+					<a name="updatePerspective"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>updatePerspective</b>()
+					</div>
+					</div>
+					<div class="description">
+						Updates the current perspective matrix when one of the internal perspective variables
+[near,far,fov] has changed, or when the view has changed its dimensions [width, height]
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
 					<a name="updateWithActor"> </a>
 					<div class="title">
 					<div class="fixedFont">
@@ -2736,7 +3038,7 @@ this camera is following the actor passed as parameter here
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Mar 30 2014 03:31:57 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Apr 07 2014 17:40:50 GMT-0400 (EDT)
 		</div>
         </div>
         </div>

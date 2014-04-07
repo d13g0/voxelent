@@ -43,7 +43,7 @@ vxlMaterial.prototype.getFrom = function(model){
     }
     
     if (model.diffuse != undefined){
-        this.diffuse = model.diffuse.slice(0) 
+        this.diffuse = model.diffuse.slice(0);
     }
     
     if (model.specular != undefined){
@@ -74,6 +74,7 @@ vxlMaterial.prototype.getFrom = function(model){
         this.colors = model.colors;
     }
     
+    return this;
     
 };
 

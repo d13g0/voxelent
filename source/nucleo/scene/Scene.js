@@ -522,7 +522,7 @@ vxlScene.prototype.getActorByCellUID = function(UID){
  */
 vxlScene.prototype.createActorGroup = function(name, list){
     var actorGroup = undefined;
-    if(this.getActorGroup(name) != null){
+    if(this.getActorGroup(name) != undefined){
         alert('vxlScene.createActorGroup: an actor group with the name '+name+' already exists');
         throw('vxlScene.createActorGroup: an actor group with the name '+name+' already exists');
     }
@@ -552,5 +552,5 @@ vxlScene.prototype.getActorGroup = function(name){
             return this._groups[i];
         }
     }
-    return null;
+    return undefined;
 };

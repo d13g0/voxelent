@@ -122,7 +122,7 @@ vxlFrameAnimation.prototype._timeUp = function(){
     setTimeout((function(self){
         return function(){
             self._timeUp();
-        }
+        };
     })(this), this.renderRate - diff);
     
 };

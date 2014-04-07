@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-    This file is part of Voxelent's Nucleo
+    This file is part of Voxelent's Nucleo 
 
     Nucleo is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ var vxl = {
 */
 version : 
 {
-    number: '0.90.0',
+    number: '0.90.1',
    	codename : 'c4n314',
    	plugins  : []
 },
@@ -375,7 +375,7 @@ def : {
     * @property {vxl.def.renderer.rate} rate The rendering rat
     */
 	renderer 		: {
-			        mode: { TIMER:'TIMER', ANIMFRAME:'ANIFRAME'}, //EXPERIMENTAL NOT WAY TO CANCEL YET },
+			        mode: { TIMER:'TIMER', ANIMFRAME:'ANIMFRAME', ON_DEMAND:'ON_DEMAND'}, 
 			        rate : { SLOW: 10000,  NORMAL: 500 }
 	},
 	
@@ -450,49 +450,6 @@ go : {
     views               : [],
     scenes              : [],
     essl : {},
-    renderman : {
-
-		_timid : 0,
-		_rates : [],
-		_stop  : false,
-		
-		render : function(){
-			for(var i=0; i<vxl.go.views.length;i+=1){
-				vxl.go.views[i].renderer.render();
-			}
-			if (vxl.go.renderman._stop != true){
-			 vxl.go.renderman._timid = window.requestAnimFrame(vxl.go.renderman.render);
-			}
-			else{
-			    vxl.go.renderman._stop = false;
-			}
-		},
-		
-		cancel : function(){
-		    vxl.go.renderman._stop = true;
-		},
-		
-		slow : function(){
-			/*vxl.go.renderman._rates = [];
-			for(var i = 0; i < vxl.go.renderman._views.length; i++){
-			    if (vxl.go.renderman._views[i].renderer.mode == vxl.def.renderer.mode.ANIMFRAME) continue;
-				vxl.go.console('vxl.go.slowRendering: slow rendering on view '+vxl.go.renderman._views[i].name,true);
-				vxl.go.renderman._rates.push(vxl.go.renderman._views[i].renderer.renderRate);
-				vxl.go.renderman._views[i].renderer.setRenderRate(vxl.def.renderer.rate.SLOW);
-			}*/
-		},
-		
-		normal : function(){
-			/*for(var i = 0; i < vxl.go.renderman._views.length; i++){
-			    if (vxl.go.renderman._views[i].renderer.mode == vxl.def.renderer.mode.ANIMFRAME) continue;
-				vxl.go.console('vxl.go.normalRendering: go back to normal rendering on view '+vxl.go.renderman._views[i].name,true);
-				if (vxl.go.renderman._rates[i] != undefined){
-				    vxl.go.renderman._views[i].renderer.setRenderRate(vxl.go.renderman._rates[i]);
-				}
-			}*/
-		}
-	},
-	
 	console : function(txt,flag) { 
 		if (this.debug == true || flag){
 			console.info(txt);
@@ -508,13 +465,15 @@ go : {
 * @property {vxlCamera}         camera      the current camera
 * @property {vxlActor}          actor       the current actor
 * @property {vxlFrameAnimation} animation   the current animation
+* @property {vxlEngine} engine   the current rendering engine
 */
 c : {
 	scene		: undefined,
 	view		: undefined,
 	camera 		: undefined,
 	actor		: undefined,  
-	animation 	: undefined
+	animation 	: undefined,
+	engine      : undefined //since 0.90.0
 },
 /**
  * Utility functions

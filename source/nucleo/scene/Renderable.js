@@ -45,7 +45,10 @@ function vxlRenderable(actor){
     this.actor = actor;
     this.parts = [];    
     this.update(vxl.def.renderable.task.CREATE);
-}
+};
+
+
+
 
 
 /**
@@ -60,15 +63,30 @@ vxlRenderable.prototype.update = function(task){
     }
 
   
-    var model  = this.actor.getRenderableModel();
+    var model  = this._getModel();
     
-    if (model == undefined) return;
+    if (model == undefined) return; //no model to process
     
     switch(model.type){
-        case vxl.def.model.type.MESH: this._processMesh(model,task); break;
+        case vxl.def.model.type.MESH:     this._processMesh(model,task); break;
         case vxl.def.model.type.BIG_DATA: this._processBigData(model,task); break;
     }
    
+};
+
+/**
+ * Queries the actor for a model to process
+ * @private
+ */
+vxlRenderable.prototype._getModel = function(){
+    var actor = this.actor;
+    if (actor.mesh && actor.mesh.model){
+        return actor.mesh.model;
+    }
+    else if (actor.model.type == vxl.def.model.type.BIG_DATA){
+        return actor.model;
+    }
+    else return undefined;
 };
 
 /**
@@ -162,109 +180,112 @@ vxlRenderable.prototype._reindex = function(indices){
         indices[i] = indices[i] - min;
     }
     return indices;
-}
+};
 
 
 /***
- * Processing big data 
  * 
- * The idea here is read chunks of size 65K from the model index array. Then obtain vertex, normal, and color
- * arrays for each index in the chunk.
- * After that, the new part index is generated
  * 
+ * The idea here is to read parts of size 65K from the model index array. 
+ * Then obtain vertex, normal, and color arrays for each index in the part (using _getVertexData).
+ * 
+ * As each part is populated, the respective index array is generated accordingly.
  * 
  */
 vxlRenderable.prototype._processBigData = function(model,reslice){
     
+    var global_index = model.indices;
+    var size         = vxl.def.model.MAX_NUM_INDICES;
     
+    if (model.mode == vxl.def.actor.mode.LINES){
+        size = size - 1; //adjusting to even number of indices for partitioning.
+    }
+   
+    var L            = global_index.length;
+    var max_index    = global_index.max();
+    var material     = this.actor.material;
+    var has_colors   = (material.colors && material.colors.length>0);
+    var has_normals  = (model.normals   && model.normals.length>0);
+    var has_scalars  = (model.scalars   && model.scalars.length>0);
+    var mode         = model.mode;
     
-    var bigDataIndex = model.indices;
+    data = {vertices:[], indices:[],mode:mode};
+    if (has_colors)  { data.colors = [];  }
+    if (has_normals) { data.normals = []; }
+    if (has_scalars) { data.scalars = []; }
     
-    var size = vxl.def.model.MAX_NUM_INDICES;
+    index_map = {};
+    part_number = 1;
+    new_index = 0;
+    progress = 0;
     
-    var N = Math.floor(model.indices.length / size);
-    var R = model.indices.length % size;
-    
-    var material = this.actor.material;
-    
-    //TODO: Be more clever about the partitioning. The arrays don't need to have 65K in lenght
-    //what the specs means is that the max element in the array index is 65K.
-    //this is because the index range goes up to 65535 as the highest index.
-    
-    for (var i=0; i<=N; i +=1){
+    for (var i=0; i<L; i +=1){
         
-        var part = new vxlModel(model.name+'-renderable-part-'+i);    
-        var indexMap = [], localIndexArray = [], globalIndexArray = [], innerIndex = 0;
+        index = global_index[i];
         
-        if (i == N) {
-            if ( R > 0){
-                globalIndexArray = bigDataIndex.slice(i*size,i*size+R);
-             }
-             else{
-                 break;
-             }
-        }
-        else{
-            globalIndexArray = bigDataIndex.slice(i*size,(i+1)*size);
-        }
-        
-        if (material.colors && material.colors.length>0)  {  part.colors = [];   }   
-        
-        if (model.normals && model.normals.length>0){  part.normals = [];  }
-        
-        if (model.scalars && model.scalars.length>0){  part.scalars = [];  }
-        
-        for(var k=0,K = globalIndexArray.length; k<K; k+=1){
-            //Get an index from the global index
-            var outerIndex  = globalIndexArray[k];
-            
-            //if it has not been processed then process it.
-            //Processing consist into adding data to the respective part arrays
-            if (indexMap[outerIndex] == undefined){
-                indexMap[outerIndex] = innerIndex;
+        if  (index_map[index] == undefined){
+    
+            index_map[index] = new_index;
+            vertex = this._getVertexData(index);
+            data.vertices.push.apply(data.vertices, vertex.coords);
                 
-                vertexInfo = this._getBigDataVertexInfo(outerIndex);
-                part.vertices.push.apply(part.vertices, vertexInfo.coords);
-                if (model.normals && model.normals.length>0){
- 
-                    part.normals.push.apply(part.normals, vertexInfo.normal);
-                }
-                if (material.colors && material.colors.length>0){
-                    part.colors.push.apply(part.colors, vertexInfo.color);
-                }
-                if (model.scalars && model.scalars.length>0){
-                    part.scalars.push(vertexInfo.scalar);
-                }
-                innerIndex +=1;
+            if (has_normals){
+                data.normals.push.apply(data.normals, vertex.normal);
             }
-            //write the new index to the part index array
-            part.indices.push(indexMap[outerIndex]);
-            
+ 
+            if (has_colors){
+                data.colors.push.apply(data.colors, vertex.color);
+            }
+ 
+            if (has_scalars){
+                data.scalars.push(vertex.scalar);
+            }
+            new_index +=1;
         }
-        part.update();
-        this.parts.push(part);
-    }   
+        data.indices.push(index_map[index]);
+        
+        if ((new_index == size+1) || (i == L-1)){
+            
+            var part = new vxlModel(model.name+'-renderable-part-'+part_number,data);
+            part.update();
+            vxl.go.console('Creating part '+part.name+' ['+part_number+']',true);    
+            this.parts.push(part);
+            
+            new_index    = 0;
+            part_number += 1;
+            part         = {vertices:[], indices:[],mode:mode};
+            index_map    = {};
+            
+            data = {vertices:[], indices:[],mode:mode};
+            if (has_colors)  { data.colors = [];  }
+            if (has_normals) { data.normals = []; }
+            if (has_scalars) { data.scalars = []; }
+        } 
+    }
+        
 };
 
 /**
- * Unlike meshes, Big Data models do not have picking colors associated
+ * Useful to divide a big data model into renderable parts. The method _processBigData
+ * will read information from the buffers indicated by the index in order to populate each
+ * renderable part with the correct information 
+ * 
  * @param {Object} index
  * @private
  */
-vxlRenderable.prototype._getBigDataVertexInfo = function(index){
+vxlRenderable.prototype._getVertexData = function(index){
     
-    var material = this.actor.material;
-    var model = this.actor.model;
+    var material   = this.actor.material;
+    var model      = this.actor.model;
+    var vertex = {};
     
-    var vertexInfo = {};
+    vertex.coords   = model.vertices.slice(index*3, index*3+3);
     
-    vertexInfo.coords = model.vertices.slice(index*3, index*3+3);
+    if (model.normals)   {  vertex.normal  = model.normals.slice(index*3, index*3+3);  }
+    if (material.colors) {  vertex.color   = material.colors.slice(index*3, index*3+3);}
+    if (model.scalars)   {  vertex.scalar  = model.scalars[index];}
     
-    if (model.normals){ vertexInfo.normal = model.normals.slice(index*3, index*3+3);}
-    if (material.colors){  vertexInfo.color = material.colors.slice(index*3, index*3+3);}
-    if (model.scalars){  vertexInfo.scalar = model.scalars[index];}
-    
-    return vertexInfo;
+    return vertex;
     
     
 };

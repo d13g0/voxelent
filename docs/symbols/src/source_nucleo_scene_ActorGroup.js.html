@@ -135,167 +135,176 @@
 <span class='line'>128</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>129</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>130</span> 
-<span class='line'>131</span> 
-<span class='line'>132</span> </span><span class="COMM">/**
-<span class='line'>133</span>  * Returns the size of the actor group
-<span class='line'>134</span>  * @returns {Number} the lenght of the actor group
-<span class='line'>135</span>  */</span><span class="WHIT">
-<span class='line'>136</span> </span><span class="NAME">vxlActorGroup.prototype.size</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>137</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.list.length</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>138</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>139</span> 
-<span class='line'>140</span> </span><span class="COMM">/**
-<span class='line'>141</span>  * Set a property for actors in the group. Please notice that by design actor groups only 
-<span class='line'>142</span>  * set actor level properties instead of model level properties.
-<span class='line'>143</span>  * 
+<span class='line'>131</span> </span><span class="COMM">/**
+<span class='line'>132</span>  * Resets the contents of this actor group
+<span class='line'>133</span>  */</span><span class="WHIT">
+<span class='line'>134</span> </span><span class="NAME">vxlActorGroup.prototype.reset</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">list</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>135</span> </span><span class="WHIT">   </span><span class="NAME">this.list</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>136</span> </span><span class="WHIT">   </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">list</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">list</span><span class="WHIT"> </span><span class="KEYW">instanceof</span><span class="WHIT"> </span><span class="NAME">Array</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="WHIT">       </span><span class="NAME">this.addList</span><span class="PUNC">(</span><span class="NAME">list</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>138</span> </span><span class="WHIT">   </span><span class="PUNC">}</span><span class="WHIT">  
+<span class='line'>139</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>140</span> 
+<span class='line'>141</span> </span><span class="COMM">/**
+<span class='line'>142</span>  * Returns the size of the actor group
+<span class='line'>143</span>  * @returns {Number} the lenght of the actor group
 <span class='line'>144</span>  */</span><span class="WHIT">
-<span class='line'>145</span> </span><span class="NAME">vxlActorGroup.prototype.setProperty</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">property</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>146</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">N</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.list.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">N</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">+</span><span class="PUNC">=</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>147</span> </span><span class="WHIT">        </span><span class="NAME">this.list</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">setProperty</span><span class="PUNC">(</span><span class="NAME">property</span><span class="PUNC">,</span><span class="NAME">value</span><span class="PUNC">,</span><span class="NAME">vxl.def.actor</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>148</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>149</span> </span><span class="WHIT">    
-<span class='line'>150</span>     </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>151</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>152</span> 
-<span class='line'>153</span> </span><span class="COMM">/**
-<span class='line'>154</span>  * Invoke an operation on the actors belonging to this group
-<span class='line'>155</span>  * @param {function} operation from vxlActor.prototype
-<span class='line'>156</span>  * @param {list} parameters
-<span class='line'>157</span>  */</span><span class="WHIT">
-<span class='line'>158</span> </span><span class="NAME">vxlActorGroup.prototype._apply</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">operation</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">parameters</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>159</span> </span><span class="WHIT">   </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">N</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.list.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">N</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">+</span><span class="PUNC">=</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>160</span> </span><span class="WHIT">        </span><span class="NAME">operation.apply</span><span class="PUNC">(</span><span class="NAME">this.list</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">parameters</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>161</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>162</span> </span><span class="WHIT">    
-<span class='line'>163</span>     </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>164</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>165</span> 
-<span class='line'>166</span> </span><span class="COMM">/**
-<span class='line'>167</span>  * Flip normals
-<span class='line'>168</span>  */</span><span class="WHIT">
-<span class='line'>169</span> </span><span class="NAME">vxlActorGroup.prototype.flipNormals</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>170</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.flipNormals</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>171</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>172</span> 
-<span class='line'>173</span> </span><span class="COMM">/**
-<span class='line'>174</span>  * Rotation on the X axis
-<span class='line'>175</span>  * @param {float} angle angle in degrees
-<span class='line'>176</span>  */</span><span class="WHIT">
-<span class='line'>177</span> </span><span class="NAME">vxlActorGroup.prototype.rotateX</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">angle</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>178</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.rotateX</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">angle</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>179</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>180</span> 
-<span class='line'>181</span> </span><span class="COMM">/**
-<span class='line'>182</span>  * Rotation on the Y axis
-<span class='line'>183</span>  * @param {float} angle angle in degrees
-<span class='line'>184</span>  */</span><span class="WHIT">
-<span class='line'>185</span> </span><span class="NAME">vxlActorGroup.prototype.rotateY</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">angle</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>186</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.rotateY</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">angle</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>187</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>188</span> 
-<span class='line'>189</span> </span><span class="COMM">/**
-<span class='line'>190</span>  * Rotation on the Z axis
-<span class='line'>191</span>  * @param {float} angle angle in degrees
-<span class='line'>192</span>  */</span><span class="WHIT">
-<span class='line'>193</span> </span><span class="NAME">vxlActorGroup.prototype.rotateZ</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">angle</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>194</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.rotateZ</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">angle</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>195</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>196</span> 
-<span class='line'>197</span> </span><span class="COMM">/**
-<span class='line'>198</span>  * Translation by a given vector
-<span class='line'>199</span>  */</span><span class="WHIT">
-<span class='line'>200</span> </span><span class="NAME">vxlActorGroup.prototype.translate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">,</span><span class="NAME">z</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>201</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.translate</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">,</span><span class="NAME">z</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>202</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>203</span> 
-<span class='line'>204</span> </span><span class="COMM">/**
-<span class='line'>205</span>  * Sets the material diffuse color of the group
-<span class='line'>206</span>  * @param {list} color in rgb decimal format
-<span class='line'>207</span>  */</span><span class="WHIT">
-<span class='line'>208</span> </span><span class="NAME">vxlActorGroup.prototype.setColor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">color</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>209</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.setProperty</span><span class="PUNC">(</span><span class="STRN">'color'</span><span class="PUNC">,</span><span class="NAME">color</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>210</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>211</span> 
-<span class='line'>212</span> </span><span class="COMM">/**
-<span class='line'>213</span>  * Sets the lookup table for this group
-<span class='line'>214</span>  */</span><span class="WHIT">
-<span class='line'>215</span> </span><span class="NAME">vxlActorGroup.prototype.setLookupTable</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">lutID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">min</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">max</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>216</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.setLookupTable</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">lutID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">min</span><span class="PUNC">,</span><span class="NAME">max</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>217</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>218</span> 
-<span class='line'>219</span> </span><span class="COMM">/**
-<span class='line'>220</span>  * Sets the opacity for this group
-<span class='line'>221</span>  */</span><span class="WHIT">
-<span class='line'>222</span> </span><span class="NAME">vxlActorGroup.prototype.setOpacity</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">opacity</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>223</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.setProperty</span><span class="PUNC">(</span><span class="STRN">'opacity'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">opacity</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>224</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>225</span> 
-<span class='line'>226</span> </span><span class="COMM">/**
-<span class='line'>227</span>  * Sets the picker for this group
-<span class='line'>228</span>  * @see {vxlActor#setPicker}
-<span class='line'>229</span>  */</span><span class="WHIT">
-<span class='line'>230</span> </span><span class="NAME">vxlActorGroup.prototype.setPicker</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">type</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callback</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>231</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.setPicker</span><span class="PUNC">,</span><span class="PUNC">[</span><span class="NAME">type</span><span class="PUNC">,</span><span class="NAME">callback</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>232</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>233</span> 
-<span class='line'>234</span> </span><span class="COMM">/**
-<span class='line'>235</span>  * Sets the position for this group
-<span class='line'>236</span>  * @see {vxlActor#setPosition}
-<span class='line'>237</span>  */</span><span class="WHIT">
-<span class='line'>238</span> </span><span class="NAME">vxlActorGroup.prototype.setPosition</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">,</span><span class="NAME">z</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>239</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.setPosition</span><span class="PUNC">,</span><span class="PUNC">[</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">,</span><span class="NAME">z</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>240</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>241</span> 
-<span class='line'>242</span> </span><span class="COMM">/**
-<span class='line'>243</span>  * Sets the scale for this group
-<span class='line'>244</span>  * @see {vxlActor#setScale}
-<span class='line'>245</span>  */</span><span class="WHIT">
-<span class='line'>246</span> </span><span class="NAME">vxlActorGroup.prototype.setScale</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">,</span><span class="NAME">z</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>247</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.setScale</span><span class="PUNC">,</span><span class="PUNC">[</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">,</span><span class="NAME">z</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>248</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>249</span> 
-<span class='line'>250</span> </span><span class="COMM">/**
-<span class='line'>251</span>  * Sets the shininess for this group
-<span class='line'>252</span>  * @see {vxlActor#setShininess}
-<span class='line'>253</span>  */</span><span class="WHIT">
-<span class='line'>254</span> </span><span class="NAME">vxlActorGroup.prototype.setShininess</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">shine</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>255</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.setProperty</span><span class="PUNC">(</span><span class="STRN">'shininess'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">shine</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>256</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>257</span> 
-<span class='line'>258</span> </span><span class="COMM">/**
-<span class='line'>259</span>  * Sets the visibility for this group
-<span class='line'>260</span>  * @see {vxlActor#setVisibility}
-<span class='line'>261</span>  */</span><span class="WHIT">
-<span class='line'>262</span> </span><span class="NAME">vxlActorGroup.prototype.setVisible</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">visible</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>263</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.setProperty</span><span class="PUNC">(</span><span class="STRN">'visible'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">visible</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>264</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>265</span> 
+<span class='line'>145</span> </span><span class="NAME">vxlActorGroup.prototype.size</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>146</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.list.length</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>147</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>148</span> 
+<span class='line'>149</span> </span><span class="COMM">/**
+<span class='line'>150</span>  * Set a property for actors in the group. Please notice that by design actor groups only 
+<span class='line'>151</span>  * set actor level properties instead of model level properties.
+<span class='line'>152</span>  * 
+<span class='line'>153</span>  */</span><span class="WHIT">
+<span class='line'>154</span> </span><span class="NAME">vxlActorGroup.prototype.setProperty</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">property</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>155</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">N</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.list.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">N</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">+</span><span class="PUNC">=</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>156</span> </span><span class="WHIT">        </span><span class="NAME">this.list</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">setProperty</span><span class="PUNC">(</span><span class="NAME">property</span><span class="PUNC">,</span><span class="NAME">value</span><span class="PUNC">,</span><span class="NAME">vxl.def.actor</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>157</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>158</span> </span><span class="WHIT">    
+<span class='line'>159</span>     </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>160</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>161</span> 
+<span class='line'>162</span> </span><span class="COMM">/**
+<span class='line'>163</span>  * Invoke an operation on the actors belonging to this group
+<span class='line'>164</span>  * @param {function} operation from vxlActor.prototype
+<span class='line'>165</span>  * @param {list} parameters
+<span class='line'>166</span>  */</span><span class="WHIT">
+<span class='line'>167</span> </span><span class="NAME">vxlActorGroup.prototype._apply</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">operation</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">parameters</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>168</span> </span><span class="WHIT">   </span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">N</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.list.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">N</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">+</span><span class="PUNC">=</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>169</span> </span><span class="WHIT">        </span><span class="NAME">operation.apply</span><span class="PUNC">(</span><span class="NAME">this.list</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">parameters</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>170</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>171</span> </span><span class="WHIT">    
+<span class='line'>172</span>     </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>173</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>174</span> 
+<span class='line'>175</span> </span><span class="COMM">/**
+<span class='line'>176</span>  * Flip normals
+<span class='line'>177</span>  */</span><span class="WHIT">
+<span class='line'>178</span> </span><span class="NAME">vxlActorGroup.prototype.flipNormals</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>179</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.flipNormals</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>180</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>181</span> 
+<span class='line'>182</span> </span><span class="COMM">/**
+<span class='line'>183</span>  * Rotation on the X axis
+<span class='line'>184</span>  * @param {float} angle angle in degrees
+<span class='line'>185</span>  */</span><span class="WHIT">
+<span class='line'>186</span> </span><span class="NAME">vxlActorGroup.prototype.rotateX</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">angle</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>187</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.rotateX</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">angle</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>188</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>189</span> 
+<span class='line'>190</span> </span><span class="COMM">/**
+<span class='line'>191</span>  * Rotation on the Y axis
+<span class='line'>192</span>  * @param {float} angle angle in degrees
+<span class='line'>193</span>  */</span><span class="WHIT">
+<span class='line'>194</span> </span><span class="NAME">vxlActorGroup.prototype.rotateY</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">angle</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>195</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.rotateY</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">angle</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>196</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>197</span> 
+<span class='line'>198</span> </span><span class="COMM">/**
+<span class='line'>199</span>  * Rotation on the Z axis
+<span class='line'>200</span>  * @param {float} angle angle in degrees
+<span class='line'>201</span>  */</span><span class="WHIT">
+<span class='line'>202</span> </span><span class="NAME">vxlActorGroup.prototype.rotateZ</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">angle</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>203</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.rotateZ</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">angle</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>204</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>205</span> 
+<span class='line'>206</span> </span><span class="COMM">/**
+<span class='line'>207</span>  * Translation by a given vector
+<span class='line'>208</span>  */</span><span class="WHIT">
+<span class='line'>209</span> </span><span class="NAME">vxlActorGroup.prototype.translate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">,</span><span class="NAME">z</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>210</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.translate</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">,</span><span class="NAME">z</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>211</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>212</span> 
+<span class='line'>213</span> </span><span class="COMM">/**
+<span class='line'>214</span>  * Sets the material diffuse color of the group
+<span class='line'>215</span>  * @param {list} color in rgb decimal format
+<span class='line'>216</span>  */</span><span class="WHIT">
+<span class='line'>217</span> </span><span class="NAME">vxlActorGroup.prototype.setColor</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">color</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>218</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.setProperty</span><span class="PUNC">(</span><span class="STRN">'color'</span><span class="PUNC">,</span><span class="NAME">color</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>219</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>220</span> 
+<span class='line'>221</span> </span><span class="COMM">/**
+<span class='line'>222</span>  * Sets the lookup table for this group
+<span class='line'>223</span>  */</span><span class="WHIT">
+<span class='line'>224</span> </span><span class="NAME">vxlActorGroup.prototype.setLookupTable</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">lutID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">min</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">max</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>225</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.setLookupTable</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">lutID</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">min</span><span class="PUNC">,</span><span class="NAME">max</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>226</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>227</span> 
+<span class='line'>228</span> </span><span class="COMM">/**
+<span class='line'>229</span>  * Sets the opacity for this group
+<span class='line'>230</span>  */</span><span class="WHIT">
+<span class='line'>231</span> </span><span class="NAME">vxlActorGroup.prototype.setOpacity</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">opacity</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>232</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.setProperty</span><span class="PUNC">(</span><span class="STRN">'opacity'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">opacity</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>233</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>234</span> 
+<span class='line'>235</span> </span><span class="COMM">/**
+<span class='line'>236</span>  * Sets the picker for this group
+<span class='line'>237</span>  * @see {vxlActor#setPicker}
+<span class='line'>238</span>  */</span><span class="WHIT">
+<span class='line'>239</span> </span><span class="NAME">vxlActorGroup.prototype.setPicker</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">type</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">callback</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>240</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.setPicker</span><span class="PUNC">,</span><span class="PUNC">[</span><span class="NAME">type</span><span class="PUNC">,</span><span class="NAME">callback</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>241</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>242</span> 
+<span class='line'>243</span> </span><span class="COMM">/**
+<span class='line'>244</span>  * Sets the position for this group
+<span class='line'>245</span>  * @see {vxlActor#setPosition}
+<span class='line'>246</span>  */</span><span class="WHIT">
+<span class='line'>247</span> </span><span class="NAME">vxlActorGroup.prototype.setPosition</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">,</span><span class="NAME">z</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>248</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.setPosition</span><span class="PUNC">,</span><span class="PUNC">[</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">,</span><span class="NAME">z</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>249</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>250</span> 
+<span class='line'>251</span> </span><span class="COMM">/**
+<span class='line'>252</span>  * Sets the scale for this group
+<span class='line'>253</span>  * @see {vxlActor#setScale}
+<span class='line'>254</span>  */</span><span class="WHIT">
+<span class='line'>255</span> </span><span class="NAME">vxlActorGroup.prototype.setScale</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">,</span><span class="NAME">z</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>256</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.setScale</span><span class="PUNC">,</span><span class="PUNC">[</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">,</span><span class="NAME">z</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>257</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>258</span> 
+<span class='line'>259</span> </span><span class="COMM">/**
+<span class='line'>260</span>  * Sets the shininess for this group
+<span class='line'>261</span>  * @see {vxlActor#setShininess}
+<span class='line'>262</span>  */</span><span class="WHIT">
+<span class='line'>263</span> </span><span class="NAME">vxlActorGroup.prototype.setShininess</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">shine</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>264</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.setProperty</span><span class="PUNC">(</span><span class="STRN">'shininess'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">shine</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>265</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>266</span> 
 <span class='line'>267</span> </span><span class="COMM">/**
-<span class='line'>268</span>  *  Sets the shading for this group
-<span class='line'>269</span>  * @see {vxlActor#setShading}
+<span class='line'>268</span>  * Sets the visibility for this group
+<span class='line'>269</span>  * @see {vxlActor#setVisibility}
 <span class='line'>270</span>  */</span><span class="WHIT">
-<span class='line'>271</span> </span><span class="NAME">vxlActorGroup.prototype.setShading</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">shading</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>272</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.setProperty</span><span class="PUNC">(</span><span class="STRN">'shading'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">shading</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>271</span> </span><span class="NAME">vxlActorGroup.prototype.setVisible</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">visible</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>272</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.setProperty</span><span class="PUNC">(</span><span class="STRN">'visible'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">visible</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>273</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>274</span> 
-<span class='line'>275</span> </span><span class="COMM">/**
-<span class='line'>276</span>  * Sets the visualization mode for this group
-<span class='line'>277</span>  * @see {vxlActor#setVisualizationMode}
-<span class='line'>278</span>  */</span><span class="WHIT">
-<span class='line'>279</span> </span><span class="NAME">vxlActorGroup.prototype.setVisualizationMode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">mode</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>280</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.setVisualizationMode</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">mode</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>281</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>282</span> 
+<span class='line'>275</span> 
+<span class='line'>276</span> </span><span class="COMM">/**
+<span class='line'>277</span>  *  Sets the shading for this group
+<span class='line'>278</span>  * @see {vxlActor#setShading}
+<span class='line'>279</span>  */</span><span class="WHIT">
+<span class='line'>280</span> </span><span class="NAME">vxlActorGroup.prototype.setShading</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">shading</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>281</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.setProperty</span><span class="PUNC">(</span><span class="STRN">'shading'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">shading</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>282</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>283</span> 
-<span class='line'>284</span> 
-<span class='line'>285</span> 
-<span class='line'>286</span> </span><span class="COMM">/**
-<span class='line'>287</span>  * Contains the explanation of why the actor group could not be created
-<span class='line'>288</span>  * @class
-<span class='line'>289</span>  * @author Diego Cantor
-<span class='line'>290</span>  */</span><span class="WHIT">
-<span class='line'>291</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">vxlActorGroupException</span><span class="PUNC">(</span><span class="NAME">messages</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>292</span> </span><span class="WHIT">    </span><span class="NAME">this.messages</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">messages</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>293</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>294</span> </span></pre></body></html>
+<span class='line'>284</span> </span><span class="COMM">/**
+<span class='line'>285</span>  * Sets the visualization mode for this group
+<span class='line'>286</span>  * @see {vxlActor#setVisualizationMode}
+<span class='line'>287</span>  */</span><span class="WHIT">
+<span class='line'>288</span> </span><span class="NAME">vxlActorGroup.prototype.setVisualizationMode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">mode</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>289</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._apply</span><span class="PUNC">(</span><span class="NAME">vxlActor.prototype.setVisualizationMode</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">mode</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>290</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>291</span> 
+<span class='line'>292</span> 
+<span class='line'>293</span> 
+<span class='line'>294</span> 
+<span class='line'>295</span> </span><span class="COMM">/**
+<span class='line'>296</span>  * Contains the explanation of why the actor group could not be created
+<span class='line'>297</span>  * @class
+<span class='line'>298</span>  * @author Diego Cantor
+<span class='line'>299</span>  */</span><span class="WHIT">
+<span class='line'>300</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">vxlActorGroupException</span><span class="PUNC">(</span><span class="NAME">messages</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>301</span> </span><span class="WHIT">    </span><span class="NAME">this.messages</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">messages</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>302</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>303</span> </span></pre></body></html>

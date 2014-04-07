@@ -10,26 +10,22 @@
 
 <script src="lib/jquery.js"     type="text/javascript"></script>
 <script src="lib/jquery-ui.js"  type="text/javascript"> </script>
-<script type='text/javascript'  src='lib/voxelent_v0.90.0.js'> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.1.js'> </script>
 <script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
 
 <title>Voxelent - Demo Brain</title>
 
 <script type='text/javascript' id='code-js'>
 
-
+	var view;
     
 	function runVoxApp(){
 		
-	    vxl.go.notifier.subscribe(vxl.events.MODELS_LOADED, this);
-	    
+	    vxl.go.notifier.subscribe(vxl.events.MODELS_LOADED, afterLoadingModels);
+
 	    vxl.api.loadLUTS('assets/tables');
-	    
-	
-	    vxl.api.setup('view-1');  // as there are no other views, this one becomes vxl.c.view
-	    
+	    view  = vxl.api.setup('view-1');  // as there are no other views, this one becomes vxl.c.view
 	    var gui = new vxlGUI(vxl.c.view); //and can be used here
-	    
 	    
 	    var list = ["part1.json",
 	    			"part2.json",
@@ -38,28 +34,24 @@
 	    			"part5.json",
 	    			"part6.json"];
 	    
-
-	    vxl.api.load(list,'assets/models/brain',vxl.def.model.loadingMode.LATER);
-	    vxl.c.view.start();
+	    vxl.api.load(list,'assets/models/brain/thickness/',vxl.def.model.loadingMode.LATER);
+	    view.start();
 	}
 	
-	function handleEvent(event, src){
-	    if (event == vxl.events.MODELS_LOADED){
-        	vxl.api.setLookupTable('default');
-        	vxl.c.camera.longShot();
-        	//vxl.api.boundingBoxON();
-        	$('#overlay-div').fadeIn(3000);
-        	
-            if (navigator.platform.toUpperCase().indexOf("MAC") == 0){
-            	$("#zoom").html("Command + Click: dollying");
-            	$("#pan").html("Shift + Click: panning");
-            	$("#roll").html("Command + Shift + Click: roll");
-            }
-            
-             setupLUTSelector();    
-        	
-    	}
-	}
+	function afterLoadingModels(event, src){
+
+    	vxl.api.setLookupTable('default');
+    	vxl.c.camera.longShot();
+    	$('#overlay-div').fadeIn(3000);
+    	
+        if (navigator.platform.toUpperCase().indexOf("MAC") == 0){
+        	$("#zoom").html("Command + Click: dollying");
+        	$("#pan").html("Shift + Click: panning");
+        	$("#roll").html("Command + Shift + Click: roll");
+        }
+        
+         setupLUTSelector();    
+	};
 	
 	/**
      * Creates the dropdown selector from which lookup tables can be selected

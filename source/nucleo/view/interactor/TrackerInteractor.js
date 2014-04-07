@@ -211,7 +211,7 @@ vxlTrackerInteractor.prototype.onDrop = function(event){
     var files = event.dataTransfer.files;
     var reader = new vxlVTKReader(this.view.scene);
     if (reader.isSupported()){
-        reader.read(files[0]);
+        reader.readFile(files[0]);
     }
     else {
         throw 'vxlTrackerInteractor.drop: File API is not supported on this browser';

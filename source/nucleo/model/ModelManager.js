@@ -43,10 +43,8 @@ function vxlModelManager(){
  */
 vxlModelManager.prototype.handleEvent = function(event,source){
     var reader = source;
-    var parts = reader.getParts();
-    for (var i = 0; i < parts.length; i+=1){
-        this.add(parts[i],parts[i].name,reader.scene);
-    }
+    var model = reader.getModel();
+    this.add(model, reader.scene);
 };
 
 
@@ -71,7 +69,7 @@ vxlModelManager.prototype.load = function(uri, scene) {
 	    dtype ='text';
 	}
 	else if (extension == 'json'){
-	    dtype = 'json'
+	    dtype = 'json';
 	}
 	else{
 	    alert ('vxlManager.load ERROR: Unknown filetype ['+extension+']');
@@ -90,13 +88,14 @@ vxlModelManager.prototype.load = function(uri, scene) {
     		return function(json, textStatus){
     		    json.uri = filename;
     		    json.path = vxl.util.getPath(uri);
-    			manager.add(json,modelname,scene);
+    		    json.name = modelname;
+    			manager.add(json,scene);
     		};
     		break;
     	case 'vtk':
 		    return function(data){
 		        reader = new vxlVTKReader(scene);
-		        reader.parseText(modelname, data);
+		        reader.readText(modelname, data);
 		    };
 		 }
 	};
@@ -138,36 +137,41 @@ vxlModelManager.prototype.loadList = function(list,scene){
 
 /**
  * 
- * @param {Object} JSON_OBJECT the JSON object that contains the definition of the model
- * @param {String} name name of the model to be created
- * @param {vxlScene} scene the scene to be called back when the model is created
+ * @param {Object} p_object the JSON object that contains the definition of the model or
+ * an instance of vxlModel. The object must have a 'name' property.
+ * @param {vxlScene} p_scene the scene to be called back when the model is created
  */
-vxlModelManager.prototype.add = function(JSON_OBJECT,name,scene){
+vxlModelManager.prototype.add = function(p_object,p_scene){
 	
 	var self = this;
+	var model = undefined;
 	
-	function scheduledAdd(){
+	if (p_object instanceof vxlModel){
+	    model = p_object;
+	}
+	else{
+	    model = new vxlModel(p_object.name, p_object);
+	}
 	
-    	
-    	var model = new vxlModel(name, JSON_OBJECT);
-    	
+	function scheduled_add(){
+		
     	model.loaded = true;
     	self.models.push(model);
     	self.toLoad.splice(name,1); //removes it from the pending list if exists
     	
     	vxl.go.console('ModelManager: model '+model.name+' created.'); 
     	
-    	if (scene != undefined && scene instanceof vxlScene){
+    	if (p_scene != undefined && p_scene instanceof vxlScene){
     		vxl.go.console('ModelManager: notifying the scene...');
-    		if (scene.loadingMode == vxl.def.model.loadingMode.LIVE){
-    			scene.createActor(model);
+    		if (p_scene.loadingMode == vxl.def.model.loadingMode.LIVE){
+    			p_scene.createActor(model);
     		}
-    		else if (scene.loadingMode == vxl.def.model.loadingMode.LATER){
+    		else if (p_scene.loadingMode == vxl.def.model.loadingMode.LATER){
     			if(self.allLoaded()){
-    				scene.createActors(self.models);
+    				p_scene.createActors(self.models);
     			}
     		}
-    		else if (scene.loadingMode == vxl.def.model.loadingMode.DETACHED){
+    		else if (p_scene.loadingMode == vxl.def.model.loadingMode.DETACHED){
     			//do nothing
     		}
     	}
@@ -178,9 +182,9 @@ vxlModelManager.prototype.add = function(JSON_OBJECT,name,scene){
     	else{
     	    vxl.go.notifier.fire(vxl.events.MODEL_NEW, self);
     	}
-	}
+	};
 	
-	setTimeout(function(){scheduledAdd()},0);
+	setTimeout(function(){scheduled_add();},0);
  };
  
 /**

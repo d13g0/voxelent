@@ -9,7 +9,7 @@
 <link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
 <script src="lib/jquery.js"     type="text/javascript"></script>
 <script src="lib/jquery-ui.js"  type="text/javascript"> </script>
-<script type='text/javascript'  src='lib/voxelent_v0.90.0.js'> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.1.js'> </script>
 <script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
 
 
@@ -131,8 +131,8 @@ var vbo, ibo, tbo, texture, plane,  allocated = false;
 
         pm.enableAttribute("aVertexPosition");
         pm.enableAttribute("aVertexTextureCoords");
-        pm.setUniform('uPMatrix',   trx.pMatrix);
-        pm.setUniform('uMVMatrix',	trx.mvMatrix);
+        pm.setUniform('uPMatrix',   trx.projection);
+        pm.setUniform('uMVMatrix',	trx.model_view);
         pm.setUniform("uSampler", 0);
         
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);

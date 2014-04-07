@@ -35,6 +35,7 @@ function vxlFloor(){
 
 /**
  * Creates the grid
+ * @TODO: review impossible combinations
  */
 vxlFloor.prototype.setGrid =function(dimension, spacing){
 

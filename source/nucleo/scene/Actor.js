@@ -56,8 +56,11 @@ function vxlActor(model){
   this._scale 		  = vec3.fromValues(1, 1, 1);
   this._rotation 	  = vec3.fromValues(0, 0, 0);
   this._matrix        = mat4.create();
+  
   this._matrix_world  = mat4.create();
   this._matrix_normal = mat4.create();
+  this._matrix_pmv    = mat4.create();
+  
   this._dirty         = false;
   this._picking       = vxl.def.actor.picking.DISABLED;
   this._pickingCallback = undefined;
@@ -74,27 +77,30 @@ function vxlActor(model){
  
   this.mesh         = undefined;
   
-  this.material     = new vxlMaterial();
+  
   this.renderable   = undefined;
   
   this._bb_disabled = false; //to accelerate animations if we dont care about bb.
-                             //@TODO: find another way to optimize this.
-  
+                             
   if (model){
   	this.model 	    = model;
   	this.name 	    = model.name;
   	this.mode       = model.mode;
   	this._bb        = model.bb.slice(0);
   	this._centre    = vec3.clone(model.centre);
-  	this.material.getFrom(model);
   	
   	if (model.type == vxl.def.model.type.BIG_DATA){
   	    this.renderable = new vxlRenderable(this);
   	}
+  	
+  	var material = new vxlMaterial();
+    this.setMaterial(material.getFrom(model));
   }
   else{
-      this.model = new vxlModel();
+      this.model = undefined;
+      this.material = undefined;
   }
+  
   
   var e = vxl.events;
   vxl.go.notifier.publish(
@@ -114,7 +120,7 @@ function vxlActor(model){
  */
 vxlActor.prototype.setScene = function(scene){
     this.scene = scene;
-}
+};
 
 
 /**
@@ -361,6 +367,19 @@ vxlActor.prototype.getHeight = function(){
 
 
 /**
+ * @param {vxlMaterial} p_material the new material 
+ */
+vxlActor.prototype.setMaterial = function(p_material){
+    
+    this.material = p_material;
+    
+    if (this.material.texture){
+        this._new_texture = true;
+    }
+};
+
+
+/**
 * Sets the actor color. This color can be different from the original model color
 * @param {Number, Array, vec3} r it can be the red component, a 3-dimensional Array or a vec3 (glMatrix)
 * @param {Number} g if r is a number, then this parameter corresponds to the green component
@@ -404,13 +423,20 @@ vxlActor.prototype.setShininess = function(s){
 
 /**
  * Associates a new texture with this actor
- * @param {String} uri the location of the texture to load 
+ * @param {vxlTexture|String} p_texture the texture to load
  */
-vxlActor.prototype.setTexture = function(uri){
-    this.material.texture = new vxlTexture(uri);  
-    this.dirty = true; //reallocation required
+vxlActor.prototype.setTexture = function(p_texture){
+    var instance = undefined;
+    if (typeof(p_texture)=='string'){
+        instance = new vxlTexture(p_texture);
+    }
+    else{
+        instance = p_texture;
+    }
+    this.material.texture = instance;  
+    this._new_texture = true; 
     return this;  
-}
+};
 
 /**
  * If the property exists, then it updates it
@@ -695,21 +721,11 @@ vxlActor.prototype.getPickingType = function(){
     return this._picking;  
 };
 
-/**
- * 
- */
-vxlActor.prototype.getRenderableModel = function(){
-    if (this.mesh && this.mesh.model){
-        return this.mesh.model;
-    }
-    else if (this.model.type == vxl.def.model.type.BIG_DATA){
-        return this.model;
-    }
-    else return undefined;
-    
-};
+;
 
 /**
+ * Used by vxlMesh to update the renderable object after the mesh has changed
+ * 
  * @param {String} task type of update
  */
 vxlActor.prototype.updateRenderable = function(task){

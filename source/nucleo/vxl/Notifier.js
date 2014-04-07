@@ -49,9 +49,9 @@ vxlNotifier.prototype.publish = function(list,sender){
 		}
 	}
 	else {
-		throw 'vxlNotifier.sends: this method receives a string or a list of strings'
+		throw 'vxlNotifier.sends: this method receives a string or a list of strings';
 	}
-}
+};
 
 
 /**
@@ -120,15 +120,21 @@ vxlNotifier.prototype.fire = function(event, src){
         if (idx == -1){
         	throw 'The source '+src+' is not registered to trigger the event '+event+'. Did you use vxlNotifier.publish?';
         }
+    	
     	vxl.go.console('vxlNotifier: firing ' +event);
     	
     	var targets = self.targetList[event];
     	
     	for (var index=0;index<targets.length;index++){
-             targets[index].handleEvent(event,src);
+    	    if (typeof(targets[index]) =='object'){
+                targets[index].handleEvent(event,src);
+            }
+            else if (typeof(targets[index] == 'function')){
+                targets[index](event,src);
+            }
         }
 	}
-	setTimeout(function(){processEvent()},0)
+	setTimeout(function(){processEvent();},0);
 };
 
 

@@ -37,7 +37,7 @@
 			<!-- begin publish.classesIndex -->
 			<div align="center"><h2><a href="../index.html">Class List</a></h2></div>
 <hr />
-<h3>Current Version:  0.90.0</h3>
+<h3>Current Version:  0.90.1</h3>
 <p>Download it <a href='http://voxelent.com/downloads/'>here</a></p>
 <ul class="classList">
 	
@@ -214,6 +214,28 @@
 								
 								
 								
+								<b><a href="../symbols/vxlProgramManager.html#clearCache">clearCache</a></b>
+								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
 								<b><a href="../symbols/vxlProgramManager.html#disableAttribute">disableAttribute</a></b>
 								(name)
 								</div>
@@ -324,6 +346,28 @@
 								
 								
 								
+								<b><a href="../symbols/vxlProgramManager.html#releaseProgram">releaseProgram</a></b>
+								()
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
 								<b><a href="../symbols/vxlProgramManager.html#setAttributePointer">setAttributePointer</a></b>
 								(name, numElements, type, norm, stride, offset)
 								</div>
@@ -348,6 +392,28 @@
 								
 								<b><a href="../symbols/vxlProgramManager.html#setDefault">setDefault</a></b>
 								(programID, uniformName, value)
+								</div>
+							</td>
+							
+						</tr>
+					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlProgramManager.html#setProgram">setProgram</a></b>
+								(p_program, p_force_it)
 								</div>
 							</td>
 							
@@ -397,6 +463,28 @@
 							
 						</tr>
 					
+						<tr>
+							<td class="attributes">
+							    <div class="fixedFont">&nbsp;
+							</div></td>
+							
+							<td class="returns">
+							
+							      <span>void</span>   
+							    
+							</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								
+								
+								
+								<b><a href="../symbols/vxlProgramManager.html#useProgram">useProgram</a></b>
+								(ID)
+								</div>
+							</td>
+							
+						</tr>
+					
 					</tbody>
 				</table>
 				
@@ -420,7 +508,7 @@
 				</div>
 
 				<div class="description">
-					<p>Presents a simple interface to communicate with a ESSL (GLSL) programThis class is responsible for creating, compiling and linking any ESSL program.It also has methods to query and set uniforms and attributes belonging to the programthat is being currently executed in the GPU</P><p>a vxlProgramManager maintains a database of the programs that have been linked to the GPU. This way, program switching is easier as it is not necessary to go through the compilation and linking process every timeThe program manager is available through the <code>pm</code> attribute  of vxlEngine</p>
+					<p>Presents a simple interface to communicate with a ESSL (GLSL) programThis class is responsible for creating, compiling and linking any ESSL program.It also has methods to query and set uniforms and attributes belonging to the programthat is being currently executed in the GPU</P><p>a vxlProgramManager maintains a database of the programs that have been linked to the GPU. This way, program switching is easier as it is not necessary to go through the compilation and linking process every time<p>The program manager simplifies working with ESSL programs. It providesget/set operations for attributes and uniforms and handles internally the location variablesof these elements which are required to operate with them in the GPU. In other wordsit hides gl.getAttribLocation and gl.getUniformLocation calls.</p><p>The program manager catches uniforms and only updates the GPU if needed.  </p><p>The program manager is available through the <code>pm</code> attribute  of vxlEngine</p>
 					
 				</div>
 
@@ -465,6 +553,37 @@
 				<h2>
 					Method Detail
 				</h2>
+				
+				<div class='methodDetail'>
+					<a name="clearCache"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>clearCache</b>()
+					</div>
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+				</div>	
 				
 				<div class='methodDetail'>
 					<a name="disableAttribute"> </a>
@@ -702,6 +821,37 @@
 				</div>	
 				
 				<div class='methodDetail'>
+					<a name="releaseProgram"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>releaseProgram</b>()
+					</div>
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+
+					
+
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
 					<a name="setAttributePointer"> </a>
 					<div class="title">
 					<div class="fixedFont">
@@ -882,6 +1032,66 @@
 				</div>	
 				
 				<div class='methodDetail'>
+					<a name="setProgram"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>setProgram</b>(p_program, p_force_it)
+					</div>
+					</div>
+					<div class="description">
+						Tries to add a new program definition to this renderer
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{<a href="../symbols/vxlProgram.html">vxlProgram</a>}</span> 
+								</td>
+								<td>
+									<code>p_program</code>
+								</td>	
+								<td><p>an instance of a vxlProgram object or one of its descendants
+								
+								</p>
+								</td>
+							</tr>	
+							
+							<tr><td>
+									
+								</td>
+								<td>
+									<code>p_force_it</code>
+								</td>	
+								<td><p>
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+				</div>	
+				
+				<div class='methodDetail'>
 					<a name="setUniform"> </a>
 					<div class="title">
 					<div class="fixedFont">
@@ -896,7 +1106,7 @@
 					</div>
 					</div>
 					<div class="description">
-						Sets a uniform.Uses polymorphism to make the programmers life happier
+						Sets a uniform. Caches the uniform location.Uses polymorphism to make the programmers life happier
 						
 						
 					</div>
@@ -1001,6 +1211,59 @@
 						
 				</div>	
 				
+				<div class='methodDetail'>
+					<a name="useProgram"> </a>
+					<div class="title">
+					<div class="fixedFont">
+
+					
+					
+					 	<span>void</span> 
+					
+					
+					
+					  <b>useProgram</b>(ID)
+					</div>
+					</div>
+					<div class="description">
+						Uses a program from the database.If you are not sure if the program you want to use is in the database then call vxlRenderer.setProgram instead
+						
+						
+					</div>
+
+					
+
+						
+							<p class="heading">Parameters:</p>
+							<table class="paramTable">
+							
+							<tr><td>
+									<span class="light fixedFont">{String}</span> 
+								</td>
+								<td>
+									<code>ID</code>
+								</td>	
+								<td><p>the program id
+								
+								</p>
+								</td>
+							</tr>	
+							
+							</table>
+						
+						
+						
+						
+						
+						
+						
+							<p class="heading">See:</p>
+							
+								<span><a href="../symbols/vxlRenderer.html#setProgram">vxlRenderer#setProgram</a></span>
+							
+						
+				</div>	
+				
 			
 
 <!-- ============================== event details ========================= -->
@@ -1013,7 +1276,7 @@
 <!-- ============================== footer ================================= -->
 		<div style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Mar 30 2014 03:31:57 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Apr 07 2014 17:40:50 GMT-0400 (EDT)
 		</div>
         </div>
         </div>

@@ -297,7 +297,9 @@ vxlView.prototype.setClearDepth = function(d){
  * @see vxlRenderer#render
  */
 vxlView.prototype.refresh = function(){
-    this.renderer.render();
+    if (this.renderer.mode != vxl.def.renderer.mode.ANIMFRAME){
+        this.renderer.render();
+    }
 };
 
 /**

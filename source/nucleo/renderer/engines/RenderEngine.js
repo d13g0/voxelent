@@ -159,7 +159,7 @@ vxlRenderEngine.prototype._reallocateActor = function(actor){
     //-----------------------------------------------------------------------
     // Buffers to draw parts.
     //-----------------------------------------------------------------------
-    if (actor.mode == am.FLAT){
+    if (actor.mode == am.FLAT || actor.model.type == vxl.def.model.type.BIG_DATA){
         if (buffers.vertex_parts == undefined) { buffers.vertex_parts   = gl.createBuffer(); }
         if (buffers.normal_parts == undefined) { buffers.normal_parts   = gl.createBuffer(); }
         if (buffers.color_parts  == undefined) { buffers.color_parts    = gl.createBuffer(); }
@@ -219,7 +219,7 @@ vxlRenderEngine.prototype._reallocateActor = function(actor){
     //-----------------------------------------------------------------------
     //When the texture loads, make sure we call actor._reallocate
     //-----------------------------------------------------------------------
-    if (model.texcoords && actor.material.texture && actor.material.texture.loaded){
+    if (model.texcoords && actor.material.texture){
         buffers.texcoords = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texcoords);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.texcoords), gl.STATIC_DRAW);
@@ -312,7 +312,7 @@ vxlRenderEngine.prototype._setRenderableNormals = function(actor,part){
     
   var gl = this.gl;
   var pm = this.pm;
-  var buffers = this._gl_buffers[model.UID];
+  var buffers = this._gl_buffers[actor.model.UID];
   var essl    = vxl.def.essl; 
   
   if (part.normals != undefined && part.normals.length>0){
@@ -332,7 +332,7 @@ vxlRenderEngine.prototype._setRenderableColors = function(actor,part){
     
   var gl = this.gl;
   var pm = this.pm;
-  var buffers = this._gl_buffers[model.UID];
+  var buffers = this._gl_buffers[actor.model.UID];
   var essl    = vxl.def.essl; 
   
   if (part.colors != undefined && part.colors.length>0){
@@ -363,8 +363,8 @@ vxlRenderEngine.prototype._updateActorTransforms = function(scene){
      
      for (var i=0;i<N;i+=1){
          actor = elements[i];
-         if (!actor.visible) continue;
-         actor._matrix_world  = mat4.multiply(actor._matrix_world, trx.mvMatrix, actor._matrix);
+         if (actor.visible == false && scene.frameAnimation == undefined) continue;
+         actor._matrix_world  = mat4.multiply(actor._matrix_world, trx.model_view, actor._matrix);
          actor._matrix_normal = mat4.copy(actor._matrix_normal, actor._matrix_world);
          actor._matrix_normal = mat4.invert(mat4.create(), actor._matrix_normal);
          actor._matrix_normal = mat4.transpose(actor._matrix_normal, actor._matrix_normal);
@@ -380,9 +380,10 @@ vxlRenderEngine.prototype.render = function(scene){
     var trx     = this._transforms,
     pm          = this.pm,
     gl          = this.gl,
-    glsl        = vxl.def.essl;
+    essl        = vxl.def.essl;
     
     this._updateActorTransforms(scene);
+    pm.setUniform(essl.PERSPECTIVE_MATRIX,  trx.projection);
  
     //@TODO: CHECK is this supposed to be here? >>//
     if (scene.frameAnimation != undefined){  scene.frameAnimation.update(); }
@@ -487,7 +488,7 @@ vxlRenderEngine.prototype._renderActor = function(actor){
     pm.setUniform("uMaterialDiffuse",       diffuse);
     pm.setUniform(essl.MODEL_VIEW_MATRIX,   actor._matrix_world);
     pm.setUniform(essl.NORMAL_MATRIX,       actor._matrix_normal);
-    pm.setUniform(essl.PERSPECTIVE_MATRIX,  trx.pMatrix);
+    
     
     this._handleCulling(actor);
     
@@ -497,10 +498,10 @@ vxlRenderEngine.prototype._renderActor = function(actor){
     }
     
     // SETTING UP THE VERTEX ATTRIBUTE    
-    if (actor.mode != vxl.def.actor.mode.FLAT && actor.model.type != vxl.def.model.type.BIG_DATA){
+   //if (actor.mode != vxl.def.actor.mode.FLAT && actor.model.type != vxl.def.model.type.BIG_DATA){
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
         pm.setAttributePointer(essl.VERTEX_ATTRIBUTE, 3, gl.FLOAT, false, 0, 0);
-    }
+   // }
     
     var am = vxl.def.actor.mode;
     
@@ -550,7 +551,7 @@ vxlRenderEngine.prototype._renderSolid = function(actor){
             this._setRenderableNormals(actor,part);
             this._setRenderableColors(actor,part);
             
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index_part);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index_parts);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(part.indices), gl.STATIC_DRAW);
             gl.drawElements(gl.TRIANGLES, part.indices.length, gl.UNSIGNED_SHORT,0);
         }
@@ -612,9 +613,32 @@ vxlRenderEngine.prototype._renderLines = function(actor){
     var essl    = vxl.def.essl;
     
     pm.setUniform("uUseShading", false);
-    this._setColors(actor);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
-    gl.drawElements(gl.LINES, actor.model.indices.length, gl.UNSIGNED_SHORT,0); 
+    
+    if (actor.model.type == vxl.def.model.type.BIG_DATA){
+        
+        if (actor.renderable  == undefined){
+            alert('the actor does not have a renderable object');
+            throw 'the actor does not have a renderable object';
+        }
+        
+        parts = actor.renderable.parts;
+        var i = parts.length;
+        
+        for(var j=0; j<i;j++){
+            var part = parts[j];
+            this._setRenderableVertices(actor,part); //same vertex buffer for all parts?
+            this._setRenderableColors(actor,part);
+            
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index_parts);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(part.indices), gl.STATIC_DRAW);
+            gl.drawElements(gl.LINES, part.indices.length, gl.UNSIGNED_SHORT,0);
+        }
+    }
+    else{
+        this._setColors(actor);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+        gl.drawElements(gl.LINES, actor.model.indices.length, gl.UNSIGNED_SHORT,0); 
+    }
 };
 
 /**
@@ -651,8 +675,8 @@ vxlRenderEngine.prototype._renderBoundingBoxAndSolid = function(actor){    var m
     //bounding box, don't move the bb as it has been updated with the actor transform already ;-)
     trx.calculateModelView();
     trx.calculateNormal(); 
-    pm.setUniform(essl.MODEL_VIEW_MATRIX,  trx.mvMatrix);
-    pm.setUniform(essl.NORMAL_MATRIX, trx.nMatrix);
+    pm.setUniform(essl.MODEL_VIEW_MATRIX,  trx.model_view);
+    pm.setUniform(essl.NORMAL_MATRIX, trx.normal);
     pm.disableAttribute(essl.NORMAL_ATTRIBUTE);
     pm.setUniform("uUseShading", false);
     
@@ -863,11 +887,17 @@ vxlRenderEngine.prototype._renderTextured = function(actor){
         return;
     }
     
+    if (actor._new_texture){
+        actor.reallocate();
+        actor._new_texture = false;
+        return;
+    }
+    
+    
     if (model.texcoords){
         
         pm.setUniform("uUseTextures", true);
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texcoords);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.texcoords), gl.STATIC_DRAW);
         pm.setAttributePointer(essl.TEXCOORD_ATTRIBUTE, 2, gl.FLOAT,false, 0,0);
         pm.enableAttribute(essl.TEXCOORD_ATTRIBUTE);
         

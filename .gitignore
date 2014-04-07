@@ -31,6 +31,8 @@ c4n3l4/
 beginners-guide*/
 beginners_guide*/
 sandbox/
+demos/assets/models/brain/dti/*.json
+demos/assets/models/brain/dti/*.vtk
 # --------------------------------------------
 # Other files
 # --------------------------------------------

@@ -118,7 +118,7 @@ vxlEngine.prototype.clear = function(){
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.viewport(0, 0, width, height); //@TODO: Think about dividing view ports for multi-view apps - March 19/2012
     
-    this._transforms.calculatePerspective();
+    this._transforms.calculateProjection();
 };
 
 /**

@@ -1,4 +1,89 @@
 -------------------------------------------------------------------------------------------
+VERSION 0.90.1 
+-------------------------------------------------------------------------------------------
+
+Functionality
+--------------
+* vxlActorGroup:
+
+	new api method:
+	
+		vxl.api.getAllActors() : returns an actor group (vxlActorGroup) with all the actors in the scene.
+		                         the group is updated over subsequent calls to getAllActors().
+		                         
+    new method:
+        vxlActorGroup.reset(list):  resets the list to the list given by default. If the list is empty or
+        undefined, it empties the actor group.
+        
+        
+* vxlVTKReader and vtk2json.py:
+    
+    Improved support for VTK ASCII files
+
+* vxlCamera:
+
+    Three new methods:
+	vxlCamera.setPerspective(near,far,angle,aspect)
+	vxlCamera.updatePerspective(aspect)
+	vxlCamera.setAspectRatio(ratio)
+
+    vxlCamera.gotoLandmark now uses cosine interpolation for the animation (smoother)
+
+* vxlRenderer:
+
+	vxlRenderer now supports a new render mode: vxl.def.renderer.mode.ON_DEMAND
+	this mode waits until the render() method is called through camera.refresh() or view.refresh()
+	or when the user interacts with the window. 
+
+    vxlRenderer now has two callbacks to include code in the rendering cycle:
+
+    vxlRenderer.doBeforeRendering and vxlRenderer.doAfterRendering
+
+	both methods receive a function reference that is invoked before or after the rendering respectively.
+	Check the demo-lookup-table.html and test-5000-monkeys.html to see it in action.
+
+* vxlRenderEngine:
+
+	Now we can render BIG DATA of type LINES. Check the new test-big-data-lines.html
+
+* vxlNotifier:
+
+	Now you can use functions to receive notifications from voxelent events (vxlNotifier).
+	Before this version, it was necessary to have a function called handleEvent(event,source) in
+	the current object (usually Window).
+
+	The code was updated in vxlNotifier.prototype.fire to dispatch events to functions in
+	addition to objects.
+
+	Check demo-brain.html for an example.
+
+Performance
+--------------
+vxlProgramManager is caching the ESSL uniforms. If they do not change between rendering
+calls then the GPU is not updated.
+
+pack_nucleo.py : the script that generates the one file download (voxelent_x.js) and its minimized version now runs
+                 a lot faster!
+                 
+
+Refactoring
+--------------
+
+The vxl.go.renderman is gone. It was a hack that allowed using window.requestAnimFrame. 
+The proper implementation of this is now contained in vxlRenderer.start using
+Function.prototype.bind as described in https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
+
+ 
+Fixed Bugs:
+
+Support for JQuery was downgraded to 1.110 and JQuery UI to 1.10.4. The sliders in the demo pages seem to work
+correctly with these versions.
+
+
+Asynchronous texture loading is working thanks to updates in the code of vxlRenderEngine, vxlActor and vxlMaterial
+
+
+-------------------------------------------------------------------------------------------
 VERSION 0.90.0 - 
 -------------------------------------------------------------------------------------------
 

@@ -417,10 +417,29 @@ wireframeON :  function(){
   * @param {String} name name of the actor group
   * @param {List} list list of actors to add to the actor group
   * @returns {vxlActorGroup} the actor group
-  * @see {vxlScene#createActorGroup} 
+  * @see vxlScene#createActorGroup 
   */
  createActorGroup: function(name, list){
      return vxl.c.scene.createActorGroup(name, list);
+ },
+ 
+ /**
+  *Returns a new actor group (vxlActorGroup) with all the actors in the current scene
+  * @see vxlActorGroup
+  */
+ getAllActors: function(){
+     var scene = vxl.c.scene;
+     
+     var group = scene.getActorGroup('all');
+     
+     if (group == undefined){
+        group = scene.createActorGroup('all', vxl.c.scene._actors);
+     }
+     else{
+         group.reset(vxl.c.scene._actors);
+     }
+     
+     return group;
  },
  
  /**

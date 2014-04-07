@@ -9,7 +9,7 @@
 <link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
 <script src="lib/jquery.js"     type="text/javascript"></script>
 <script src="lib/jquery-ui.js"  type="text/javascript"> </script>
-<script type='text/javascript'  src='lib/voxelent_v0.90.0.js'> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.1.js'> </script>
 <script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
 
 <title>Voxelent - Heart Demo</title>
@@ -21,7 +21,7 @@
 
 		var e = vxl.events;
 		var ntf = vxl.go.notifier;
-		ntf.subscribe([e.MODELS_LOADED, e.SCENE_UPDATED], this);
+		ntf.subscribe([e.MODELS_LOADED, e.SCENE_UPDATED], doAfterLoadingAll);
 
 		//1. Setup the view
 		view = vxl.api.setup('view-1');
@@ -89,7 +89,7 @@
 		
 	};
 
-	function handleEvent(event, src) {
+	function doAfterLoadingAll(event, src) {
 		
 		
 		if (event == vxl.events.SCENE_UPDATED) {

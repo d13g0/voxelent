@@ -24,7 +24,16 @@
  * This way, program switching is easier as it is not necessary to go through the 
  * compilation and linking process every time
  * 
- * The program manager is available through the <code>pm</code> attribute  of vxlEngine
+ * <p>
+ * The program manager simplifies working with ESSL programs. It provides
+ * get/set operations for attributes and uniforms and handles internally the location variables
+ * of these elements which are required to operate with them in the GPU. In other words
+ * it hides gl.getAttribLocation and gl.getUniformLocation calls.
+ * </p>
+ * <p>
+ * The program manager catches uniforms and only updates the GPU if needed.  
+ * </p>
+ * <p>The program manager is available through the <code>pm</code> attribute  of vxlEngine
  * </p>
  * @class
  * @constructor
@@ -49,7 +58,8 @@ function vxlProgramManager (gl) {
     this._defaults                 = [];
  
     this._one_time_warning         = false;
-    this._program_enforced         = false; 
+    this._program_enforced         = false;
+    
 };
 
 /**
@@ -96,9 +106,9 @@ vxlProgramManager.prototype._createProgramObject = function(ID){
     var code = this._registered_programs[ID];
     
     if (code == undefined){
-        var message = 'vxlProgramManager.loadProgram WARN: '/
-        ' The program '+ID+' must be registered first!'
-        console.warn(message);
+        var message = 'vxlProgramManager.loadProgram ERROR: '+
+        ' The program '+ID+' must be registered first!';
+        console.error(message);
         return;
     }
     
@@ -296,28 +306,84 @@ vxlProgramManager.prototype.setUniform = function(p_uniform_id, p_value, hint){
     var uniform_list  		= this._uniform_map[this._current_program_ID];
     var uniform_loc_map	    = this._curr_uniform_loc_map;
     var uniform_cache 		= this._curr_uniform_cache;
+    var uniform_types       = this._uniform_types[this._current_program_ID];
     var loc                 = undefined;
+    var reset               = false;
     
-    if (uniform_list.indexOf(p_uniform_id) >=0){
-        loc = uniform_loc_map[p_uniform_id];
-        if (loc == undefined){
-            loc = gl.getUniformLocation(prg,p_uniform_id);  
-            uniform_loc_map[p_uniform_id] = loc;     
+    if (uniform_list.indexOf(p_uniform_id) == -1){
+        console.warn('vxlProgramManager.setUniform: the uniform '+p_uniform_id+' is not defined for the program '+this._current_program_ID);
+        return;
+    }
+    
+    loc = uniform_loc_map[p_uniform_id];
+    
+    if (loc == undefined){  
+        loc = gl.getUniformLocation(prg,p_uniform_id);  
+        uniform_loc_map[p_uniform_id] = loc;     
+    }
+    
+    var cached_value = uniform_cache[p_uniform_id];
+    var type = uniform_types[p_uniform_id];
+    
+    if (cached_value == undefined){
+        reset = true;
+    }
+    else{ 
+       switch(type){ 
+            case 'sampler2D':
+            case 'float':
+            case 'int':
+            case 'bool': reset = (cached_value !== p_value); break;
+            case 'mat4':
+                    reset  = (
+                        (p_value[0] !== cached_value[0]) ||
+                        (p_value[1] !== cached_value[1]) ||
+                        (p_value[2] !== cached_value[2]) ||
+                        (p_value[3] !== cached_value[3]) ||
+                        (p_value[4] !== cached_value[4]) ||
+                        (p_value[5] !== cached_value[5]) ||
+                        (p_value[6] !== cached_value[6]) ||
+                        (p_value[7] !== cached_value[7]) ||
+                        (p_value[8] !== cached_value[8]) ||
+                        (p_value[9] !== cached_value[9]) ||
+                        (p_value[10] !== cached_value[10]) ||
+                        (p_value[11] !== cached_value[11]) ||
+                        (p_value[12] !== cached_value[12]) ||
+                        (p_value[13] !== cached_value[13]) ||
+                        (p_value[14] !== cached_value[14]) ||
+                        (p_value[15] !== cached_value[15])); break;
+            case 'vec3':
+                    reset = (
+                        (p_value[0] !== cached_value[0]) ||
+                        (p_value[1] !== cached_value[1]) ||
+                        (p_value[2] !== cached_value[2])); break;
+            case 'vec4':
+                    reset = (
+                        (p_value[0] !== cached_value[0]) ||
+                    (p_value[1] !== cached_value[1]) ||
+                    (p_value[2] !== cached_value[2]) ||
+                    (p_value[3] !== cached_value[3])); break;
+            default:
+                reset = true;
         }
-        
-        cached_value = uniform_cache[p_uniform_id];
-        
-        //if (cached_value == p_value ) return; //@TODO: this does not catch all cases (i.e. mat4, vec3)
-        
-        uniform_cache[p_uniform_id] = p_value;
+    }
+   
+    if (reset){
+        switch(type){ 
+            case 'float':
+            case 'int':
+            case 'bool': uniform_cache[p_uniform_id] = p_value; break;
+            case 'mat4': uniform_cache[p_uniform_id] = mat4.clone(p_value); break;
+            case 'mat3': uniform_cache[p_uniform_id] = mat3.clone(p_value); break;
+            case 'vec4': uniform_cache[p_uniform_id] = vec4.clone(p_value); break;
+            case 'vec3': uniform_cache[p_uniform_id] = vec3.clone(p_value); break;
+            case 'vec2': uniform_cache[p_uniform_id] = vec2.clone(p_value); break;
+            case 'sampler2D': uniform_cache[p_uniform_id] = p_value; break;
+            default: alert('error: type unknown cannot update uniform cache');
+        }
         this._setPolymorphicUniform(p_uniform_id, loc, p_value, hint);
     }
-    else{
-    	console.warn('vxlProgramManager.setUniform: the uniform '+p_uniform_id+' is not defined for the program '+this._current_program_ID);
-        
-    }
-    
-    
+
 };
 
 /**
@@ -507,12 +573,11 @@ vxlProgramManager.prototype._setPolymorphicUniform = function(uniformID, locatio
     }
     
     
-    else if (value instanceof Array){
+    else if (value instanceof Array || value instanceof Float32Array){ //vec2, vec3, vec4
         
         /*If we receive a uniform of length 3 but the type is length 4
          * complete with 1.0
-         * This will happen for blender scenes where the material colors are 
-         * of length 3 (no alpha)
+         *  This is a hack that needs to be revisited....
          * 
          */ 
          

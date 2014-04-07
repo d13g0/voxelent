@@ -62,11 +62,11 @@ function vxlTexture(uri){
     this.image = new Image();
     this.image.onload = function(){
         self._onLoad();
-    }
+    };
     
     this.image.onError = function(){
         self._onError();
-    }
+    };
     
     this.uri = uri;
     if (this.uri != undefined){

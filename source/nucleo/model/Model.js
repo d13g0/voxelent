@@ -37,7 +37,7 @@ function vxlModel(name, JSON_OBJECT){
 	this.wireframe 	= undefined;
 	this.bb         = [0,0,0,0,0,0];
     this.centre     = [0,0,0,0,0,0];
-	this.mode       = vxl.def.actor.mode.SOLID
+	this.mode       = vxl.def.actor.mode.SOLID;
 	this.image      = undefined;
 	this.uri        = undefined;
 	this.colors     = undefined;
@@ -81,7 +81,10 @@ vxlModel.BB_INDICES = [0,1,1,2,2,3,3,0,0,4,4,5,5,6,6,7,7,4,1,5,2,6,3,7];
  * @param {Object} JSON_OBJECT the JSON object that describes the model
  */
 vxlModel.prototype.load = function(nm,JSON_OBJECT){
-	this.name		= nm.replace(/\.[^/.]+$/, "")
+    if (nm == undefined){
+        throw 'vxlModel.load ERROR: the object must have a name';
+    }
+	this.name		= nm.replace(/\.[^/.]+$/, "");
 	if (JSON_OBJECT.name != null){ //if the name is defined in the JSON object, then use it
 		this.name = JSON_OBJECT.name;
 	}
@@ -105,10 +108,9 @@ vxlModel.prototype.update = function(){
     }
     
 
-    if(
-        (this.normals == undefined || 
-            (this.normals != undefined && this.normals.length == 0))
-        && this.indices != undefined)
+    if(this.normals == undefined
+        && this.indices != undefined
+        && this.mode != vxl.def.actor.mode.LINES) //@TODO: explain that mode is representation mode. (change name?)
     {
         this.computeNormals();
     }
@@ -131,6 +133,7 @@ vxlModel.prototype.update = function(){
     
     if (this.type == vxl.def.model.type.SIMPLE && this.indices.max() > vxl.def.model.MAX_NUM_INDICES){
         this.setType(vxl.def.model.type.BIG_DATA);
+        console.info('the model '+this.name+' type is BIG_DATA');
     }
     
 };

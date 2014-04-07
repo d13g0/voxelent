@@ -128,6 +128,15 @@ vxlActorGroup.prototype.remove = function(actor){
     }
 };
 
+/**
+ * Resets the contents of this actor group
+ */
+vxlActorGroup.prototype.reset = function(list){
+   this.list = [];
+   if (list != undefined && list instanceof Array){
+       this.addList(list);
+   }  
+};
 
 /**
  * Returns the size of the actor group

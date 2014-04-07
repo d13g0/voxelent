@@ -35,10 +35,6 @@ function vxlLandmark(name, camera) {
 	
 	var c = camera;
     
-    this._fov             = c._fov;
-    this.Z_NEAR           = c.Z_NEAR;    
-    this.Z_FAR            = c.Z_FAR;
-    
     this._matrix          = mat4.clone(c._matrix);
     this._right           = vec3.clone(c._right);
     this._up              = vec3.clone(c._up);
@@ -66,9 +62,7 @@ vxlLandmark.prototype.retrieve = function(camera) {
     
 	var c = camera;
 	
-	c._fov             = this._fov;
-    c.Z_NEAR           = this.Z_NEAR;    
-    c.Z_FAR            = this.Z_FAR;
+
     
     c._matrix          = mat4.copy(c._matrix,this._matrix);
     c._right           = vec3.copy(c._right,this._right);
