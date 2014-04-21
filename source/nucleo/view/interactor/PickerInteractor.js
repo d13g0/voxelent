@@ -14,42 +14,111 @@
     along with Nucleo.  If not, see <http://www.gnu.org/licenses/>.
 ---------------------------------------------------------------------------*/  
 
-vxlPickerInteractor.prototype = new vxlViewInteractor();
+vxlPickerInteractor.prototype = new vxlTrackerInteractor();
 vxlPickerInteractor.prototype.constructor = vxlPickerInteractor;
 /**
  * @class 
- * Interactor that implements a picking mechanism. Implemented in 0.89.1
+ * Interactor that implements a picking mechanism. 
  * @constructor   
+ * 
  * @param {Object} view the view this interactor will observe
  * @param {Object} camera the camera this interactor will master
+ * 
  * @author Diego Cantor
+ * 
+ * @since 0.89.1  initial release
+ * @version 0.90.2 picking lists
  */
 function vxlPickerInteractor(){
-	vxlViewInteractor.call(this);
-	this._drag = false;
+	vxlTrackerInteractor.call(this);
 	this.timerID = -1;
 	this.list = [];
 	this.rate = 50;
-
+	
+	this._actors = [];
+	this._picking_list = [];
+	this._picking_mode = false;
+	
+	this._cellpicking = false;
+	
 };
 
+
+vxlPickerInteractor.prototype.setCellPicking = function(flag){
+    this._cellpicking = flag;
+};
 
 vxlPickerInteractor.prototype.getType = function(){
     return "vxlPickerInteractor";
 };
 
-vxlPickerInteractor.prototype.get2DCoords = function(ev){
+vxlPickerInteractor.prototype._getCoords = function(ev){
     var x, y, top = 0, left = 0, obj = this.view.canvas;
     var rect = obj.getBoundingClientRect();
-     
-    // return relative mouse position
     x = ev.clientX - rect.left;
     y = vxl.c.view.canvas.height - (ev.clientY - rect.top); 
-                                       //this variable contains the height of the canvas and it updates dynamically
-                                       //as we resize the browser window.
-    //console.info('x='+x+', y='+y);
     return [x,y];
+};
+
+vxlPickerInteractor.prototype._getActorAt = function(x,y){
     
+    var actor, results, color;
+    
+    var scene = this.view.scene;
+    
+    color  = this.view.renderer.readOffscreenPixel(x, y);
+    if (color[0] == 0 && color[1] == 0 && color[2] == 0 && color[3] ==0){
+        return null;
+    }
+    
+    results = vxl.go.picker.query(color);
+    if (results == null) return null;
+    
+    actor  = scene.getActorByCellUID(results.uid);
+    if (actor == null) { 
+        actor = scene.getActorByUID(results.uid);
+    }
+    if (actor != null && actor.isPickable()){
+        return actor;
+    }
+    return null;
+};
+
+/**
+ * Reacts to the onmouse event on the canvas 
+ * @param {Object} ev mouse event
+ */
+vxlPickerInteractor.prototype.onMouseDown = function(ev){ 
+    
+    vxlTrackerInteractor.prototype.onMouseDown.call(this, ev);
+    ev.preventDefault();
+    this.view.canvas.style.cursor = 'crosshair';
+    
+    
+    coords = this._getCoords(ev);
+    
+    
+    var actor = this._getActorAt(coords[0], coords[1]);
+    if (actor == null){
+        this._endPicking();
+        return;
+    }
+    
+    var idx = this._picking_list.indexOf(actor.UID);
+    if ( idx == -1){
+        if (actor._pick_callback != undefined){
+            actor._pick_callback(actor, actor.UID);
+        }
+        this._picking_list.push(actor.UID);
+        this._actors.push(actor);
+    }
+    else{
+        this._picking_list.splice(idx,1);
+        this._actors.splice(idx,1);
+        if (actor._unpick_callback){
+            actor._unpick_callback(actor, actor.UID);
+        }
+    }
 };
 
 
@@ -58,29 +127,12 @@ vxlPickerInteractor.prototype.get2DCoords = function(ev){
  * @param {Object} ev
  */
 vxlPickerInteractor.prototype.onMouseUp   = function(ev){
-    this._drag = false;
-    if (this.timerID != -1){
-        clearInterval(this.timerID);
+    vxlTrackerInteractor.prototype.onMouseUp.call(this, ev);
+    
+    if (!ev.shiftKey){
+        this.view.canvas.style.cursor = 'default';
+        this._endPicking();
     }
-    
-    
-};
-
-/**
- * Reacts to the onmouse event on the canvas 
- * @param {Object} ev mouse event
- */
-vxlPickerInteractor.prototype.onMouseDown = function(ev){ 
-    ev.preventDefault();
-    this.view.canvas.style.cursor = 'crosshair'
-    this.list.push(this.get2DCoords(ev));
-    this._doWork();   
-    this._drag = true;
-    
-    if (this.timerID != -1){
-        clearInterval(this.timerID);
-    }
-    this.timerID = setInterval((function(self) {return function() {self._doWork();}})(this),this.rate); 
 };
 
 /**
@@ -89,44 +141,24 @@ vxlPickerInteractor.prototype.onMouseDown = function(ev){
  */
 vxlPickerInteractor.prototype.onMouseMove = function(ev){ 
     ev.preventDefault();
-    if (this._drag){
-        this.list.push(this.get2DCoords(ev));
+    vxlTrackerInteractor.prototype.onMouseMove.call(this, ev);
+};
+
+
+vxlPickerInteractor.prototype.setCallback = function(callback){
+    this.callback = callback; 
+};
+
+vxlPickerInteractor.prototype._endPicking = function(){
+    if (this.callback){
+        this.callback(this._actors);
     }
+    var i = this._actors.length;
+    while (i--){
+        if (this._actors[i]._unpick_callback){
+            this._actors[i]._unpick_callback(this._actors[i], this._actors[i].UID);
+        }
+    }
+    this._actors = [];
+    this._picking_list = [];
 };
-
-vxlPickerInteractor.prototype._doWork = function(){
-  var i        = this.list.length;
-  var renderer = this.view.renderer;
-  var scene    = this.view.scene;  
-  while(i--){
-        var coords = this.list.pop();
-        var color  = renderer.readOffscreenPixel(coords[0], coords[1]);
-
-        if (color[0] == 0 && color[1] == 0 && color[2] == 0 && color[3] ==0){
-            continue;
-        }
-        
-        var results = vxl.go.picker.query(color);
-        
-        if (results == null) continue;
-        
-        var actor  = scene.getActorByCellUID(results.uid);
-        
-        if (actor == null) { //try object UID
-            actor = scene.getActorByUID(results.uid);
-        }
-        
-        if (actor != null && actor.isPickable() && actor._pickingCallback != undefined){
-            actor._pickingCallback(actor, results.uid);
-        }
-  }
-};
-
-
-vxlPickerInteractor.prototype.onKeyDown       = function(ev){};
-vxlPickerInteractor.prototype.onKeyUp         = function(ev){};
-vxlPickerInteractor.prototype.onDragOver      = function(ev){ };
-vxlPickerInteractor.prototype.onDragLeave     = function(ev){};
-vxlPickerInteractor.prototype.onDrop          = function(ev){};
-vxlViewInteractor.prototype.onDoubleClick     = function(ev){};
-

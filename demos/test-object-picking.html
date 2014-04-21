@@ -9,13 +9,13 @@
 <link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
 <script src="lib/jquery.js"     type="text/javascript"></script>
 <script src="lib/jquery-ui.js"  type="text/javascript"> </script>
-<script type='text/javascript'  src='lib/voxelent_v0.90.1.js'> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.2.js'> </script>
 
 <title>Voxelent - Object Picking Test</title>
 
 <script type='text/javascript'>
 
-var view, actor, mesh , pickerInteractor, currentInteractor;
+var view, cone, cylinder, sphere , pickerInteractor;
 
 
 function runVoxApp(){
@@ -23,10 +23,12 @@ function runVoxApp(){
     view = vxl.api.setup('view-1');
     var list = ['cone.json','cylinder.json','sphere.json'];
     vxl.api.load(list,'assets/models/geometry');
+    view.renderer.setMode(vxl.def.renderer.mode.ANIMFRAME);
     view.start();
-    view.renderer.enableOffscreen();
+    
     pickerInteractor = new vxlPickerInteractor();
-    defaultInteractor = view.interactor;
+    pickerInteractor.setCallback(processHits);
+    view.setInteractor(pickerInteractor);
 };
 
 function handleEvent(event){
@@ -39,20 +41,20 @@ function handleEvent(event){
     var color = [0.7, 0.7, 0.7];
     cone.setPosition(7,2,5);  
     cone.rotateZ(45);
-    cone.setPicker(vxl.def.actor.picking.OBJECT,pickingCallback);
+    cone.setPicking(vxl.def.actor.picking.OBJECT,pick,unpick);
     coneColor = cone.material.diffuse;
     cone.setColor(color);
 
     cylinder.setPosition(-10,2,5);
     cylinder.setColor(0.7,0,0.1);
     cylinder.rotateZ(-30);
-    cylinder.setPicker(vxl.def.actor.picking.OBJECT,pickingCallback);
+    cylinder.setPicking(vxl.def.actor.picking.OBJECT,pick,unpick);
     cylinderColor = cylinder.material.diffuse;
     cylinder.setColor(color);
 
     sphere.setPosition(0,2,-5);
     sphere.setColor(0,0.9,0.2);
-    sphere.setPicker(vxl.def.actor.picking.OBJECT,pickingCallback);
+    sphere.setPicking(vxl.def.actor.picking.OBJECT,pick,unpick);
     sphereColor = sphere.material.diffuse;
     sphere.setColor(color);
     
@@ -69,33 +71,32 @@ function handleEvent(event){
 };
 
 
-function pickingCallback(actor, uid){
+function pick(actor, uid){
     switch(actor.UID){
-        case cylinder.UID: actor.setColor(cylinderColor); break
+        case cylinder.UID: actor.setColor(cylinderColor); break;
         case sphere.UID: actor.setColor(sphereColor); break;
         case cone.UID: actor.setColor(coneColor); break;
     }
-    console.info("The actor "+actor.name+" was selected");
+};
+
+function unpick(actor,uid){
+	actor.setColor(0.7,0.7,0.7);
+}
+
+function processHits(list){
+	var i = list.length;
+	while(i--){
+		console.info(list[i].name);
+	}
 };
 
 document.onkeypress = function(e){
     e = e || window.event;
     var charCode = (typeof e.which == "number") ? e.which : e.keyCode;
     
-    if (charCode == 112 || charCode  == 80) {
-        if ( view.interactor.UID == pickerInteractor.UID){
-            view.setInteractor(defaultInteractor);
-            console.info('default interactor active');
-        }
-        else{
-            view.setInteractor(pickerInteractor);
-            console.info('picker interactor active');
-        }    
-    }
-    
     if (charCode == 98){
 	    	vxl.c.view.renderer.engine._debug_picking_flag = !vxl.c.view.renderer.engine._debug_picking_flag;
-	    }
+	}
 };
 
 
@@ -112,43 +113,18 @@ document.onkeypress = function(e){
      position: relative;
 }
 
-.overlay {
-    background: rgba(100,100,100,0.5);
-    padding: 10px;
-    width: 200px;
-    height: 25%;
-    position: absolute;
-    top: 5px;
-    right: 15px;
-    font-size:12px;
-    font-family: Arial,Helvetica;
-    color: white;
-    display: none;
-}
 
-.overlay p {
-    padding-left:10px;
-    padding-right:10px;
-}
 
 </style>
 
 </head>
 <body onload='runVoxApp()'>
-	<div><img src="css/img/voxelent.png" /></div>
-	<div>
+	<div class='show'>
 	<canvas id = 'view-1' width='1200' height='600'>
 		<p>
 			Your browser does not support WebGL :-(
 		</p>
 	</canvas>
-	<div id='overlay-div' class='overlay'>
-	  <p>Goal:</p>
-	  <p> 
-	      Switch to picking and select the objects on the scene.</p>
-	  <p> Make sure you check the console for messages</p>
-      <p>Use <b>p</b> to switch between tracking and picking interactors</p>
-    </div>  
     </div>
 </body>			
 </html>

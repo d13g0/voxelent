@@ -51,7 +51,7 @@ function vxlView(canvasID, scene, handleLayout){
 	this.backgroundColor = vxl.def.view.background.slice(0);
 	
 	//Drag and drop
-	this.dragndrop = false;
+	this._dragndrop = false;
 
 	//Create Renderer
 	this.renderer = new vxlRenderer(this);
@@ -219,13 +219,28 @@ vxlView.prototype._runPrefixMethod = function(obj,method){
 vxlView.prototype.fullscreen = function(flag){
     if (!this._fullscreenFlag) return; //ignore request if fullscreen is not active
     if (flag == true){
+        var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+        if (is_chrome){
+        this._runPrefixMethod(this.canvas, "RequestFullscreen");
+        }
+        else{
         this._runPrefixMethod(this.canvas, "RequestFullScreen");
+        }
     }
     else{
-        if (this._runPrefixMethod(document,"FullScreen") || 
+        
+        if (document.cancelFullScreen) {
+        document.cancelFullScreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitCancelFullScreen) {
+            document.webkitCancelFullScreen();
+        }
+        
+     /*   if (this._runPrefixMethod(document,"FullScreen") || 
             this._runPrefixMethod(document,"isFullScreen")){
             this._runPrefixMethod(document,"CancelFullScreen");
-        }    
+        }*/    
     }
 
 };
@@ -317,7 +332,7 @@ vxlView.prototype.refresh = function(){
  * @param {Boolean} flag
  */
 vxlView.prototype.setDragAndDrop = function(flag){
-    this.dragndrop = flag;
+    this._dragndrop = flag;
 };
 
 /**

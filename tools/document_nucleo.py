@@ -20,7 +20,7 @@ def document(VOX_VERSION_NUMBER):
     else:
         SEP = '\\'
         
-    subprocess.call(['java','-jar','jsdoc-toolkit'+SEP+'jsrun.jar', 'jsdoc-toolkit'+SEP+'app'+SEP+'run.js', '-D=\"version:'+VERSION_TAG+'\"', '-t=jsdoc-toolkit'+SEP+'templates'+SEP+'jsdoc', '-a','-E=gl-matrix.js' ,'-d=..'+SEP+'docs', '-r=10', '..'+SEP+'source'+SEP+'nucleo'])
+    subprocess.call(['java','-jar','jsdoc-toolkit'+SEP+'jsrun.jar', 'jsdoc-toolkit'+SEP+'app'+SEP+'run.js', '-D=\"version:'+VERSION_TAG+'\"', '-t=jsdoc-toolkit'+SEP+'templates'+SEP+'vox_template', '-a','-E=gl-matrix.js' ,'-d=..'+SEP+'docs', '-s','-r=10', '..'+SEP+'source'+SEP+'nucleo'])
     print ' -- END DOCUMENTER --'
     
 if __name__ == '__main__':

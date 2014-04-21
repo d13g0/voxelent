@@ -53,6 +53,7 @@ vxlLookupTableManager.prototype.load = function(name){
         url         : nocacheuri,
         type        :"GET",
         dataType    : "json",
+        mimeType    : "text/plain",
         success     : successHandler(manager,name),
         error       : errorHandler(uri)
     }); 

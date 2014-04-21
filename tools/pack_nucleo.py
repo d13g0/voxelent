@@ -117,6 +117,7 @@ def pack(VOX_VERSION_NUMBER):
              'ViewInteractor', 
              'TrackerInteractor', 
              'PickerInteractor',
+             'CellPickerInteractor',
              'Transforms',
              'Program',
              'LambertProgram',

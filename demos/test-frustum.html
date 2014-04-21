@@ -9,7 +9,7 @@
 <link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
 <script src="lib/jquery.js"     type="text/javascript"></script>
 <script src="lib/jquery-ui.js"  type="text/javascript"> </script>
-<script type='text/javascript'  src='lib/voxelent_v0.90.1.js'> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.2.js'> </script>
 <script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
 
 <title>Voxelent - Test Frustum</title>
@@ -22,7 +22,7 @@
 	    view = vxl.api.setup('view-1');
 	    vxl.api.load('assets/models/simple/triangle.json');
 	    view.start();
-	   
+	    view.renderer.setMode(vxl.def.renderer.mode.ANIMFRAME);
 	    cam = vxl.c.camera;
 	}
 	
@@ -46,7 +46,8 @@
 		var near = cam.Z_NEAR;
 		var far = cam.Z_FAR;
 		var angle = cam._fov * Math.PI / 180;
-		var pmatrix = vxl.c.view.renderer.engine._transforms.pMatrix;
+		vxl.c.view.renderer.engine._transforms.calculateProjection();
+		var pmatrix = vxl.c.view.renderer.engine._transforms.projection;
 		var mvmatrix = mat4.multiply(mat4.create(), mat4.invert(mat4.create(), vxl.c.camera._matrix), actor._matrix);
 		
 		var vc = vec3.transformMat4(vec3.create(), vertex, mvmatrix);

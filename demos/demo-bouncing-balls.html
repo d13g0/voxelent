@@ -9,7 +9,7 @@
 <link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
 <script src="lib/jquery.js"     type="text/javascript"></script>
 <script src="lib/jquery-ui.js"  type="text/javascript"> </script>
-<script type='text/javascript'  src='lib/voxelent_v0.90.1.js'> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.2.js'> </script>
 <script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
 
 <title>Voxelent - Demo Boucing Balls</title>
@@ -374,13 +374,20 @@ void main(void)
         </td>
         <td align='center'>
         <button id='btnReset'>Reset</button>
+        <button id='btnFullScreen'>Full Screen</btn>
       
         </td>
     </tr>
 </table>
 </div>
 <script> 
-
+$('#btnFullScreen').button().click(
+	function(){
+		var view = vxl.c.view;
+		view.enableFullScreen();
+		view.fullscreen(true);	
+	}
+);
 $('#chkUpdateLight').button();
 $('#opt-type').buttonset();
 $('#btnGoHome').button();

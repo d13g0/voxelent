@@ -169,7 +169,7 @@ vxlScene.prototype.createActor = function(model){
 
 /**
  * Creates multiples actors at once
- * @param models a list of models to create actors from
+ * @param {[ vxlModel ]} models a list of models to create actors from
  */
 vxlScene.prototype.createActors = function(models){
     var i = models.length;
@@ -230,7 +230,8 @@ vxlScene.prototype.updateActor = function(actor){
  */
 vxlScene.prototype.removeActor = function(actor){
 	var idx = this._actors.indexOf(actor);
-	this._actors.splice(idx,1);
+	var actor = this._actors.splice(idx,1);
+	actor = null;
     this.computeBoundingBox();
 };
 

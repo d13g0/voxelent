@@ -9,7 +9,7 @@
 <link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
 <script src="lib/jquery.js"     type="text/javascript"></script>
 <script src="lib/jquery-ui.js"  type="text/javascript"> </script>
-<script type='text/javascript'  src='lib/voxelent_v0.90.1.js'> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.2.js'> </script>
 <script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
 
 <title>Voxelent - Demo Brain</title>
@@ -39,11 +39,12 @@
 	    			"part6.json"];
 	    
 
-	    vxl.api.load(list,'assets/models/brain',vxl.def.model.loadingMode.LATER);
+	    vxl.api.load(list,'assets/models/brain/thickness/',vxl.def.model.loadingMode.LATER);
 	    view.start();
 	    vxl.api.setProgram(view, vxl.go.essl.lambert);
-    	pickerInteractor = new vxlPickerInteractor();
+    	pickerInteractor = new vxlCellPickerInteractor();
     	defaultInteractor = view.interactor;
+    	view.renderer.setMode(vxl.def.renderer.mode.ANIMFRAME);
 	}
 	
 	function handleEvent(event, src){
@@ -61,7 +62,7 @@
         	
         	function setPicker(){
         		if (index < actors.length){
-        			actors[index].setPicker(vxl.def.actor.picking.CELL, pickingCallback);
+        			actors[index].setPicking(vxl.def.actor.picking.CELL, pick);
         		}
         		else{
         			return;
@@ -75,7 +76,7 @@
     	}
 	}
 	
-	function pickingCallback(actor, uid){
+	function pick(actor, uid){
     
     
 	    var cell = actor.mesh.getCell(uid);

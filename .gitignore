@@ -33,6 +33,10 @@ beginners_guide*/
 sandbox/
 demos/assets/models/brain/dti/*.json
 demos/assets/models/brain/dti/*.vtk
+demos/assets/models/brain/fibres/*.json
+demos/assets/models/brain/fibres/*.vtk
+docs/
+tools/jsdoc-toolkit/
 # --------------------------------------------
 # Other files
 # --------------------------------------------

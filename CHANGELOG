@@ -1,4 +1,32 @@
 -------------------------------------------------------------------------------------------
+VERSION 0.90.2 
+-------------------------------------------------------------------------------------------
+
+Bug Fixes:
+-----------
+keybindings F: fullscreen and X: exit fullscreen are working with latest API updates
+
+Loading models do not show the not-well formed warning in Firefox anymore. The classes
+that load JSON dynamically set now the mime type on the request.
+
+
+Features:
+----------
+working on improving the picking mechanism, check:
+test-object-picking and test-cell-picking
+
+vxlCamera.stopLandmarkAnimation: for long running animations there is this option to stop them.
+
+Docs:
+----------
+Working on improving the documentation:
+
+A jquery based search capability was added to the
+API docs.
+
+A new template was added too.
+
+-------------------------------------------------------------------------------------------
 VERSION 0.90.1 
 -------------------------------------------------------------------------------------------
 

@@ -9,7 +9,7 @@
 <link rel='stylesheet'          type='text/css' href='css/jquery-ui-bs/theme.css'/>
 <script src="lib/jquery.js"     type="text/javascript"></script>
 <script src="lib/jquery-ui.js"  type="text/javascript"> </script>
-<script type='text/javascript'  src='lib/voxelent_v0.90.1.js'> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.2.js'> </script>
 <script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
 
 <title>Voxelent - Cell Picking Test</title>
@@ -24,7 +24,8 @@ function runVoxApp(){
     view = vxl.api.setup('view-1');
     vxl.api.load('sphere.json','assets/models/geometry');
     view.start();
-    pickerInteractor = new vxlPickerInteractor();
+    view.renderer.setMode(vxl.def.renderer.mode.ANIMFRAME);
+    pickerInteractor = new vxlCellPickerInteractor();
     defaultInteractor = view.interactor;
 };
 
@@ -33,7 +34,7 @@ function doAfterLoaded(event,src){
     actor = vxl.api.getActor('sphere');
     actor.setColor(0.7,0.7,0.7);
     actor.setPosition(0,0,-10);
-    actor.setPicker(vxl.def.actor.picking.CELL, pickingCallback);
+    actor.setPicking(vxl.def.actor.picking.CELL, pick);
     
     var cam = vxl.c.camera;
     cam.setType(vxl.def.camera.type.ORBITING);
@@ -44,16 +45,14 @@ function doAfterLoaded(event,src){
 };
 
 
-function pickingCallback(actor, uid){
-    
-    
+function pick(actor, uid){
     var cell = actor.mesh.getCell(uid);
     
     var angle = Math.acos(vec3.dot(cell.normal, vxl.c.camera._forward)) * vxl.def.rad2deg;
     
     if (angle <=90){
         cell.setColor(0.2,0.5,0.0);
-	    vxl.c.camera.refresh();
+//	    vxl.c.camera.refresh();
     }
 };
 

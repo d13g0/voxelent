@@ -61,12 +61,14 @@ vxlModelManager.prototype.load = function(uri, scene) {
     var extension = filename.split('.')[1];
 	
 	var dtype = 'json';
+	var mime = 'application/json';
 	
 	if (manager.isModelLoaded(modelname)) return;
 	
 	
 	if (extension == 'vtk'){
 	    dtype ='text';
+	    mime = 'text/plain';
 	}
 	else if (extension == 'json'){
 	    dtype = 'json';
@@ -117,6 +119,7 @@ vxlModelManager.prototype.load = function(uri, scene) {
 		url			: nocacheuri,
 		type		:"GET",
 		dataType	: dtype,
+		mimeType    : mime,
 		success 	: successHandler(manager,modelname,scene),
 		error		: errorHandler(uri)
 	});    

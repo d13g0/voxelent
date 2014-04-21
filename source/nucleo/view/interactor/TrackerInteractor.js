@@ -27,19 +27,20 @@ function vxlTrackerInteractor(){
     vxlViewInteractor.call(this);    
 	this.MOTION_FACTOR = 10.0;
 	this.task = vxl.def.interactor.task.NONE;
-	this.x = 0;
-	this.y = 0;
-	this.lastX = 0;
-	this.lastY = 0;
-	this.lastClickedX = 0;
-	this.lastClickedY = 0;
-	this.ctrlPressed = false;
-	this.altPressed = false;
-	this.keyPressed = 0;
-	this.button = -1;
-	this.dragging = false;
-	this.dragndrop = false;
-	this.isMac = vxl.util.isMac();
+	this._x            = 0;
+	this._y            = 0;
+	this._lastX        = 0;
+	this._lastY        = 0;
+	this._lastClickedX = 0;
+	this._lastClickedY = 0;
+	this._ctrl_key     = false;
+	this._alt_key      = false;
+	this._shift_key    = false;
+	this._key          = 0;
+	this._button       = -1;
+	this._dragging     = false;
+	this._dragndrop    = false;
+	this._is_mac       = vxl.util.isMac();
 	
 	this.addKeyAction('F', function(view,cam){view.fullscreen(true);});
 	this.addKeyAction('X', function(view,cam){view.fullscreen(false);});
@@ -54,36 +55,36 @@ vxlTrackerInteractor.prototype.getType = function(){
 };
 
 /**
- * Reacts to the window onKeyDown event 
+ * Invoked when the user presses a key
  */
 vxlTrackerInteractor.prototype.onKeyDown = function(ev){
 
-    this.keyPressed = ev.keyCode;
-    this.altPressed = ev.altKey;
-    this.shiftPressed = ev.shiftKey;
+    this._key             = ev.keyCode;
+    this._alt_key         = ev.altKey;
+    this._shift_key       = ev.shiftKey;
     
     var camera = this.camera;
     
     
-    if (!this.altPressed && !this.shiftPressed){
-        switch(this.keyPressed){
+    if (!this._alt_key && !this._shift_key){
+        switch(this._key){
               case 38:camera.changeElevation(10);  break;
               case 40:camera.changeElevation(-10); break;
               case 37:camera.changeAzimuth(-10);   break;
               case 39:camera.changeAzimuth(10);    break;
-              default: this.fireKeyAction(this.keyPressed);
+              default: this.fireKeyAction(this._key);
         }
     }
     //PANNING
-    else if(this.shiftPressed && this.keyPressed !=17) {
+    else if(this._shift_key && this._key!=17) {
         var px = 0;
         var py = 0;
-        switch(this.keyPressed){
+        switch(this._key){
             case 38:py = 10; break;
             case 40:py = -10;break;
             case 37:px = -10;break;
             case 39:px = 10; break;
-            default: this.fireKeyAction(this.keyPressed);
+            default: this.fireKeyAction(this._key);
         }
         if(px != 0 || py !=0){
             this.pan(px,py);
@@ -93,66 +94,66 @@ vxlTrackerInteractor.prototype.onKeyDown = function(ev){
 };
 
 /**
- * Reacts to the canvas onkeyup event 
+ * Invoked when the user releases a key
  */
 vxlTrackerInteractor.prototype.onKeyUp = function(ev){
     if (ev.keyCode == 17){
-        this.ctrlPressed = false;
+        this._ctrl_key = false;
     }
 };
 
 /**
- *Reacts to the canvas onmouseup event 
+ * Invoked when the user releases the mouse
  */
 vxlTrackerInteractor.prototype.onMouseUp = function(ev){
 	task = vxl.def.interactor.task.NONE;
-	this.dragging = false;
+	this._dragging = false;
 };
 
 /**
- *Reacts to the canvas onmousedown event 
+ * Invoked when the user presses a mouse button
  */
 vxlTrackerInteractor.prototype.onMouseDown = function(ev){
-	this.x             = ev.clientX;
-	this.y             = ev.clientY;
-	this.lastClikedX   = this.x;
-	this.lastClickedY  = this.y;
-	this.button        = ev.button;
-	this.dragging      = true;
+	this._x             = ev.clientX;
+	this._y             = ev.clientY;
+	this._lastClickedX  = this._x;
+	this._lastClickedY  = this._y;
+	this._button        = ev.button;
+	this._dragging      = true;
 };
 
 /**
- *Reacts to the canvas onmousemove event 
+ * Invoked when the user moves the mouse
  */
 vxlTrackerInteractor.prototype.onMouseMove = function(ev){
 
-	this.lastX         = this.x;
-	this.lastY         = this.y;
-	this.x             = ev.clientX;
-    this.y             = ev.clientY;
+	this._lastX         = this._x;
+	this._lastY         = this._y;
+	this._x             = ev.clientX;
+    this._y             = ev.clientY;
 
-	if (!this.dragging) return;
-    if (this.button !=0) return;  
+	if (!this._dragging) return;
+    if (this._button !=0) return;  
 	
-	this.ctrlPressed 	= ev.ctrlKey;
+	this._ctrl_key 	= ev.ctrlKey;
 	
-	if (this.isMac && ev.metaKey){
-	    this.ctrlPressed = true;
+	if (this._is_mac && ev.metaKey){
+	    this._ctrl_key = true;
 	}
 	
-	this.altPressed 	= ev.altKey;
-	this.shiftPressed 	= ev.shiftKey;
+	this._alt_key       = ev.altKey;
+	this._shift_key 	= ev.shiftKey;
 	
-	var rx = this.x - this.lastX;
-	var ry = this.y - this.lastY;
+	var rx = this._x - this._lastX;
+	var ry = this._y - this._lastY;
 		 
-    if (this.ctrlPressed && !this.shiftPressed){ 
+    if (this._ctrl_key && !this._shift_key){ 
 		this.dolly(ry);
 	}
-	else if (this.shiftPressed && !this.ctrlPressed){
+	else if (this._shift_key && !this._ctrl_key){
 		this.pan(rx,ry);
 	}
-	else if (this.ctrlPressed && this.shiftPressed){
+	else if (this._ctrl_key && this._shift_key){
 	    this.roll(ry);
 	}
 	else {
@@ -165,47 +166,48 @@ vxlTrackerInteractor.prototype.onMouseMove = function(ev){
 
 
 /**
- *  Implements the behaviour of the tracker on the ondragover mouse event
+ *  Invoked when the user drags a file over the view
  */
 vxlTrackerInteractor.prototype.onDragOver = function(event){
     event.stopPropagation();
     event.preventDefault();
     
         
-    if (this.view.dragndrop){
-        if (!this.dragndrop){
+    if (this.view._dragndrop){
+        if (!this._dragndrop){
             this.bgcolor = this.view.backgroundColor.slice(0);
-            this.dragndrop = true;
+            this._dragndrop = true;
         }
         event.dataTransfer.dropEffect = 'copy';
-        this.view.setBackgroundColor(0,0.514,0.678);
+        this.view.setBackgroundColor(0,0.514,0.678); //vox color
     }
 };
 
 /**
- * Implements the behaviour of the tracker on the ondragleave mouse event 
+ * Invoked when the user drags away from the view
  */
 vxlTrackerInteractor.prototype.onDragLeave = function(event){
     event.stopPropagation();
     event.preventDefault();
 
-    if (this.view.dragndrop){
+    if (this.view._dragndrop){
         event.dataTransfer.dropEffect = 'copy';
         this.view.setBackgroundColor(this.bgcolor);
-        this.dragndrop = false;
+        this._dragndrop = false;
     }
     
 };
 
 /**
- * Implements the behaviour of the tracker on the ondrop mouse event
+ * Processes the file that has been droped on the view
+ * 
  * @TODO: this method only works for VTK ascii files. Review other formats 
  */
 vxlTrackerInteractor.prototype.onDrop = function(event){
     event.stopPropagation();
     event.preventDefault();
-    if (!this.view.dragndrop) return; //the view is configured to not accept dnd
-    this.dragndrop = false;
+    if (!this.view._dragndrop) return; //the view is configured to not accept dnd
+    this._dragndrop = false;
     this.view.setBackgroundColor(this.bgcolor);
     
     var files = event.dataTransfer.files;
@@ -219,7 +221,8 @@ vxlTrackerInteractor.prototype.onDrop = function(event){
 };
 
 /**
- * Calls the current camera longShot method 
+ * By default, this method invokes a long shot operation on the current 
+ * camera to visualize all the objects in the scene
  * @param {Object} event
  */
 vxlTrackerInteractor.prototype.onDoubleClick = function(event){
@@ -256,7 +259,7 @@ vxlTrackerInteractor.prototype.roll = function(value){
 
 
 
-/**    this.dragndrop = false;
+/**    this._dragndrop = false;
  * Internal method used by this tracker to rotate the camera.
  * @param {Number} dx the rotation on the X axis (elevation)
  * @param {Number} dy the rotation on the Y axis (azimuth)
@@ -294,7 +297,7 @@ vxlTrackerInteractor.prototype.pan = function(dx,dy){
 	
 	var camera = this.camera;
 	var canvas = camera.view.canvas;
-	var scene = camera.view.scene;    this.dragndrop = false;
+	var scene = camera.view.scene;    this._dragndrop = false;
 	var dimMax = Math.max(canvas.width, canvas.height);
 	var deltaX = 1 / dimMax;
 	var deltaY = 1 / dimMax;

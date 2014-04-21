@@ -10,7 +10,7 @@
 
 <script src="lib/jquery.js"     type="text/javascript"></script>
 <script src="lib/jquery-ui.js"  type="text/javascript"> </script>
-<script type='text/javascript'  src='lib/voxelent_v0.90.1.js'> </script>
+<script type='text/javascript'  src='lib/voxelent_v0.90.2.js'> </script>
 <script type='text/javascript'  src='lib/vox-gui_v0.1.js'> </script>
 
 <title>Voxelent - Demo Brain</title>
@@ -158,14 +158,14 @@ $('#toggleMesh').button().click(
 function changeOpacity(){
     var v = $('#op-slider-id').slider('value');
     
-    var gl = vxl.c.view.renderer.gl;
+    var gl = vxl.c.view.renderer.engine.gl;
     
     if (v < 1){
         //gl.disable(gl.DEPTH_TEST);
         gl.enable(gl.BLEND);
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);
-        vxl.api.setUniformDefault('lambert','uLightDiffuse',[0.5,0.5,0.5,1.0]);
+        vxl.api.setUniformDefault('lambert','uLightDiffuse',[0.5,0.5,0.5,0.5]);
     }
     else{
         //gl.enable(gl.DEPTH_TEST);

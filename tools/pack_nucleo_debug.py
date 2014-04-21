@@ -33,6 +33,7 @@ def debug():
              'ViewInteractor', 
              'TrackerInteractor', 
              'PickerInteractor',
+             'CellPickerInteractor',
              'Transforms',
              'Program',
              'LambertProgram',

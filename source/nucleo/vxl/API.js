@@ -17,7 +17,7 @@
  * @namespace Application Programing Interface namespace.
  *  
  * Using vxl.api in your programs you will be able to access many of the features offered by 
- * Voxelent's Nucleo library.
+ * Voxelent's Nucleo library.  
  * 
  * By design, type checking is enforced throughout the functions provided by the public API. 
  * The goal is to help novice programmers that will use the API more often than advanced programmers.

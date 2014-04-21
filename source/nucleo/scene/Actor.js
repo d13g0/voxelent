@@ -44,8 +44,9 @@
  * var actor = vxl.c.scene.getActorByName('example');
  * actor.setProperty('color',[1.0,0.0,0.0])
  * </pre>
- * @class Actors represent models (assets) in a Scene
  * @constructor
+ * @class Actors represent models (assets) in a Scene
+ * 
  */
 function vxlActor(model){
   
@@ -62,9 +63,13 @@ function vxlActor(model){
   this._matrix_pmv    = mat4.create();
   
   this._dirty         = false;
-  this._picking       = vxl.def.actor.picking.DISABLED;
-  this._pickingCallback = undefined;
-  this._pickingColor    = undefined; //used when the picking is vxl.def.actor.picking.OBJECT
+  
+  this._picking              = vxl.def.actor.picking.DISABLED;
+  this._pickCallback         = undefined;
+  this._unpickCallback       = undefined;
+  this._pickingColor         = undefined; //used when the picking is vxl.def.actor.picking.OBJECT
+  
+  
   this._trackingCameras = [];
   
   this.UID = vxl.util.generateUID();
@@ -658,16 +663,18 @@ vxlActor.prototype.clone = function(){
 /**
  * 
  * @param {String} type one of the possible values for vxl.def.actor.picking
- * @param {Object} callback a function that is invoked when a picking event occurs. This parameter is 
+ * @param {Function} pick a function that is invoked when a picking event occurs. This parameter is 
  * required if the type (first argument) is different from vxl.def.actor.picking.DISABLED 
  * the callback receives an actor object to operate over it.
+ * @param {Function} unpick a function that is invoked when an unpicking event occurs.
  */
-vxlActor.prototype.setPicker = function(type, callback){
+vxlActor.prototype.setPicking = function(type, pick, unpick){
     this._picking = type;
     
     switch(type){
         case vxl.def.actor.picking.DISABLED: 
-            this._pickingCallback = undefined;
+            this._pick_callback = undefined;
+            this._unpick_callback = undefined;
             this.mesh = undefined;
             this.renderable = undefined;
             this.setVisualizationMode(vxl.def.actor.mode.SOLID); 
@@ -682,16 +689,20 @@ vxlActor.prototype.setPicker = function(type, callback){
                 this.setVisualizationMode(vxl.def.actor.mode.FLAT);           
             };
             
-            this._pickingCallback = callback;
-             
+            this._pick_callback = pick;
+            this._unpick_callback = unpick;
             break;
+  
         case vxl.def.actor.picking.OBJECT:
+  
             this._pickingColor = vxl.go.picker.getColorFor(this);
-            this._pickingCallback = callback;
+            this._pick_callback = pick;
+            this._unpick_callback = unpick;
             break;
     }
     
     if (this._picking  != vxl.def.actor.picking.DISABLED){
+        
         var i = this.scene.views.length;
         while(i--){
             //@TODO: do we want this for all the views?
